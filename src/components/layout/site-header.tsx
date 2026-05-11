@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/auth";
 
 const nav = [
-  { href: "/descobrir/sao-paulo", label: "Descobrir" },
+  { href: "/descobrir/sao-paulo-sp", label: "Descobrir" },
   { href: "/cidades", label: "Cidades" },
-  { href: "/descobrir/sao-paulo?verified=1", label: "Verificadas" },
+  { href: "/descobrir/sao-paulo-sp?verified=1", label: "Verificadas" },
   { href: "/novidades", label: "Novidades" },
 ];
 
@@ -14,7 +15,8 @@ type SiteHeaderProps = {
   activeHref?: string;
 };
 
-export function SiteHeader({ variant = "marketing", activeHref }: SiteHeaderProps) {
+export async function SiteHeader({ variant = "marketing", activeHref }: SiteHeaderProps) {
+  const session = await auth();
   return (
     <header
       className={cn(
@@ -50,15 +52,31 @@ export function SiteHeader({ variant = "marketing", activeHref }: SiteHeaderProp
           >
             <Search className="h-5 w-5" strokeWidth={1.5} />
           </button>
-          <Link href="/entrar" className="hidden text-sm font-medium text-foreground sm:inline">
-            Entrar
-          </Link>
-          <Link
-            href="/planos"
-            className="rounded-none bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white sm:px-5"
-          >
-            Anunciar perfil
-          </Link>
+          {session ? (
+            <Link href="/painel" className="hidden text-sm font-medium text-foreground sm:inline">
+              Painel
+            </Link>
+          ) : (
+            <Link href="/entrar" className="hidden text-sm font-medium text-foreground sm:inline">
+              Entrar
+            </Link>
+          )}
+          {!session && (
+            <Link
+              href="/cadastro/acompanhante"
+              className="rounded-none bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white sm:px-5"
+            >
+              Anunciar perfil
+            </Link>
+          )}
+          {session && (
+            <Link
+              href="/painel"
+              className="rounded-none bg-coral px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white sm:px-5"
+            >
+              Meu painel
+            </Link>
+          )}
         </div>
       </div>
     </header>
