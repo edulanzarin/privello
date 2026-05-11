@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Loader2, Star, Lock, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Lock, Trash2 } from "lucide-react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
+import { useToast } from "@/components/ui/toast";
 
 const LANGUAGE_OPTIONS = [
   { value: "PT", label: "Português" },
@@ -44,7 +45,7 @@ type Profile = {
 
 export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile; cityName: string; citySlug: string }) {
   const router = useRouter();
-  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [uploading, setUploading] = useState(false);
@@ -69,16 +70,20 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
       fd.set("file", file);
       fd.set("isPublic", String(isPublic));
       const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!res.ok) { const d = await res.json(); setError(d.error); break; }
+      if (!res.ok) {
+        const d = await res.json();
+        toast(d.error ?? "Erro ao enviar foto.", "error");
+        break;
+      }
     }
     setUploading(false);
+    toast("Foto adicionada.");
     router.refresh();
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setSaved(false);
     const fd = new FormData(e.currentTarget);
     fd.set("citySlug", selectedCitySlug);
     fd.set("cityQuery", selectedCityLabel);
@@ -86,8 +91,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     fd.set("_from", "painel");
     startTransition(async () => {
       const res = await saveOnboardingPerfil(fd);
-      if (res?.error) { setError(res.error); return; }
-      setSaved(true);
+      if (res?.error) { setError(res.error); toast(res.error, "error"); return; }
+      toast("Perfil salvo com sucesso.");
       router.refresh();
     });
   }
@@ -100,7 +105,6 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</div>}
-      {saved && <div className="border border-success/30 bg-success/5 px-4 py-3 text-sm text-success">Perfil salvo com sucesso.</div>}
 
       {/* ── Fotos ── */}
       <div className={card}>
@@ -113,10 +117,10 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               {m.isCover && <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Capa</span>}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60 opacity-0 transition group-hover:opacity-100">
                 {!m.isCover && (
-                  <button type="button" onClick={() => { setCoverPhoto(m.id); router.refresh(); }}
+                  <button type="button" onClick={async () => { await setCoverPhoto(m.id); toast("Capa definida."); router.refresh(); }}
                     className="w-16 bg-coral py-1 text-[9px] font-bold uppercase text-white">Capa</button>
                 )}
-                <button type="button" onClick={() => { removePhoto(m.id); router.refresh(); }}
+                <button type="button" onClick={async () => { await removePhoto(m.id); toast("Foto removida."); router.refresh(); }}
                   className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
                   <Trash2 className="h-3 w-3" /> Remover
                 </button>
@@ -139,7 +143,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             <div key={m.id} className="group relative aspect-square overflow-hidden border border-line">
               <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition group-hover:opacity-100">
-                <button type="button" onClick={() => { removePhoto(m.id); router.refresh(); }}
+                <button type="button" onClick={async () => { await removePhoto(m.id); toast("Foto removida."); router.refresh(); }}
                   className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
                   <Trash2 className="h-3 w-3" /> Remover
                 </button>

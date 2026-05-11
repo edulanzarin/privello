@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { saveDurationOptions } from "@/app/painel/_actions/provider-settings";
+import { SaveForm } from "@/components/painel/save-form";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,7 @@ export default async function PainelValoresPage() {
         </p>
       </div>
 
-      <form action={saveDurationOptions} className="space-y-4">
+      <SaveForm action={saveDurationOptions} successMessage="Valores salvos." className="space-y-4">
         <div className="border border-line bg-white overflow-hidden">
           {DURATION_OPTIONS.map(({ minutes, label }, i) => {
             const existing = existingByMinutes.get(minutes);
@@ -81,7 +82,7 @@ export default async function PainelValoresPage() {
         >
           Salvar valores
         </button>
-      </form>
+      </SaveForm>
     </div>
   );
 }

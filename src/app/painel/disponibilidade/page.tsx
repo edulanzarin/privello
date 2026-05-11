@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { saveAvailabilityWindows } from "@/app/painel/_actions/provider-settings";
+import { SaveForm } from "@/components/painel/save-form";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,7 @@ export default async function PainelDisponibilidadePage() {
         </p>
       </div>
 
-      <form action={saveAvailabilityWindows} className="space-y-4">
+      <SaveForm action={saveAvailabilityWindows} successMessage="Disponibilidade salva." className="space-y-4">
         <div className="border border-line bg-white overflow-hidden">
           {[0, 1, 2, 3, 4, 5, 6].map((weekday) => {
             const r = byWd.get(weekday);
@@ -97,7 +98,7 @@ export default async function PainelDisponibilidadePage() {
         >
           Salvar disponibilidade
         </button>
-      </form>
+      </SaveForm>
     </div>
   );
 }
