@@ -25,8 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-background pb-16 text-foreground">
-        {children}
+      <body className="flex min-h-screen flex-col bg-background text-foreground">
+        <div className="flex flex-1 flex-col pb-16">
+          {children}
+        </div>
         <BottomNavWrapper />
       </body>
     </html>
