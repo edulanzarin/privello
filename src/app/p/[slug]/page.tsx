@@ -1,10 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Heart, Lock, MapPin, Phone, Star } from "lucide-react";
+import { Lock, MapPin, Phone, Star } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ViewTracker } from "@/components/profile/view-tracker";
+import { FavoriteButton } from "@/components/profile/favorite-button";
+import { auth } from "@/lib/auth";
+import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { formatBrl } from "@/lib/money";
 import { getProfileBySlug } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -19,6 +22,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params;
   const profile = await getProfileBySlug(slug);
   if (!profile) notFound();
+
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.id;
+  const initialFavorited = isLoggedIn ? await getFavoriteStatus(profile.id) : false;
 
   const publicMedia = profile.media.filter((m) => m.isPublic);
   const cover = publicMedia.find((m) => m.isCover) ?? publicMedia[0];
@@ -114,13 +121,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   <Phone className="h-4 w-4" strokeWidth={1.5} />
                   Ver número
                 </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 border border-foreground px-6 py-3 text-sm font-medium"
-                >
-                  <Heart className="h-4 w-4" strokeWidth={1.5} />
-                  Favoritar
-                </button>
+                <FavoriteButton
+                  profileId={profile.id}
+                  initialFavorited={initialFavorited}
+                  isLoggedIn={isLoggedIn}
+                />
               </div>
 
               <dl className="mt-10 grid grid-cols-2 gap-3 text-sm">
