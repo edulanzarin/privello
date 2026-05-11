@@ -199,31 +199,16 @@ export async function getPremiumWeekProfiles() {
 }
 
 /**
- * "Em alta da semana" — top profiles by viewsCurrentPeriod.
- * PREMIUM always appear before DESTAQUE, DESTAQUE before ESSENCIAL.
- * Within each tier, sorted by viewsCurrentPeriod desc.
- * Returns up to `limit` profiles.
+ * "Em alta da semana" — purely by viewsCurrentPeriod, no plan grouping.
+ * Most viewed profiles this week, regardless of plan tier.
  */
 export async function getHotProfiles(limit = 20) {
-  const now = new Date();
   const profiles = await prisma.profile.findMany({
-    // Exclude actively boosted profiles — they appear in their own section
-    where: { OR: [{ featuredUntil: null }, { featuredUntil: { lte: now } }] },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
-    take: limit * 3,
+    take: limit,
   });
-
-  const out: typeof profiles = [];
-  for (const tier of PLAN_ORDER) {
-    const group = profiles
-      .filter((p) => p.planTier === tier)
-      .sort((a, b) => b.viewsCurrentPeriod - a.viewsCurrentPeriod);
-    out.push(...group);
-    if (out.length >= limit) break;
-  }
-
-  return out.slice(0, limit);
+  return profiles;
 }
 
 /**

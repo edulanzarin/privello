@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";
 import { CitySessionSaver } from "@/components/discover/city-session-saver";
 import { CitySwitcher } from "@/components/discover/city-switcher";
+import { ProviderBanner } from "@/components/layout/provider-banner";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
@@ -10,7 +11,6 @@ import { ProfileListRow } from "@/components/profile/profile-list-row";
 import { buildDiscoverHref, parseDiscoverSearchParams } from "@/lib/discover-params";
 import { getOrCreateCityBySlug, listProfilesForCity } from "@/lib/queries";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -39,18 +39,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   // Always resolves — creates the city row if it doesn't exist yet
   const city = await getOrCreateCityBySlug(citySlug);
 
-  // If viewer is a provider, exclude their own profile from results
   const session = await auth();
-  let excludeProfileId: string | undefined;
-  if (session?.user?.id) {
-    const own = await prisma.profile.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true },
-    });
-    if (own) excludeProfileId = own.id;
-  }
+  const isProvider = session?.user?.role === "PROVIDER";
 
-  const profiles = await listProfilesForCity(city.id, { ...filters, excludeProfileId }, sort);
+  const profiles = await listProfilesForCity(city.id, filters, sort);
   const count = profiles.length;
 
   const sortLabel =
@@ -98,6 +90,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
       <SiteHeader activeHref={`/descobrir/${citySlug}`} />
       <CitySessionSaver citySlug={citySlug} />
       <CitySwitcher currentCityName={city.name} citySlug={citySlug} />
+      {isProvider && <ProviderBanner variant="search" />}
       <main className="min-h-screen pb-16">
         {/* ── Header ── */}
         <div className="border-b border-line bg-white">

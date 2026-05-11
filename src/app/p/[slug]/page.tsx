@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { MapPin, Star } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { ProviderBanner } from "@/components/layout/provider-banner";
 import { ViewTracker } from "@/components/profile/view-tracker";
 import { FavoriteButton } from "@/components/profile/favorite-button";
 import { PhotoCarousel } from "@/components/profile/photo-carousel";
@@ -11,6 +12,7 @@ import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { formatBrl } from "@/lib/money";
 import { getProfileBySlug } from "@/lib/queries";
+import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -26,15 +28,21 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
-  const initialFavorited = isLoggedIn ? await getFavoriteStatus(profile.id) : false;
+  const isProvider = session?.user?.role === "PROVIDER";
 
-  // Check if viewer is the profile owner
-  const isOwner = isLoggedIn && session?.user?.id
-    ? (await import("@/lib/prisma")).prisma.profile
-        .findUnique({ where: { userId: session.user.id }, select: { id: true } })
-        .then((p) => p?.id === profile.id)
-    : Promise.resolve(false);
-  const ownerView = await isOwner;
+  // Determine viewer relationship to this profile
+  let ownerView = false;
+  if (isProvider && session?.user?.id) {
+    const own = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    ownerView = own?.id === profile.id;
+  }
+
+  // Clients can favorite; providers cannot interact with other profiles
+  const canInteract = !isProvider;
+  const initialFavorited = canInteract && isLoggedIn ? await getFavoriteStatus(profile.id) : false;
 
   const publicMedia = profile.media.filter((m) => m.isPublic);
   const privateCount = profile.media.filter((m) => !m.isPublic).length;
@@ -60,14 +68,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
   return (
     <>
       <SiteHeader activeHref={`/descobrir/${profile.city.slug}`} />
-      {/* Only track views for non-owners */}
-      {!ownerView && <ViewTracker profileId={profile.id} />}
-      {ownerView && (
-        <div className="border-b border-coral/20 bg-coral/5 px-4 py-2 text-center text-xs text-coral">
-          Você está visualizando seu próprio perfil — visualizações não são contadas.
-          <Link href="/painel" className="ml-2 font-semibold underline">Ir ao painel</Link>
-        </div>
-      )}
+      {/* View tracking — only for non-providers viewing other profiles */}
+      {!isProvider && !ownerView && <ViewTracker profileId={profile.id} />}
+      {/* Provider banners */}
+      {ownerView && <ProviderBanner variant="own-profile" />}
+      {isProvider && !ownerView && <ProviderBanner variant="other-profile" />}
       <main className="min-h-screen pb-16">
         <div className="border-b border-line bg-white">
           <div className="mx-auto max-w-6xl px-4 py-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted sm:px-6">
@@ -112,27 +117,36 @@ export default async function PublicProfilePage({ params }: PageProps) {
               {profile.tagline ? <p className="mt-6 font-serif text-lg italic text-foreground/90">{profile.tagline}</p> : null}
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link
-                  href={`/solicitar/${profile.slug}`}
-                  className="inline-flex items-center justify-center gap-2 bg-foreground px-6 py-3 text-sm font-semibold text-white"
-                >
-                  Marcar horário
-                </Link>
-                <a
-                  href={
-                    profile.whatsappPhone
-                      ? `https://wa.me/${profile.whatsappPhone.replace(/\D/g, "")}`
-                      : "#"
-                  }
-                  className="inline-flex items-center justify-center gap-2 bg-coral px-6 py-3 text-sm font-semibold text-white"
-                >
-                  Chamar no WhatsApp
-                </a>
-                <FavoriteButton
-                  profileId={profile.id}
-                  initialFavorited={initialFavorited}
-                  isLoggedIn={isLoggedIn}
-                />
+                {!isProvider && (
+                  <>
+                    <Link
+                      href={`/solicitar/${profile.slug}`}
+                      className="inline-flex items-center justify-center gap-2 bg-foreground px-6 py-3 text-sm font-semibold text-white"
+                    >
+                      Marcar horário
+                    </Link>
+                    <a
+                      href={
+                        profile.whatsappPhone
+                          ? `https://wa.me/${profile.whatsappPhone.replace(/\D/g, "")}`
+                          : "#"
+                      }
+                      className="inline-flex items-center justify-center gap-2 bg-coral px-6 py-3 text-sm font-semibold text-white"
+                    >
+                      Chamar no WhatsApp
+                    </a>
+                    <FavoriteButton
+                      profileId={profile.id}
+                      initialFavorited={initialFavorited}
+                      isLoggedIn={isLoggedIn}
+                    />
+                  </>
+                )}
+                {ownerView && (
+                  <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 border border-foreground px-6 py-3 text-sm font-semibold text-foreground">
+                    Editar perfil
+                  </Link>
+                )}
               </div>
 
               <dl className="mt-10 grid grid-cols-2 gap-3 text-sm">

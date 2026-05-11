@@ -1,178 +1,165 @@
-import { FinancialOrigin } from "@prisma/client";
-import { DEMO_PROVIDER_SLUG } from "@/lib/constants";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlugForPainel, listFinancialRecordsForMonth } from "@/lib/queries";
+import { listFinancialRecordsForMonth } from "@/lib/queries";
+import { addFinancialRecord } from "@/app/painel/_actions/provider-settings";
+import type { FinancialOrigin } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
 function originBadge(origin: FinancialOrigin) {
   switch (origin) {
-    case "SITE":
-      return "bg-foreground text-white";
-    case "WHATSAPP":
-      return "bg-coral/15 text-coral";
-    default:
-      return "bg-black/10 text-muted";
+    case "SITE":      return "bg-foreground text-white";
+    case "WHATSAPP":  return "bg-coral/15 text-coral";
+    default:          return "bg-black/10 text-muted";
   }
 }
 
 export default async function PainelFinanceiroPage() {
-  const year = 2026;
-  const month = 5;
-  let rows: Awaited<ReturnType<typeof listFinancialRecordsForMonth>> = [];
-  try {
-    const p = await getProfileBySlugForPainel(DEMO_PROVIDER_SLUG);
-    if (p) rows = await listFinancialRecordsForMonth(p.id, year, month);
-  } catch {
-    /* */
-  }
+  const session = await auth();
+  if (!session?.user?.id) redirect("/entrar");
 
-  const total = rows.reduce((a, r) => a + r.amountBrl, 0);
-  const paid = rows.filter((r) => !r.isNoShow).length;
+  const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
+  if (!profile) redirect("/conta/onboarding/perfil");
+
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth() + 1;
+
+  const rows = await listFinancialRecordsForMonth(profile.id, year, month);
+
+  const total  = rows.reduce((a, r) => a + r.amountBrl, 0);
+  const paid   = rows.filter((r) => !r.isNoShow).length;
   const noshow = rows.filter((r) => r.isNoShow).length;
+  const avg    = paid > 0 ? Math.round(rows.filter((r) => !r.isNoShow).reduce((a, r) => a + r.amountBrl, 0) / paid) : 0;
+
+  const monthName = now.toLocaleDateString("pt-BR", { month: "long" });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">
-            Financeiro · maio {year}
-          </p>
-          <h1 className="mt-2 font-serif text-3xl sm:text-4xl">
-            Seu mês. <em className="not-italic text-muted">até aqui</em>
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight capitalize">Financeiro · {monthName} {year}</h1>
+          <p className="mt-1 text-sm text-muted">Registros do mês atual.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <div className="flex overflow-hidden rounded border border-line bg-white text-xs font-semibold">
-            <span className="bg-foreground px-3 py-2 text-white">Maio</span>
-            <span className="px-3 py-2 text-muted">Abril</span>
-            <span className="px-3 py-2 text-muted">Março</span>
-            <span className="px-3 py-2 text-muted">Ano</span>
-          </div>
-          <button type="button" className="border border-line bg-white px-3 py-2 text-xs">
-            Exportar
-          </button>
-          <button type="button" className="bg-foreground px-3 py-2 text-xs text-white">
-            Registrar encontro
-          </button>
-        </div>
+        {/* Add record form */}
+        <details className="group">
+          <summary className="cursor-pointer list-none">
+            <span className="inline-block bg-coral px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+              + Registrar encontro
+            </span>
+          </summary>
+          <form action={addFinancialRecord} className="mt-3 border border-line bg-white p-5 space-y-4 sm:w-96">
+            <p className="text-xs font-bold uppercase tracking-wider">Novo registro</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Cliente</label>
+                <input name="clientLabel" required placeholder="Nome / iniciais"
+                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Valor (R$)</label>
+                <input name="amountBrl" type="number" required min={1} placeholder="500"
+                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Duração</label>
+                <input name="durationLabel" placeholder="2h"
+                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Local</label>
+                <input name="locationLabel" placeholder="Local próprio"
+                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Pagamento</label>
+                <input name="paymentLabel" placeholder="Pix"
+                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </div>
+              <div className="flex items-end pb-2">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" name="isNoShow" className="h-4 w-4" />
+                  No-show
+                </label>
+              </div>
+            </div>
+            <button type="submit" className="w-full bg-foreground py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+              Registrar
+            </button>
+          </form>
+        </details>
       </div>
 
+      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ["Faturamento · mai", formatBrl(15300), "↑ 22% vs abr"],
-          ["Encontros realizados", "7", "meta: 12"],
-          ["Ticket médio", formatBrl(2186), "↑ R$ 340"],
-          ["Clientes recorrentes", "3", "43% do mês"],
+          ["Faturamento", formatBrl(total), monthName],
+          ["Encontros realizados", String(paid), "este mês"],
+          ["Ticket médio", avg > 0 ? formatBrl(avg) : "—", "por encontro"],
+          ["No-shows", String(noshow), "este mês"],
         ].map(([t, v, s]) => (
-          <div key={t} className="border border-line bg-white p-5 shadow-sm">
+          <div key={t} className="border border-line bg-white p-5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">{t}</p>
-            <p className="mt-2 text-2xl font-semibold">{v}</p>
-            <p className="mt-1 text-xs font-medium text-success">{s}</p>
+            <p className="mt-2 text-2xl font-bold tabular-nums">{v}</p>
+            <p className="mt-1 text-xs text-muted">{s}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="border border-line bg-white p-6 shadow-sm">
-          <h2 className="text-[10px] font-semibold uppercase tracking-wider text-muted">Faturamento por dia · maio</h2>
-          <p className="mt-1 text-xs text-muted">{formatBrl(15300)} acumulado (ilustrativo)</p>
-          <div className="mt-6 flex h-44 items-end gap-1">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="flex flex-1 flex-col justify-end gap-0.5">
-                <div className="h-[40%] w-full bg-foreground/90" />
-                <div className="h-[25%] w-full bg-coral/80" />
-                <div className="h-[15%] w-full bg-line" />
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex flex-wrap gap-4 text-[10px] text-muted">
-            <span>
-              <span className="mr-1 inline-block h-2 w-2 bg-foreground" /> Via site (agendado)
-            </span>
-            <span>
-              <span className="mr-1 inline-block h-2 w-2 bg-coral" /> Via WhatsApp
-            </span>
-            <span>
-              <span className="mr-1 inline-block h-2 w-2 bg-line" /> Manual
-            </span>
-          </div>
+      {/* Records table */}
+      <div className="border border-line bg-white">
+        <div className="border-b border-line px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+            Registros · {rows.length} encontros · {formatBrl(total)} total
+          </p>
         </div>
-        <div className="border border-line bg-white p-6 shadow-sm">
-          <h2 className="text-[10px] font-semibold uppercase tracking-wider text-muted">Clientes do mês</h2>
-          <p className="text-xs text-muted">Por faturamento</p>
-          <ol className="mt-4 space-y-3 text-sm">
-            {["Cliente R.M.", "Felipe R.", "Anônimo"].map((name, i) => (
-              <li key={name} className="flex justify-between border-b border-line py-2">
-                <span>
-                  0{i + 1} · {name}
-                </span>
-                <span className="font-medium">{formatBrl(4420 - i * 800)}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
-
-      <div className="border border-line bg-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-          <div className="flex flex-wrap gap-3 text-xs font-semibold">
-            <span className="border-b-2 border-foreground pb-2">Todos ({rows.length})</span>
-            <span className="text-muted">Via site</span>
-            <span className="text-muted">Via WhatsApp</span>
-          </div>
-          <button type="button" className="text-xs underline">
-            Filtrar
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line text-[10px] font-semibold uppercase tracking-wider text-muted">
-                <th className="px-4 py-3">Data</th>
-                <th className="px-4 py-3">Cliente</th>
-                <th className="px-4 py-3">Duração</th>
-                <th className="px-4 py-3">Local</th>
-                <th className="px-4 py-3">Pagamento</th>
-                <th className="px-4 py-3">Origem</th>
-                <th className="px-4 py-3 text-right">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-line">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {r.occurredAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}{" "}
-                    {r.occurredAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                  </td>
-                  <td className="px-4 py-3">{r.clientLabel}</td>
-                  <td className="px-4 py-3">{r.durationLabel}</td>
-                  <td className="px-4 py-3">{r.locationLabel}</td>
-                  <td className="px-4 py-3">{r.paymentLabel}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${originBadge(r.origin)}`}>
-                      {r.origin}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {r.isNoShow ? (
-                      <span className="text-coral">
-                        {formatBrl(r.amountBrl)}
-                        <span className="ml-2 text-[10px] uppercase">No-show</span>
-                      </span>
-                    ) : (
-                      formatBrl(r.amountBrl)
-                    )}
-                  </td>
+        {rows.length === 0 ? (
+          <p className="px-4 py-8 text-center text-sm text-muted">
+            Nenhum registro este mês. Use o botão acima para registrar um encontro.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-line text-[10px] font-semibold uppercase tracking-wider text-muted">
+                  <th className="px-4 py-3">Data</th>
+                  <th className="px-4 py-3">Cliente</th>
+                  <th className="px-4 py-3">Duração</th>
+                  <th className="px-4 py-3">Local</th>
+                  <th className="px-4 py-3">Pagamento</th>
+                  <th className="px-4 py-3">Origem</th>
+                  <th className="px-4 py-3 text-right">Valor</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="px-4 py-3 text-xs text-muted">
-          Mostrando {rows.length} de {rows.length} deste mês · Total {formatBrl(total)} · {paid} pagos · {noshow}{" "}
-          no-show
-        </p>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.id} className="border-b border-line last:border-0">
+                    <td className="px-4 py-3 whitespace-nowrap text-muted">
+                      {r.occurredAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}{" "}
+                      {r.occurredAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </td>
+                    <td className="px-4 py-3 font-medium">{r.clientLabel}</td>
+                    <td className="px-4 py-3 text-muted">{r.durationLabel}</td>
+                    <td className="px-4 py-3 text-muted">{r.locationLabel}</td>
+                    <td className="px-4 py-3 text-muted">{r.paymentLabel}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${originBadge(r.origin)}`}>
+                        {r.origin}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold">
+                      {r.isNoShow ? (
+                        <span className="text-coral">{formatBrl(r.amountBrl)} <span className="text-[10px]">no-show</span></span>
+                      ) : formatBrl(r.amountBrl)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

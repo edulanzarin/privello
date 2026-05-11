@@ -7,7 +7,6 @@ import {
   Diamond,
   ImageIcon,
   LayoutDashboard,
-  MessageCircle,
   Star,
   User,
   Clock,
@@ -26,13 +25,12 @@ const items = (slug: string): Item[] => [
   { type: "link", href: "/painel/perfil", label: "Editar perfil", icon: ImageIcon },
   { type: "link", href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
   { type: "link", href: "/painel/valores", label: "Valores", icon: CircleDollarSign },
-  { type: "muted", label: "Cliques no WhatsApp", icon: MessageCircle },
   { type: "muted", label: "Avaliações", icon: Star },
   { type: "link", href: "/painel/financeiro", label: "Financeiro", icon: BarChart3, badge: "Premium" },
-  { type: "link", href: "/planos", label: "Plano", icon: Diamond },
+  { type: "link", href: "/painel/plano", label: "Plano", icon: Diamond },
 ];
 
-export function PainelSidebar({ displayName, profileSlug }: { displayName: string; profileSlug: string }) {
+export function PainelSidebar({ displayName, profileSlug, planTier }: { displayName: string; profileSlug: string; planTier?: string }) {
   const pathname = usePathname();
   const navItems = items(profileSlug);
 
