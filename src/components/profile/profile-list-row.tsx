@@ -13,7 +13,6 @@ const PLAN_CONFIG = {
     badgeText:  "text-white",
     badgeLabel: "BOOST",
     priceClass: "text-orange-500 font-bold",
-    leftBar:    "bg-orange-500",
   },
   PREMIUM: {
     wrapClass:  "ring-2 ring-coral",
@@ -21,7 +20,6 @@ const PLAN_CONFIG = {
     badgeText:  "text-white",
     badgeLabel: "PREMIUM",
     priceClass: "text-coral font-bold",
-    leftBar:    "bg-coral",
   },
   DESTAQUE: {
     wrapClass:  "ring-2 ring-foreground",
@@ -29,7 +27,6 @@ const PLAN_CONFIG = {
     badgeText:  "text-white",
     badgeLabel: "DESTAQUE",
     priceClass: "text-foreground font-semibold",
-    leftBar:    "bg-foreground",
   },
   ESSENCIAL: {
     wrapClass:  "ring-1 ring-line",
@@ -37,7 +34,6 @@ const PLAN_CONFIG = {
     badgeText:  "text-muted",
     badgeLabel: "ESSENCIAL",
     priceClass: "text-muted font-medium",
-    leftBar:    "bg-line",
   },
 } as const;
 
@@ -52,14 +48,11 @@ export function ProfileListRow({ profile, className }: { profile: ProfileCardPay
     <Link
       href={`/p/${profile.slug}`}
       className={cn(
-        "group relative flex gap-0 bg-white transition hover:shadow-md overflow-hidden",
+        "group relative flex bg-white transition hover:shadow-md overflow-hidden",
         plan.wrapClass,
         className,
       )}
     >
-      {/* Left accent bar */}
-      <span className={cn("w-1 shrink-0", plan.leftBar)} aria-hidden />
-
       {/* Photo */}
       <div className="relative h-28 w-20 shrink-0 bg-line sm:h-32 sm:w-24">
         <Image src={imageUrl} alt="" fill className="object-cover" sizes="96px" />
