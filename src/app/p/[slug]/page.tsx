@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Lock, MapPin, Phone, Star } from "lucide-react";
+import { Lock, MapPin, Star } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ViewTracker } from "@/components/profile/view-tracker";
@@ -114,13 +114,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 >
                   Chamar no WhatsApp
                 </a>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 border border-foreground px-6 py-3 text-sm font-medium"
-                >
-                  <Phone className="h-4 w-4" strokeWidth={1.5} />
-                  Ver número
-                </button>
                 <FavoriteButton
                   profileId={profile.id}
                   initialFavorited={initialFavorited}

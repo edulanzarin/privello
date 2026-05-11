@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-background pb-20 text-foreground">
+      <body className="min-h-full bg-background pb-16 text-foreground">
         {children}
         <BottomNavWrapper />
       </body>
