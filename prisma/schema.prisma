@@ -1,0 +1,283 @@
+// Privello — PostgreSQL (Prisma 5)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  PROVIDER
+  ADMIN
+  MODERATOR
+}
+
+enum PlanTier {
+  ESSENCIAL
+  DESTAQUE
+  PREMIUM
+}
+
+enum MeetingRequestStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  COMPLETED
+  EXPIRED
+}
+
+enum ModerationStatus {
+  NOVO
+  REVISAO
+  APROVADO
+  REJEITADO
+}
+
+enum FinancialOrigin {
+  SITE
+  WHATSAPP
+  MANUAL
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  role      UserRole @default(CLIENT)
+  phone     String?
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile         Profile?
+  meetingRequests MeetingRequest[] @relation("ClientRequests")
+}
+
+model City {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  heroImage String?
+  profiles  Profile[]
+  districts District[]
+}
+
+model District {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String
+  cityId   String
+  city     City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  profiles Profile[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  slug        String @unique
+  publicCode  String @unique
+  displayName String
+  age         Int
+  bio         String  @db.Text
+  tagline     String?
+
+  cityId     String
+  city       City     @relation(fields: [cityId], references: [id])
+  districtId String
+  district   District @relation(fields: [districtId], references: [id])
+
+  priceHour       Int
+  priceTwoHours   Int?
+  priceOvernight  Int?
+  priceTravelDay  Int?
+  paymentMethods  String?
+
+  heightCm   Int?
+  dressSize  String?
+  hair       String?
+  eyes       String?
+  languages  String?
+
+  servesMen                Boolean @default(true)
+  servesCouples            Boolean @default(false)
+  servesWomen              Boolean @default(false)
+  hasOwnPlace              Boolean @default(false)
+  homeVisit                Boolean @default(false)
+  travelsNational          Boolean @default(false)
+  travelsInternational     Boolean @default(false)
+
+  whatsappPhone String?
+
+  isOnline      Boolean @default(false)
+  isVerified    Boolean @default(false)
+  videoVerified Boolean @default(false)
+
+  viewsThisMonth      Int      @default(0)
+  viewsCurrentPeriod  Int      @default(0)
+  memberSince    DateTime @default(now())
+  rankPosition   Int?
+  lastUpdatedAt  DateTime @updatedAt
+
+  planTier      PlanTier  @default(ESSENCIAL)
+  featuredUntil DateTime?
+  boostLabel    String?
+
+  ratingAvg   Float @default(0)
+  ratingCount Int   @default(0)
+
+  media               Media[]
+  reviews             Review[]
+  availabilityRules   AvailabilityRule[]
+  durationOptions     ProfileDurationOption[]
+  meetingRequests     MeetingRequest[]     @relation("ProviderRequests")
+  financialRecords    FinancialRecord[]
+  whatsAppClicks      WhatsAppClick[]
+  verificationCases   VerificationCase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId, isVerified, planTier])
+  @@index([cityId, districtId])
+  @@index([slug])
+  @@index([lastUpdatedAt])
+  @@index([viewsCurrentPeriod])
+}
+
+// Tracks when the "Em alta" period started — single row, id = "hot"
+model HotPeriodConfig {
+  id        String   @id @default("hot")
+  startedAt DateTime @default(now())
+}
+
+model Media {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  url       String
+  isPublic  Boolean @default(true)
+  sortOrder Int     @default(0)
+  isCover   Boolean @default(false)
+
+  @@index([profileId, isPublic, sortOrder])
+}
+
+model AvailabilityRule {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  weekday   Int
+  startTime String
+  endTime   String
+  status    String  @default("AVAILABLE")
+
+  @@index([profileId, weekday])
+}
+
+// Opções de duração + preço (agendamento / WhatsApp; editável no painel).
+model ProfileDurationOption {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  minutes   Int
+  label     String
+  priceBrl  Int
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  @@index([profileId, active, sortOrder])
+}
+
+model Review {
+  id               String   @id @default(cuid())
+  profileId        String
+  profile          Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  reviewerInitials String
+  reviewerName     String
+  rating           Float
+  text             String   @db.Text
+  punctuality      Float
+  descriptionScore Float
+  conversation     Float
+  experience       Float
+  createdAt        DateTime @default(now())
+
+  @@index([profileId, createdAt])
+}
+
+model MeetingRequest {
+  id        String               @id @default(cuid())
+  profileId String
+  profile   Profile              @relation("ProviderRequests", fields: [profileId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    User                 @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
+  status    MeetingRequestStatus @default(PENDING)
+  date      DateTime
+  startTime String
+  endTime   String
+  duration  String
+  location  String
+  notes     String?              @db.Text
+  totalBrl  Int
+  expiresAt DateTime
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([profileId, status])
+  @@index([clientId])
+}
+
+model FinancialRecord {
+  id            String          @id @default(cuid())
+  profileId     String
+  profile       Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  occurredAt    DateTime
+  clientLabel   String
+  durationLabel String
+  locationLabel String
+  paymentLabel  String
+  origin        FinancialOrigin
+  amountBrl     Int
+  isNoShow      Boolean         @default(false)
+  notes         String?         @db.Text
+
+  @@index([profileId, occurredAt])
+}
+
+model WhatsAppClick {
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  clickedAt DateTime @default(now())
+  source    String
+  visitor   String
+  verified  Boolean  @default(false)
+
+  @@index([profileId, clickedAt])
+}
+
+model VerificationCase {
+  id           String           @id @default(cuid())
+  profileId    String
+  profile      Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  status       ModerationStatus @default(NOVO)
+  documentType String?
+  documentNote String?
+  selfieMatch  Int?
+  selfieNote   String?
+  waitingSince DateTime         @default(now())
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([status, waitingSince])
+}

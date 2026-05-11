@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --privello-cream: #faf9f7;
+  --privello-ink: #0d0d0d;
+  --privello-muted: #6b6b6b;
+  --privello-line: #e8e5e0;
+  --privello-coral: #c8102e;
+  --privello-green: #0a9f6e;
+  --privello-sidebar: #0d0d0d;
+}
+
+@theme inline {
+  --color-background: var(--privello-cream);
+  --color-foreground: var(--privello-ink);
+  --color-muted: var(--privello-muted);
+  --color-line: var(--privello-line);
+  --color-coral: var(--privello-coral);
+  --color-success: var(--privello-green);
+  --color-sidebar: var(--privello-sidebar);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-inter);
+}
+
+body {
+  background: var(--privello-cream);
+  color: var(--privello-ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* font-serif now maps to Inter — use weight/tracking to create hierarchy */
+.font-serif {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+/* ── Boost fire border animation ─────────────────────────────────────────── */
+@property --fire-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes fire-rotate {
+  to { --fire-angle: 360deg; }
+}
+
+@keyframes fire-glow {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+@keyframes ember-float {
+  0%   { transform: translateY(0) translateX(0) scale(1);    opacity: 1;   }
+  100% { transform: translateY(-22px) translateX(4px) scale(0.3); opacity: 0; }
+}
+
+/* The wrapper that creates the animated fire border */
+.fire-border-wrap {
+  position: relative;
+  border-radius: 0;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--fire-angle),
+    #ff4500,
+    #ff8c00,
+    #ffd700,
+    #ff6600,
+    #ff2200,
+    #ff4500
+  );
+  animation: fire-rotate 1.6s linear infinite, fire-glow 2s ease-in-out infinite;
+}
+
+.fire-border-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 0;
+  background: conic-gradient(
+    from var(--fire-angle),
+    rgba(255, 69, 0, 0.5),
+    rgba(255, 140, 0, 0.3),
+    rgba(255, 215, 0, 0.4),
+    rgba(255, 100, 0, 0.3),
+    rgba(255, 34, 0, 0.5),
+    rgba(255, 69, 0, 0.5)
+  );
+  filter: blur(8px);
+  z-index: -1;
+  animation: fire-rotate 1.6s linear infinite;
+}
+
+.ember {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ff8c00;
+  animation: ember-float 1.2s ease-out infinite;
+  pointer-events: none;
+}
+.ember-2 { animation-delay: 0.4s; animation-duration: 1.5s; background: #ffd700; width: 3px; height: 3px; }
+.ember-3 { animation-delay: 0.8s; animation-duration: 1.0s; background: #ff4500; width: 2px; height: 2px; }
+.ember-4 { animation-delay: 0.2s; animation-duration: 1.8s; background: #ff6600; width: 3px; height: 3px; }
