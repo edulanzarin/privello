@@ -1,0 +1,177 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+async function getProviderProfile() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/entrar");
+  const profile = await prisma.profile.findUnique({
+    where: { userId: session.user.id },
+  });
+  if (!profile) redirect("/entrar");
+  return profile;
+}
+
+// ── Step 1: Perfil ────────────────────────────────────────────────────────────
+export async function saveOnboardingPerfil(formData: FormData) {
+  const profile = await getProviderProfile();
+
+  const cityQuery = (formData.get("cityQuery") as string).trim();
+  const citySlug  = (formData.get("citySlug") as string).trim();
+  const bio       = (formData.get("bio") as string).trim();
+  const tagline   = (formData.get("tagline") as string | null)?.trim() ?? null;
+  const whatsapp  = (formData.get("whatsappPhone") as string | null)?.trim() ?? null;
+  const heightCm  = formData.get("heightCm") ? Number(formData.get("heightCm")) : null;
+  const dressSize = (formData.get("dressSize") as string | null)?.trim() || null;
+  const hair      = (formData.get("hair") as string | null)?.trim() || null;
+  const eyes      = (formData.get("eyes") as string | null)?.trim() || null;
+  const languages = (formData.get("languages") as string | null)?.trim() || null;
+
+  const servesMen    = formData.get("servesMen") === "on";
+  const servesWomen  = formData.get("servesWomen") === "on";
+  const servesCouples= formData.get("servesCouples") === "on";
+  const hasOwnPlace  = formData.get("hasOwnPlace") === "on";
+  const homeVisit    = formData.get("homeVisit") === "on";
+  const travelsNational     = formData.get("travelsNational") === "on";
+  const travelsInternational= formData.get("travelsInternational") === "on";
+
+  if (!bio) return { error: "Escreva uma bio." };
+  if (!citySlug) return { error: "Selecione uma cidade." };
+
+  // Upsert city
+  const city = await prisma.city.upsert({
+    where: { slug: citySlug },
+    update: {},
+    create: {
+      slug: citySlug,
+      name: cityQuery || citySlug,
+    },
+  });
+
+  // Get or create a default district for this city
+  let district = await prisma.district.findFirst({ where: { cityId: city.id } });
+  if (!district) {
+    district = await prisma.district.create({
+      data: { name: "Centro", slug: "centro", cityId: city.id },
+    });
+  }
+
+  await prisma.profile.update({
+    where: { id: profile.id },
+    data: {
+      bio,
+      tagline: tagline || null,
+      whatsappPhone: whatsapp || null,
+      cityId: city.id,
+      districtId: district.id,
+      heightCm: heightCm && !isNaN(heightCm) ? heightCm : null,
+      dressSize,
+      hair,
+      eyes,
+      languages,
+      servesMen,
+      servesWomen,
+      servesCouples,
+      hasOwnPlace,
+      homeVisit,
+      travelsNational,
+      travelsInternational,
+    },
+  });
+
+  revalidatePath("/conta/onboarding/perfil");
+  redirect("/conta/onboarding/fotos");
+}
+
+// ── Step 2: Fotos — add a photo by URL ───────────────────────────────────────
+export async function addPhotoByUrl(formData: FormData) {
+  const profile = await getProviderProfile();
+  const url      = (formData.get("url") as string).trim();
+  const isPublic = formData.get("isPublic") !== "false";
+
+  if (!url) return { error: "URL inválida." };
+
+  // Count existing photos to set sortOrder
+  const count = await prisma.media.count({ where: { profileId: profile.id, isPublic } });
+  const isCover = isPublic && count === 0; // first public photo = cover
+
+  await prisma.media.create({
+    data: { profileId: profile.id, url, isPublic, sortOrder: count, isCover },
+  });
+
+  revalidatePath("/conta/onboarding/fotos");
+  return { ok: true };
+}
+
+export async function removePhoto(mediaId: string) {
+  const profile = await getProviderProfile();
+  await prisma.media.deleteMany({ where: { id: mediaId, profileId: profile.id } });
+
+  // Re-set cover to first remaining public photo
+  const first = await prisma.media.findFirst({
+    where: { profileId: profile.id, isPublic: true },
+    orderBy: { sortOrder: "asc" },
+  });
+  if (first) {
+    await prisma.media.updateMany({ where: { profileId: profile.id }, data: { isCover: false } });
+    await prisma.media.update({ where: { id: first.id }, data: { isCover: true } });
+  }
+
+  revalidatePath("/conta/onboarding/fotos");
+}
+
+export async function setCoverPhoto(mediaId: string) {
+  const profile = await getProviderProfile();
+  await prisma.media.updateMany({ where: { profileId: profile.id }, data: { isCover: false } });
+  await prisma.media.update({ where: { id: mediaId }, data: { isCover: true } });
+  revalidatePath("/conta/onboarding/fotos");
+}
+
+// ── Step 3: Valores ───────────────────────────────────────────────────────────
+export async function saveOnboardingValores(formData: FormData) {
+  const profile = await getProviderProfile();
+
+  const priceHour      = Number(formData.get("priceHour"));
+  const priceTwoHours  = formData.get("priceTwoHours") ? Number(formData.get("priceTwoHours")) : null;
+  const priceOvernight = formData.get("priceOvernight") ? Number(formData.get("priceOvernight")) : null;
+  const priceTravelDay = formData.get("priceTravelDay") ? Number(formData.get("priceTravelDay")) : null;
+  const paymentMethods = (formData.get("paymentMethods") as string | null)?.trim() || null;
+
+  if (!priceHour || priceHour < 1) return { error: "Informe o valor por hora." };
+
+  await prisma.profile.update({
+    where: { id: profile.id },
+    data: {
+      priceHour,
+      priceTwoHours,
+      priceOvernight,
+      priceTravelDay,
+      paymentMethods,
+    },
+  });
+
+  revalidatePath("/conta/onboarding/valores");
+  redirect("/conta/onboarding/publicar");
+}
+
+// ── Step 4: Publicar ──────────────────────────────────────────────────────────
+export async function publishProfile() {
+  const profile = await getProviderProfile();
+
+  // Basic validation
+  if (!profile.bio || profile.priceHour < 1) {
+    return { error: "Complete o perfil e os valores antes de publicar." };
+  }
+
+  // Mark as online (visible in listings)
+  await prisma.profile.update({
+    where: { id: profile.id },
+    data: { isOnline: true },
+  });
+
+  revalidatePath(`/p/${profile.slug}`);
+  redirect("/painel");
+}

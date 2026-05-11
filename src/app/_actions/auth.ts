@@ -128,9 +128,9 @@ export async function registerProviderAction(formData: FormData) {
     },
   });
 
-  // Auto-login and redirect to onboarding
+  // Auto-login and redirect to onboarding step 1
   try {
-    await signIn("credentials", { email, password, redirectTo: "/conta/onboarding/fotos" });
+    await signIn("credentials", { email, password, redirectTo: "/conta/onboarding/perfil" });
   } catch (err) {
     throw err;
   }
