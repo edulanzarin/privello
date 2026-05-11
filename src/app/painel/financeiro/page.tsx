@@ -38,22 +38,17 @@ export default async function PainelFinanceiroPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight capitalize">Financeiro · {monthName} {year}</h1>
           <p className="mt-1 text-sm text-muted">Registros do mês atual.</p>
         </div>
-        {/* Add record form */}
-        <details className="group">
-          <summary className="cursor-pointer list-none">
-            <span className="inline-block bg-coral px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
-              + Registrar encontro
-            </span>
-          </summary>
-          <form action={addFinancialRecord} className="mt-3 border border-line bg-white p-5 space-y-4 sm:w-96">
-            <p className="text-xs font-bold uppercase tracking-wider">Novo registro</p>
+        {/* Add record form — always visible, not inside details */}
+        <div className="border border-line bg-white p-5 sm:w-96">
+          <p className="text-xs font-bold uppercase tracking-wider mb-4">+ Registrar encontro</p>
+          <form action={addFinancialRecord} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              <div className="col-span-2">
                 <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Cliente</label>
                 <input name="clientLabel" required placeholder="Nome / iniciais"
                   className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
@@ -65,31 +60,46 @@ export default async function PainelFinanceiroPage() {
               </div>
               <div>
                 <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Duração</label>
-                <input name="durationLabel" placeholder="2h"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+                <select name="durationLabel" defaultValue="2 horas" className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white">
+                  <option value="30 minutos">30 minutos</option>
+                  <option value="1 hora">1 hora</option>
+                  <option value="1h30">1h30</option>
+                  <option value="2 horas">2 horas</option>
+                  <option value="3 horas">3 horas</option>
+                  <option value="4 horas">4 horas</option>
+                  <option value="Pernoite">Pernoite</option>
+                  <option value="Diária">Diária</option>
+                </select>
               </div>
               <div>
                 <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Local</label>
-                <input name="locationLabel" placeholder="Local próprio"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+                <select name="locationLabel" className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white">
+                  <option value="Local próprio">Local próprio</option>
+                  <option value="A domicílio">A domicílio</option>
+                  <option value="Motel / hotel">Motel / hotel</option>
+                </select>
               </div>
               <div>
                 <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Pagamento</label>
-                <input name="paymentLabel" placeholder="Pix"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+                <select name="paymentLabel" className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white">
+                  <option value="Pix">Pix</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão">Cartão</option>
+                  <option value="Pix · Dinheiro">Pix · Dinheiro</option>
+                </select>
               </div>
-              <div className="flex items-end pb-2">
+              <div className="flex items-end pb-1">
                 <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" name="isNoShow" className="h-4 w-4" />
+                  <input type="checkbox" name="isNoShow" className="h-4 w-4 accent-coral" />
                   No-show
                 </label>
               </div>
             </div>
-            <button type="submit" className="w-full bg-foreground py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+            <button type="submit" className="w-full bg-coral py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition">
               Registrar
             </button>
           </form>
-        </details>
+        </div>
       </div>
 
       {/* Stats */}
