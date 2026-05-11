@@ -84,7 +84,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     <>
       <SiteHeader activeHref={`/descobrir/${citySlug}`} />
       <CitySessionSaver citySlug={citySlug} />
-      <CitySwitcher currentCityName={city.name} />
+      <CitySwitcher currentCityName={city.name} citySlug={citySlug} />
       <main className="min-h-screen pb-16">
         {/* ── Header ── */}
         <div className="border-b border-line bg-white">

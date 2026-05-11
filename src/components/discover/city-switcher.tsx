@@ -6,11 +6,23 @@ import { useState } from "react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { LAST_CITY_KEY } from "@/components/layout/bottom-nav";
 
-type Props = { currentCityName: string };
+type Props = { currentCityName: string; citySlug: string };
 
-export function CitySwitcher({ currentCityName }: Props) {
+/** Derives "São Paulo, SP" from slug "sao-paulo-sp" */
+function displayFromSlug(slug: string, fallback: string): string {
+  const parts = slug.split("-");
+  if (parts.length < 2) return fallback;
+  const uf = parts[parts.length - 1].toUpperCase();
+  // If the fallback already contains a comma (e.g. "Blumenau, SC") use it directly
+  if (fallback.includes(",")) return fallback;
+  return `${fallback}, ${uf}`;
+}
+
+export function CitySwitcher({ currentCityName, citySlug }: Props) {
   const router = useRouter();
   const [searching, setSearching] = useState(false);
+
+  const displayName = displayFromSlug(citySlug, currentCityName);
 
   return (
     <div className="sticky top-14 z-40 border-b border-line bg-white/95 backdrop-blur-md shadow-sm">
@@ -49,7 +61,7 @@ export function CitySwitcher({ currentCityName }: Props) {
               onClick={() => setSearching(true)}
               className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-coral transition"
             >
-              {currentCityName}
+              {displayName}
               <ChevronDown className="h-3.5 w-3.5 text-muted" strokeWidth={2} />
             </button>
           )}
