@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search, Users } from "lucide-react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
+import { LAST_CITY_KEY } from "@/components/layout/bottom-nav";
 
 type GenderOption = { value: string; label: string };
 
@@ -20,7 +21,8 @@ export function HeroSearchForm() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const slug = citySlug || "sao-paulo";
+    const slug = citySlug || "sao-paulo-sp";
+    if (slug) sessionStorage.setItem(LAST_CITY_KEY, slug);
     const p = new URLSearchParams();
     if (gender) p.set("genero", gender);
     const q = p.toString();

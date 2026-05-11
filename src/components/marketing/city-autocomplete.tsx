@@ -54,13 +54,13 @@ async function getIbgeMunicipios(): Promise<IbgeMunicipio[]> {
 }
 
 type Props = {
-  /** Called when the user selects a city. Receives the city slug (e.g. "blumenau-sc"). */
   onSelect: (slug: string, label: string) => void;
-  /** Initial display value */
   initialLabel?: string;
+  /** Compact mode: no label, smaller padding, for use in sticky bars */
+  compact?: boolean;
 };
 
-export function CityAutocomplete({ onSelect, initialLabel = "" }: Props) {
+export function CityAutocomplete({ onSelect, initialLabel = "", compact = false }: Props) {
   const [query, setQuery] = useState(initialLabel);
   const [results, setResults] = useState<CityResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -130,17 +130,20 @@ export function CityAutocomplete({ onSelect, initialLabel = "" }: Props) {
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-3 bg-white px-4 py-3 text-left">
-      <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
+      {!compact && <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />}
       <span className="w-full">
-        <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted">Cidade</span>
+        {!compact && <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted">Cidade</span>}
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Ex: Blumenau, São Paulo…"
+          placeholder={compact ? "Trocar cidade…" : "Ex: Blumenau, São Paulo…"}
           autoComplete="off"
-          className="mt-0.5 w-full border-0 bg-transparent p-0 text-sm font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
+          className={compact
+            ? "w-full border-0 bg-transparent p-0 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-muted/60"
+            : "mt-0.5 w-full border-0 bg-transparent p-0 text-sm font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
+          }
         />
       </span>
 

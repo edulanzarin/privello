@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
+import { LAST_CITY_KEY } from "@/components/layout/bottom-nav";
 import { Users } from "lucide-react";
 
 const GENDER_OPTIONS = [
@@ -18,6 +19,7 @@ export function BuscarForm() {
 
   function handleSearch() {
     if (!citySlug) return;
+    sessionStorage.setItem(LAST_CITY_KEY, citySlug);
     const p = new URLSearchParams();
     if (gender) p.set("genero", gender);
     const q = p.toString();
@@ -74,7 +76,10 @@ export function BuscarForm() {
           ].map((c) => (
             <button
               key={c.slug}
-              onClick={() => router.push(`/descobrir/${c.slug}`)}
+              onClick={() => {
+                sessionStorage.setItem(LAST_CITY_KEY, c.slug);
+                router.push(`/descobrir/${c.slug}`);
+              }}
               className="rounded-full border border-line bg-white px-3 py-1.5 text-xs text-muted transition hover:border-foreground/30 hover:text-foreground"
             >
               {c.label}

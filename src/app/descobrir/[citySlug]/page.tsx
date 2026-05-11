@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";
+import { CitySessionSaver } from "@/components/discover/city-session-saver";
+import { CitySwitcher } from "@/components/discover/city-switcher";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
@@ -81,6 +83,8 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   return (
     <>
       <SiteHeader activeHref={`/descobrir/${citySlug}`} />
+      <CitySessionSaver citySlug={citySlug} />
+      <CitySwitcher currentCityName={city.name} />
       <main className="min-h-screen pb-16">
         {/* ── Header ── */}
         <div className="border-b border-line bg-white">
@@ -167,7 +171,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   </Link>
                 )}
                 <Link
-                  href="/"
+                  href="/buscar"
                   className="border border-line px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground"
                 >
                   Buscar outra cidade
