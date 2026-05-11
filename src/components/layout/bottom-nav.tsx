@@ -17,7 +17,7 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
   const router = useRouter();
 
   // Hide bottom nav inside the provider dashboard — it has its own sidebar
-  if (pathname.startsWith("/painel")) return null;
+  // (removed — bottom nav stays visible everywhere)
 
   const profileHref = isLoggedIn
     ? userRole === "PROVIDER" ? "/painel" : "/conta/perfil"

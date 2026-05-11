@@ -18,6 +18,7 @@ import { formatBrl } from "@/lib/money";
 import { getProfileBySlug } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SolicitarWhatsAppPanel } from "@/components/solicitar/solicitar-whatsapp-panel";
 
 export const dynamic = "force-dynamic";
@@ -320,6 +321,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
           />
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }
