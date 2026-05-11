@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SolicitarWhatsAppPanel } from "@/components/solicitar/solicitar-whatsapp-panel";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +67,16 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
 
   const profile = await getProfileBySlug(slug);
   if (!profile) notFound();
+
+  // Block providers from accessing booking page
+  const session = await auth();
+  if (session?.user?.id) {
+    const viewerProfile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    if (viewerProfile) redirect(`/p/${slug}`);
+  }
 
   const sp = new URLSearchParams();
   Object.entries(raw).forEach(([k, v]) => {

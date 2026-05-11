@@ -29,25 +29,26 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
 
-  // Determine if viewer is a provider — check both role and profile existence
-  let isProvider = session?.user?.role === "PROVIDER";
+  // Reliable provider check: query the DB directly
+  let isProvider = false;
   let ownerView = false;
-
-  if (isLoggedIn && session?.user?.id) {
-    const viewerProfile = await prisma.profile.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true },
-    });
-    // If they have a provider profile, treat as provider regardless of role string
-    if (viewerProfile) {
-      isProvider = true;
-      ownerView = viewerProfile.id === profile.id;
+  if (session?.user?.id) {
+    try {
+      const viewerProfile = await prisma.profile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true },
+      });
+      if (viewerProfile) {
+        isProvider = true;
+        ownerView = viewerProfile.id === profile.id;
+      }
+    } catch {
+      // fallback to role string if DB fails
+      isProvider = session.user.role === "PROVIDER";
     }
   }
 
-  // Clients can favorite; providers cannot interact with other profiles
-  const canInteract = !isProvider;
-  const initialFavorited = canInteract && isLoggedIn ? await getFavoriteStatus(profile.id) : false;
+  const initialFavorited = !isProvider && isLoggedIn ? await getFavoriteStatus(profile.id) : false;
 
   const publicMedia = profile.media.filter((m) => m.isPublic);
   const privateCount = profile.media.filter((m) => !m.isPublic).length;
