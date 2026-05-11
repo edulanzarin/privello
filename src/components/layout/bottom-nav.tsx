@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flame, Home, Play, User } from "lucide-react";
+import { Home, Play, Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type BottomNavProps = {
@@ -25,11 +25,10 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
       active: pathname === "/",
     },
     {
-      href: "/em-alta",
-      label: "Em alta",
-      icon: Flame,
-      active: pathname.startsWith("/em-alta"),
-      highlight: true, // coral accent
+      href: "/buscar",
+      label: "Buscar",
+      icon: Search,
+      active: pathname.startsWith("/buscar") || pathname.startsWith("/descobrir"),
     },
     {
       href: "/reels",
@@ -42,7 +41,10 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
       href: profileHref,
       label: isLoggedIn ? "Perfil" : "Entrar",
       icon: User,
-      active: pathname.startsWith("/painel") || pathname.startsWith("/conta/perfil") || pathname === "/entrar",
+      active:
+        pathname.startsWith("/painel") ||
+        pathname.startsWith("/conta") ||
+        pathname === "/entrar",
     },
   ];
 
@@ -56,19 +58,13 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center gap-1 px-4 py-2 text-[10px] font-semibold uppercase tracking-wider transition",
-                item.active
-                  ? item.highlight ? "text-coral" : "text-foreground"
-                  : "text-muted hover:text-foreground",
+                "relative flex flex-col items-center gap-1 px-5 py-2 text-[10px] font-semibold uppercase tracking-wider transition",
+                item.active ? "text-foreground" : "text-muted hover:text-foreground",
               )}
             >
               <div className="relative">
                 <Icon
-                  className={cn(
-                    "h-5 w-5 transition",
-                    item.highlight && item.active && "fill-coral text-coral",
-                    item.highlight && !item.active && "text-muted",
-                  )}
+                  className="h-5 w-5 transition"
                   strokeWidth={item.active ? 2 : 1.5}
                 />
                 {item.soon && (
@@ -78,12 +74,8 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
                 )}
               </div>
               <span>{item.label}</span>
-              {/* Active indicator dot */}
               {item.active && (
-                <span className={cn(
-                  "absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2",
-                  item.highlight ? "bg-coral" : "bg-foreground",
-                )} />
+                <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 bg-coral" />
               )}
             </Link>
           );
