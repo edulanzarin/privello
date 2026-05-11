@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Eye } from "lucide-react";
 
 type Props = {
