@@ -54,18 +54,22 @@ export async function saveDurationOptions(formData: FormData) {
     const minutesRaw = formData.get(`dur_${i}_minutes`);
     if (minutesRaw == null || String(minutesRaw).trim() === "") continue;
     const minutes = Number(minutesRaw);
-    if (!Number.isFinite(minutes) || minutes < 15 || minutes > 24 * 60) continue;
-    const label = String(formData.get(`dur_${i}_label`) ?? "").trim() || `${minutes} min`;
-    const price = Number(formData.get(`dur_${i}_price`));
+    if (!Number.isFinite(minutes) || minutes < 15 || minutes > 24 * 60 * 2) continue;
+
+    const priceRaw = formData.get(`dur_${i}_price`);
+    // Skip rows with empty price — provider doesn't offer this duration
+    if (!priceRaw || String(priceRaw).trim() === "") continue;
+
+    const price = Number(priceRaw);
     if (!Number.isFinite(price) || price < 0) continue;
+
+    const label = String(formData.get(`dur_${i}_label`) ?? "").trim() || `${minutes} min`;
     options.push({ minutes, label, priceBrl: Math.round(price), sortOrder: options.length });
   }
 
-  if (!options.length) throw new Error("Informe ao menos uma duração com preço.");
-
   await prisma.$transaction([
     prisma.profileDurationOption.deleteMany({ where: { profileId: profile.id } }),
-    prisma.profileDurationOption.createMany({
+    ...(options.length > 0 ? [prisma.profileDurationOption.createMany({
       data: options.map((o) => ({
         profileId: profile.id,
         minutes: o.minutes,
@@ -74,7 +78,7 @@ export async function saveDurationOptions(formData: FormData) {
         sortOrder: o.sortOrder,
         active: true,
       })),
-    }),
+    })] : []),
   ]);
 
   revalidatePath("/painel/valores");
