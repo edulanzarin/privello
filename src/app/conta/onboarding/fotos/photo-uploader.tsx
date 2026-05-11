@@ -1,73 +1,64 @@
 "use client";
 
-import { ImagePlus } from "lucide-react";
-import { useState, useTransition } from "react";
-import { addPhotoByUrl } from "@/app/_actions/onboarding";
+import { ImagePlus, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export function PhotoUploader({ isPublic }: { isPublic: boolean }) {
-  const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState("");
+type Props = { isPublic: boolean };
+
+export function PhotoUploader({ isPublic }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
-  function handleAdd() {
-    if (!url.trim()) return;
+  async function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
     setError(null);
-    const fd = new FormData();
-    fd.set("url", url.trim());
-    fd.set("isPublic", String(isPublic));
-    startTransition(async () => {
-      const res = await addPhotoByUrl(fd);
-      if (res?.error) { setError(res.error); return; }
-      setUrl("");
-      setOpen(false);
-    });
-  }
+    setUploading(true);
 
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex h-28 w-28 flex-col items-center justify-center gap-1 border border-dashed border-line bg-white text-[10px] font-semibold uppercase text-muted hover:border-foreground/30"
-      >
-        <ImagePlus className="h-6 w-6" strokeWidth={1.25} />
-        Adicionar
-      </button>
-    );
+    for (const file of Array.from(files)) {
+      const fd = new FormData();
+      fd.set("file", file);
+      fd.set("isPublic", String(isPublic));
+
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro ao enviar foto.");
+        break;
+      }
+    }
+
+    setUploading(false);
+    router.refresh();
   }
 
   return (
-    <div className="flex w-full flex-col gap-2 border border-line bg-white p-4 sm:max-w-sm">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-        {isPublic ? "Foto pública" : "Foto privada"} — cole a URL
-      </p>
+    <div>
       <input
-        type="url"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://..."
-        className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground"
-        autoFocus
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        className="hidden"
+        onChange={(e) => handleFiles(e.target.files)}
       />
-      {error && <p className="text-xs text-coral">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={pending || !url.trim()}
-          className="flex-1 bg-foreground py-2 text-xs font-bold uppercase tracking-wider text-white disabled:opacity-50"
-        >
-          {pending ? "Adicionando…" : "Adicionar"}
-        </button>
-        <button
-          type="button"
-          onClick={() => { setOpen(false); setUrl(""); setError(null); }}
-          className="border border-line px-4 py-2 text-xs text-muted"
-        >
-          Cancelar
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        className="flex h-32 w-32 flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-white text-muted transition hover:border-coral hover:text-coral disabled:opacity-50"
+      >
+        {uploading
+          ? <Loader2 className="h-6 w-6 animate-spin" strokeWidth={1.5} />
+          : <ImagePlus className="h-6 w-6" strokeWidth={1.25} />
+        }
+        <span className="text-[10px] font-semibold uppercase tracking-wider">
+          {uploading ? "Enviando…" : "Adicionar"}
+        </span>
+      </button>
+      {error && <p className="mt-2 text-xs text-coral">{error}</p>}
     </div>
   );
 }

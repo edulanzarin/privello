@@ -4,6 +4,20 @@ import { useState, useTransition } from "react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 
+const LANGUAGE_OPTIONS = [
+  { value: "PT", label: "Português" },
+  { value: "EN", label: "Inglês" },
+  { value: "ES", label: "Espanhol" },
+  { value: "FR", label: "Francês" },
+  { value: "IT", label: "Italiano" },
+  { value: "DE", label: "Alemão" },
+  { value: "JP", label: "Japonês" },
+  { value: "ZH", label: "Mandarim" },
+];
+
+const HAIR_OPTIONS = ["Loiro", "Castanho", "Preto", "Ruivo", "Grisalho", "Colorido"];
+const EYES_OPTIONS = ["Castanhos", "Verdes", "Azuis", "Pretos", "Mel", "Cinzas"];
+
 type Profile = {
   bio: string;
   tagline: string | null;
@@ -30,111 +44,213 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
   const [selectedCitySlug, setSelectedCitySlug] = useState(citySlug);
   const [selectedCityLabel, setSelectedCityLabel] = useState(cityName);
 
+  // Multi-select languages
+  const initialLangs = profile.languages
+    ? profile.languages.split(" · ").map((l) => l.trim())
+    : ["PT"];
+  const [selectedLangs, setSelectedLangs] = useState<string[]>(initialLangs);
+
+  function toggleLang(val: string) {
+    setSelectedLangs((prev) =>
+      prev.includes(val) ? prev.filter((l) => l !== val) : [...prev, val]
+    );
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     const fd = new FormData(e.currentTarget);
     fd.set("citySlug", selectedCitySlug);
     fd.set("cityQuery", selectedCityLabel);
+    fd.set("languages", selectedLangs.join(" · "));
     startTransition(async () => {
       const res = await saveOnboardingPerfil(fd);
       if (res?.error) setError(res.error);
     });
   }
 
-  const field = "w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground";
-  const label = "block text-xs font-semibold uppercase tracking-wider text-muted mb-2";
-  const check = "flex items-center gap-2 text-sm cursor-pointer";
+  const inputCls = "w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground transition";
+  const selectCls = "w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground transition cursor-pointer";
+  const labelCls = "block text-xs font-semibold uppercase tracking-wider text-muted mb-2";
+  const sectionCls = "space-y-2";
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-8 max-w-2xl">
+    <form onSubmit={handleSubmit} className="mt-8 max-w-2xl space-y-8">
       {error && (
-        <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</div>
+        <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
+          {error}
+        </div>
       )}
 
-      {/* Cidade */}
-      <div>
-        <span className={label}>Cidade onde atende</span>
-        <div className="border border-line bg-white">
-          <CityAutocomplete
-            initialLabel={cityName}
-            onSelect={(slug, lbl) => { setSelectedCitySlug(slug); setSelectedCityLabel(lbl); }}
+      {/* ── Localização e contato ── */}
+      <div className="border border-line bg-white p-6 space-y-6">
+        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Localização e contato</p>
+
+        <div className={sectionCls}>
+          <span className={labelCls}>Cidade onde atende <span className="text-coral">*</span></span>
+          <div className="border border-line">
+            <CityAutocomplete
+              initialLabel={cityName}
+              onSelect={(slug, lbl) => { setSelectedCitySlug(slug); setSelectedCityLabel(lbl); }}
+            />
+          </div>
+        </div>
+
+        <div className={sectionCls}>
+          <label className={labelCls}>WhatsApp (com DDD) <span className="text-coral">*</span></label>
+          <input
+            name="whatsappPhone"
+            type="tel"
+            defaultValue={profile.whatsappPhone ?? ""}
+            placeholder="+55 11 99999-9999"
+            className={inputCls}
           />
         </div>
       </div>
 
-      {/* WhatsApp */}
-      <div>
-        <label className={label}>WhatsApp (com DDD)</label>
-        <input name="whatsappPhone" defaultValue={profile.whatsappPhone ?? ""} placeholder="+55 11 99999-9999" className={field} />
+      {/* ── Apresentação ── */}
+      <div className="border border-line bg-white p-6 space-y-6">
+        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Apresentação</p>
+
+        <div className={sectionCls}>
+          <label className={labelCls}>Frase de destaque <span className="text-muted font-normal normal-case">(aparece no topo do perfil)</span></label>
+          <input
+            name="tagline"
+            defaultValue={profile.tagline ?? ""}
+            placeholder="Ex: Encontros com calma e presença de verdade."
+            className={inputCls}
+            maxLength={120}
+          />
+        </div>
+
+        <div className={sectionCls}>
+          <label className={labelCls}>Bio <span className="text-coral">*</span></label>
+          <textarea
+            name="bio"
+            defaultValue={profile.bio}
+            rows={5}
+            required
+            placeholder="Fale sobre você, seu estilo, o que você oferece e como prefere ser contatada..."
+            className={`${inputCls} resize-none`}
+          />
+          <p className="text-[10px] text-muted">Seja autêntica — perfis com bio completa convertem muito mais.</p>
+        </div>
       </div>
 
-      {/* Tagline */}
-      <div>
-        <label className={label}>Tagline <span className="text-muted normal-case font-normal">(frase curta de destaque)</span></label>
-        <input name="tagline" defaultValue={profile.tagline ?? ""} placeholder="Ex: Encontros com calma e presença de verdade." className={field} maxLength={120} />
-      </div>
+      {/* ── Características físicas ── */}
+      <div className="border border-line bg-white p-6 space-y-6">
+        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Características físicas</p>
 
-      {/* Bio */}
-      <div>
-        <label className={label}>Bio <span className="text-coral">*</span></label>
-        <textarea name="bio" defaultValue={profile.bio} rows={5} required placeholder="Fale sobre você, seu estilo, o que oferece..." className={`${field} resize-none`} />
-      </div>
-
-      {/* Atributos físicos */}
-      <div>
-        <p className={label}>Características físicas</p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div>
-            <label className="block text-xs text-muted mb-1">Altura (cm)</label>
-            <input name="heightCm" type="number" defaultValue={profile.heightCm ?? ""} placeholder="168" className={field} min={140} max={220} />
+          <div className={sectionCls}>
+            <label className={labelCls}>Altura (cm)</label>
+            <input
+              name="heightCm"
+              type="number"
+              defaultValue={profile.heightCm ?? ""}
+              placeholder="168"
+              className={inputCls}
+              min={140}
+              max={220}
+            />
           </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Manequim</label>
-            <input name="dressSize" defaultValue={profile.dressSize ?? ""} placeholder="38" className={field} />
+          <div className={sectionCls}>
+            <label className={labelCls}>Manequim</label>
+            <input
+              name="dressSize"
+              defaultValue={profile.dressSize ?? ""}
+              placeholder="38"
+              className={inputCls}
+            />
           </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Cabelo</label>
-            <input name="hair" defaultValue={profile.hair ?? ""} placeholder="Castanho" className={field} />
+          <div className={sectionCls}>
+            <label className={labelCls}>Cabelo</label>
+            <select name="hair" defaultValue={profile.hair ?? ""} className={selectCls}>
+              <option value="">Selecione</option>
+              {HAIR_OPTIONS.map((h) => (
+                <option key={h} value={h}>{h}</option>
+              ))}
+            </select>
           </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Olhos</label>
-            <input name="eyes" defaultValue={profile.eyes ?? ""} placeholder="Castanhos" className={field} />
+          <div className={sectionCls}>
+            <label className={labelCls}>Olhos</label>
+            <select name="eyes" defaultValue={profile.eyes ?? ""} className={selectCls}>
+              <option value="">Selecione</option>
+              {EYES_OPTIONS.map((e) => (
+                <option key={e} value={e}>{e}</option>
+              ))}
+            </select>
           </div>
         </div>
-        <div className="mt-4">
-          <label className="block text-xs text-muted mb-1">Idiomas</label>
-          <input name="languages" defaultValue={profile.languages ?? ""} placeholder="PT · EN · ES" className={`${field} max-w-xs`} />
+
+        <div className={sectionCls}>
+          <label className={labelCls}>Idiomas que fala</label>
+          <div className="flex flex-wrap gap-2">
+            {LANGUAGE_OPTIONS.map((lang) => (
+              <button
+                key={lang.value}
+                type="button"
+                onClick={() => toggleLang(lang.value)}
+                className={`border px-3 py-1.5 text-xs font-semibold transition ${
+                  selectedLangs.includes(lang.value)
+                    ? "border-foreground bg-foreground text-white"
+                    : "border-line bg-white text-muted hover:border-foreground/30"
+                }`}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
+          {selectedLangs.length === 0 && (
+            <p className="text-xs text-coral">Selecione ao menos um idioma.</p>
+          )}
         </div>
       </div>
 
-      {/* Atende a */}
-      <div>
-        <p className={label}>Atende a</p>
-        <div className="flex flex-wrap gap-4">
-          <label className={check}><input type="checkbox" name="servesMen" defaultChecked={profile.servesMen} /> Homens</label>
-          <label className={check}><input type="checkbox" name="servesWomen" defaultChecked={profile.servesWomen} /> Mulheres</label>
-          <label className={check}><input type="checkbox" name="servesCouples" defaultChecked={profile.servesCouples} /> Casais</label>
+      {/* ── Atendimento ── */}
+      <div className="border border-line bg-white p-6 space-y-6">
+        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Atendimento</p>
+
+        <div className={sectionCls}>
+          <label className={labelCls}>Atende a</label>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { name: "servesMen",     label: "Homens",  checked: profile.servesMen },
+              { name: "servesWomen",   label: "Mulheres", checked: profile.servesWomen },
+              { name: "servesCouples", label: "Casais",  checked: profile.servesCouples },
+            ].map((opt) => (
+              <label key={opt.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
+                <input type="checkbox" name={opt.name} defaultChecked={opt.checked} className="hidden" />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className={sectionCls}>
+          <label className={labelCls}>Modalidade</label>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { name: "hasOwnPlace",          label: "Local próprio",       checked: profile.hasOwnPlace },
+              { name: "homeVisit",             label: "A domicílio / hotel", checked: profile.homeVisit },
+              { name: "travelsNational",       label: "Viagens nacionais",   checked: profile.travelsNational },
+              { name: "travelsInternational",  label: "Viagens internacionais", checked: profile.travelsInternational },
+            ].map((opt) => (
+              <label key={opt.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
+                <input type="checkbox" name={opt.name} defaultChecked={opt.checked} className="hidden" />
+                {opt.label}
+              </label>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Atendimento */}
-      <div>
-        <p className={label}>Modalidade de atendimento</p>
-        <div className="flex flex-wrap gap-4">
-          <label className={check}><input type="checkbox" name="hasOwnPlace" defaultChecked={profile.hasOwnPlace} /> Local próprio</label>
-          <label className={check}><input type="checkbox" name="homeVisit" defaultChecked={profile.homeVisit} /> A domicílio / hotel</label>
-          <label className={check}><input type="checkbox" name="travelsNational" defaultChecked={profile.travelsNational} /> Viagens nacionais</label>
-          <label className={check}><input type="checkbox" name="travelsInternational" defaultChecked={profile.travelsInternational} /> Viagens internacionais</label>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between pt-4">
-        <span className="text-xs text-muted">* obrigatório</span>
+      <div className="flex items-center justify-between pt-2">
+        <p className="text-xs text-muted"><span className="text-coral">*</span> obrigatório</p>
         <button
           type="submit"
-          disabled={pending}
-          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-60"
+          disabled={pending || selectedLangs.length === 0}
+          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50"
         >
           {pending ? "Salvando…" : "Continuar →"}
         </button>
