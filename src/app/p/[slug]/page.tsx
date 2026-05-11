@@ -28,16 +28,21 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
-  const isProvider = session?.user?.role === "PROVIDER";
 
-  // Determine viewer relationship to this profile
+  // Determine if viewer is a provider — check both role and profile existence
+  let isProvider = session?.user?.role === "PROVIDER";
   let ownerView = false;
-  if (isProvider && session?.user?.id) {
-    const own = await prisma.profile.findUnique({
+
+  if (isLoggedIn && session?.user?.id) {
+    const viewerProfile = await prisma.profile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
     });
-    ownerView = own?.id === profile.id;
+    // If they have a provider profile, treat as provider regardless of role string
+    if (viewerProfile) {
+      isProvider = true;
+      ownerView = viewerProfile.id === profile.id;
+    }
   }
 
   // Clients can favorite; providers cannot interact with other profiles

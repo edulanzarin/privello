@@ -11,6 +11,7 @@ import { ProfileListRow } from "@/components/profile/profile-list-row";
 import { buildDiscoverHref, parseDiscoverSearchParams } from "@/lib/discover-params";
 import { getOrCreateCityBySlug, listProfilesForCity } from "@/lib/queries";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,15 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   const city = await getOrCreateCityBySlug(citySlug);
 
   const session = await auth();
-  const isProvider = session?.user?.role === "PROVIDER";
+  // Provider detection: check if user has a profile (more reliable than role string)
+  let isProvider = false;
+  if (session?.user?.id) {
+    const viewerProfile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    if (viewerProfile) isProvider = true;
+  }
 
   const profiles = await listProfilesForCity(city.id, filters, sort);
   const count = profiles.length;

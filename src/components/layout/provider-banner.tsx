@@ -3,38 +3,48 @@ import { Eye } from "lucide-react";
 
 type Props = {
   variant: "own-profile" | "other-profile" | "search";
-  profileSlug?: string;
 };
 
-export function ProviderBanner({ variant, profileSlug }: Props) {
+export function ProviderBanner({ variant }: Props) {
   if (variant === "own-profile") {
     return (
-      <div className="flex items-center justify-between gap-4 border-b border-coral/20 bg-coral/5 px-4 py-2.5">
-        <div className="flex items-center gap-2 text-xs text-coral">
-          <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-          <span>Você está visualizando seu próprio perfil — visualizações não são contadas.</span>
+      <div className="border-b border-coral/20 bg-coral/5 px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-coral">
+            <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+            <span>Você está visualizando seu próprio perfil — visualizações não são contadas.</span>
+          </div>
+          <Link href="/painel" className="shrink-0 text-xs font-semibold text-coral underline underline-offset-2">
+            Ir ao painel
+          </Link>
         </div>
-        <Link href="/painel" className="shrink-0 text-xs font-semibold text-coral underline underline-offset-2">
-          Ir ao painel
-        </Link>
       </div>
     );
   }
 
   if (variant === "other-profile") {
     return (
-      <div className="flex items-center gap-2 border-b border-line bg-white px-4 py-2.5 text-xs text-muted">
-        <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-        <span>Você está navegando como acompanhante — visualizações, curtidas e contato não estão disponíveis neste modo.</span>
+      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-amber-700">
+            <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+            <span>Você está navegando como acompanhante — curtidas, contato e visualizações não estão disponíveis.</span>
+          </div>
+          <Link href="/entrar" className="shrink-0 text-xs font-semibold text-amber-700 underline underline-offset-2">
+            Entrar como cliente
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (variant === "search") {
     return (
-      <div className="flex items-center gap-2 border border-line bg-white px-4 py-2.5 text-xs text-muted">
-        <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
-        <span>Você está navegando como acompanhante. Visualizações de outros perfis não são contadas.</span>
+      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 text-xs text-amber-700">
+          <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+          <span>Você está navegando como acompanhante — visualizações de outros perfis não são contadas.</span>
+        </div>
       </div>
     );
   }
