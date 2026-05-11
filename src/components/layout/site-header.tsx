@@ -1,81 +1,42 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 
-const nav = [
-  { href: "/descobrir/sao-paulo-sp", label: "Descobrir" },
-  { href: "/cidades", label: "Cidades" },
-  { href: "/descobrir/sao-paulo-sp?verified=1", label: "Verificadas" },
-  { href: "/novidades", label: "Novidades" },
-];
-
 type SiteHeaderProps = {
-  variant?: "marketing" | "minimal";
-  activeHref?: string;
+  variant?: "default" | "minimal";
 };
 
-export async function SiteHeader({ variant = "marketing", activeHref }: SiteHeaderProps) {
+export async function SiteHeader({ variant = "default" }: SiteHeaderProps) {
   const session = await auth();
+
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 border-b border-line/80 bg-[#fdfcfa]/95 backdrop-blur-md",
-        variant === "minimal" && "border-transparent bg-white",
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+    <header className="sticky top-0 z-50 border-b border-line/60 bg-background/95 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        {/* Logo */}
         <Link href="/" className="text-xl font-black tracking-tight text-foreground">
           privello<span className="text-coral">.</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted md:flex">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "border-b-2 border-transparent pb-0.5 transition hover:text-foreground",
-                activeHref === item.href && "border-foreground text-foreground",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3 sm:gap-4">
-          <button
-            type="button"
-            className="rounded-full p-2 text-foreground hover:bg-black/5"
-            aria-label="Buscar"
-          >
-            <Search className="h-5 w-5" strokeWidth={1.5} />
-          </button>
+        {/* Right side */}
+        <div className="flex items-center gap-2">
           {session ? (
-            <Link href="/painel" className="hidden text-sm font-medium text-foreground sm:inline">
-              Painel
-            </Link>
+            <span className="hidden text-sm text-muted sm:inline">
+              {session.user?.name?.split(" ")[0]}
+            </span>
           ) : (
-            <Link href="/entrar" className="hidden text-sm font-medium text-foreground sm:inline">
-              Entrar
-            </Link>
-          )}
-          {!session && (
-            <Link
-              href="/cadastro/acompanhante"
-              className="rounded-none bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white sm:px-5"
-            >
-              Anunciar perfil
-            </Link>
-          )}
-          {session && (
-            <Link
-              href="/painel"
-              className="rounded-none bg-coral px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white sm:px-5"
-            >
-              Meu painel
-            </Link>
+            <>
+              <Link
+                href="/entrar"
+                className="px-4 py-2 text-xs font-semibold text-foreground transition hover:text-coral"
+              >
+                Entrar
+              </Link>
+              <Link
+                href="/cadastro"
+                className="bg-coral px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-coral/90"
+              >
+                Criar conta
+              </Link>
+            </>
           )}
         </div>
       </div>
