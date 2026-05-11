@@ -83,7 +83,13 @@ export async function saveOnboardingPerfil(formData: FormData) {
   });
 
   revalidatePath("/conta/onboarding/perfil");
-  redirect("/conta/onboarding/fotos");
+  revalidatePath("/painel/perfil");
+  revalidatePath(`/p/${profile.slug}`);
+
+  // Only redirect when called from onboarding (not from painel)
+  const fromOnboarding = formData.get("_from") !== "painel";
+  if (fromOnboarding) redirect("/conta/onboarding/fotos");
+  return { ok: true };
 }
 
 // ── Step 2: Fotos — add a photo by URL ───────────────────────────────────────

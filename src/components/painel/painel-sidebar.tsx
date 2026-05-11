@@ -20,10 +20,10 @@ type Item =
   | { type: "link"; href: string; label: string; icon: typeof LayoutDashboard; badge?: string }
   | { type: "muted"; label: string; icon: typeof LayoutDashboard };
 
-const items: Item[] = [
+const items = (slug: string): Item[] => [
   { type: "link", href: "/painel", label: "Visão geral", icon: LayoutDashboard },
-  { type: "link", href: "/conta/onboarding/perfil", label: "Meu perfil", icon: User },
-  { type: "link", href: "/conta/onboarding/fotos", label: "Fotos", icon: ImageIcon },
+  { type: "link", href: `/p/${slug}`, label: "Ver perfil", icon: User },
+  { type: "link", href: "/painel/perfil", label: "Editar perfil", icon: ImageIcon },
   { type: "link", href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
   { type: "link", href: "/painel/valores", label: "Valores", icon: CircleDollarSign },
   { type: "muted", label: "Cliques no WhatsApp", icon: MessageCircle },
@@ -32,8 +32,9 @@ const items: Item[] = [
   { type: "link", href: "/planos", label: "Plano", icon: Diamond },
 ];
 
-export function PainelSidebar({ displayName }: { displayName: string }) {
+export function PainelSidebar({ displayName, profileSlug }: { displayName: string; profileSlug: string }) {
   const pathname = usePathname();
+  const navItems = items(profileSlug);
 
   return (
     <aside className="flex w-full flex-col border-r border-white/10 bg-sidebar px-4 py-6 text-white md:fixed md:left-0 md:top-0 md:h-[calc(100vh-4rem)] md:w-56 md:overflow-y-auto">
@@ -44,7 +45,7 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
       <p className="mt-8 text-[10px] font-semibold uppercase tracking-wider text-white/40">Painel</p>
 
       <nav className="mt-3 flex flex-1 flex-col gap-0.5">
-        {items.map((item) => {
+        {navItems.map((item) => {
           if (item.type === "muted") {
             return (
               <div
@@ -60,15 +61,15 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
           const isActive =
             item.href === "/painel/financeiro"
               ? pathname.startsWith("/painel/financeiro")
-              : item.href === "/painel/solicitacoes"
-                ? pathname.startsWith("/painel/solicitacoes")
-                : item.href === "/painel/disponibilidade"
-                  ? pathname.startsWith("/painel/disponibilidade")
-                  : item.href === "/painel/valores"
-                    ? pathname.startsWith("/painel/valores")
+              : item.href === "/painel/disponibilidade"
+                ? pathname.startsWith("/painel/disponibilidade")
+                : item.href === "/painel/valores"
+                  ? pathname.startsWith("/painel/valores")
+                  : item.href === "/painel/perfil"
+                    ? pathname.startsWith("/painel/perfil")
                     : item.href === "/painel"
                       ? pathname === "/painel"
-                      : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                      : pathname === item.href;
 
           return (
             <Link

@@ -10,17 +10,19 @@ export default async function PainelLayout({ children }: { children: React.React
   if (!session?.user?.id) redirect("/entrar?callbackUrl=/painel");
 
   let displayName = session.user.name ?? "Anunciante";
+  let profileSlug = "";
   try {
     const profile = await prisma.profile.findUnique({
       where: { userId: session.user.id },
-      select: { displayName: true },
+      select: { displayName: true, slug: true },
     });
     if (profile?.displayName) displayName = profile.displayName;
+    if (profile?.slug) profileSlug = profile.slug;
   } catch { /* offline */ }
 
   return (
     <div className="min-h-screen bg-[#f4f4f2] text-foreground">
-      <PainelSidebar displayName={displayName} />
+      <PainelSidebar displayName={displayName} profileSlug={profileSlug} />
       <div className="md:pl-56">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">{children}</div>
       </div>
