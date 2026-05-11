@@ -39,7 +39,7 @@ export default async function PainelValoresPage() {
         </p>
       </div>
 
-      <form action={saveDurationOptions} className="space-y-4 max-w-lg">
+      <form action={saveDurationOptions} className="space-y-4">
         <div className="border border-line bg-white overflow-hidden">
           {DURATION_OPTIONS.map(({ minutes, label }, i) => {
             const existing = existingByMinutes.get(minutes);

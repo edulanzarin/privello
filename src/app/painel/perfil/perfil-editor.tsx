@@ -98,7 +98,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const card = "border border-line bg-white p-6 space-y-5";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</div>}
       {saved && <div className="border border-success/30 bg-success/5 px-4 py-3 text-sm text-success">Perfil salvo com sucesso.</div>}
 
@@ -106,15 +106,15 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
       <div className={card}>
         <p className="text-sm font-bold">Fotos públicas · {publicPhotos.length}</p>
         <p className="text-xs text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
           {publicPhotos.map((m) => (
-            <div key={m.id} className={`group relative h-28 w-28 overflow-hidden border-2 ${m.isCover ? "border-coral" : "border-line"}`}>
-              <Image src={m.url} alt="" fill className="object-cover" sizes="112px" />
+            <div key={m.id} className={`group relative aspect-square overflow-hidden border-2 ${m.isCover ? "border-coral" : "border-line"}`}>
+              <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
               {m.isCover && <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Capa</span>}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60 opacity-0 transition group-hover:opacity-100">
                 {!m.isCover && (
                   <button type="button" onClick={() => { setCoverPhoto(m.id); router.refresh(); }}
-                    className="w-20 bg-coral py-1 text-[9px] font-bold uppercase text-white">Capa</button>
+                    className="w-16 bg-coral py-1 text-[9px] font-bold uppercase text-white">Capa</button>
                 )}
                 <button type="button" onClick={() => { removePhoto(m.id); router.refresh(); }}
                   className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
@@ -126,7 +126,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
           <input ref={publicRef} type="file" accept="image/*" multiple className="hidden"
             onChange={(e) => uploadFiles(e.target.files, true)} />
           <button type="button" onClick={() => publicRef.current?.click()} disabled={uploading}
-            className="flex h-28 w-28 flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-white text-muted hover:border-coral hover:text-coral disabled:opacity-50">
+            className="flex aspect-square flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-white text-muted hover:border-coral hover:text-coral disabled:opacity-50">
             {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" strokeWidth={1.25} />}
             <span className="text-[10px] font-semibold uppercase">Adicionar</span>
           </button>
@@ -134,10 +134,10 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
         <p className="text-sm font-bold pt-2">Galeria privada · {privatePhotos.length}</p>
         <p className="text-xs text-muted">Conteúdo explícito permitido. Visível apenas para assinantes da plataforma.</p>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
           {privatePhotos.map((m) => (
-            <div key={m.id} className="group relative h-28 w-28 overflow-hidden border border-line">
-              <Image src={m.url} alt="" fill className="object-cover" sizes="112px" />
+            <div key={m.id} className="group relative aspect-square overflow-hidden border border-line">
+              <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition group-hover:opacity-100">
                 <button type="button" onClick={() => { removePhoto(m.id); router.refresh(); }}
                   className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
@@ -149,7 +149,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
           <input ref={privateRef} type="file" accept="image/*" multiple className="hidden"
             onChange={(e) => uploadFiles(e.target.files, false)} />
           <button type="button" onClick={() => privateRef.current?.click()} disabled={uploading}
-            className="flex h-28 w-28 flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-white text-muted hover:border-foreground hover:text-foreground disabled:opacity-50">
+            className="flex aspect-square flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-white text-muted hover:border-foreground hover:text-foreground disabled:opacity-50">
             {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-5 w-5" strokeWidth={1.25} />}
             <span className="text-[10px] font-semibold uppercase">Privada</span>
           </button>
