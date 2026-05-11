@@ -93,6 +93,7 @@ export type DiscoverFilters = {
   onlineOnly?: boolean;
   hasOwnPlace?: boolean;
   homeVisit?: boolean;
+  excludeProfileId?: string; // hide own profile from search results
 };
 
 export type ProfileSort = "relevance" | "price_asc" | "price_desc" | "rating";
@@ -159,6 +160,7 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
   if (filters.onlineOnly) where.isOnline = true;
   if (filters.hasOwnPlace) where.hasOwnPlace = true;
   if (filters.homeVisit) where.homeVisit = true;
+  if (filters.excludeProfileId) where.id = { not: filters.excludeProfileId };
 
   const profiles = await prisma.profile.findMany({
     where,

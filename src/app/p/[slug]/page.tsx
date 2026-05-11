@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Lock, MapPin, Star } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ViewTracker } from "@/components/profile/view-tracker";
 import { FavoriteButton } from "@/components/profile/favorite-button";
+import { PhotoCarousel } from "@/components/profile/photo-carousel";
 import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { formatBrl } from "@/lib/money";
@@ -27,9 +28,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const isLoggedIn = !!session?.user?.id;
   const initialFavorited = isLoggedIn ? await getFavoriteStatus(profile.id) : false;
 
+  // Check if viewer is the profile owner
+  const isOwner = isLoggedIn && session?.user?.id
+    ? (await import("@/lib/prisma")).prisma.profile
+        .findUnique({ where: { userId: session.user.id }, select: { id: true } })
+        .then((p) => p?.id === profile.id)
+    : Promise.resolve(false);
+  const ownerView = await isOwner;
+
   const publicMedia = profile.media.filter((m) => m.isPublic);
-  const cover = publicMedia.find((m) => m.isCover) ?? publicMedia[0];
-  const thumbs = publicMedia.filter((m) => m.id !== cover?.id).slice(0, 2);
   const privateCount = profile.media.filter((m) => !m.isPublic).length;
 
   const memberLabel = profile.memberSince.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
@@ -53,7 +60,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
   return (
     <>
       <SiteHeader activeHref={`/descobrir/${profile.city.slug}`} />
-      <ViewTracker profileId={profile.id} />
+      {/* Only track views for non-owners */}
+      {!ownerView && <ViewTracker profileId={profile.id} />}
+      {ownerView && (
+        <div className="border-b border-coral/20 bg-coral/5 px-4 py-2 text-center text-xs text-coral">
+          Você está visualizando seu próprio perfil — visualizações não são contadas.
+          <Link href="/painel" className="ml-2 font-semibold underline">Ir ao painel</Link>
+        </div>
+      )}
       <main className="min-h-screen pb-16">
         <div className="border-b border-line bg-white">
           <div className="mx-auto max-w-6xl px-4 py-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted sm:px-6">
@@ -136,27 +150,12 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </dl>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
-              <div className="relative aspect-[4/5] w-full bg-line sm:min-h-[420px]">
-                {cover ? (
-                  <Image src={cover.url} alt="" fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" priority />
-                ) : null}
-                <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-1 text-xs text-white">
-                  1 / {publicMedia.length || 1}
-                </span>
-              </div>
-              <div className="flex flex-row gap-3 sm:flex-col">
-                {thumbs.map((m) => (
-                  <div key={m.id} className="relative aspect-square w-24 shrink-0 bg-line sm:aspect-auto sm:h-32 sm:w-full">
-                    <Image src={m.url} alt="" fill className="object-cover" sizes="120px" />
-                  </div>
-                ))}
-                <div className="relative flex flex-1 items-center justify-center border border-dashed border-line bg-black/5 text-center text-xs text-muted">
-                  <span className="flex items-center gap-1 px-2">
-                    <Lock className="h-4 w-4" strokeWidth={1.5} />+{privateCount || 15} privadas
-                  </span>
-                </div>
-              </div>
+            <div>
+              <PhotoCarousel
+                photos={publicMedia}
+                privateCount={privateCount}
+                displayName={profile.displayName}
+              />
             </div>
           </div>
         </section>
