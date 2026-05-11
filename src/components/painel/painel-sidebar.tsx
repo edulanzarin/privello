@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
-  Calendar,
   Diamond,
   ImageIcon,
   LayoutDashboard,
@@ -15,7 +14,6 @@ import {
   CircleDollarSign,
 } from "lucide-react";
 import { LogoutButton } from "@/components/painel/logout-button";
-import { DEMO_PROVIDER_SLUG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 type Item =
@@ -24,8 +22,7 @@ type Item =
 
 const items: Item[] = [
   { type: "link", href: "/painel", label: "Visão geral", icon: LayoutDashboard },
-  { type: "link", href: "/painel/solicitacoes", label: "Solicitações", icon: Calendar, badge: "4" },
-  { type: "link", href: `/p/${DEMO_PROVIDER_SLUG}`, label: "Meu perfil", icon: User },
+  { type: "link", href: "/conta/onboarding/perfil", label: "Meu perfil", icon: User },
   { type: "link", href: "/conta/onboarding/fotos", label: "Fotos", icon: ImageIcon },
   { type: "link", href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
   { type: "link", href: "/painel/valores", label: "Valores", icon: CircleDollarSign },

@@ -1,17 +1,22 @@
 import { PainelSidebar } from "@/components/painel/painel-sidebar";
-import { DEMO_PROVIDER_SLUG } from "@/lib/constants";
-import { getProfileBySlugForPainel } from "@/lib/queries";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
-  let displayName = "Anunciante";
+  const session = await auth();
+  if (!session?.user?.id) redirect("/entrar?callbackUrl=/painel");
+
+  let displayName = session.user.name ?? "Anunciante";
   try {
-    const p = await getProfileBySlugForPainel(DEMO_PROVIDER_SLUG);
-    displayName = p?.displayName ?? p?.user?.name ?? displayName;
-  } catch {
-    /* offline DB */
-  }
+    const profile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { displayName: true },
+    });
+    if (profile?.displayName) displayName = profile.displayName;
+  } catch { /* offline */ }
 
   return (
     <div className="min-h-screen bg-[#f4f4f2] text-foreground">
