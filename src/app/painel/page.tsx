@@ -1,12 +1,51 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Bell, Eye, Heart, MessageCircle, TrendingUp, Zap } from "lucide-react";
+import { Eye, Heart, MessageCircle, TrendingUp, Zap, ArrowUpRight, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { countWhatsAppClicksToday, listWhatsAppClicksRecent } from "@/lib/queries";
+import { countWhatsAppClicksToday, listWhatsAppClicksRecent, listFinancialRecordsForMonth } from "@/lib/queries";
 import { formatBrl } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
+
+// ── SVG Bar Chart ─────────────────────────────────────────────────────────────
+function BarChart({ data, color = "#c8102e" }: { data: number[]; color?: string }) {
+  const max = Math.max(...data, 1);
+  const w = 100 / data.length;
+  return (
+    <svg viewBox={`0 0 ${data.length * 10} 40`} className="w-full" preserveAspectRatio="none">
+      {data.map((v, i) => {
+        const h = (v / max) * 36;
+        return (
+          <rect
+            key={i}
+            x={i * 10 + 1}
+            y={40 - h}
+            width={8}
+            height={h}
+            fill={color}
+            opacity={v === 0 ? 0.15 : 0.85}
+            rx={1}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Sparkline ─────────────────────────────────────────────────────────────────
+function Sparkline({ data, color = "#c8102e" }: { data: number[]; color?: string }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const pts = data
+    .map((v, i) => `${(i / (data.length - 1)) * 100},${40 - (v / max) * 36}`)
+    .join(" ");
+  return (
+    <svg viewBox="0 0 100 40" className="w-full" preserveAspectRatio="none">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default async function PainelOverviewPage() {
   const session = await auth();
@@ -18,184 +57,247 @@ export default async function PainelOverviewPage() {
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
-  const [clicks, clicksToday] = await Promise.all([
-    listWhatsAppClicksRecent(profile.id, 6),
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const today = now.getDate();
+
+  const [clicks, clicksToday, financialRows] = await Promise.all([
+    listWhatsAppClicksRecent(profile.id, 5),
     countWhatsAppClicksToday(profile.id),
+    listFinancialRecordsForMonth(profile.id, year, month),
   ]);
 
-  // Count favorites — use raw to avoid stale client issues
   const favRows = await prisma.$queryRaw<[{ count: bigint }]>`
     SELECT COUNT(*) as count FROM "Favorite" WHERE "profileId" = ${profile.id}
   `;
   const favoritesCount = Number(favRows[0]?.count ?? 0);
-
-  // viewsCurrentPeriod may not be in the cached client yet
   const viewsPeriod = (profile as Record<string, unknown>).viewsCurrentPeriod as number ?? 0;
   const uniqueVisitors = new Set(clicks.map((c) => c.visitor)).size;
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
 
+  // Financial stats
+  const totalMonth = financialRows.reduce((a, r) => a + r.amountBrl, 0);
+  const paidRows   = financialRows.filter((r) => !r.isNoShow);
+  const avgTicket  = paidRows.length > 0 ? Math.round(paidRows.reduce((a, r) => a + r.amountBrl, 0) / paidRows.length) : 0;
+
+  // Revenue by day (last 14 days)
+  const revenueByDay = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(today - 13 + i);
+    const dayStr = d.toDateString();
+    return financialRows
+      .filter((r) => new Date(r.occurredAt).toDateString() === dayStr && !r.isNoShow)
+      .reduce((a, r) => a + r.amountBrl, 0);
+  });
+
+  // WhatsApp clicks last 7 days (mock from recent clicks count)
+  const clicksByDay = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(today - 6 + i);
+    const dayStr = d.toDateString();
+    return clicks.filter((c) => new Date(c.clickedAt).toDateString() === dayStr).length;
+  });
+
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const monthName = now.toLocaleDateString("pt-BR", { month: "long" });
+
+  const isIncomplete = !profile.bio || profile.priceHour === 0 || !profile.whatsappPhone;
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="space-y-6">
+
+      {/* ── Header ── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">
-            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+            {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             {greeting}, {profile.displayName}<span className="text-coral">.</span>
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${
-            profile.isOnline
-              ? "border-success/30 bg-success/10 text-success"
-              : "border-line bg-white text-muted"
+          <span className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-semibold ${
+            profile.isOnline ? "border-success/30 bg-success/10 text-success" : "border-line bg-white text-muted"
           }`}>
-            <span className={`h-2 w-2 rounded-full ${profile.isOnline ? "bg-success" : "bg-muted"}`} />
-            {profile.isOnline ? "Perfil online" : "Perfil pausado"}
+            <span className={`h-1.5 w-1.5 rounded-full ${profile.isOnline ? "bg-success" : "bg-muted"}`} />
+            {profile.isOnline ? "Online" : "Pausado"}
           </span>
-          <Link
-            href={`/p/${profile.slug}`}
-            className="inline-flex items-center gap-2 bg-foreground px-3 py-1.5 text-xs font-medium text-white"
-          >
-            <Eye className="h-4 w-4" strokeWidth={1.5} />
-            Ver perfil público
+          <Link href={`/p/${profile.slug}`}
+            className="inline-flex items-center gap-1.5 border border-line bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground transition">
+            <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Ver perfil
           </Link>
         </div>
       </div>
 
-      {/* Stats cards — real data */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="border border-line bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Visualizações</p>
+      {/* ── Incomplete warning ── */}
+      {isIncomplete && (
+        <div className="flex items-center justify-between gap-4 border border-coral/30 bg-coral/5 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-coral">
+            <AlertCircle className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+            <span>
+              Perfil incompleto —{" "}
+              {!profile.bio && "falta a bio. "}
+              {profile.priceHour === 0 && "falta o valor por hora. "}
+              {!profile.whatsappPhone && "falta o WhatsApp."}
+            </span>
           </div>
-          <p className="mt-3 text-2xl font-bold tabular-nums">{profile.viewsThisMonth.toLocaleString("pt-BR")}</p>
-          <p className="mt-1 text-[10px] text-muted">Total acumulado</p>
-        </div>
-
-        <div className="border border-line bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">WhatsApp hoje</p>
-          </div>
-          <p className="mt-3 text-2xl font-bold tabular-nums">{clicksToday}</p>
-          <p className="mt-1 text-[10px] text-muted">{uniqueVisitors} visitante{uniqueVisitors !== 1 ? "s" : ""} único{uniqueVisitors !== 1 ? "s" : ""}</p>
-        </div>
-
-        <div className="border border-line bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Heart className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Curtidas</p>
-          </div>
-          <p className="mt-3 text-2xl font-bold tabular-nums">{favoritesCount}</p>
-          <p className="mt-1 text-[10px] text-muted">Perfis que te salvaram</p>
-        </div>
-
-        <div className="border border-line bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Visualizações período</p>
-          </div>
-          <p className="mt-3 text-2xl font-bold tabular-nums">{viewsPeriod.toLocaleString("pt-BR")}</p>
-          <p className="mt-1 text-[10px] text-muted">Semana atual (Em alta)</p>
-        </div>
-      </div>
-
-      {/* Boost + WhatsApp clicks */}
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        {/* WhatsApp recent clicks */}
-        <div className="border border-line bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-              Cliques no WhatsApp · hoje · {clicksToday}
-            </h2>
-          </div>
-
-          {profile.whatsappPhone && (
-            <div className="mt-4 flex items-center justify-between border border-line bg-[#fafafa] px-3 py-2 text-sm">
-              <span className="font-mono text-muted">
-                {profile.whatsappPhone.replace(/(\+\d{2})(\d{2})(\d{4,5})(\d{4})/, "$1 $2 $3-$4")}
-              </span>
-              <Link href="/conta/onboarding/perfil" className="text-xs underline text-muted">
-                Editar
-              </Link>
-            </div>
-          )}
-
-          {clicks.length > 0 ? (
-            <ul className="mt-4 space-y-2 text-xs">
-              {clicks.map((c) => (
-                <li key={c.id} className="flex justify-between text-muted">
-                  <span>
-                    {c.clickedAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} · {c.visitor}
-                  </span>
-                  <span>{c.source}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-4 text-sm text-muted">Nenhum clique hoje ainda.</p>
-          )}
-
-          <p className="mt-4 flex gap-2 text-[10px] leading-relaxed text-muted">
-            <span className="text-coral">ⓘ</span>
-            Conversas acontecem no WhatsApp. A Privello não armazena mensagens.
-          </p>
-        </div>
-
-        {/* Boost CTA */}
-        <div className="border border-foreground bg-sidebar p-6 text-white shadow-lg">
-          <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-orange-400" strokeWidth={1.5} />
-            <h2 className="font-bold">Topo da lista</h2>
-          </div>
-          <p className="mt-2 text-sm text-white/70">
-            Disparo único — até 3× mais views nas próximas 24h.
-          </p>
-          {isBoosted ? (
-            <div className="mt-4 rounded border border-orange-500/30 bg-orange-500/10 px-4 py-3">
-              <p className="text-sm font-semibold text-orange-400">Boost ativo</p>
-              <p className="mt-1 text-xs text-white/60">
-                Expira em {new Date(profile.featuredUntil!).toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="mt-4 text-2xl font-bold">R$ 89 / disparo</p>
-              <Link
-                href="/planos"
-                className="mt-6 block w-full bg-white py-3 text-center text-xs font-bold uppercase tracking-wider text-foreground"
-              >
-                Disparar boost agora
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Profile completeness warning */}
-      {(!profile.bio || profile.priceHour === 0 || !profile.whatsappPhone) && (
-        <div className="border border-coral/30 bg-coral/5 p-5">
-          <p className="text-sm font-semibold text-coral">Perfil incompleto</p>
-          <p className="mt-1 text-xs text-muted">
-            {!profile.bio && "Falta a bio. "}
-            {profile.priceHour === 0 && "Falta o valor por hora. "}
-            {!profile.whatsappPhone && "Falta o WhatsApp. "}
-          </p>
-          <Link
-            href="/conta/onboarding/perfil"
-            className="mt-3 inline-block border border-coral px-4 py-2 text-xs font-semibold text-coral"
-          >
-            Completar perfil →
+          <Link href="/painel/perfil" className="shrink-0 text-xs font-bold text-coral underline">
+            Completar →
           </Link>
         </div>
       )}
+
+      {/* ── KPI cards ── */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {/* Views */}
+        <div className="border border-line bg-white p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Visualizações</p>
+            <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">{profile.viewsThisMonth.toLocaleString("pt-BR")}</p>
+          <p className="mt-1 text-[10px] text-muted">acumulado</p>
+          <div className="mt-3 h-8">
+            <Sparkline data={[...Array(7)].map((_, i) => Math.max(0, viewsPeriod - (6 - i) * 2))} color="#6b6b6b" />
+          </div>
+        </div>
+
+        {/* WhatsApp */}
+        <div className="border border-line bg-white p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">WhatsApp hoje</p>
+            <MessageCircle className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">{clicksToday}</p>
+          <p className="mt-1 text-[10px] text-muted">{uniqueVisitors} visitante{uniqueVisitors !== 1 ? "s" : ""} único{uniqueVisitors !== 1 ? "s" : ""}</p>
+          <div className="mt-3 h-8">
+            <BarChart data={clicksByDay} color="#0a9f6e" />
+          </div>
+        </div>
+
+        {/* Curtidas */}
+        <div className="border border-line bg-white p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Curtidas</p>
+            <Heart className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">{favoritesCount}</p>
+          <p className="mt-1 text-[10px] text-muted">perfis salvos</p>
+          <div className="mt-3 h-8 flex items-end gap-0.5">
+            {[...Array(7)].map((_, i) => (
+              <div key={i} className="flex-1 bg-coral/20 rounded-sm"
+                style={{ height: `${20 + i * 5}%` }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Faturamento */}
+        <div className="border border-line bg-white p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Faturamento</p>
+            <TrendingUp className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">{formatBrl(totalMonth)}</p>
+          <p className="mt-1 text-[10px] text-muted capitalize">{monthName}</p>
+          <div className="mt-3 h-8">
+            <BarChart data={revenueByDay} color="#c8102e" />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Charts row ── */}
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+
+        {/* Revenue chart */}
+        <div className="border border-line bg-white p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Faturamento · últimos 14 dias</p>
+              <p className="mt-1 text-lg font-bold">{formatBrl(totalMonth)}</p>
+            </div>
+            <Link href="/painel/financeiro"
+              className="flex items-center gap-1 text-xs font-semibold text-muted hover:text-foreground transition">
+              Ver tudo <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
+            </Link>
+          </div>
+          <div className="h-32">
+            <BarChart data={revenueByDay} color="#c8102e" />
+          </div>
+          <div className="mt-2 flex justify-between text-[10px] text-muted">
+            <span>-13 dias</span>
+            <span>hoje</span>
+          </div>
+          {/* Summary row */}
+          <div className="mt-4 grid grid-cols-3 gap-3 border-t border-line pt-4">
+            <div>
+              <p className="text-[10px] text-muted uppercase tracking-wider">Encontros</p>
+              <p className="mt-1 font-bold">{paidRows.length}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted uppercase tracking-wider">Ticket médio</p>
+              <p className="mt-1 font-bold">{avgTicket > 0 ? formatBrl(avgTicket) : "—"}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted uppercase tracking-wider">No-shows</p>
+              <p className="mt-1 font-bold">{financialRows.filter((r) => r.isNoShow).length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className="space-y-6">
+          {/* Boost */}
+          <div className="border border-foreground bg-sidebar p-5 text-white">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-orange-400" strokeWidth={1.5} />
+              <p className="font-bold text-sm">Boost · topo da lista</p>
+            </div>
+            {isBoosted ? (
+              <div className="mt-3 border border-orange-500/30 bg-orange-500/10 px-3 py-2">
+                <p className="text-xs font-semibold text-orange-400">Boost ativo</p>
+                <p className="mt-0.5 text-[10px] text-white/60">
+                  Expira {new Date(profile.featuredUntil!).toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="mt-2 text-xs text-white/60">Até 3× mais views nas próximas 24h.</p>
+                <p className="mt-3 text-xl font-bold">R$ 89</p>
+                <Link href="/planos"
+                  className="mt-3 block w-full bg-white py-2 text-center text-xs font-bold uppercase tracking-wider text-foreground">
+                  Disparar boost
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Recent WhatsApp clicks */}
+          <div className="border border-line bg-white p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted mb-3">
+              WhatsApp recente
+            </p>
+            {clicks.length === 0 ? (
+              <p className="text-xs text-muted">Nenhum clique ainda.</p>
+            ) : (
+              <ul className="space-y-2">
+                {clicks.map((c) => (
+                  <li key={c.id} className="flex items-center justify-between text-xs">
+                    <span className="text-muted">
+                      {c.clickedAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <span className="font-medium truncate mx-2">{c.visitor}</span>
+                    <span className="text-muted shrink-0">{c.source}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
