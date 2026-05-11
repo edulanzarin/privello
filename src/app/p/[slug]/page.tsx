@@ -308,16 +308,20 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 Inícios possíveis no agendamento: de 30 em 30 minutos dentro destes intervalos (sem exibir ocupação de
                 terceiros).
               </p>
-              <Link
-                href={`/solicitar/${profile.slug}`}
-                className="mt-6 flex w-full items-center justify-center bg-coral py-3 text-sm font-semibold text-white"
-              >
-                Montar horário e mensagem no WhatsApp
-              </Link>
-              <p className="mt-3 text-xs leading-relaxed text-muted">
-                Você escolhe dia, horário e duração; abrimos o WhatsApp com o texto pronto. A confirmação é direto com
-                ela — a Privello não grava a conversa.
-              </p>
+              {!isProvider && (
+                <>
+                  <Link
+                    href={`/solicitar/${profile.slug}`}
+                    className="mt-6 flex w-full items-center justify-center bg-coral py-3 text-sm font-semibold text-white"
+                  >
+                    Montar horário e mensagem no WhatsApp
+                  </Link>
+                  <p className="mt-3 text-xs leading-relaxed text-muted">
+                    Você escolhe dia, horário e duração; abrimos o WhatsApp com o texto pronto. A confirmação é direto com
+                    ela — a Privello não grava a conversa.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </section>
