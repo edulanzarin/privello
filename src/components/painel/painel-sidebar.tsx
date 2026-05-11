@@ -39,7 +39,7 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-full flex-col border-r border-white/10 bg-sidebar px-4 py-6 text-white md:fixed md:left-0 md:top-0 md:h-screen md:w-56">
+    <aside className="flex w-full flex-col border-r border-white/10 bg-sidebar px-4 py-6 text-white md:fixed md:left-0 md:top-0 md:h-[calc(100vh-4rem)] md:w-56 md:overflow-y-auto">
       <Link href="/" className="text-lg font-black tracking-tight">
         privello<span className="text-coral">.</span>
       </Link>
