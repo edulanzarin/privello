@@ -3,7 +3,7 @@ import Link from "next/link";
 export function SiteFooter() {
   return (
     /* pb-20 = space for the fixed bottom nav on mobile */
-    <footer className="border-t border-line bg-white pb-20 pt-10 text-sm text-muted">
+    <footer className="border-t border-line bg-white pt-10 text-sm text-muted">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-lg font-black tracking-tight text-foreground">
           privello<span className="text-coral">.</span>
