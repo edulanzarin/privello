@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Eye } from "lucide-react";
 
 type Props = {
@@ -25,14 +24,9 @@ export function ProviderBanner({ variant }: Props) {
   if (variant === "other-profile") {
     return (
       <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-amber-700">
-            <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-            <span>Você está navegando como acompanhante — curtidas, contato e visualizações não estão disponíveis.</span>
-          </div>
-          <Link href="/entrar" className="shrink-0 text-xs font-semibold text-amber-700 underline underline-offset-2">
-            Entrar como cliente
-          </Link>
+        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 text-xs text-amber-700">
+          <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+          <span>Você está navegando como acompanhante — curtidas, contato e visualizações não estão disponíveis.</span>
         </div>
       </div>
     );

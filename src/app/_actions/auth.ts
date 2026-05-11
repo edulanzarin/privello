@@ -9,15 +9,30 @@ import { AuthError } from "next-auth";
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const callbackUrl = (formData.get("callbackUrl") as string) || "/painel";
+  const callbackUrl = formData.get("callbackUrl") as string | null;
+
+  // Determine redirect based on user role
+  const user = await prisma.user.findUnique({
+    where: { email: email?.toLowerCase() },
+    select: { role: true },
+  });
+
+  // Default redirect: providers go to /painel, clients go to /
+  // Never redirect clients to /painel
+  let redirectTo = "/";
+  if (callbackUrl && !callbackUrl.startsWith("/painel")) {
+    redirectTo = callbackUrl;
+  } else if (user?.role === "PROVIDER") {
+    redirectTo = "/painel";
+  }
 
   try {
-    await signIn("credentials", { email, password, redirectTo: callbackUrl });
+    await signIn("credentials", { email, password, redirectTo });
   } catch (err) {
     if (err instanceof AuthError) {
       return { error: "E-mail ou senha incorretos." };
     }
-    throw err; // redirect throws — let it propagate
+    throw err;
   }
 }
 

@@ -9,13 +9,16 @@ export default async function PainelLayout({ children }: { children: React.React
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar?callbackUrl=/painel");
 
+  // Clients don't have a provider profile — redirect them to home
+  const profile = await prisma.profile.findUnique({
+    where: { userId: session.user.id },
+    select: { displayName: true, slug: true, planTier: true },
+  });
+  if (!profile) redirect("/");
+
   let displayName = session.user.name ?? "Anunciante";
   let profileSlug = "";
   try {
-    const profile = await prisma.profile.findUnique({
-      where: { userId: session.user.id },
-      select: { displayName: true, slug: true },
-    });
     if (profile?.displayName) displayName = profile.displayName;
     if (profile?.slug) profileSlug = profile.slug;
   } catch { /* offline */ }
