@@ -14,6 +14,7 @@ import {
   Clock,
   CircleDollarSign,
 } from "lucide-react";
+import { LogoutButton } from "@/components/painel/logout-button";
 import { DEMO_PROVIDER_SLUG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -39,10 +40,12 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
 
   return (
     <aside className="flex w-full flex-col border-r border-white/10 bg-sidebar px-4 py-6 text-white md:fixed md:left-0 md:top-0 md:h-screen md:w-56">
-      <Link href="/" className="font-serif text-lg font-semibold">
+      <Link href="/" className="text-lg font-black tracking-tight">
         privello<span className="text-coral">.</span>
       </Link>
+
       <p className="mt-8 text-[10px] font-semibold uppercase tracking-wider text-white/40">Painel</p>
+
       <nav className="mt-3 flex flex-1 flex-col gap-0.5">
         {items.map((item) => {
           if (item.type === "muted") {
@@ -56,6 +59,7 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
               </div>
             );
           }
+
           const isActive =
             item.href === "/painel/financeiro"
               ? pathname.startsWith("/painel/financeiro")
@@ -80,7 +84,7 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
             >
               <item.icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
               <span className="flex-1">{item.label}</span>
-              {item.badge ? (
+              {item.badge && (
                 <span
                   className={cn(
                     "rounded px-1.5 py-0.5 text-[10px] font-semibold",
@@ -89,11 +93,12 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
                 >
                   {item.badge}
                 </span>
-              ) : null}
+              )}
             </Link>
           );
         })}
       </nav>
+
       <div className="mt-6 rounded border border-white/10 p-3 text-xs">
         <p className="text-white/50">Plano Premium</p>
         <p className="mt-1 font-semibold">23 dias restantes</p>
@@ -101,9 +106,12 @@ export function PainelSidebar({ displayName }: { displayName: string }) {
           <div className="h-full w-3/4 bg-coral" />
         </div>
       </div>
+
+      {/* User + logout */}
       <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
-        <div className="h-9 w-9 rounded-full bg-white/10" />
-        <span className="truncate text-sm font-medium">{displayName}</span>
+        <div className="h-8 w-8 shrink-0 rounded-full bg-white/10" />
+        <span className="flex-1 truncate text-sm font-medium">{displayName}</span>
+        <LogoutButton />
       </div>
     </aside>
   );
