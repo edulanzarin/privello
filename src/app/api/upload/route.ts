@@ -19,8 +19,10 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  const isPublic = formData.get("isPublic") !== "false";
+  const file      = formData.get("file") as File | null;
+  const isPublic  = formData.get("isPublic") !== "false";
+  const caption   = (formData.get("caption") as string | null)?.trim() || null;
+  const mediaType = (formData.get("mediaType") as string | null) ?? "IMAGE";
 
   if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
   if (!ALLOWED.includes(file.type)) {
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
   const isCover = isPublic && count === 0;
 
   const media = await prisma.media.create({
-    data: { profileId: profile.id, url, isPublic, sortOrder: count, isCover },
+    data: { profileId: profile.id, url, isPublic, sortOrder: count, isCover, caption, mediaType },
   });
 
   return NextResponse.json({ ok: true, media });

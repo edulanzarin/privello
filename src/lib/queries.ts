@@ -172,14 +172,24 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
   return finalizeDiscoverOrder(profiles, sort);
 }
 
-export async function getProfileBySlug(slug: string) {
+export async function getProfileBySlug(slug: string, userId?: string) {
   return prisma.profile.findUnique({
     where: { slug },
     include: {
       city: true,
       district: true,
-      media: { orderBy: { sortOrder: "asc" } },
-      reviews: { orderBy: { createdAt: "desc" }, take: 12 },
+      media: {
+        orderBy: { createdAt: "desc" },
+        include: {
+          _count: { select: { likes: true, comments: true } },
+          likes: userId ? { where: { userId }, select: { id: true } } : false,
+        },
+      },
+      reviews: {
+        orderBy: { createdAt: "desc" },
+        take: 12,
+        include: { user: { select: { id: true, name: true, slug: true } } },
+      },
       availabilityRules: { orderBy: [{ weekday: "asc" }] },
       durationOptions: {
         where: { active: true },
@@ -187,6 +197,18 @@ export async function getProfileBySlug(slug: string) {
       },
     },
   });
+}
+
+export async function isSubscriber(userId: string): Promise<boolean> {
+  const now = new Date();
+  const sub = await prisma.subscription.findFirst({
+    where: { userId, status: "ACTIVE", expiresAt: { gt: now } },
+  });
+  return !!sub;
+}
+
+export async function getUserReviewForProfile(profileId: string, userId: string) {
+  return prisma.review.findUnique({ where: { profileId_userId: { profileId, userId } } });
 }
 
 export async function getPremiumWeekProfiles() {
@@ -427,6 +449,95 @@ export async function listFinancialRecordsForMonth(profileId: string, year: numb
   return prisma.financialRecord.findMany({
     where: { profileId, occurredAt: { gte: start, lte: end } },
     orderBy: { occurredAt: "desc" },
+  });
+}
+
+export async function listReels({
+  cityId,
+  profileId,
+  cursor,
+  limit = 10,
+  userId,
+}: {
+  cityId?: string;
+  profileId?: string;
+  cursor?: string;
+  limit?: number;
+  userId?: string;
+}) {
+  const where: Parameters<typeof prisma.media.findMany>[0]["where"] = {
+    mediaType: "REEL",
+    isPublic: true,
+    profile: {
+      ...(cityId    ? { cityId }    : {}),
+      ...(profileId ? { id: profileId } : {}),
+    },
+  };
+
+  const items = await prisma.media.findMany({
+    where,
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    orderBy: { createdAt: "desc" },
+    include: {
+      profile: {
+        select: {
+          id: true,
+          slug: true,
+          displayName: true,
+          city: { select: { name: true, slug: true } },
+          media: { where: { isCover: true }, take: 1, select: { url: true } },
+        },
+      },
+      _count: { select: { likes: true, comments: true } },
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
+    },
+  });
+
+  const hasMore = items.length > limit;
+  if (hasMore) items.pop();
+
+  return {
+    reels: items.map((r) => ({
+      id: r.id,
+      url: r.url,
+      caption: r.caption,
+      createdAt: r.createdAt.toISOString(),
+      likeCount: r._count.likes,
+      commentCount: r._count.comments,
+      likedByMe: userId ? (r.likes as { id: string }[]).length > 0 : false,
+      profile: {
+        id: r.profile.id,
+        slug: r.profile.slug,
+        displayName: r.profile.displayName,
+        coverUrl: r.profile.media[0]?.url ?? null,
+        cityName: r.profile.city.name,
+        citySlug: r.profile.city.slug,
+      },
+    })),
+    hasMore,
+    nextCursor: hasMore ? items[items.length - 1].id : null,
+  };
+}
+
+export async function listMediaWithCounts(mediaId: string, userId?: string) {
+  return prisma.media.findUnique({
+    where: { id: mediaId },
+    include: {
+      _count: { select: { likes: true, comments: true } },
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
+    },
+  });
+}
+
+export async function listMediaComments(mediaId: string) {
+  return prisma.mediaComment.findMany({
+    where: { mediaId },
+    orderBy: { createdAt: "asc" },
+    take: 50,
+    include: {
+      user: { select: { id: true, name: true, slug: true } },
+    },
   });
 }
 

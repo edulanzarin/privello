@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MapPin, Star, ShieldCheck, Video, Clock3, MessageCircle } from "lucide-react";
+import { MapPin, Star, ShieldCheck, Video, Clock3, MessageCircle, Lock } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProviderBanner } from "@/components/layout/provider-banner";
@@ -9,11 +8,11 @@ import { ViewTracker } from "@/components/profile/view-tracker";
 import { FavoriteButton } from "@/components/profile/favorite-button";
 import { MediaGallery } from "@/components/profile/media-gallery";
 import { AudioPlayer } from "@/components/profile/audio-player";
-import { StoryBar } from "@/components/stories/story-bar";
+import { ProfileStoryCover } from "@/components/profile/profile-story-cover";
 import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlug, getStoriesForProfile } from "@/lib/queries";
+import { getProfileBySlug, getStoriesForProfile, isSubscriber, getUserReviewForProfile } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
@@ -31,11 +30,10 @@ type PageProps = { params: Promise<{ slug: string }> };
 
 export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params;
-  const profile = await getProfileBySlug(slug);
-  if (!profile) notFound();
-
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
+  const profile = await getProfileBySlug(slug, session?.user?.id);
+  if (!profile) notFound();
 
   let isProvider = false;
   let ownerView = false;
@@ -59,24 +57,27 @@ export default async function PublicProfilePage({ params }: PageProps) {
   // Stories ativos deste perfil
   const storyGroup = await getStoriesForProfile(profile.id, session?.user?.id);
   const isClientUser = isLoggedIn && !isProvider;
+  const isSubscriberViewer = isClientUser && session?.user?.id ? await isSubscriber(session.user.id) : false;
+  const userReview = isClientUser && session?.user?.id
+    ? await getUserReviewForProfile(profile.id, session.user.id)
+    : null;
 
-  const publicMedia = profile.media.filter((m) => m.isPublic);
-  const privateCount = profile.media.filter((m) => !m.isPublic).length;
-  const cover = publicMedia.find((m) => m.isCover) ?? publicMedia[0];
+  const allMedia = profile.media.map((m) => ({
+    id: m.id,
+    url: m.url,
+    mediaType: m.mediaType,
+    isPublic: m.isPublic,
+    isCover: m.isCover,
+    caption: m.caption,
+    createdAt: m.createdAt.toISOString(),
+    likeCount: m._count.likes,
+    commentCount: m._count.comments,
+    likedByMe: isClientUser ? (m.likes as { id: string }[]).length > 0 : false,
+  }));
+  const cover = allMedia.find((m) => m.isCover && m.isPublic) ?? allMedia.find((m) => m.isPublic) ?? allMedia[0];
 
   const memberLabel = profile.memberSince.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
   const monthsVerified = Math.max(0, Math.floor((Date.now() - profile.memberSince.getTime()) / (30.44 * 86400000)));
-
-  const rs = profile.reviews;
-  const fallback = profile.ratingAvg;
-  const avgDim = (get: (r: (typeof rs)[0]) => number) =>
-    rs.length ? rs.reduce((a, r) => a + get(r), 0) / rs.length : fallback;
-  const dims = [
-    ["Pontualidade", avgDim((r) => r.punctuality)],
-    ["Descrição",    avgDim((r) => r.descriptionScore)],
-    ["Conversa",     avgDim((r) => r.conversation)],
-    ["Experiência",  avgDim((r) => r.experience)],
-  ] as const;
 
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
   const planBadge = isBoosted
@@ -99,11 +100,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {!isProvider && !ownerView && <ViewTracker profileId={profile.id} />}
       {ownerView  && <ProviderBanner variant="own-profile" />}
       {isProvider && !ownerView && <ProviderBanner variant="other-profile" />}
-
-      {/* Story bar — só aparece se tiver stories ativos */}
-      {storyGroup && (
-        <StoryBar groups={[storyGroup]} isClient={isClientUser} />
-      )}
 
       <main className="min-h-screen pb-20">
 
@@ -217,30 +213,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </dl>
             </div>
 
-            {/* ── Right: Cover photo ── */}
-            <div className="relative overflow-hidden bg-line lg:aspect-[3/4]">
-              {cover ? (
-                <Image
-                  src={cover.url}
-                  alt={profile.displayName}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:1024px) 100vw, 400px"
-                  priority
-                />
-              ) : (
-                <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
-                  <p className="text-sm text-muted">Sem foto</p>
-                </div>
-              )}
-              {/* Plan badge */}
-              <div className={cn(
-                "absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white",
-                planBadge.bg,
-              )}>
-                {planBadge.label}
-              </div>
-            </div>
+            {/* ── Right: Cover photo with story ring ── */}
+            <ProfileStoryCover
+              storyGroup={storyGroup}
+              coverUrl={cover?.url ?? null}
+              displayName={profile.displayName}
+              planBadge={planBadge}
+              isClient={isClientUser}
+            />
           </div>
         </div>
         </section>
@@ -249,9 +229,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
         <section className="border-t border-line bg-white">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <MediaGallery
-              photos={publicMedia}
-              privateCount={privateCount}
+              media={allMedia}
               displayName={profile.displayName}
+              slug={profile.slug}
+              isClient={isClientUser}
+              isSubscriber={isSubscriberViewer}
+              currentUserId={session?.user?.id}
+              isOwner={ownerView}
             />
           </div>
         </section>
@@ -385,35 +369,70 @@ export default async function PublicProfilePage({ params }: PageProps) {
         {/* ── Reviews ── */}
         <section className="border-t border-line py-14">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="font-serif text-3xl">
-                {profile.ratingAvg.toFixed(1)} · {profile.ratingCount} avaliações
+                {profile.ratingAvg > 0 ? (
+                  <>{profile.ratingAvg.toFixed(1)} <span className="text-xl text-muted">· {profile.ratingCount} avaliações</span></>
+                ) : (
+                  <span className="text-2xl text-muted">Sem avaliações ainda</span>
+                )}
               </h2>
-              <div className="grid grid-cols-2 gap-4 text-xs sm:grid-cols-4">
-                {dims.map(([k, v]) => (
-                  <div key={String(k)}>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">{k}</p>
-                    <p className="mt-1 text-lg font-medium">{Number.isFinite(v) ? Number(v).toFixed(1) : "—"}</p>
-                  </div>
+              {/* CTA for eligible clients */}
+              {isClientUser && !ownerView && (
+                isSubscriberViewer ? (
+                  <Link
+                    href={`/avaliar/${profile.slug}`}
+                    className="shrink-0 border border-foreground px-4 py-2 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-foreground hover:text-white transition"
+                  >
+                    {userReview ? "Editar avaliação" : "Avaliar"}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/assinar"
+                    className="shrink-0 text-xs font-semibold text-coral hover:underline"
+                  >
+                    Assine para avaliar
+                  </Link>
+                )
+              )}
+            </div>
+
+            {profile.reviews.length === 0 ? (
+              <p className="mt-8 text-sm text-muted">Nenhuma avaliação ainda.</p>
+            ) : (
+              <div className="mt-10 grid gap-4 md:grid-cols-3">
+                {profile.reviews.map((r) => (
+                  <article key={r.id} className="border border-line bg-white p-5">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-medium text-white">
+                        {(r.user.name ?? "?")[0].toUpperCase()}
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {r.user.slug ? `@${r.user.slug}` : r.user.name}
+                        </p>
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
+                          {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                          <span className="ml-1">{r.createdAt.toLocaleDateString("pt-BR")}</span>
+                        </p>
+                      </div>
+                    </div>
+                    {isSubscriberViewer ? (
+                      r.comment && (
+                        <p className="mt-4 text-sm italic leading-relaxed text-muted">{r.comment}</p>
+                      )
+                    ) : (
+                      <div className="mt-4 flex items-center gap-2 rounded bg-line/50 px-3 py-2">
+                        <Lock className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
+                        <Link href="/assinar" className="text-xs text-coral hover:underline">
+                          Assine para ver o comentário
+                        </Link>
+                      </div>
+                    )}
+                  </article>
                 ))}
               </div>
-            </div>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {profile.reviews.map((r) => (
-                <article key={r.id} className="border border-line bg-white p-5">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-medium text-white">
-                      {r.reviewerInitials}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold">{r.reviewerName}</p>
-                      <p className="text-xs text-muted">{r.createdAt.toLocaleDateString("pt-BR")} · {r.rating.toFixed(1)}</p>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-sm italic leading-relaxed text-muted">{r.text}</p>
-                </article>
-              ))}
-            </div>
+            )}
           </div>
         </section>
       </main>

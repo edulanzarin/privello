@@ -1,0 +1,86 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Check, Lock, ImageIcon, Film, Star } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { isSubscriber } from "@/lib/queries";
+import { SubscribeButton } from "./subscribe-button";
+
+export const dynamic = "force-dynamic";
+
+const PERKS = [
+  { icon: ImageIcon, label: "Fotos privadas desbloqueadas", sub: "Veja as fotos exclusivas de todas as acompanhantes" },
+  { icon: Film, label: "Reels privados", sub: "Acesso a vídeos exclusivos para assinantes" },
+  { icon: Star, label: "Avaliações completas", sub: "Veja e deixe comentários nas avaliações" },
+  { icon: Lock, label: "Comentar nas fotos", sub: "Interaja diretamente com as acompanhantes" },
+];
+
+export default async function AssinarPage() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.id;
+  const isClient = isLoggedIn && session?.user?.role === "CLIENT";
+
+  const alreadySubscribed = isClient ? await isSubscriber(session!.user!.id!) : false;
+
+  if (!isLoggedIn) {
+    redirect("/entrar?callbackUrl=/assinar");
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9f9f7] px-4 py-16">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-coral">Privello Assinante</p>
+          <h1 className="mt-2 font-serif text-4xl">Acesso total</h1>
+          <p className="mt-2 text-sm text-muted">Desbloqueie conteúdo exclusivo em todo o site.</p>
+        </div>
+
+        {/* Pricing card */}
+        <div className="mt-8 border border-line bg-white p-8 shadow-sm">
+          <div className="flex items-end gap-1">
+            <span className="font-serif text-5xl font-light">R$&nbsp;19</span>
+            <span className="mb-1 font-serif text-2xl">,90</span>
+            <span className="mb-2 ml-1 text-sm text-muted">/mês</span>
+          </div>
+          <p className="mt-1 text-xs text-muted">Cancele quando quiser · Renovação mensal</p>
+
+          <ul className="mt-6 space-y-3">
+            {PERKS.map((p) => (
+              <li key={p.label} className="flex gap-3">
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-coral/10">
+                  <Check className="h-3 w-3 text-coral" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{p.label}</p>
+                  <p className="text-xs text-muted">{p.sub}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8">
+            {alreadySubscribed ? (
+              <div className="rounded bg-success/10 px-4 py-3 text-center">
+                <p className="text-sm font-semibold text-success">Você já é assinante ✓</p>
+                <Link href="/" className="mt-1 block text-xs text-muted hover:text-foreground">
+                  Ir para a página inicial
+                </Link>
+              </div>
+            ) : isClient ? (
+              <SubscribeButton />
+            ) : (
+              <p className="text-center text-sm text-muted">
+                Somente clientes podem assinar.{" "}
+                <Link href="/cadastro/cliente" className="text-coral hover:underline">Criar conta de cliente</Link>
+              </p>
+            )}
+          </div>
+        </div>
+
+        <p className="mt-4 text-center text-xs text-muted">
+          Integração de pagamento em breve · Assinatura ativada para demonstração
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
+import { getOrCreateCityBySlug } from "@/lib/queries";
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 export async function loginAction(formData: FormData) {
@@ -57,12 +58,9 @@ export async function registerClientAction(formData: FormData) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-  let slug = base;
-  let attempt = 0;
-  while (await prisma.user.findUnique({ where: { slug } })) {
-    attempt++;
-    slug = `${base}-${attempt}`;
-  }
+  const slug = base;
+  const slugTaken = await prisma.user.findUnique({ where: { slug } });
+  if (slugTaken) return { error: `O @ "${slug}" já está em uso. Tente um nome diferente.` };
 
   await prisma.user.create({
     data: { name, email, password: hash, role: "CLIENT", slug },
@@ -82,10 +80,13 @@ export async function registerProviderAction(formData: FormData) {
   const password    = formData.get("password") as string;
   const displayName = (formData.get("displayName") as string).trim();
   const ageStr      = formData.get("age") as string;
+  const citySlug    = (formData.get("citySlug")  as string | null)?.trim() ?? "";
+  const cityQuery   = (formData.get("cityQuery") as string | null)?.trim() ?? "";
 
   if (!email || !password || !displayName || !ageStr) {
     return { error: "Preencha todos os campos obrigatórios." };
   }
+  if (!citySlug) return { error: "Selecione a cidade onde você atende." };
   if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
 
   const age = parseInt(ageStr, 10);
@@ -104,34 +105,24 @@ export async function registerProviderAction(formData: FormData) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-  let slug = base;
-  let attempt = 0;
-  while (await prisma.profile.findUnique({ where: { slug } })) {
-    attempt++;
-    slug = `${base}-${attempt}`;
-  }
+  const slug = base;
+  const slugTaken = await prisma.profile.findUnique({ where: { slug } });
+  if (slugTaken) return { error: `O @ "${slug}" já está em uso. Tente outro nome artístico.` };
 
   // Generate unique publicCode
   const count = await prisma.profile.count();
   const publicCode = `PRV-${String(count + 1).padStart(3, "0")}`;
 
-  // We need a city — use São Paulo as default, provider can change later
-  let city = await prisma.city.findUnique({ where: { slug: "sao-paulo-sp" } });
-  if (!city) {
-    city = await prisma.city.upsert({
-      where: { slug: "sao-paulo-sp" },
-      update: {},
-      create: { name: "São Paulo", slug: "sao-paulo-sp" },
-    });
-  }
+  // Resolve city from user selection
+  const city = await getOrCreateCityBySlug(citySlug);
+  if (!city) return { error: "Cidade não encontrada. Tente novamente." };
 
-  // Default district
-  let district = await prisma.district.findFirst({ where: { cityId: city.id } });
-  if (!district) {
-    district = await prisma.district.create({
-      data: { name: "Centro", slug: "centro", cityId: city.id },
-    });
-  }
+  // Use "Centro" as default district, creating if not present
+  const district = await prisma.district.upsert({
+    where: { cityId_slug: { cityId: city.id, slug: "centro" } },
+    update: {},
+    create: { name: cityQuery.split(",")[0].trim() || "Centro", slug: "centro", cityId: city.id },
+  });
 
   await prisma.user.create({
     data: {

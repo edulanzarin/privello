@@ -43,6 +43,12 @@ enum FinancialOrigin {
   MANUAL
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -63,6 +69,10 @@ model User {
   favorites       Favorite[]
   storyLikes      StoryLike[]
   storyViews      StoryView[]
+  mediaLikes      MediaLike[]
+  mediaComments   MediaComment[]
+  subscriptions   Subscription[]
+  reviews         Review[]
 }
 
 // NextAuth v5 required models
@@ -219,16 +229,47 @@ model Favorite {
 }
 
 model Media {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   url       String
-  mediaType String  @default("IMAGE")
-  isPublic  Boolean @default(true)
-  sortOrder Int     @default(0)
-  isCover   Boolean @default(false)
+  mediaType String   @default("IMAGE")
+  isPublic  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  isCover   Boolean  @default(false)
+  caption   String?
+  createdAt DateTime @default(now())
+
+  likes    MediaLike[]
+  comments MediaComment[]
 
   @@index([profileId, isPublic, sortOrder])
+  @@index([mediaType, isPublic, createdAt(sort: Desc)])
+}
+
+model MediaLike {
+  id        String   @id @default(cuid())
+  mediaId   String
+  userId    String
+  createdAt DateTime @default(now())
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+  @@index([mediaId])
+}
+
+model MediaComment {
+  id        String   @id @default(cuid())
+  mediaId   String
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([mediaId, createdAt])
+  @@index([userId])
 }
 
 model Story {
@@ -301,20 +342,30 @@ model ProfileDurationOption {
 }
 
 model Review {
-  id               String   @id @default(cuid())
-  profileId        String
-  profile          Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  reviewerInitials String
-  reviewerName     String
-  rating           Float
-  text             String   @db.Text
-  punctuality      Float
-  descriptionScore Float
-  conversation     Float
-  experience       Float
-  createdAt        DateTime @default(now())
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([profileId, createdAt])
+  @@unique([profileId, userId])
+  @@index([profileId, createdAt(sort: Desc)])
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    SubscriptionStatus @default(ACTIVE)
+  expiresAt DateTime
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId, status])
 }
 
 model MeetingRequest {

@@ -136,6 +136,15 @@ export async function setCoverPhoto(mediaId: string) {
   revalidatePath("/conta/onboarding/fotos");
 }
 
+export async function updateMediaCaption(mediaId: string, caption: string) {
+  const profile = await getProviderProfile();
+  await prisma.media.updateMany({
+    where: { id: mediaId, profileId: profile.id },
+    data: { caption: caption.trim() || null },
+  });
+  revalidatePath("/painel/midias");
+}
+
 // ── Step 3: Valores ───────────────────────────────────────────────────────────
 const DURATION_DEFS = [
   { key: "30min",    minutes: 30,   label: "30 min" },
