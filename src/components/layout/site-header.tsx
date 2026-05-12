@@ -39,13 +39,6 @@ export async function SiteHeader({ variant = "default", activeHref }: SiteHeader
           privello<span className="text-coral">.</span>
         </Link>
 
-        {/* Center nav */}
-        <nav className="hidden items-center gap-5 sm:flex">
-          <Link href="/reels" className="text-xs font-semibold uppercase tracking-wider text-muted transition hover:text-foreground">
-            Reels
-          </Link>
-        </nav>
-
         {/* Right side */}
         <div className="flex items-center gap-2">
           {session ? (
