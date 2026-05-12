@@ -43,6 +43,8 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount }: Props
   const [mediaType, setMediaType] = useState("IMAGE");
   const [uploadPublic, setUploadPublic] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Reset visible on tab change
@@ -87,10 +89,17 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount }: Props
     router.refresh();
   }
 
-  async function uploadFiles(files: FileList | null) {
+  function handleFileSelect(files: FileList | null) {
     if (!files?.length) return;
+    const arr = Array.from(files);
+    setPendingFiles(arr);
+    setPreviews(arr.map((f) => URL.createObjectURL(f)));
+  }
+
+  async function uploadFiles() {
+    if (!pendingFiles.length) return;
     setUploading(true);
-    for (const file of Array.from(files)) {
+    for (const file of pendingFiles) {
       const fd = new FormData();
       fd.set("file", file);
       fd.set("isPublic", String(uploadPublic));
@@ -99,10 +108,18 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount }: Props
       if (!res.ok) { const d = await res.json(); toast(d.error ?? "Erro ao enviar.", "error"); break; }
     }
     setUploading(false);
-    toast("Arquivo adicionado.");
+    toast(`${pendingFiles.length} arquivo(s) adicionado(s).`);
+    setPendingFiles([]);
+    setPreviews([]);
     setShowUpload(false);
     setVisTab(uploadPublic ? "publica" : "privada");
     router.refresh();
+  }
+
+  function cancelUpload() {
+    setPendingFiles([]);
+    setPreviews([]);
+    setShowUpload(false);
   }
 
   const cover = publicMedia.find((m) => m.isCover) ?? publicMedia[0];
@@ -155,11 +172,12 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount }: Props
         <div className="border border-line bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-bold">Adicionar mídia</p>
-            <button type="button" onClick={() => setShowUpload(false)}
-              className="text-muted hover:text-foreground">
+            <button type="button" onClick={cancelUpload} className="text-muted hover:text-foreground">
               <X className="h-4 w-4" strokeWidth={2} />
             </button>
           </div>
+
+          {/* Type + visibility */}
           <div className="flex flex-wrap gap-4">
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted mb-2">Tipo</label>
@@ -186,17 +204,64 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount }: Props
               </div>
             </div>
           </div>
+
+          {/* Preview grid or drop zone */}
+          {previews.length > 0 ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                {previews.map((src, i) => (
+                  <div key={i} className="relative overflow-hidden bg-line" style={{ aspectRatio: "3/4" }}>
+                    {pendingFiles[i]?.type.startsWith("video") ? (
+                      <video src={src} className="h-full w-full object-cover" muted playsInline />
+                    ) : (
+                      <img src={src} alt="" className="h-full w-full object-cover" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPendingFiles((f) => f.filter((_, j) => j !== i));
+                        setPreviews((p) => p.filter((_, j) => j !== i));
+                      }}
+                      className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-coral"
+                    >
+                      <X className="h-3 w-3" strokeWidth={2} />
+                    </button>
+                  </div>
+                ))}
+                {/* Add more */}
+                <button type="button" onClick={() => fileRef.current?.click()}
+                  className="flex items-center justify-center border-2 border-dashed border-line bg-white text-muted hover:border-coral hover:text-coral transition"
+                  style={{ aspectRatio: "3/4" }}>
+                  <Plus className="h-6 w-6" strokeWidth={1.5} />
+                </button>
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={uploadFiles} disabled={uploading}
+                  className="flex flex-1 items-center justify-center gap-2 bg-coral py-2.5 text-xs font-bold uppercase tracking-wider text-white disabled:opacity-50">
+                  {uploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando…</> : `Publicar ${pendingFiles.length} arquivo(s)`}
+                </button>
+                <button type="button" onClick={cancelUpload}
+                  className="border border-line px-4 py-2.5 text-xs font-semibold text-muted hover:text-foreground">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" onClick={() => fileRef.current?.click()}
+              className="flex w-full flex-col items-center justify-center gap-3 border-2 border-dashed border-line bg-white py-10 text-muted transition hover:border-coral hover:text-coral">
+              <ImagePlus className="h-8 w-8" strokeWidth={1.25} />
+              <span className="text-sm font-semibold">Clique para selecionar arquivos</span>
+              <span className="text-xs text-muted/60">
+                {mediaType === "IMAGE" ? "JPG, PNG, WebP · máx 8MB" : "MP4, WebM, MOV · máx 50MB"}
+              </span>
+            </button>
+          )}
+
           <input ref={fileRef} type="file"
             accept={mediaType === "IMAGE" ? "image/*" : "video/*"}
             multiple className="hidden"
-            onChange={(e) => uploadFiles(e.target.files)} />
-          <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="flex w-full items-center justify-center gap-3 border-2 border-dashed border-line bg-white py-8 text-muted transition hover:border-coral hover:text-coral disabled:opacity-50">
-            {uploading
-              ? <><Loader2 className="h-5 w-5 animate-spin" /> <span className="text-sm">Enviando…</span></>
-              : <><ImagePlus className="h-5 w-5" strokeWidth={1.25} /> <span className="text-sm font-semibold">Clique para selecionar arquivos</span></>
-            }
-          </button>
+            onChange={(e) => handleFileSelect(e.target.files)} />
+
           {!uploadPublic && <p className="text-[10px] text-muted">Conteúdo explícito permitido na galeria privada.</p>}
         </div>
       )}

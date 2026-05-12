@@ -317,7 +317,7 @@ export type StoryGroup = {
 export async function getStoriesForProfile(profileId: string, userId?: string): Promise<StoryGroup | null> {
   const now = new Date();
   const rawStories = await prisma.story.findMany({
-    where: { profileId, expiresAt: { gt: now } },
+    where: { profileId, expiresAt: { gt: now } }, // no plan restriction for individual profile
     include: {
       profile: {
         select: {

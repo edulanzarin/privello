@@ -106,7 +106,8 @@ export function MediaGallery({ photos, privateCount, displayName }: Props) {
               <button
                 key={m.id}
                 onClick={() => tab === "fotos" && setLightbox(imageItems.indexOf(m))}
-                className="group relative aspect-square overflow-hidden bg-line"
+                className="group relative overflow-hidden bg-line"
+                style={{ aspectRatio: "3/4" }}
               >
                 {m.mediaType === "VIDEO" ? (
                   <video
@@ -135,9 +136,10 @@ export function MediaGallery({ photos, privateCount, displayName }: Props) {
               </button>
             ))}
 
-            {/* Private count cell — show after last visible item on last page */}
+            {/* Private count cell */}
             {!hasMore && privateCount > 0 && tab === "fotos" && (
-              <div className="relative flex aspect-square items-center justify-center bg-foreground/90">
+              <div className="relative flex items-center justify-center bg-foreground/90"
+                style={{ aspectRatio: "3/4" }}>
                 <div className="text-center text-white">
                   <Lock className="mx-auto h-5 w-5 opacity-60" strokeWidth={1.5} />
                   <p className="mt-1.5 text-lg font-bold">+{privateCount}</p>
