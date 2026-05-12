@@ -11,7 +11,10 @@ export default async function OnboardingValoresPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
-  const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
+  const profile = await prisma.profile.findUnique({
+    where: { userId: session.user.id },
+    include: { durationOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } } },
+  });
   if (!profile) redirect("/entrar");
 
   return (

@@ -75,7 +75,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
   const sectionCls = "space-y-2";
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 max-w-2xl space-y-8">
+    <form onSubmit={handleSubmit} className="mt-8 space-y-8">
       {error && (
         <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
           {error}

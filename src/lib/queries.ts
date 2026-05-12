@@ -295,6 +295,89 @@ export async function countWhatsAppClicksToday(profileId: string) {
   });
 }
 
+export type StoryGroup = {
+  profileId: string;
+  slug: string;
+  displayName: string;
+  coverUrl: string;
+  allSeen: boolean;
+  stories: {
+    id: string;
+    mediaUrl: string;
+    mediaType: string;
+    caption: string | null;
+    createdAt: string;
+    viewCount: number;
+    likeCount: number;
+    seenByMe: boolean;
+    likedByMe: boolean;
+  }[];
+};
+
+export async function listStoriesForCity(cityId: string, userId?: string): Promise<StoryGroup[]> {
+  const now = new Date();
+  const rawStories = await prisma.story.findMany({
+    where: {
+      expiresAt: { gt: now },
+      profile: {
+        cityId,
+        planTier: { in: ["DESTAQUE", "PREMIUM"] },
+      },
+    },
+    include: {
+      profile: {
+        select: {
+          id: true,
+          slug: true,
+          displayName: true,
+          media: { where: { isCover: true }, take: 1, select: { url: true } },
+        },
+      },
+      _count: { select: { views: true, likes: true } },
+      views: userId ? { where: { userId }, select: { id: true } } : false,
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // Group by profile, keep profile order by most recent story
+  const groups = new Map<string, StoryGroup>();
+  for (const s of rawStories) {
+    const pId = s.profile.id;
+    if (!groups.has(pId)) {
+      groups.set(pId, {
+        profileId: pId,
+        slug: s.profile.slug,
+        displayName: s.profile.displayName,
+        coverUrl: s.profile.media[0]?.url ?? "https://picsum.photos/seed/x/200/200",
+        allSeen: false,
+        stories: [],
+      });
+    }
+    const g = groups.get(pId)!;
+    const seenByMe = userId ? (s.views as { id: string }[]).length > 0 : false;
+    const likedByMe = userId ? (s.likes as { id: string }[]).length > 0 : false;
+    g.stories.push({
+      id: s.id,
+      mediaUrl: s.mediaUrl,
+      mediaType: s.mediaType,
+      caption: s.caption,
+      createdAt: s.createdAt.toISOString(),
+      viewCount: s._count.views,
+      likeCount: s._count.likes,
+      seenByMe,
+      likedByMe,
+    });
+  }
+
+  // Mark allSeen
+  for (const g of groups.values()) {
+    g.allSeen = g.stories.every((s) => s.seenByMe);
+  }
+
+  return Array.from(groups.values());
+}
+
 export async function listFinancialRecordsForMonth(profileId: string, year: number, month: number) {
   const start = new Date(year, month - 1, 1);
   const end = new Date(year, month, 0, 23, 59, 59, 999);

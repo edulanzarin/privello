@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
   const dir = join(process.cwd(), "public", "uploads", profile.id);
   await mkdir(dir, { recursive: true });
 
-  const ext = file.name.split(".").pop() ?? "jpg";
+  const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
+  const ext = extMap[file.type] ?? "jpg";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   await writeFile(join(dir, filename), buffer);
 

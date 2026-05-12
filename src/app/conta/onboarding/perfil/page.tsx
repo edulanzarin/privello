@@ -27,7 +27,11 @@ export default async function OnboardingPerfilPage() {
         <p className="mt-3 max-w-xl text-sm text-muted">
           Essas informações aparecem no seu anúncio. Seja autêntica — perfis completos convertem mais.
         </p>
-        <PerfilForm profile={profile} cityName={profile.city?.name ?? ""} citySlug={profile.city?.slug ?? ""} />
+        <PerfilForm
+          profile={profile}
+          cityName={profile.city ? `${profile.city.name}, ${profile.city.slug.split("-").pop()?.toUpperCase()}` : ""}
+          citySlug={profile.city?.slug ?? ""}
+        />
       </main>
     </div>
   );

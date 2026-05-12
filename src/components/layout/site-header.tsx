@@ -1,12 +1,35 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 type SiteHeaderProps = {
   variant?: "default" | "minimal";
+  activeHref?: string;
 };
 
-export async function SiteHeader({ variant = "default" }: SiteHeaderProps) {
+export async function SiteHeader({ variant = "default", activeHref }: SiteHeaderProps) {
   const session = await auth();
+
+  let handle: string | null = null;
+  if (session?.user?.id) {
+    if (session.user.role === "PROVIDER") {
+      const p = await prisma.profile.findUnique({
+        where: { userId: session.user.id },
+        select: { slug: true },
+      });
+      handle = p?.slug ?? null;
+    } else {
+      const u = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { slug: true },
+      });
+      handle = u?.slug ?? null;
+    }
+  }
+
+  const userLabel = handle
+    ? `@${handle}`
+    : session?.user?.name?.split(" ")[0] ?? null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-background/95 backdrop-blur-md">
@@ -19,9 +42,12 @@ export async function SiteHeader({ variant = "default" }: SiteHeaderProps) {
         {/* Right side */}
         <div className="flex items-center gap-2">
           {session ? (
-            <span className="hidden text-sm text-muted sm:inline">
-              {session.user?.name?.split(" ")[0]}
-            </span>
+            <Link
+              href={session?.user?.role === "PROVIDER" ? (handle ? `/p/${handle}` : "/painel") : "/conta/perfil"}
+              className="hidden text-sm font-medium text-muted transition hover:text-foreground sm:inline"
+            >
+              {userLabel}
+            </Link>
           ) : (
             <>
               <Link

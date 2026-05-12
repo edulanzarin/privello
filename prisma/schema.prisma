@@ -47,6 +47,7 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  slug      String?  @unique
   image     String?
   role      UserRole @default(CLIENT)
   phone     String?
@@ -60,6 +61,8 @@ model User {
   accounts        Account[]
   sessions        Session[]
   favorites       Favorite[]
+  storyLikes      StoryLike[]
+  storyViews      StoryView[]
 }
 
 // NextAuth v5 required models
@@ -156,6 +159,7 @@ model Profile {
   travelsInternational     Boolean @default(false)
 
   whatsappPhone String?
+  audioUrl      String?
 
   isOnline      Boolean @default(false)
   isVerified    Boolean @default(false)
@@ -175,6 +179,7 @@ model Profile {
   ratingCount Int   @default(0)
 
   media               Media[]
+  stories             Story[]
   reviews             Review[]
   availabilityRules   AvailabilityRule[]
   durationOptions     ProfileDurationOption[]
@@ -218,11 +223,55 @@ model Media {
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   url       String
+  mediaType String  @default("IMAGE")
   isPublic  Boolean @default(true)
   sortOrder Int     @default(0)
   isCover   Boolean @default(false)
 
   @@index([profileId, isPublic, sortOrder])
+}
+
+model Story {
+  id        String      @id @default(cuid())
+  profileId String
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  mediaUrl  String
+  mediaType String      @default("IMAGE")
+  caption   String?
+  expiresAt DateTime
+  createdAt DateTime    @default(now())
+
+  views     StoryView[]
+  likes     StoryLike[]
+
+  @@index([profileId, expiresAt])
+  @@index([expiresAt])
+}
+
+model StoryView {
+  id        String   @id @default(cuid())
+  storyId   String
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime @default(now())
+
+  @@unique([storyId, userId])
+  @@index([storyId])
+  @@index([userId])
+}
+
+model StoryLike {
+  id      String   @id @default(cuid())
+  storyId String
+  story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likedAt DateTime @default(now())
+
+  @@unique([storyId, userId])
+  @@index([storyId])
+  @@index([userId])
 }
 
 model AvailabilityRule {

@@ -25,14 +25,14 @@ const PLAN_CONFIG = {
     wrapClass:  "ring-2 ring-foreground",
     badgeBg:    "bg-foreground",
     badgeText:  "text-white",
-    badgeLabel: "DESTAQUE",
+    badgeLabel: "PLUS",
     priceClass: "text-foreground font-semibold",
   },
   ESSENCIAL: {
     wrapClass:  "ring-1 ring-line",
     badgeBg:    "bg-line",
     badgeText:  "text-muted",
-    badgeLabel: "ESSENCIAL",
+    badgeLabel: "BASIC",
     priceClass: "text-muted font-medium",
   },
 } as const;
@@ -73,6 +73,7 @@ export function ProfileListRow({ profile, className }: { profile: ProfileCardPay
           <p className="text-base font-semibold leading-tight">
             {profile.displayName}, {profile.age}
           </p>
+          <p className="mt-0.5 text-[10px] text-muted/50">@{profile.slug}</p>
           <p className="mt-1 flex items-center gap-1 text-xs text-muted">
             <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.5} />
             {profile.district.name} · {profile.city.name}

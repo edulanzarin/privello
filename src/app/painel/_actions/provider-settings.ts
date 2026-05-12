@@ -6,6 +6,30 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { timeToMinutes } from "@/lib/time-utils";
 
+export async function createStory(formData: FormData) {
+  const profile = await getSessionProfile();
+  if (profile.planTier !== "DESTAQUE" && profile.planTier !== "PREMIUM") {
+    return { error: "Stories disponíveis no plano Plus ou Premium." };
+  }
+  const mediaUrl = (formData.get("mediaUrl") as string).trim();
+  const caption = (formData.get("caption") as string | null)?.trim() || null;
+  if (!mediaUrl) return { error: "URL da mídia obrigatória." };
+
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  await prisma.story.create({
+    data: { profileId: profile.id, mediaUrl, mediaType: "IMAGE", caption, expiresAt },
+  });
+  revalidatePath("/painel/stories");
+}
+
+export async function deleteStory(formData: FormData) {
+  const profile = await getSessionProfile();
+  const storyId = (formData.get("storyId") as string).trim();
+  if (!storyId) return;
+  await prisma.story.deleteMany({ where: { id: storyId, profileId: profile.id } });
+  revalidatePath("/painel/stories");
+}
+
 async function getSessionProfile() {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
@@ -67,7 +91,17 @@ export async function saveDurationOptions(formData: FormData) {
     options.push({ minutes, label, priceBrl: Math.round(price), sortOrder: options.length });
   }
 
+  const paymentMethods = (formData.get("paymentMethods") as string | null)?.trim() || null;
+  const oneHour = options.find((o) => o.minutes === 60);
+
   await prisma.$transaction([
+    prisma.profile.update({
+      where: { id: profile.id },
+      data: {
+        ...(oneHour ? { priceHour: oneHour.priceBrl } : {}),
+        ...(paymentMethods !== undefined ? { paymentMethods } : {}),
+      },
+    }),
     prisma.profileDurationOption.deleteMany({ where: { profileId: profile.id } }),
     ...(options.length > 0 ? [prisma.profileDurationOption.createMany({
       data: options.map((o) => ({
@@ -84,6 +118,83 @@ export async function saveDurationOptions(formData: FormData) {
   revalidatePath("/painel/valores");
   revalidatePath(`/p/${profile.slug}`);
   revalidatePath(`/solicitar/${profile.slug}`);
+}
+
+export async function confirmRequest(formData: FormData) {
+  const profile = await getSessionProfile();
+  const requestId = formData.get("requestId") as string;
+  if (!requestId) return;
+  await prisma.meetingRequest.updateMany({
+    where: { id: requestId, profileId: profile.id, status: "PENDING" },
+    data: { status: "CONFIRMED" },
+  });
+  revalidatePath("/painel/solicitacoes");
+}
+
+export async function declineRequest(formData: FormData) {
+  const profile = await getSessionProfile();
+  const requestId = formData.get("requestId") as string;
+  if (!requestId) return;
+  await prisma.meetingRequest.updateMany({
+    where: { id: requestId, profileId: profile.id, status: "PENDING" },
+    data: { status: "REJECTED" },
+  });
+  revalidatePath("/painel/solicitacoes");
+}
+
+export async function updateFinancialRecord(formData: FormData) {
+  const profile = await getSessionProfile();
+  const recordId = (formData.get("recordId") as string).trim();
+  if (!recordId) return;
+
+  const clientLabel   = (formData.get("clientLabel") as string).trim();
+  const durationLabel = (formData.get("durationLabel") as string).trim();
+  const locationLabel = (formData.get("locationLabel") as string).trim();
+  const paymentLabel  = (formData.get("paymentLabel") as string).trim();
+  const amountBrl     = Number(formData.get("amountBrl"));
+  const isNoShow      = formData.get("isNoShow") === "on";
+
+  if (!clientLabel || !amountBrl) return;
+
+  await prisma.financialRecord.updateMany({
+    where: { id: recordId, profileId: profile.id },
+    data: { clientLabel, durationLabel: durationLabel || "—", locationLabel: locationLabel || "—", paymentLabel: paymentLabel || "—", amountBrl: Math.round(amountBrl), isNoShow },
+  });
+
+  revalidatePath("/painel/financeiro");
+  revalidatePath("/painel");
+}
+
+export async function deleteFinancialRecord(formData: FormData) {
+  const profile = await getSessionProfile();
+  const recordId = (formData.get("recordId") as string).trim();
+  if (!recordId) return;
+
+  await prisma.financialRecord.deleteMany({
+    where: { id: recordId, profileId: profile.id },
+  });
+
+  revalidatePath("/painel/financeiro");
+  revalidatePath("/painel");
+}
+
+export async function changeHandle(formData: FormData): Promise<{ error: string } | undefined> {
+  const profile = await getSessionProfile();
+  const raw = (formData.get("handle") as string ?? "").trim().toLowerCase().replace(/^@/, "");
+
+  if (!raw) return { error: "Handle não pode ser vazio." };
+  if (!/^[a-z0-9_-]{3,30}$/.test(raw)) return { error: "Use letras, números, _ e - (3–30 caracteres)." };
+
+  const existing = await prisma.profile.findFirst({ where: { slug: raw, NOT: { id: profile.id } } });
+  if (existing) return { error: `@${raw} já está em uso.` };
+
+  const oldSlug = profile.slug;
+  await prisma.profile.update({ where: { id: profile.id }, data: { slug: raw } });
+
+  revalidatePath("/painel");
+  revalidatePath("/painel/perfil");
+  revalidatePath(`/p/${oldSlug}`);
+  revalidatePath(`/p/${raw}`);
 }
 
 export async function addFinancialRecord(formData: FormData) {

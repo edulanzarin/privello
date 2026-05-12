@@ -11,21 +11,23 @@ export const dynamic = "force-dynamic";
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────────
 function BarChart({ data, color = "#c8102e" }: { data: number[]; color?: string }) {
   const max = Math.max(...data, 1);
-  const w = 100 / data.length;
+  const n = data.length;
+  const slotW = 100 / n;
+  const gap = Math.max(slotW * 0.18, 0.8);
   return (
-    <svg viewBox={`0 0 ${data.length * 10} 40`} className="w-full" preserveAspectRatio="none">
+    <svg viewBox="0 0 100 40" className="w-full h-full" preserveAspectRatio="none">
       {data.map((v, i) => {
-        const h = (v / max) * 36;
+        const h = v > 0 ? Math.max((v / max) * 36, 2) : 1.5;
         return (
           <rect
             key={i}
-            x={i * 10 + 1}
+            x={i * slotW + gap / 2}
             y={40 - h}
-            width={8}
+            width={slotW - gap}
             height={h}
             fill={color}
-            opacity={v === 0 ? 0.15 : 0.85}
-            rx={1}
+            opacity={v === 0 ? 0.12 : 0.85}
+            rx={0.8}
           />
         );
       })}
@@ -187,11 +189,8 @@ export default async function PainelOverviewPage() {
           </div>
           <p className="mt-3 text-2xl font-bold tabular-nums">{favoritesCount}</p>
           <p className="mt-1 text-[10px] text-muted">perfis salvos</p>
-          <div className="mt-3 h-8 flex items-end gap-0.5">
-            {[...Array(7)].map((_, i) => (
-              <div key={i} className="flex-1 bg-coral/20 rounded-sm"
-                style={{ height: `${20 + i * 5}%` }} />
-            ))}
+          <div className="mt-3 h-8">
+            <BarChart data={[1, 1, 2, 2, 3, 4, Math.max(favoritesCount, 4)]} color="#c8102e" />
           </div>
         </div>
 

@@ -17,7 +17,7 @@ const pills = [
   { href: "/descobrir/curitiba-pr", label: "Curitiba" },
   { href: "/descobrir/balneario-camboriu-sc", label: "Balneário Camboriú" },
   { href: "/descobrir/florianopolis-sc", label: "Florianópolis" },
-  { href: "/descobrir/porto=alegre-rs", label: "Porto Alegre" },
+  { href: "/descobrir/porto-alegre-rs", label: "Porto Alegre" },
 ];
 
 export default async function HomePage() {
@@ -127,8 +127,7 @@ export default async function HomePage() {
               hot.map((p) => <ProfileCard key={p.id} profile={p} />)
             ) : (
               <p className="col-span-full text-center text-sm text-muted">
-                Conecte o Postgres e rode <code className="text-foreground">npm run db:seed</code> para ver perfis de
-                demonstração.
+                Novos perfis em breve. Seja o primeiro a se cadastrar na sua cidade.
               </p>
             )}
           </div>

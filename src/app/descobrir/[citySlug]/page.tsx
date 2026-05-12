@@ -9,7 +9,8 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
 import { ProfileListRow } from "@/components/profile/profile-list-row";
 import { buildDiscoverHref, parseDiscoverSearchParams } from "@/lib/discover-params";
-import { getOrCreateCityBySlug, listProfilesForCity } from "@/lib/queries";
+import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "@/lib/queries";
+import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -51,8 +52,12 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     if (viewerProfile) isProvider = true;
   }
 
-  const profiles = await listProfilesForCity(city.id, filters, sort);
+  const [profiles, storyGroups] = await Promise.all([
+    listProfilesForCity(city.id, filters, sort),
+    listStoriesForCity(city.id, session?.user?.id),
+  ]);
   const count = profiles.length;
+  const isClientUser = !!session?.user?.id && !isProvider;
 
   const sortLabel =
     sort === "price_asc"
@@ -164,6 +169,11 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
             )}
           </div>
         </div>
+
+        {/* ── Stories ── */}
+        {storyGroups.length > 0 && (
+          <StoryBar groups={storyGroups} isClient={isClientUser} />
+        )}
 
         {/* ── Body ── */}
         {count === 0 ? (

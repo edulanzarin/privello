@@ -67,6 +67,8 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Only open the dropdown when the user actually types — not on initial render
+  const userTypedRef = useRef(false);
 
   // Pre-warm the cache as soon as the component mounts
   useEffect(() => {
@@ -75,7 +77,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2) {
+    if (!userTypedRef.current || trimmed.length < 2) {
       setResults([]);
       setOpen(false);
       return;
@@ -136,7 +138,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); }}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder={compact ? "Trocar cidade…" : "Ex: Blumenau, São Paulo…"}
           autoComplete="off"

@@ -132,32 +132,59 @@ export async function removePhoto(mediaId: string) {
 export async function setCoverPhoto(mediaId: string) {
   const profile = await getProviderProfile();
   await prisma.media.updateMany({ where: { profileId: profile.id }, data: { isCover: false } });
-  await prisma.media.update({ where: { id: mediaId }, data: { isCover: true } });
+  await prisma.media.updateMany({ where: { id: mediaId, profileId: profile.id }, data: { isCover: true } });
   revalidatePath("/conta/onboarding/fotos");
 }
 
 // ── Step 3: Valores ───────────────────────────────────────────────────────────
+const DURATION_DEFS = [
+  { key: "30min",    minutes: 30,   label: "30 min" },
+  { key: "1h",       minutes: 60,   label: "1 hora" },
+  { key: "2h",       minutes: 120,  label: "2 horas" },
+  { key: "3h",       minutes: 180,  label: "3 horas" },
+  { key: "4h",       minutes: 240,  label: "4 horas" },
+  { key: "overnight",minutes: 720,  label: "Pernoite" },
+  { key: "travel",   minutes: 1440, label: "Diária" },
+] as const;
+
 export async function saveOnboardingValores(formData: FormData) {
   const profile = await getProviderProfile();
 
-  const priceHour      = Number(formData.get("priceHour"));
-  const priceTwoHours  = formData.get("priceTwoHours") ? Number(formData.get("priceTwoHours")) : null;
-  const priceOvernight = formData.get("priceOvernight") ? Number(formData.get("priceOvernight")) : null;
-  const priceTravelDay = formData.get("priceTravelDay") ? Number(formData.get("priceTravelDay")) : null;
   const paymentMethods = (formData.get("paymentMethods") as string | null)?.trim() || null;
 
-  if (!priceHour || priceHour < 1) return { error: "Informe o valor por hora." };
-
-  await prisma.profile.update({
-    where: { id: profile.id },
-    data: {
-      priceHour,
-      priceTwoHours,
-      priceOvernight,
-      priceTravelDay,
-      paymentMethods,
-    },
+  // Build active duration options from form
+  const options: { minutes: number; label: string; priceBrl: number; sortOrder: number }[] = [];
+  DURATION_DEFS.forEach((d, i) => {
+    const enabled = formData.get(`enabled_${d.key}`) === "1";
+    const price   = Number(formData.get(`price_${d.key}`));
+    if (enabled && price > 0) {
+      options.push({ minutes: d.minutes, label: d.label, priceBrl: price, sortOrder: i });
+    }
   });
+
+  const oneHour = options.find((o) => o.minutes === 60);
+  if (!oneHour) return { error: "Informe o valor para 1 hora (obrigatório)." };
+
+  const twoHours  = options.find((o) => o.minutes === 120);
+  const overnight = options.find((o) => o.minutes === 600);
+  const travel    = options.find((o) => o.minutes === 1440);
+
+  await prisma.$transaction([
+    prisma.profile.update({
+      where: { id: profile.id },
+      data: {
+        priceHour:      oneHour.priceBrl,
+        priceTwoHours:  twoHours?.priceBrl  ?? null,
+        priceOvernight: overnight?.priceBrl ?? null,
+        priceTravelDay: travel?.priceBrl    ?? null,
+        paymentMethods,
+      },
+    }),
+    prisma.profileDurationOption.deleteMany({ where: { profileId: profile.id } }),
+    prisma.profileDurationOption.createMany({
+      data: options.map((o) => ({ ...o, profileId: profile.id, active: true })),
+    }),
+  ]);
 
   revalidatePath("/conta/onboarding/valores");
   redirect("/conta/onboarding/publicar");

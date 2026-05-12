@@ -3,9 +3,21 @@
 import { useState, useTransition } from "react";
 import { registerClientAction } from "@/app/_actions/auth";
 
+function nameToHandle(name: string) {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function ClientRegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [name, setName] = useState("");
+
+  const handle = nameToHandle(name);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,16 +39,27 @@ export function ClientRegisterForm() {
 
       <div>
         <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-          Nome
+          Seu @
         </label>
+        <p className="mt-1 text-xs text-muted">
+          Este será o seu endereço único na plataforma
+        </p>
         <input
           name="name"
           type="text"
           required
           autoComplete="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="mt-2 w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground"
-          placeholder="Seu nome"
+          placeholder="Ex: Duda Querida"
         />
+        {handle && (
+          <p className="mt-1.5 text-xs text-muted">
+            Seu @:{" "}
+            <span className="font-semibold text-foreground">@{handle}</span>
+          </p>
+        )}
       </div>
 
       <div>

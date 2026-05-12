@@ -1,28 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
-import { saveOnboardingValores } from "@/app/_actions/onboarding";
+import { useRouter } from "next/navigation";
+import { saveDurationOptions } from "@/app/painel/_actions/provider-settings";
+import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 
 const DURATIONS = [
-  { key: "30min",    label: "30 min",  required: false },
-  { key: "1h",       label: "1 hora",  required: true  },
-  { key: "2h",       label: "2 horas", required: false },
-  { key: "3h",       label: "3 horas", required: false },
-  { key: "4h",       label: "4 horas", required: false },
-  { key: "overnight",label: "Pernoite",required: false },
-  { key: "travel",   label: "Diária",  required: false },
+  { minutes: 30,   label: "30 min",  required: false },
+  { minutes: 60,   label: "1 hora",  required: true  },
+  { minutes: 120,  label: "2 horas", required: false },
+  { minutes: 180,  label: "3 horas", required: false },
+  { minutes: 240,  label: "4 horas", required: false },
+  { minutes: 720,  label: "Pernoite",required: false },
+  { minutes: 1440, label: "Diária",  required: false },
 ] as const;
 
 const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferência", "Cripto"];
-
-type DurationKey = typeof DURATIONS[number]["key"];
-
-const MINUTES_MAP: Record<DurationKey, number> = {
-  "30min": 30, "1h": 60, "2h": 120, "3h": 180, "4h": 240, "overnight": 720, "travel": 1440,
-};
 
 type DurationOption = { minutes: number; priceBrl: number };
 type Profile = {
@@ -34,38 +29,27 @@ type Profile = {
   durationOptions: DurationOption[];
 };
 
-function initEnabled(profile: Profile): Record<DurationKey, boolean> {
-  const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
-  return {
-    "30min":    byMin.has(30)   || false,
-    "1h":       true,
-    "2h":       byMin.has(120)  || !!profile.priceTwoHours,
-    "3h":       byMin.has(180)  || false,
-    "4h":       byMin.has(240)  || false,
-    "overnight":byMin.has(720)  || !!profile.priceOvernight,
-    "travel":   byMin.has(1440) || !!profile.priceTravelDay,
-  };
-}
-
-function initPrices(profile: Profile): Record<DurationKey, number> {
-  const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
-  return {
-    "30min":    byMin.get(30)?.priceBrl   || 0,
-    "1h":       byMin.get(60)?.priceBrl   || profile.priceHour || 0,
-    "2h":       byMin.get(120)?.priceBrl  || profile.priceTwoHours  || 0,
-    "3h":       byMin.get(180)?.priceBrl  || 0,
-    "4h":       byMin.get(240)?.priceBrl  || 0,
-    "overnight":byMin.get(720)?.priceBrl  || profile.priceOvernight || 0,
-    "travel":   byMin.get(1440)?.priceBrl || profile.priceTravelDay || 0,
-  };
-}
-
 export function ValoresForm({ profile }: { profile: Profile }) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [pending, startTransition] = useTransition();
-  const [err, setErr]              = useState<string | null>(null);
 
-  const [enabled, setEnabled] = useState<Record<DurationKey, boolean>>(() => initEnabled(profile));
-  const [prices,  setPrices]  = useState<Record<DurationKey, number>>(() => initPrices(profile));
+  const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
+
+  const [enabled, setEnabled] = useState<Record<number, boolean>>(() =>
+    Object.fromEntries(DURATIONS.map((d) => [
+      d.minutes,
+      d.required || byMin.has(d.minutes),
+    ]))
+  );
+  const [prices, setPrices] = useState<Record<number, number>>(() =>
+    Object.fromEntries(DURATIONS.map((d) => [
+      d.minutes,
+      byMin.get(d.minutes)?.priceBrl
+        ?? (d.minutes === 60 ? profile.priceHour : 0)
+        ?? 0,
+    ]))
+  );
   const [payments, setPayments] = useState<string[]>(() =>
     profile.paymentMethods ? profile.paymentMethods.split(" · ").map((s) => s.trim()) : []
   );
@@ -76,77 +60,67 @@ export function ValoresForm({ profile }: { profile: Profile }) {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setErr(null);
-    if (!enabled["1h"] || !prices["1h"]) {
-      setErr("Selecione um valor para 1 hora (obrigatório).");
-      return;
-    }
     const fd = new FormData();
+    let idx = 0;
     DURATIONS.forEach((d) => {
-      fd.set(`enabled_${d.key}`, enabled[d.key] ? "1" : "0");
-      fd.set(`price_${d.key}`,   String(prices[d.key] ?? 0));
+      if (!enabled[d.minutes] || !prices[d.minutes]) return;
+      fd.set(`dur_${idx}_minutes`, String(d.minutes));
+      fd.set(`dur_${idx}_label`,   d.label);
+      fd.set(`dur_${idx}_price`,   String(prices[d.minutes]));
+      idx++;
     });
     fd.set("paymentMethods", payments.join(" · "));
     startTransition(async () => {
-      const res = await saveOnboardingValores(fd);
-      if (res?.error) setErr(res.error);
+      await saveDurationOptions(fd);
+      toast("Valores salvos.");
+      router.refresh();
     });
   }
 
   const sel = "w-full border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground transition cursor-pointer disabled:bg-line disabled:text-muted";
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-8">
-      {err && (
-        <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{err}</div>
-      )}
-
-      {/* ── Durações e preços ── */}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Durações */}
       <div className="border border-line bg-white">
         <div className="border-b border-line px-6 py-4">
           <p className="text-xs font-bold uppercase tracking-wider">Durações e valores</p>
           <p className="mt-1 text-xs text-muted">Ative as durações que você oferece e defina o valor de cada uma.</p>
         </div>
-
         <div className="divide-y divide-line">
           {DURATIONS.map((d) => (
-            <div key={d.key} className="flex items-center gap-4 px-6 py-4">
-              {/* Toggle */}
+            <div key={d.minutes} className="flex items-center gap-4 px-6 py-4">
               <button
                 type="button"
                 disabled={d.required}
-                onClick={() => !d.required && setEnabled((p) => ({ ...p, [d.key]: !p[d.key] }))}
+                onClick={() => !d.required && setEnabled((p) => ({ ...p, [d.minutes]: !p[d.minutes] }))}
                 className={cn(
                   "flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-                  enabled[d.key] ? "bg-coral" : "bg-line",
+                  enabled[d.minutes] ? "bg-coral" : "bg-line",
                   d.required && "opacity-60 cursor-not-allowed",
                 )}
               >
                 <span className={cn(
                   "ml-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
-                  enabled[d.key] && "translate-x-4",
+                  enabled[d.minutes] && "translate-x-4",
                 )} />
               </button>
-
-              {/* Label */}
               <span className={cn(
                 "w-20 shrink-0 text-sm font-semibold",
-                !enabled[d.key] && "text-muted",
+                !enabled[d.minutes] && "text-muted",
               )}>
                 {d.label}
                 {d.required && <span className="ml-1 text-coral">*</span>}
               </span>
-
-              {/* Price input */}
               <div className="relative max-w-[180px]">
                 <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">R$</span>
                 <input
                   type="number"
                   min={50}
                   step={50}
-                  disabled={!enabled[d.key]}
-                  value={prices[d.key] || ""}
-                  onChange={(e) => setPrices((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
+                  disabled={!enabled[d.minutes]}
+                  value={prices[d.minutes] || ""}
+                  onChange={(e) => setPrices((p) => ({ ...p, [d.minutes]: Number(e.target.value) }))}
                   placeholder="0"
                   className="w-full border border-line bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-foreground transition disabled:bg-line disabled:text-muted"
                 />
@@ -156,7 +130,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      {/* ── Formas de pagamento ── */}
+      {/* Pagamentos */}
       <div className="border border-line bg-white">
         <div className="border-b border-line px-6 py-4">
           <p className="text-xs font-bold uppercase tracking-wider">Formas de pagamento</p>
@@ -180,18 +154,13 @@ export function ValoresForm({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <Link href="/conta/onboarding/fotos" className="border border-line bg-white px-6 py-3 text-sm font-medium hover:bg-line transition">
-          ← Voltar
-        </Link>
-        <button
-          type="submit"
-          disabled={pending}
-          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50"
-        >
-          {pending ? "Salvando…" : "Continuar →"}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={pending}
+        className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50"
+      >
+        {pending ? "Salvando…" : "Salvar valores"}
+      </button>
     </form>
   );
 }

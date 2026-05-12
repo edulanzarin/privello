@@ -13,12 +13,12 @@ export default function PlanosPage() {
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">Planos para acompanhantes</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">
-            O seu trabalho <em className="not-italic text-foreground/80">com estrutura</em> de marca
+            Sua presença, <em className="not-italic text-foreground/80">com o peso que merece</em>
             <span className="text-coral">.</span>
           </h1>
           <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted">
-            Todos os planos incluem perfil verificado e acesso à plataforma. Sem comissão sobre encontros — cancelamento a
-            qualquer momento.
+            Todos os planos incluem perfil verificado e acesso à plataforma. Sem comissão sobre encontros —
+            cancele quando quiser.
           </p>
 
           <div className="mt-10 inline-flex rounded-full border border-line bg-white p-1 text-xs font-semibold">
@@ -28,12 +28,19 @@ export default function PlanosPage() {
           </div>
 
           <div className="mt-14 grid gap-6 lg:grid-cols-3">
+
+            {/* Aura */}
             <article className="flex flex-col border border-line bg-white p-8">
-              <h2 className="font-serif text-2xl">Essencial</h2>
+              <h2 className="font-serif text-2xl">Basic</h2>
               <p className="mt-1 text-sm italic text-muted">pra começar com o pé direito</p>
-              <p className="mt-6 font-sans text-3xl font-semibold">R$ 39,90 <span className="text-lg font-normal text-muted">/ mês</span></p>
-              <Link href="/entrar" className="mt-8 w-full bg-foreground py-3 text-center text-xs font-semibold uppercase tracking-wider text-white">
-                Assinar Essencial
+              <p className="mt-6 font-sans text-3xl font-semibold">
+                R$ 39,90 <span className="text-lg font-normal text-muted">/ mês</span>
+              </p>
+              <Link
+                href="/entrar"
+                className="mt-8 w-full bg-foreground py-3 text-center text-xs font-semibold uppercase tracking-wider text-white hover:bg-foreground/80 transition"
+              >
+                Assinar Basic
               </Link>
               <ul className="mt-8 space-y-3 text-sm">
                 {[
@@ -56,22 +63,26 @@ export default function PlanosPage() {
               </ul>
             </article>
 
+            {/* Encanto */}
             <article className="relative flex flex-col border-2 border-foreground bg-foreground p-8 text-white">
               <span className="absolute right-4 top-0 -translate-y-1/2 bg-coral px-2 py-1 text-[10px] font-bold uppercase tracking-wide">
                 Mais escolhido
               </span>
-              <h2 className="font-serif text-2xl">Destaque</h2>
+              <h2 className="font-serif text-2xl">Plus</h2>
               <p className="mt-1 text-sm italic text-white/70">pra aparecer mais e converter mais</p>
               <p className="mt-6 text-3xl font-semibold">R$ 89 / mês</p>
-              <Link href="/entrar" className="mt-8 w-full bg-white py-3 text-center text-xs font-semibold uppercase tracking-wider text-foreground">
-                Assinar destaque
+              <Link
+                href="/entrar"
+                className="mt-8 w-full bg-white py-3 text-center text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-white/90 transition"
+              >
+                Assinar Plus
               </Link>
               <ul className="mt-8 space-y-3 text-sm">
                 {[
-                  "Tudo do Essencial",
+                  "Tudo do Basic",
                   "Até 20 fotos + 3 vídeos",
                   "Topo da cidade em rodízio editorial",
-                  "Badge Destaque",
+                  "Badge Plus",
                   "Estatísticas de views",
                   "Pedidos de encontro pelo site",
                 ].map((t) => (
@@ -89,22 +100,23 @@ export default function PlanosPage() {
               </ul>
             </article>
 
+            {/* Ícone */}
             <article className="flex flex-col bg-coral p-8 text-white">
               <h2 className="font-serif text-2xl">Premium</h2>
               <p className="mt-1 text-sm italic text-white/85">controle total do seu negócio</p>
               <p className="mt-6 text-3xl font-semibold">R$ 189 / mês</p>
               <Link
                 href="/entrar"
-                className="mt-8 w-full bg-white py-3 text-center text-xs font-semibold uppercase tracking-wider text-coral"
+                className="mt-8 w-full bg-white py-3 text-center text-xs font-semibold uppercase tracking-wider text-coral hover:bg-white/90 transition"
               >
-                Assinar premium
+                Assinar Premium
               </Link>
               <ul className="mt-8 space-y-3 text-sm">
                 {[
-                  "Tudo do Destaque",
+                  "Tudo do Plus",
                   "Fotos privadas sob liberação",
-                  "Posição premium na home",
-                  "Financeiro completo + exportação",
+                  "Destaque na home da plataforma",
+                  "Financeiro completo + histórico",
                   "Ranking de clientes recorrentes",
                   "1 boost 24h grátis / mês",
                   "Suporte WhatsApp prioritário",
@@ -118,6 +130,7 @@ export default function PlanosPage() {
             </article>
           </div>
 
+          {/* Boost */}
           <div className="mt-12 grid gap-6 border border-line bg-white p-8 lg:grid-cols-[1fr_auto_auto] lg:items-center">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-coral">À la carte</p>
@@ -135,7 +148,10 @@ export default function PlanosPage() {
                 <p className="text-[10px] font-semibold uppercase text-muted">Disparo único</p>
                 <p className="text-2xl font-bold">R$ 89</p>
               </div>
-              <Link href="/painel" className="bg-coral px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white">
+              <Link
+                href="/painel"
+                className="bg-coral px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white hover:bg-coral/90 transition"
+              >
                 Disparar boost
               </Link>
             </div>
@@ -154,7 +170,19 @@ export default function PlanosPage() {
             <details className="mt-8 border-t border-line py-6" open>
               <summary className="cursor-pointer list-none font-medium">Posso cancelar quando quiser?</summary>
               <p className="mt-3 text-sm leading-relaxed text-muted">
-                Sim. Sem fidelidade — cancela em um clique e mantém seu perfil no plano Essencial, se desejar.
+                Sim. Sem fidelidade — cancela em um clique e mantém seu perfil no plano Basic, se desejar.
+              </p>
+            </details>
+            <details className="border-t border-line py-6">
+              <summary className="cursor-pointer list-none font-medium">Posso mudar de plano depois?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Sempre. Suba ou desça de plano a qualquer momento. O valor é cobrado proporcionalmente.
+              </p>
+            </details>
+            <details className="border-t border-line py-6">
+              <summary className="cursor-pointer list-none font-medium">Os dados do financeiro ficam seguros?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Sim. Apenas você tem acesso ao seu financeiro. Nenhum dado é compartilhado com terceiros.
               </p>
             </details>
           </section>

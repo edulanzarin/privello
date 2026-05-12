@@ -49,8 +49,23 @@ export async function registerClientAction(formData: FormData) {
   if (exists) return { error: "Este e-mail já está cadastrado." };
 
   const hash = await bcrypt.hash(password, 12);
+
+  const base = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  let slug = base;
+  let attempt = 0;
+  while (await prisma.user.findUnique({ where: { slug } })) {
+    attempt++;
+    slug = `${base}-${attempt}`;
+  }
+
   await prisma.user.create({
-    data: { name, email, password: hash, role: "CLIENT" },
+    data: { name, email, password: hash, role: "CLIENT", slug },
   });
 
   // Auto-login after register
@@ -63,14 +78,12 @@ export async function registerClientAction(formData: FormData) {
 
 // ── Cadastro acompanhante ─────────────────────────────────────────────────────
 export async function registerProviderAction(formData: FormData) {
-  const name        = (formData.get("name") as string).trim();
   const email       = (formData.get("email") as string).trim().toLowerCase();
   const password    = formData.get("password") as string;
   const displayName = (formData.get("displayName") as string).trim();
   const ageStr      = formData.get("age") as string;
-  const phone       = (formData.get("phone") as string | null)?.trim() ?? "";
 
-  if (!name || !email || !password || !displayName || !ageStr) {
+  if (!email || !password || !displayName || !ageStr) {
     return { error: "Preencha todos os campos obrigatórios." };
   }
   if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
@@ -122,10 +135,9 @@ export async function registerProviderAction(formData: FormData) {
 
   await prisma.user.create({
     data: {
-      name,
+      name: displayName,
       email,
       password: hash,
-      phone: phone || null,
       role: "PROVIDER",
       profile: {
         create: {

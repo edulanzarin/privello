@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Dev\\\\privello\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Dev\\\\privello\\\\src\\\\app\" -Recurse -Force | Where-Object { $_.PSIsContainer } | ForEach-Object { $_.FullName.Replace\\(\"c:\\\\Dev\\\\privello\\\\src\\\\app\\\\\", \"\"\\) } | Sort-Object)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Dev\\\\privello\\\\src\\\\app\\\\api\" -Recurse -Filter \"*.ts\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Dev\\\\privello\\\\src\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx prisma *)",
+      "Bash(npx tsx *)",
+      "PowerShell(cd c:\\\\Dev\\\\privello; $env:PRISMA_MIGRATE_SKIP_INTERACTIVE=\"true\"; npx prisma migrate dev --name add-user-slug --create-only 2>&1)"
+    ]
+  }
+}

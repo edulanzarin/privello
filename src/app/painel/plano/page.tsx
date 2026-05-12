@@ -9,21 +9,21 @@ export const dynamic = "force-dynamic";
 const PLANS = [
   {
     tier: "ESSENCIAL",
-    name: "Essencial",
+    name: "Basic",
     price: "R$ 39,90",
     features: ["Perfil completo", "Aparece em buscas", "Botão WhatsApp", "Selo verificado"],
   },
   {
     tier: "DESTAQUE",
-    name: "Destaque",
+    name: "Plus",
     price: "R$ 89",
-    features: ["Tudo do Essencial", "Até 20 fotos", "Badge Destaque", "Estatísticas de views"],
+    features: ["Tudo do Basic", "Até 20 fotos", "Badge Plus", "Estatísticas de views"],
   },
   {
     tier: "PREMIUM",
     name: "Premium",
     price: "R$ 189",
-    features: ["Tudo do Destaque", "Fotos privadas", "Posição premium", "1 boost grátis/mês"],
+    features: ["Tudo do Plus", "Fotos privadas", "Posição destaque na home", "1 boost grátis/mês"],
   },
 ] as const;
 
@@ -44,7 +44,10 @@ export default async function PainelPlanoPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Plano</h1>
         <p className="mt-1 text-sm text-muted">
-          Plano atual: <span className="font-semibold text-foreground">{profile.planTier}</span>
+          Plano atual:{" "}
+          <span className="font-semibold text-foreground">
+            {{ ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier}
+          </span>
         </p>
       </div>
 

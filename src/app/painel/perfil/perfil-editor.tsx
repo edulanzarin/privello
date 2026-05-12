@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Loader2, Lock, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Lock, Trash2, AtSign, Mic, X, Play, Pause } from "lucide-react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
+import { changeHandle } from "@/app/painel/_actions/provider-settings";
 import { useToast } from "@/components/ui/toast";
 
 const LANGUAGE_OPTIONS = [
@@ -24,10 +25,11 @@ const EYES_OPTIONS = ["Castanhos", "Verdes", "Azuis", "Pretos", "Mel", "Cinzas"]
 
 type Media = { id: string; url: string; isPublic: boolean; isCover: boolean; sortOrder: number };
 type Profile = {
-  slug: string;
+  slug: string | null;
   bio: string;
   tagline: string | null;
   whatsappPhone: string | null;
+  audioUrl: string | null;
   heightCm: number | null;
   dressSize: string | null;
   hair: string | null;
@@ -53,6 +55,14 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const [selectedCityLabel, setSelectedCityLabel] = useState(cityName);
   const publicRef = useRef<HTMLInputElement>(null);
   const privateRef = useRef<HTMLInputElement>(null);
+  const [handleValue, setHandleValue] = useState(profile.slug ?? "");
+  const [handleError, setHandleError] = useState<string | null>(null);
+  const [handlePending, startHandleTransition] = useTransition();
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(profile.audioUrl);
+  const [audioUploading, setAudioUploading] = useState(false);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const audioPreviewRef = useRef<HTMLAudioElement>(null);
 
   const initialLangs = profile.languages?.split(" · ").map((l) => l.trim()) ?? ["PT"];
   const [selectedLangs, setSelectedLangs] = useState<string[]>(initialLangs);
@@ -81,6 +91,22 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     router.refresh();
   }
 
+  async function uploadAudio(file: File) {
+    setAudioUploading(true);
+    const fd = new FormData();
+    fd.set("file", file);
+    const res = await fetch("/api/upload-audio", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) { toast(data.error ?? "Erro ao enviar áudio.", "error"); }
+    else { setAudioUrl(data.url); toast("Áudio salvo com sucesso."); }
+    setAudioUploading(false);
+  }
+
+  async function removeAudio() {
+    const res = await fetch("/api/upload-audio", { method: "DELETE" });
+    if (res.ok) { setAudioUrl(null); setAudioPlaying(false); toast("Áudio removido."); }
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -103,6 +129,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const card = "border border-line bg-white p-6 space-y-5";
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</div>}
 
@@ -113,7 +140,11 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
           {publicPhotos.map((m) => (
             <div key={m.id} className={`group relative aspect-square overflow-hidden border-2 ${m.isCover ? "border-coral" : "border-line"}`}>
-              <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
+              {m.url.match(/\.(mp4|webm|mov)$/i) ? (
+                <video src={m.url} className="h-full w-full object-cover" muted playsInline />
+              ) : (
+                <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
+              )}
               {m.isCover && <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Capa</span>}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60 opacity-0 transition group-hover:opacity-100">
                 {!m.isCover && (
@@ -141,7 +172,11 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
           {privatePhotos.map((m) => (
             <div key={m.id} className="group relative aspect-square overflow-hidden border border-line">
-              <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
+              {m.url.match(/\.(mp4|webm|mov)$/i) ? (
+                <video src={m.url} className="h-full w-full object-cover" muted playsInline />
+              ) : (
+                <Image src={m.url} alt="" fill className="object-cover" sizes="(max-width:640px) 33vw, 128px" />
+              )}
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition group-hover:opacity-100">
                 <button type="button" onClick={async () => { await removePhoto(m.id); toast("Foto removida."); router.refresh(); }}
                   className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
@@ -184,6 +219,68 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
           <label className={lbl}>Bio <span className="text-coral">*</span></label>
           <textarea name="bio" defaultValue={profile.bio} rows={5} required className={`${inp} resize-none`} placeholder="Fale sobre você..." />
         </div>
+      </div>
+
+      {/* ── Voz ── */}
+      <div className={card}>
+        <div className="flex items-center gap-2">
+          <Mic className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          <p className="text-sm font-bold">Voz — "Ouça minha voz"</p>
+        </div>
+        <p className="text-xs text-muted">
+          Um áudio curto (até 2 min) que aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.
+        </p>
+
+        {audioUrl ? (
+          <div className="flex items-center gap-3 rounded border border-line bg-white px-4 py-3">
+            <audio ref={audioPreviewRef} src={audioUrl} onEnded={() => setAudioPlaying(false)} />
+            <button
+              type="button"
+              onClick={() => {
+                const a = audioPreviewRef.current;
+                if (!a) return;
+                if (audioPlaying) { a.pause(); setAudioPlaying(false); }
+                else { a.play(); setAudioPlaying(true); }
+              }}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral text-white hover:bg-coral/90"
+            >
+              {audioPlaying
+                ? <Pause className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
+                : <Play  className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
+              }
+            </button>
+            <p className="flex-1 truncate text-xs text-muted">{audioUrl.split("/").pop()}</p>
+            <button
+              type="button"
+              onClick={removeAudio}
+              className="flex items-center gap-1 text-xs text-muted hover:text-coral"
+            >
+              <X className="h-3.5 w-3.5" /> Remover
+            </button>
+          </div>
+        ) : (
+          <div>
+            <input
+              ref={audioInputRef}
+              type="file"
+              accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/x-m4a,.mp3,.wav,.ogg,.m4a"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAudio(f); }}
+            />
+            <button
+              type="button"
+              onClick={() => audioInputRef.current?.click()}
+              disabled={audioUploading}
+              className="flex items-center gap-2 border border-dashed border-line bg-white px-5 py-3 text-sm text-muted hover:border-coral hover:text-coral disabled:opacity-50 transition"
+            >
+              {audioUploading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <Mic className="h-4 w-4" strokeWidth={1.5} />
+              }
+              {audioUploading ? "Enviando…" : "Enviar áudio"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Características ── */}
@@ -260,5 +357,50 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         </button>
       </div>
     </form>
+
+    {/* ── @handle ── */}
+    <div className="border border-line bg-white p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <AtSign className="h-4 w-4 text-muted" strokeWidth={1.5} />
+        <p className="text-sm font-bold">Seu @handle</p>
+      </div>
+      <p className="text-xs text-muted">
+        É o seu endereço único na plataforma. Visível na URL do seu perfil (privello.com/p/<strong>@handle</strong>).
+      </p>
+      {handleError && <p className="text-sm text-coral">{handleError}</p>}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">@</span>
+          <input
+            value={handleValue}
+            onChange={(e) => setHandleValue(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+            placeholder="seuhandle"
+            maxLength={30}
+            className="w-full border border-line bg-white py-3 pl-7 pr-4 text-sm outline-none focus:border-foreground transition"
+          />
+        </div>
+        <button
+          disabled={handlePending || handleValue === (profile.slug ?? "")}
+          onClick={() => {
+            setHandleError(null);
+            const fd = new FormData();
+            fd.set("handle", handleValue);
+            startHandleTransition(async () => {
+              const res = await changeHandle(fd);
+              if (res?.error) { setHandleError(res.error); return; }
+              toast("@handle atualizado.");
+              router.refresh();
+            });
+          }}
+          className="bg-foreground px-5 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-foreground/80 disabled:opacity-40"
+        >
+          {handlePending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
+        </button>
+      </div>
+      <p className="text-[10px] text-muted">
+        Letras minúsculas, números, _ e - · 3 a 30 caracteres · Link do perfil muda ao trocar
+      </p>
+    </div>
+    </>
   );
 }
