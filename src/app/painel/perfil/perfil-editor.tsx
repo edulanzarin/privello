@@ -8,7 +8,6 @@ import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 import { changeHandle } from "@/app/painel/_actions/provider-settings";
 import { useToast } from "@/components/ui/toast";
-import { MediaManager } from "@/components/painel/media-manager";
 
 const LANGUAGE_OPTIONS = [
   { value: "PT", label: "Português" },
@@ -135,14 +134,6 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     <>
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</div>}
-
-      {/* ── Mídia (Fotos / Vídeos / Reels / Stories) ── */}
-      <MediaManager
-        publicPhotos={profile.media.filter((m) => m.isPublic)}
-        privatePhotos={profile.media.filter((m) => !m.isPublic)}
-        stories={profile.stories}
-        canPostStories={profile.planTier === "DESTAQUE" || profile.planTier === "PREMIUM"}
-      />
 
       {/* ── Localização e contato ── */}
       <div className={card}>

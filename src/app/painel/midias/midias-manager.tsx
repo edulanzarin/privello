@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Lock, Trash2, Star, Upload } from "lucide-react";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
 import { useToast } from "@/components/ui/toast";
-import { MediaGallery } from "@/components/profile/media-gallery";
 import { cn } from "@/lib/utils";
 
 type Media = { id: string; url: string; isPublic: boolean; isCover: boolean; sortOrder: number; mediaType: string };
@@ -114,45 +113,33 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                 ) : null;
               })()}
 
-              {/* Same gallery as public profile */}
-              <MediaGallery
-                photos={publicMedia}
-                privateCount={0}
-                displayName="Minha galeria"
-              />
-
-              {/* Management grid with actions */}
-              <div className="mt-4 border-t border-line pt-4">
-                <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                  Gerenciar · passe o mouse para editar
-                </p>
-                <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-                  {publicMedia.map((m) => (
-                    <div key={m.id} className={cn(
-                      "group relative aspect-square overflow-hidden border-2",
-                      m.isCover ? "border-coral" : "border-line",
-                    )}>
-                      <Image src={m.url} alt="" fill className="object-cover" sizes="96px" />
-                      {m.isCover && (
-                        <span className="absolute left-0 top-0 bg-coral px-1 py-0.5 text-[8px] font-bold uppercase text-white">
-                          Capa
-                        </span>
-                      )}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/70 opacity-0 transition group-hover:opacity-100">
-                        {!m.isCover && (
-                          <button type="button" onClick={() => handleSetCover(m.id)}
-                            className="flex items-center gap-1 rounded bg-coral px-2 py-0.5 text-[9px] font-bold text-white">
-                            <Star className="h-2.5 w-2.5" /> Capa
-                          </button>
-                        )}
-                        <button type="button" onClick={() => handleRemove(m.id)}
-                          className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
-                          <Trash2 className="h-2.5 w-2.5" /> Remover
+              {/* Grid direto com ações no hover */}
+              <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
+                {publicMedia.map((m) => (
+                  <div key={m.id} className={cn(
+                    "group relative aspect-square overflow-hidden border-2",
+                    m.isCover ? "border-coral" : "border-line",
+                  )}>
+                    <Image src={m.url} alt="" fill className="object-cover" sizes="128px" />
+                    {m.isCover && (
+                      <span className="absolute left-0 top-0 bg-coral px-1 py-0.5 text-[8px] font-bold uppercase text-white">
+                        Capa
+                      </span>
+                    )}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/70 opacity-0 transition group-hover:opacity-100">
+                      {!m.isCover && (
+                        <button type="button" onClick={() => handleSetCover(m.id)}
+                          className="flex items-center gap-1 rounded bg-coral px-2 py-0.5 text-[9px] font-bold text-white">
+                          <Star className="h-2.5 w-2.5" /> Capa
                         </button>
-                      </div>
+                      )}
+                      <button type="button" onClick={() => handleRemove(m.id)}
+                        className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
+                        <Trash2 className="h-2.5 w-2.5" /> Remover
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </>
           )}
