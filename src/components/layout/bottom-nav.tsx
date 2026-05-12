@@ -45,7 +45,7 @@ export function BottomNav({ isLoggedIn, userRole }: BottomNavProps) {
     },
     {
       key: "acompanhantes",
-      href: "#",
+      href: "/buscar",
       label: "Acompanhantes",
       icon: Users,
       active: pathname.startsWith("/descobrir") || pathname.startsWith("/buscar"),
