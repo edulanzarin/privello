@@ -214,7 +214,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
 
             {/* ── Right: Cover photo with story ring ── */}
-            <div className="mb-8">
             <ProfileStoryCover
               storyGroup={storyGroup}
               coverUrl={cover?.url ?? null}
@@ -222,7 +221,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
               planBadge={planBadge}
               isClient={isClientUser}
             />
-            </div>
           </div>
         </div>
         </section>

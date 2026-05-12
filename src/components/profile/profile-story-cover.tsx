@@ -36,7 +36,6 @@ export function ProfileStoryCover({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef(0);
-  // Keep next/stopTimers in refs so progress effect deps stay stable
   const nextRef = useRef<() => void>(() => {});
   const stopTimers = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -63,14 +62,12 @@ export function ProfileStoryCover({
     }
   }, [localGroup, idx, close]);
 
-  // Keep nextRef current so the RAF timer can call it without being a dep
   useEffect(() => { nextRef.current = next; }, [next]);
 
   const prev = useCallback(() => {
     if (idx > 0) setIdx((i) => i - 1);
   }, [idx]);
 
-  // Restore seen state from sessionStorage on mount
   useEffect(() => {
     try {
       const seen = new Set<string>(JSON.parse(sessionStorage.getItem("prv_seen") ?? "[]"));
@@ -84,7 +81,6 @@ export function ProfileStoryCover({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Progress + auto-advance — only re-run when open or idx changes, not on localGroup updates
   useEffect(() => {
     if (!open) return;
     stopTimers();
@@ -101,9 +97,8 @@ export function ProfileStoryCover({
     timerRef.current = setTimeout(() => nextRef.current(), DURATION);
     return stopTimers;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, idx]); // intentionally omit next/stopTimers — using refs instead
+  }, [open, idx]);
 
-  // Keyboard
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => {
@@ -116,7 +111,6 @@ export function ProfileStoryCover({
     return () => { window.removeEventListener("keydown", h); document.body.style.overflow = ""; };
   }, [open, close, next, prev]);
 
-  // Mark as seen — use idx as dep, not activeStory object
   useEffect(() => {
     if (!open || !activeStory) return;
     try {
@@ -138,7 +132,7 @@ export function ProfileStoryCover({
       }).catch(() => {});
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, idx]); // intentionally omit activeStory object — use idx instead
+  }, [open, idx]);
 
   async function toggleLike() {
     if (!isClient || !activeStory) return;
@@ -161,74 +155,71 @@ export function ProfileStoryCover({
   return (
     <>
       {/* ── Cover photo ── */}
-      <div className="relative flex flex-col items-center">
-        {/* Gradient ring wrapper */}
+      <div
+        className={cn(
+          hasStory && !allSeen && "bg-gradient-to-br from-coral via-orange-400 to-pink-500 p-[3px]",
+          hasStory && allSeen && "bg-line/50 p-[2px]",
+        )}
+      >
         <div
-          className={cn(
-            "relative w-full overflow-hidden lg:aspect-[3/4]",
-            hasStory && !allSeen && "p-[3px]",
-            hasStory && !allSeen && "bg-gradient-to-br from-coral via-orange-400 to-pink-500",
-            hasStory && allSeen && "p-[2px] bg-line/50",
-          )}
+          className="relative w-full aspect-[3/4] overflow-hidden bg-line"
           onClick={() => hasStory && setOpen(true)}
           style={{ cursor: hasStory ? "pointer" : "default" }}
         >
-          <div className="relative h-full w-full overflow-hidden bg-line">
-            {coverUrl ? (
-              <Image
-                src={coverUrl}
-                alt={displayName}
-                fill
-                className="object-cover"
-                sizes="(max-width:1024px) 100vw, 400px"
-                priority
-              />
-            ) : (
-              <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
-                <p className="text-sm text-muted">Sem foto</p>
-              </div>
-            )}
-
-            {/* Plan badge */}
-            <div className={cn("absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white", planBadge.bg)}>
-              {planBadge.label}
+          {coverUrl ? (
+            <Image
+              src={coverUrl}
+              alt={displayName}
+              fill
+              className="object-cover"
+              sizes="(max-width:1024px) 100vw, 400px"
+              priority
+            />
+          ) : (
+            <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
+              <p className="text-sm text-muted">Sem foto</p>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Story ring avatar — visible below the cover, centered */}
-        {hasStory && (
-          <button
-            onClick={() => setOpen(true)}
-            className="absolute -bottom-5 left-1/2 -translate-x-1/2 z-10"
-          >
-            <div className={cn(
-              "rounded-full p-[3px]",
-              !allSeen
-                ? "bg-gradient-to-br from-coral via-orange-400 to-pink-500"
-                : "bg-line/60",
-            )}>
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-white bg-line">
-                {coverUrl ? (
-                  <Image src={coverUrl} alt={displayName} fill className="object-cover" sizes="48px" />
-                ) : (
-                  <span className="flex h-full w-full items-center justify-center text-sm font-bold text-foreground/50">
-                    {displayName[0]}
-                  </span>
-                )}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <Play className="h-3.5 w-3.5 fill-white text-white" strokeWidth={0} />
+          {/* Plan badge */}
+          <div className={cn("absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white", planBadge.bg)}>
+            {planBadge.label}
+          </div>
+
+          {/* Story indicator — inside the cover, above the plan badge */}
+          {hasStory && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+            >
+              <div className={cn(
+                "rounded-full p-[3px]",
+                !allSeen
+                  ? "bg-gradient-to-br from-coral via-orange-400 to-pink-500"
+                  : "bg-white/40",
+              )}>
+                <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-white bg-line">
+                  {coverUrl ? (
+                    <Image src={coverUrl} alt={displayName} fill className="object-cover" sizes="48px" />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white/70">
+                      {displayName[0]}
+                    </span>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                    <Play className="h-3.5 w-3.5 fill-white text-white" strokeWidth={0} />
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className={cn(
-              "mt-1 text-center text-[10px] font-bold uppercase tracking-wider",
-              !allSeen ? "text-coral" : "text-muted",
-            )}>
-              Stories
-            </p>
-          </button>
-        )}
+              <p className={cn(
+                "text-[10px] font-bold uppercase tracking-wider drop-shadow",
+                !allSeen ? "text-white" : "text-white/70",
+              )}>
+                Stories
+              </p>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Story viewer overlay ── */}
