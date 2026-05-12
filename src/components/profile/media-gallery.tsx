@@ -94,13 +94,14 @@ function PostModal({
   useEffect(() => { initItem(item); }, [item, initItem]);
 
   useEffect(() => {
+    if (!isSubscriber) return; // non-subscribers don't see comments
     setComments([]);
     setLoadingComments(true);
     fetch(`/api/media/comment?mediaId=${item.id}`)
       .then((r) => r.json())
       .then((d) => setComments(d.comments ?? []))
       .finally(() => setLoadingComments(false));
-  }, [item.id]);
+  }, [item.id, isSubscriber]);
 
   useEffect(() => {
     scrollContainerRef.current?.scrollTo({ top: 0 });
@@ -196,9 +197,23 @@ function PostModal({
           </button>
 
           {item.mediaType === "VIDEO" ? (
-            <video src={item.url} controls autoPlay className="absolute inset-0 h-full w-full object-contain" />
+            <video src={item.url} controls autoPlay className={cn("absolute inset-0 h-full w-full object-contain", !item.isPublic && !isSubscriber && "blur-xl")} />
           ) : (
-            <Image src={item.url} alt={displayName} fill className="object-contain" priority />
+            <Image src={item.url} alt={displayName} fill className={cn("object-contain", !item.isPublic && !isSubscriber && "blur-xl")} priority />
+          )}
+
+          {/* Lock overlay for private items when not subscribed */}
+          {!item.isPublic && !isSubscriber && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50">
+              <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
+              <p className="text-sm font-semibold text-white">Conteúdo exclusivo</p>
+              <Link
+                href={isClient ? "/assinar" : "/entrar?callbackUrl=/assinar"}
+                className="rounded-full bg-coral px-5 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-coral/90"
+              >
+                Assinar para ver
+              </Link>
+            </div>
           )}
 
           {items.length > 1 && (
@@ -242,6 +257,7 @@ function PostModal({
           </div>
 
           <div className="px-4 py-3 sm:flex-1 sm:overflow-y-auto">
+            {/* Caption — visible to everyone */}
             {item.caption && (
               <div className="mb-4 flex gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
@@ -256,38 +272,61 @@ function PostModal({
               </div>
             )}
 
-            {loadingComments ? (
-              <p className="py-4 text-center text-xs text-muted">Carregando…</p>
-            ) : comments.length === 0 && !item.caption ? (
-              <p className="py-8 text-center text-xs text-muted">Nenhum comentário ainda.</p>
+            {/* Comments — only visible to subscribers */}
+            {isSubscriber ? (
+              loadingComments ? (
+                <p className="py-4 text-center text-xs text-muted">Carregando…</p>
+              ) : comments.length === 0 && !item.caption ? (
+                <p className="py-8 text-center text-xs text-muted">Nenhum comentário ainda.</p>
+              ) : (
+                <div className="space-y-4">
+                  {comments.map((c) => {
+                    const canDelete = c.user.id === currentUserId || isOwner;
+                    return (
+                      <div key={c.id} className="flex gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
+                          {(c.user.name ?? "?")[0].toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm leading-snug">
+                            <span className="font-bold">{c.user.slug ? `@${c.user.slug}` : c.user.name}</span>{" "}
+                            <span className="text-foreground/80">{c.text}</span>
+                          </p>
+                          <p className="mt-0.5 text-[11px] text-muted">{fmtDate(c.createdAt)}</p>
+                        </div>
+                        {canDelete && (
+                          <button
+                            onClick={() => deleteComment(c.id)}
+                            className="shrink-0 text-muted/40 hover:text-coral transition"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div ref={commentsEndRef} />
+                </div>
+              )
             ) : (
-              <div className="space-y-4">
-                {comments.map((c) => {
-                  const canDelete = c.user.id === currentUserId || isOwner;
-                  return (
-                    <div key={c.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
-                        {(c.user.name ?? "?")[0].toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm leading-snug">
-                          <span className="font-bold">{c.user.slug ? `@${c.user.slug}` : c.user.name}</span>{" "}
-                          <span className="text-foreground/80">{c.text}</span>
-                        </p>
-                        <p className="mt-0.5 text-[11px] text-muted">{fmtDate(c.createdAt)}</p>
-                      </div>
-                      {canDelete && (
-                        <button
-                          onClick={() => deleteComment(c.id)}
-                          className="shrink-0 text-muted/40 hover:text-coral transition"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-                <div ref={commentsEndRef} />
+              /* Non-subscriber: show count + subscribe CTA */
+              <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
+                {curCommentCount > 0 ? (
+                  <>
+                    <p className="text-sm font-medium text-foreground">
+                      {curCommentCount} {curCommentCount === 1 ? "comentário" : "comentários"}
+                    </p>
+                    <p className="text-xs text-muted">Assine para ler os comentários</p>
+                    <Link
+                      href={isClient ? "/assinar" : "/entrar?callbackUrl=/assinar"}
+                      className="mt-1 rounded-full bg-coral px-4 py-1.5 text-xs font-bold text-white hover:bg-coral/90"
+                    >
+                      Assinar — R$19,90/mês
+                    </Link>
+                  </>
+                ) : !item.caption ? (
+                  <p className="text-xs text-muted">Nenhum comentário ainda.</p>
+                ) : null}
               </div>
             )}
           </div>
@@ -367,15 +406,6 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
   }
 
   function handleItemClick(m: MediaItem, idxInActive: number) {
-    if (!m.isPublic && !isSubscriber) {
-      // Private item + not subscribed → redirect to subscribe page
-      if (!isClient) {
-        router.push(`/entrar?callbackUrl=/assinar`);
-      } else {
-        router.push("/assinar");
-      }
-      return;
-    }
     setOpenIdx(idxInActive);
   }
 
