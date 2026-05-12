@@ -5,7 +5,7 @@ import { useState, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, Video, Clapperboard, BookImage, Lock, Loader2, Trash2, Star } from "lucide-react";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
-import { createStory, deleteStory } from "@/app/painel/_actions/provider-settings";
+import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
@@ -282,13 +282,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
                 {/* Post new story */}
                 <div className="border-t border-line pt-5">
                   <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Publicar story</p>
-                  <form
-                    action={async (fd) => {
-                      "use server";
-                      await createStory(fd);
-                    }}
-                    className="space-y-3 max-w-sm"
-                  >
+                  <form action={createStory} className="space-y-3 max-w-sm">
                     <div>
                       <label className="block text-[10px] font-semibold uppercase text-muted mb-1">URL da imagem / vídeo</label>
                       <input name="mediaUrl" required placeholder="https://..."
