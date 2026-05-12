@@ -14,6 +14,12 @@ export default async function PainelPerfilPage() {
     include: {
       city: true,
       media: { orderBy: { sortOrder: "asc" } },
+      stories: {
+        where: { expiresAt: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+        include: { _count: { select: { views: true, likes: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      },
     },
   });
   if (!profile) redirect("/conta/onboarding/perfil");

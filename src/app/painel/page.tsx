@@ -274,12 +274,11 @@ export default async function PainelOverviewPage() {
             )}
           </div>
 
-          {/* Last 5 WhatsApp clicks */}
+          {/* Recent WhatsApp clicks */}
           <div className="border border-line bg-white p-5">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Últimos cliques · WhatsApp</p>
-              <span className="text-xs font-bold tabular-nums">{clicksToday} hoje</span>
-            </div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted mb-3">
+              WhatsApp recente
+            </p>
             {clicks.length === 0 ? (
               <p className="text-xs text-muted">Nenhum clique ainda.</p>
             ) : (

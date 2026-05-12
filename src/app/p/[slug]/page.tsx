@@ -7,8 +7,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { ProviderBanner } from "@/components/layout/provider-banner";
 import { ViewTracker } from "@/components/profile/view-tracker";
 import { FavoriteButton } from "@/components/profile/favorite-button";
-import { WhatsAppButton } from "@/components/profile/whatsapp-button";
-import { MediaTabs } from "@/components/profile/media-tabs";
+import { MediaGallery } from "@/components/profile/media-gallery";
 import { AudioPlayer } from "@/components/profile/audio-player";
 import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
@@ -163,14 +162,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     >
                       Marcar horário
                     </Link>
-                    {profile.whatsappPhone && (
-                      <WhatsAppButton
-                        phone={profile.whatsappPhone}
-                        profileId={profile.id}
-                        source="Botão do perfil"
-                        className="inline-flex items-center justify-center gap-2 bg-coral px-6 py-3 text-sm font-semibold text-white hover:bg-coral/90 transition"
-                      />
-                    )}
+                    <a
+                      href={profile.whatsappPhone ? `https://wa.me/${profile.whatsappPhone.replace(/\D/g, "")}` : "#"}
+                      className="inline-flex items-center justify-center gap-2 bg-coral px-6 py-3 text-sm font-semibold text-white hover:bg-coral/90 transition"
+                    >
+                      <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+                      WhatsApp
+                    </a>
                     <FavoriteButton profileId={profile.id} initialFavorited={initialFavorited} isLoggedIn={isLoggedIn} />
                   </>
                 )}
@@ -237,10 +235,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
         </div>
         </section>
 
-        {/* ── Media Gallery (tabs: Fotos | Vídeos) ── */}
+        {/* ── Media Gallery (tabs: Fotos | Vídeos | Reels) ── */}
         <section className="border-t border-line bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-            <MediaTabs
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <MediaGallery
               photos={publicMedia}
               privateCount={privateCount}
               displayName={profile.displayName}
