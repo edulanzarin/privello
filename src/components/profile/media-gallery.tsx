@@ -1,65 +1,392 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, X, Lock, Play } from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 6;
 
-type MediaItem = { id: string; url: string; mediaType: string; isCover: boolean };
-
-type Props = {
-  photos: MediaItem[];
-  privateCount: number;
-  displayName: string;
+type MediaItem = {
+  id: string;
+  url: string;
+  mediaType: string;
+  isPublic: boolean;
+  isCover: boolean;
+  caption: string | null;
+  createdAt: string;
+  likeCount: number;
+  commentCount: number;
+  likedByMe: boolean;
 };
 
-export function MediaGallery({ photos, privateCount, displayName }: Props) {
+type Comment = {
+  id: string;
+  text: string;
+  createdAt: string;
+  user: { id: string; name: string | null; slug: string | null };
+};
+
+type Props = {
+  media: MediaItem[];
+  displayName: string;
+  slug: string;
+  isClient: boolean;
+  isSubscriber: boolean;
+  currentUserId?: string;
+  isOwner?: boolean;
+};
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function sortMedia(arr: MediaItem[]): MediaItem[] {
+  const cover = arr.filter((m) => m.isCover);
+  const rest = arr
+    .filter((m) => !m.isCover)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return [...cover, ...rest];
+}
+
+// ── Instagram-style post modal ────────────────────────────────────────────────
+function PostModal({
+  items,
+  startIdx,
+  slug,
+  displayName,
+  isClient,
+  isSubscriber,
+  currentUserId,
+  isOwner,
+  onClose,
+}: {
+  items: MediaItem[];
+  startIdx: number;
+  slug: string;
+  displayName: string;
+  isClient: boolean;
+  isSubscriber: boolean;
+  currentUserId?: string;
+  isOwner?: boolean;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(startIdx);
+  const item = items[idx];
+
+  const [likes, setLikes] = useState<Record<string, { count: number; liked: boolean }>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [posting, setPosting] = useState(false);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const justPostedRef = useRef(false);
+
+  const initItem = useCallback((m: MediaItem) => {
+    setLikes((prev) => prev[m.id] ? prev : { ...prev, [m.id]: { count: m.likeCount, liked: m.likedByMe } });
+    setCommentCounts((prev) => prev[m.id] !== undefined ? prev : { ...prev, [m.id]: m.commentCount });
+  }, []);
+
+  useEffect(() => { initItem(item); }, [item, initItem]);
+
+  useEffect(() => {
+    setComments([]);
+    setLoadingComments(true);
+    fetch(`/api/media/comment?mediaId=${item.id}`)
+      .then((r) => r.json())
+      .then((d) => setComments(d.comments ?? []))
+      .finally(() => setLoadingComments(false));
+  }, [item.id]);
+
+  useEffect(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    if (!justPostedRef.current) return;
+    justPostedRef.current = false;
+    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [comments.length]);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && idx > 0) setIdx((i) => i - 1);
+      if (e.key === "ArrowRight" && idx < items.length - 1) setIdx((i) => i + 1);
+    };
+    window.addEventListener("keydown", h);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", h); document.body.style.overflow = ""; };
+  }, [idx, items.length, onClose]);
+
+  async function toggleLike() {
+    if (!isClient) return;
+    const cur = likes[item.id] ?? { count: item.likeCount, liked: item.likedByMe };
+    const next = !cur.liked;
+    setLikes((s) => ({ ...s, [item.id]: { count: cur.count + (next ? 1 : -1), liked: next } }));
+    fetch("/api/media/like", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mediaId: item.id, liked: next }),
+    }).catch(() => setLikes((s) => ({ ...s, [item.id]: cur })));
+  }
+
+  async function postComment() {
+    if (!commentText.trim() || posting) return;
+    setPosting(true);
+    const res = await fetch("/api/media/comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mediaId: item.id, text: commentText }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      justPostedRef.current = true;
+      setComments((c) => [...c, data.comment]);
+      setCommentCounts((n) => ({ ...n, [item.id]: (n[item.id] ?? 0) + 1 }));
+      setCommentText("");
+    }
+    setPosting(false);
+  }
+
+  async function deleteComment(commentId: string) {
+    const res = await fetch("/api/media/comment", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commentId }),
+    });
+    if (res.ok) {
+      setComments((c) => c.filter((x) => x.id !== commentId));
+      setCommentCounts((n) => ({ ...n, [item.id]: Math.max(0, (n[item.id] ?? 1) - 1) }));
+    }
+  }
+
+  const curLike = likes[item.id] ?? { count: item.likeCount, liked: item.likedByMe };
+  const curCommentCount = commentCounts[item.id] ?? item.commentCount;
+
+  return (
+    <div
+      ref={scrollContainerRef}
+      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/80 sm:flex sm:items-center sm:justify-center sm:p-4"
+      onClick={(e) => { if ((e.target as HTMLElement) === e.currentTarget) onClose(); }}
+    >
+      <button
+        onClick={onClose}
+        className="absolute right-4 top-4 z-20 hidden rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60 sm:block"
+      >
+        <X className="h-5 w-5" strokeWidth={1.5} />
+      </button>
+
+      <div
+        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[90vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ── Photo ── */}
+        <div className="relative aspect-[3/4] w-full shrink-0 bg-black sm:aspect-auto sm:flex-1">
+          <button
+            onClick={onClose}
+            className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm sm:hidden"
+          >
+            <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+            Voltar
+          </button>
+
+          {item.mediaType === "VIDEO" ? (
+            <video src={item.url} controls autoPlay className="absolute inset-0 h-full w-full object-contain" />
+          ) : (
+            <Image src={item.url} alt={displayName} fill className="object-contain" priority />
+          )}
+
+          {items.length > 1 && (
+            <>
+              <button
+                onClick={() => setIdx((i) => i - 1)}
+                disabled={idx === 0}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+              </button>
+              <button
+                onClick={() => setIdx((i) => i + 1)}
+                disabled={idx === items.length - 1}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </>
+          )}
+
+          {items.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+              {items.map((_, i) => (
+                <div key={i} className={cn("h-1.5 w-1.5 rounded-full transition", i === idx ? "bg-white" : "bg-white/40")} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Info + Comments ── */}
+        <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-line">
+          <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:shrink-0">
+            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-line">
+              <div className="h-full w-full bg-foreground/10" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <Link href={`/p/${slug}`} className="text-sm font-bold hover:underline">@{slug}</Link>
+            </div>
+            <p className="text-[11px] text-muted">{fmtDate(item.createdAt)}</p>
+          </div>
+
+          <div className="px-4 py-3 sm:flex-1 sm:overflow-y-auto">
+            {item.caption && (
+              <div className="mb-4 flex gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
+                  {displayName[0].toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm">
+                    <span className="font-bold">@{slug}</span>{" "}
+                    <span className="text-foreground/80">{item.caption}</span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {loadingComments ? (
+              <p className="py-4 text-center text-xs text-muted">Carregando…</p>
+            ) : comments.length === 0 && !item.caption ? (
+              <p className="py-8 text-center text-xs text-muted">Nenhum comentário ainda.</p>
+            ) : (
+              <div className="space-y-4">
+                {comments.map((c) => {
+                  const canDelete = c.user.id === currentUserId || isOwner;
+                  return (
+                    <div key={c.id} className="flex gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
+                        {(c.user.name ?? "?")[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm leading-snug">
+                          <span className="font-bold">{c.user.slug ? `@${c.user.slug}` : c.user.name}</span>{" "}
+                          <span className="text-foreground/80">{c.text}</span>
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-muted">{fmtDate(c.createdAt)}</p>
+                      </div>
+                      {canDelete && (
+                        <button
+                          onClick={() => deleteComment(c.id)}
+                          className="shrink-0 text-muted/40 hover:text-coral transition"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+                <div ref={commentsEndRef} />
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-line px-4 py-3 sm:shrink-0">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleLike}
+                disabled={!isClient}
+                className={cn("transition", !isClient && "opacity-40 cursor-not-allowed")}
+              >
+                <Heart
+                  className={cn("h-6 w-6 transition-transform active:scale-125", curLike.liked ? "fill-coral text-coral" : "text-foreground hover:text-muted")}
+                  strokeWidth={1.5}
+                />
+              </button>
+              <MessageCircle className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              <span className="ml-auto text-[11px] text-muted">{idx + 1} / {items.length}</span>
+            </div>
+            <p className="mt-1.5 text-sm font-bold">
+              {curLike.count} {curLike.count === 1 ? "curtida" : "curtidas"}
+            </p>
+          </div>
+
+          {isClient && isSubscriber ? (
+            <div className="sticky bottom-0 flex items-center gap-2 border-t border-line bg-white px-4 py-3 sm:static sm:shrink-0">
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && postComment()}
+                placeholder="Adicione um comentário…"
+                maxLength={500}
+                className="flex-1 text-sm outline-none placeholder:text-muted/60"
+              />
+              <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-xs font-bold text-coral disabled:opacity-30">
+                Publicar
+              </button>
+            </div>
+          ) : isClient ? (
+            <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
+              <Link href="/assinar" className="text-xs font-semibold text-coral hover:underline">
+                Assine para comentar
+              </Link>
+            </div>
+          ) : (
+            <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
+              <Link href="/entrar" className="text-xs font-semibold text-coral hover:underline">
+                Entre para curtir e comentar
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main gallery component ───────────────────────────────────────────────────
+export function MediaGallery({ media, displayName, slug, isClient, isSubscriber, currentUserId, isOwner }: Props) {
+  const router = useRouter();
   const [tab, setTab] = useState<"fotos" | "videos" | "reels">("fotos");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [lightbox, setLightbox] = useState<number | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
 
-  const imageItems = photos.filter((m) => m.mediaType !== "VIDEO");
-  const videoItems = photos.filter((m) => m.mediaType === "VIDEO");
+  const imageItems = sortMedia(media.filter((m) => m.mediaType !== "VIDEO" && m.mediaType !== "REEL"));
+  const videoItems = sortMedia(media.filter((m) => m.mediaType === "VIDEO"));
 
-  const activeItems = tab === "fotos" ? imageItems : videoItems;
+  const activeItems = tab === "fotos" ? imageItems : tab === "videos" ? videoItems : [];
   const displayed = activeItems.slice(0, visibleCount);
   const hasMore = visibleCount < activeItems.length;
 
-  // Reset pagination on tab change
-  const switchTab = (t: typeof tab) => { setTab(t); setVisibleCount(PAGE_SIZE); };
+  function switchTab(t: typeof tab) {
+    if (t === "reels") { router.push(`/reels/${slug}`); return; }
+    setTab(t);
+    setVisibleCount(PAGE_SIZE);
+    setOpenIdx(null);
+  }
 
-  const closeLightbox = useCallback(() => setLightbox(null), []);
-  const prevPhoto = useCallback(() =>
-    setLightbox((i) => (i === null || i === 0 ? imageItems.length - 1 : i - 1)), [imageItems.length]);
-  const nextPhoto = useCallback(() =>
-    setLightbox((i) => (i === null ? 0 : (i + 1) % imageItems.length)), [imageItems.length]);
-
-  useEffect(() => {
-    if (lightbox === null) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") prevPhoto();
-      if (e.key === "ArrowRight") nextPhoto();
-    };
-    window.addEventListener("keydown", handler);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", handler);
-      document.body.style.overflow = "";
-    };
-  }, [lightbox, closeLightbox, prevPhoto, nextPhoto]);
+  function handleItemClick(m: MediaItem, idxInActive: number) {
+    if (!m.isPublic && !isSubscriber) {
+      // Private item + not subscribed → redirect to subscribe page
+      if (!isClient) {
+        router.push(`/entrar?callbackUrl=/assinar`);
+      } else {
+        router.push("/assinar");
+      }
+      return;
+    }
+    setOpenIdx(idxInActive);
+  }
 
   const tabs = [
-    { key: "fotos" as const,  label: "Fotos",  count: imageItems.length },
+    { key: "fotos" as const, label: "Fotos", count: imageItems.length },
     { key: "videos" as const, label: "Vídeos", count: videoItems.length },
-    { key: "reels" as const,  label: "Reels",  count: 0 },
+    { key: "reels" as const, label: "Reels", count: null },
   ];
 
   return (
     <div className="mb-10">
-      {/* Tab bar */}
       <div className="flex border-b border-line">
         {tabs.map((t) => (
           <button
@@ -73,83 +400,90 @@ export function MediaGallery({ photos, privateCount, displayName }: Props) {
             )}
           >
             {t.label}
-            <span className={cn(
-              "rounded px-1.5 py-0.5 text-[10px]",
-              tab === t.key ? "bg-coral/10 text-coral" : "bg-line text-muted",
-            )}>
-              {t.count}
-            </span>
+            {t.count !== null && (
+              <span className={cn("rounded px-1.5 py-0.5 text-[10px]", tab === t.key ? "bg-coral/10 text-coral" : "bg-line text-muted")}>
+                {t.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Content */}
-      {tab === "reels" ? (
+      {activeItems.length === 0 ? (
         <div className="flex min-h-[200px] items-center justify-center">
-          <div className="text-center">
-            <Play className="mx-auto h-10 w-10 text-muted/40" strokeWidth={1} />
-            <p className="mt-3 text-sm font-medium text-muted">Reels em breve</p>
-            <p className="mt-1 text-xs text-muted/60">Esta acompanhante ainda não publicou reels.</p>
-          </div>
-        </div>
-      ) : tab === "videos" && videoItems.length === 0 ? (
-        <div className="flex min-h-[200px] items-center justify-center">
-          <div className="text-center">
-            <Play className="mx-auto h-10 w-10 text-muted/40" strokeWidth={1} />
-            <p className="mt-3 text-sm font-medium text-muted">Nenhum vídeo</p>
-          </div>
+          <p className="text-sm text-muted">
+            {tab === "videos" ? "Nenhum vídeo publicado." : "Nenhuma foto publicada."}
+          </p>
         </div>
       ) : (
         <div className="pb-6">
           <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
-            {displayed.map((m, i) => (
-              <button
-                key={m.id}
-                onClick={() => tab === "fotos" && setLightbox(imageItems.indexOf(m))}
-                className="group relative overflow-hidden bg-line"
-                style={{ aspectRatio: "3/4" }}
-              >
-                {m.mediaType === "VIDEO" ? (
-                  <video
-                    src={m.url}
-                    muted
-                    preload="metadata"
-                    playsInline
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04] group-hover:brightness-90"
-                  />
-                ) : (
-                  <Image
-                    src={m.url}
-                    alt={`${displayName} — ${i + 1}`}
-                    fill
-                    className="object-cover transition duration-300 group-hover:scale-[1.04] group-hover:brightness-90"
-                    sizes="(max-width:640px) 33vw, 25vw"
-                  />
-                )}
-                {m.mediaType === "VIDEO" && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="rounded-full bg-black/50 p-3">
-                      <Play className="h-5 w-5 fill-white text-white" strokeWidth={0} />
-                    </div>
-                  </div>
-                )}
-              </button>
-            ))}
+            {displayed.map((m, i) => {
+              const isPrivate = !m.isPublic;
+              const locked = isPrivate && !isSubscriber;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => handleItemClick(m, activeItems.indexOf(m))}
+                  className="group relative overflow-hidden bg-line"
+                  style={{ aspectRatio: "3/4" }}
+                >
+                  {m.mediaType === "VIDEO" ? (
+                    <video
+                      src={m.url}
+                      muted
+                      preload="metadata"
+                      playsInline
+                      className={cn("h-full w-full object-cover transition duration-300 group-hover:brightness-75", locked && "blur-md")}
+                    />
+                  ) : (
+                    <Image
+                      src={m.url}
+                      alt={`${displayName} — ${i + 1}`}
+                      fill
+                      className={cn("object-cover transition duration-300 group-hover:brightness-75", locked && "blur-md")}
+                      sizes="(max-width:640px) 33vw, 25vw"
+                    />
+                  )}
 
-            {/* Private count cell */}
-            {!hasMore && privateCount > 0 && tab === "fotos" && (
-              <div className="relative flex items-center justify-center bg-foreground/90"
-                style={{ aspectRatio: "3/4" }}>
-                <div className="text-center text-white">
-                  <Lock className="mx-auto h-5 w-5 opacity-60" strokeWidth={1.5} />
-                  <p className="mt-1.5 text-lg font-bold">+{privateCount}</p>
-                  <p className="text-[9px] uppercase tracking-wider opacity-60">privadas</p>
-                </div>
-              </div>
-            )}
+                  {m.mediaType === "VIDEO" && !locked && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="rounded-full bg-black/50 p-3">
+                        <Play className="h-5 w-5 fill-white text-white" strokeWidth={0} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Private locked overlay */}
+                  {locked && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40">
+                      <Lock className="h-5 w-5 text-white" strokeWidth={1.5} />
+                      <span className="rounded-full bg-coral px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                        Assinar
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Like/comment count on hover (public items only) */}
+                  {!locked && m.likeCount > 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition group-hover:opacity-100">
+                      <span className="flex items-center gap-1 text-sm font-bold text-white">
+                        <Heart className="h-4 w-4 fill-white" strokeWidth={0} />
+                        {m.likeCount}
+                      </span>
+                      {m.commentCount > 0 && (
+                        <span className="flex items-center gap-1 text-sm font-bold text-white">
+                          <MessageCircle className="h-4 w-4 fill-white" strokeWidth={0} />
+                          {m.commentCount}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Load more */}
           {hasMore && (
             <div className="border-t border-line bg-white p-4 text-center">
               <button
@@ -163,53 +497,18 @@ export function MediaGallery({ photos, privateCount, displayName }: Props) {
         </div>
       )}
 
-      {/* ── Lightbox ── */}
-      {lightbox !== null && imageItems[lightbox] && (
-        <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95"
-          onClick={closeLightbox}
-        >
-          <div
-            className="relative flex h-full w-full max-w-3xl flex-col items-center justify-center px-12"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-white/50">
-              {lightbox + 1} / {imageItems.length}
-            </p>
-            <button
-              onClick={closeLightbox}
-              className="absolute right-3 top-3 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-            >
-              <X className="h-5 w-5" strokeWidth={2} />
-            </button>
-            <div className="relative max-h-[85vh] w-full">
-              <Image
-                src={imageItems[lightbox].url}
-                alt=""
-                width={900}
-                height={1200}
-                className="mx-auto max-h-[85vh] w-auto object-contain"
-                priority
-              />
-            </div>
-            {imageItems.length > 1 && (
-              <>
-                <button
-                  onClick={prevPhoto}
-                  className="absolute left-1 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20 sm:left-3"
-                >
-                  <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-                <button
-                  onClick={nextPhoto}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20 sm:right-3"
-                >
-                  <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+      {openIdx !== null && (
+        <PostModal
+          items={activeItems}
+          startIdx={openIdx}
+          slug={slug}
+          displayName={displayName}
+          isClient={isClient}
+          isSubscriber={isSubscriber}
+          currentUserId={currentUserId}
+          isOwner={isOwner}
+          onClose={() => setOpenIdx(null)}
+        />
       )}
     </div>
   );

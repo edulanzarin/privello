@@ -19,9 +19,13 @@ export default async function PainelMidiasPage() {
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
-  const publicMedia  = profile.media.filter((m) => m.isPublic);
+  const serialize = (m: typeof profile.media[number]) => ({
+    ...m,
+    createdAt: m.createdAt.toISOString(),
+  });
+  const publicMedia  = profile.media.filter((m) => m.isPublic).map(serialize);
   const privateCount = profile.media.filter((m) => !m.isPublic).length;
-  const privateMedia = profile.media.filter((m) => !m.isPublic);
+  const privateMedia = profile.media.filter((m) => !m.isPublic).map(serialize);
 
   return (
     <div className="space-y-6">

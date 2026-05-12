@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3, Diamond, Images, LayoutDashboard,
-  Star, User, Clock, CircleDollarSign, BookImage, Pencil,
+  Star, User, Clock, CircleDollarSign, BookImage, Pencil, Clapperboard,
 } from "lucide-react";
 import { LogoutButton } from "@/components/painel/logout-button";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ function buildItems(slug: string, planTier?: string): NavItem[] {
 
     { type: "sep",   label: "Conteúdo" },
     { type: "link",  href: "/painel/midias",  label: "Mídias",       icon: Images },
+    { type: "link",  href: "/painel/reels",   label: "Reels",        icon: Clapperboard },
     canStories
       ? { type: "link",  href: "/painel/stories", label: "Stories",  icon: BookImage }
       : { type: "muted", label: "Stories",  icon: BookImage, badge: "Plus" },
