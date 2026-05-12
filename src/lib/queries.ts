@@ -314,6 +314,49 @@ export type StoryGroup = {
   }[];
 };
 
+export async function getStoriesForProfile(profileId: string, userId?: string): Promise<StoryGroup | null> {
+  const now = new Date();
+  const rawStories = await prisma.story.findMany({
+    where: { profileId, expiresAt: { gt: now } },
+    include: {
+      profile: {
+        select: {
+          id: true, slug: true, displayName: true,
+          media: { where: { isCover: true }, take: 1, select: { url: true } },
+        },
+      },
+      _count: { select: { views: true, likes: true } },
+      views: userId ? { where: { userId }, select: { id: true } } : false,
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (rawStories.length === 0) return null;
+
+  const p = rawStories[0].profile;
+  const group: StoryGroup = {
+    profileId: p.id,
+    slug: p.slug,
+    displayName: p.displayName,
+    coverUrl: p.media[0]?.url ?? "https://picsum.photos/seed/x/200/200",
+    allSeen: false,
+    stories: rawStories.map((s) => ({
+      id: s.id,
+      mediaUrl: s.mediaUrl,
+      mediaType: s.mediaType,
+      caption: s.caption,
+      createdAt: s.createdAt.toISOString(),
+      viewCount: s._count.views,
+      likeCount: s._count.likes,
+      seenByMe: userId ? (s.views as { id: string }[]).length > 0 : false,
+      likedByMe: userId ? (s.likes as { id: string }[]).length > 0 : false,
+    })),
+  };
+  group.allSeen = group.stories.every((s) => s.seenByMe);
+  return group;
+}
+
 export async function listStoriesForCity(cityId: string, userId?: string): Promise<StoryGroup[]> {
   const now = new Date();
   const rawStories = await prisma.story.findMany({

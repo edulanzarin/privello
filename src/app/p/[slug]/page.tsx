@@ -9,10 +9,11 @@ import { ViewTracker } from "@/components/profile/view-tracker";
 import { FavoriteButton } from "@/components/profile/favorite-button";
 import { MediaGallery } from "@/components/profile/media-gallery";
 import { AudioPlayer } from "@/components/profile/audio-player";
+import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlug } from "@/lib/queries";
+import { getProfileBySlug, getStoriesForProfile } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const initialFavorited = !isProvider && isLoggedIn ? await getFavoriteStatus(profile.id) : false;
 
+  // Stories ativos deste perfil
+  const storyGroup = await getStoriesForProfile(profile.id, session?.user?.id);
+  const isClientUser = isLoggedIn && !isProvider;
+
   const publicMedia = profile.media.filter((m) => m.isPublic);
   const privateCount = profile.media.filter((m) => !m.isPublic).length;
   const cover = publicMedia.find((m) => m.isCover) ?? publicMedia[0];
@@ -94,6 +99,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {!isProvider && !ownerView && <ViewTracker profileId={profile.id} />}
       {ownerView  && <ProviderBanner variant="own-profile" />}
       {isProvider && !ownerView && <ProviderBanner variant="other-profile" />}
+
+      {/* Story bar — só aparece se tiver stories ativos */}
+      {storyGroup && (
+        <StoryBar groups={[storyGroup]} isClient={isClientUser} />
+      )}
 
       <main className="min-h-screen pb-20">
 
