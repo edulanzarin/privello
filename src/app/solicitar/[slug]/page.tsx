@@ -181,6 +181,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                 <div className="flex items-center justify-between text-sm font-medium">
                   <Link
                     href={buildSolicitarHref(slug, { mes: prevMes }, sp)}
+                    scroll={false}
                     className="text-muted hover:text-foreground"
                     aria-label="Mês anterior"
                   >
@@ -191,6 +192,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   </span>
                   <Link
                     href={buildSolicitarHref(slug, { mes: nextMes }, sp)}
+                    scroll={false}
                     className="text-muted hover:text-foreground"
                     aria-label="Próximo mês"
                   >
@@ -214,6 +216,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                       <Link
                         key={ymd}
                         href={selectable ? buildSolicitarHref(slug, { dia: ymd, mes: mesStr }, sp) : "#"}
+                        scroll={false}
                         className={cn(
                           "relative block min-h-[2.25rem] py-2",
                           !selectable && "pointer-events-none text-muted/50 line-through",
@@ -245,6 +248,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     <Link
                       key={h}
                       href={buildSolicitarHref(slug, { hora: h }, sp)}
+                      scroll={false}
                       className={cn(
                         "border px-3 py-2 text-sm",
                         hora === h ? "border-foreground bg-foreground text-white" : "border-line bg-white hover:border-foreground/30",
@@ -264,6 +268,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   <Link
                     key={d.minutes}
                     href={buildSolicitarHref(slug, { durMin: String(d.minutes) }, sp)}
+                    scroll={false}
                     className={cn(
                       "border border-line bg-white p-4 text-center text-sm transition hover:border-foreground/30",
                       durationMinutes === d.minutes && "border-foreground bg-foreground text-white",
@@ -281,6 +286,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <Link
                   href={buildSolicitarHref(slug, { local: "proprio" }, sp)}
+                  scroll={false}
                   className={cn(
                     "border p-5 text-sm",
                     local === "proprio" ? "border-foreground" : "border-line bg-white",
@@ -291,6 +297,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                 </Link>
                 <Link
                   href={buildSolicitarHref(slug, { local: "domicilio" }, sp)}
+                  scroll={false}
                   className={cn(
                     "border p-5 text-sm",
                     local === "domicilio" ? "border-foreground" : "border-line bg-white",

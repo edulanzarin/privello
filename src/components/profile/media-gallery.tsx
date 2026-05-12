@@ -247,9 +247,6 @@ function PostModal({
         {/* ── Info + Comments ── */}
         <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-line">
           <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:shrink-0">
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-line">
-              <div className="h-full w-full bg-foreground/10" />
-            </div>
             <div className="min-w-0 flex-1">
               <Link href={`/p/${slug}`} className="text-sm font-bold hover:underline">@{slug}</Link>
             </div>
@@ -259,16 +256,11 @@ function PostModal({
           <div className="px-4 py-3 sm:flex-1 sm:overflow-y-auto">
             {/* Caption — visible to everyone */}
             {item.caption && (
-              <div className="mb-4 flex gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
-                  {displayName[0].toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm">
-                    <span className="font-bold">@{slug}</span>{" "}
-                    <span className="text-foreground/80">{item.caption}</span>
-                  </p>
-                </div>
+              <div className="mb-4">
+                <p className="text-sm">
+                  <span className="font-bold">@{slug}</span>{" "}
+                  <span className="text-foreground/80">{item.caption}</span>
+                </p>
               </div>
             )}
 
@@ -283,10 +275,7 @@ function PostModal({
                   {comments.map((c) => {
                     const canDelete = c.user.id === currentUserId || isOwner;
                     return (
-                      <div key={c.id} className="flex gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
-                          {(c.user.name ?? "?")[0].toUpperCase()}
-                        </div>
+                      <div key={c.id} className="flex items-start gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm leading-snug">
                             <span className="font-bold">{c.user.slug ? `@${c.user.slug}` : c.user.name}</span>{" "}
