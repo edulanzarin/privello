@@ -140,3 +140,22 @@ export async function deleteAdminMedia(mediaId: string): Promise<{ error?: strin
   revalidatePath(`/p/${media.profile.slug}`);
   return {};
 }
+
+export async function toggleMediaVisibility(mediaId: string): Promise<{ error?: string }> {
+  await requireAdmin();
+
+  const media = await prisma.media.findUnique({
+    where: { id: mediaId },
+    include: { profile: { select: { slug: true } } },
+  });
+  if (!media) return { error: "Mídia não encontrada." };
+
+  await prisma.media.update({
+    where: { id: mediaId },
+    data: { isPublic: !media.isPublic },
+  });
+
+  revalidatePath("/admin/midias");
+  revalidatePath(`/p/${media.profile.slug}`);
+  return {};
+}
