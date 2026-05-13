@@ -66,7 +66,6 @@ export async function saveAvailabilityWindows(formData: FormData) {
 
   revalidatePath("/painel/disponibilidade");
   revalidatePath(`/p/${profile.slug}`);
-  revalidatePath(`/solicitar/${profile.slug}`);
 }
 
 export async function saveDurationOptions(formData: FormData) {
@@ -117,29 +116,6 @@ export async function saveDurationOptions(formData: FormData) {
 
   revalidatePath("/painel/valores");
   revalidatePath(`/p/${profile.slug}`);
-  revalidatePath(`/solicitar/${profile.slug}`);
-}
-
-export async function confirmRequest(formData: FormData) {
-  const profile = await getSessionProfile();
-  const requestId = formData.get("requestId") as string;
-  if (!requestId) return;
-  await prisma.meetingRequest.updateMany({
-    where: { id: requestId, profileId: profile.id, status: "PENDING" },
-    data: { status: "CONFIRMED" },
-  });
-  revalidatePath("/painel/solicitacoes");
-}
-
-export async function declineRequest(formData: FormData) {
-  const profile = await getSessionProfile();
-  const requestId = formData.get("requestId") as string;
-  if (!requestId) return;
-  await prisma.meetingRequest.updateMany({
-    where: { id: requestId, profileId: profile.id, status: "PENDING" },
-    data: { status: "REJECTED" },
-  });
-  revalidatePath("/painel/solicitacoes");
 }
 
 export async function updateFinancialRecord(formData: FormData) {
@@ -226,4 +202,16 @@ export async function addFinancialRecord(formData: FormData) {
   });
 
   revalidatePath("/painel/financeiro");
+}
+
+export async function toggleOnlineStatus(): Promise<{ isOnline: boolean }> {
+  const profile = await getSessionProfile();
+  const updated = await prisma.profile.update({
+    where: { id: profile.id },
+    data: { isOnline: !profile.isOnline },
+    select: { isOnline: true },
+  });
+  revalidatePath("/painel");
+  revalidatePath(`/p/${profile.slug}`);
+  return { isOnline: updated.isOnline };
 }

@@ -1,4 +1,5 @@
 import { PainelSidebar } from "@/components/painel/painel-sidebar";
+import { ProviderHeartbeat } from "@/components/painel/provider-heartbeat";
 import { ToastProvider } from "@/components/ui/toast";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -26,9 +27,10 @@ export default async function PainelLayout({ children }: { children: React.React
 
   return (
     <ToastProvider>
+      <ProviderHeartbeat />
       <div className="min-h-screen bg-[#f4f4f2] text-foreground">
         <PainelSidebar displayName={displayName} profileSlug={profileSlug} planTier={profile.planTier} handle={profile.slug || undefined} />
-        <div className="md:pl-56">
+        <div className="pt-14 md:pl-56 md:pt-0">
           <div className="px-4 py-8 sm:px-6 lg:px-8">{children}</div>
         </div>
       </div>

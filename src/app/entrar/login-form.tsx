@@ -10,7 +10,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     if (callbackUrl) fd.set("callbackUrl", callbackUrl);
-    startTransition(() => loginAction(fd));
+    startTransition(async () => { await loginAction(fd); });
   }
 
   return (

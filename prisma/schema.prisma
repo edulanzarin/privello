@@ -22,14 +22,6 @@ enum PlanTier {
   PREMIUM
 }
 
-enum MeetingRequestStatus {
-  PENDING
-  CONFIRMED
-  REJECTED
-  COMPLETED
-  EXPIRED
-}
-
 enum ModerationStatus {
   NOVO
   REVISAO
@@ -47,6 +39,7 @@ enum SubscriptionStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+  PAST_DUE
 }
 
 model User {
@@ -57,13 +50,13 @@ model User {
   image     String?
   role      UserRole @default(CLIENT)
   phone     String?
-  password  String?
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  password         String?
+  verified         Boolean  @default(false)
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   profile         Profile?
-  meetingRequests MeetingRequest[] @relation("ClientRequests")
   accounts        Account[]
   sessions        Session[]
   favorites       Favorite[]
@@ -71,8 +64,11 @@ model User {
   storyViews      StoryView[]
   mediaLikes      MediaLike[]
   mediaComments   MediaComment[]
-  subscriptions   Subscription[]
-  reviews         Review[]
+  subscriptions    Subscription[]
+  reviews          Review[]
+  supportTickets   SupportTicket[]
+  supportMessages  SupportMessage[]
+  adminWarnings    Warning[]       @relation("AdminWarnings")
 }
 
 // NextAuth v5 required models
@@ -171,9 +167,10 @@ model Profile {
   whatsappPhone String?
   audioUrl      String?
 
-  isOnline      Boolean @default(false)
-  isVerified    Boolean @default(false)
-  videoVerified Boolean @default(false)
+  isOnline      Boolean   @default(false)
+  lastActiveAt  DateTime?
+  isVerified    Boolean   @default(false)
+  videoVerified Boolean   @default(false)
 
   viewsThisMonth      Int      @default(0)
   viewsCurrentPeriod  Int      @default(0)
@@ -188,16 +185,20 @@ model Profile {
   ratingAvg   Float @default(0)
   ratingCount Int   @default(0)
 
+  isSuspended    Boolean   @default(false)
+  suspendedAt    DateTime?
+  suspensionNote String?   @db.Text
+
   media               Media[]
   stories             Story[]
   reviews             Review[]
   availabilityRules   AvailabilityRule[]
   durationOptions     ProfileDurationOption[]
-  meetingRequests     MeetingRequest[]     @relation("ProviderRequests")
   financialRecords    FinancialRecord[]
   whatsAppClicks      WhatsAppClick[]
   verificationCases   VerificationCase[]
   favoritedBy         Favorite[]
+  warnings            Warning[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -357,37 +358,16 @@ model Review {
 }
 
 model Subscription {
-  id        String             @id @default(cuid())
-  userId    String
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    SubscriptionStatus @default(ACTIVE)
-  expiresAt DateTime
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status               SubscriptionStatus @default(ACTIVE)
+  expiresAt            DateTime
+  stripeSubscriptionId String?            @unique
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([userId, status])
-}
-
-model MeetingRequest {
-  id        String               @id @default(cuid())
-  profileId String
-  profile   Profile              @relation("ProviderRequests", fields: [profileId], references: [id], onDelete: Cascade)
-  clientId  String
-  client    User                 @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
-  status    MeetingRequestStatus @default(PENDING)
-  date      DateTime
-  startTime String
-  endTime   String
-  duration  String
-  location  String
-  notes     String?              @db.Text
-  totalBrl  Int
-  expiresAt DateTime
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-
-  @@index([profileId, status])
-  @@index([clientId])
 }
 
 model FinancialRecord {
@@ -425,6 +405,9 @@ model VerificationCase {
   profile      Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
   status       ModerationStatus @default(NOVO)
   documentType String?
+  documentFrontUrl String?
+  documentBackUrl  String?
+  selfieUrl        String?
   documentNote String?
   selfieMatch  Int?
   selfieNote   String?
@@ -433,4 +416,50 @@ model VerificationCase {
   updatedAt    DateTime         @updatedAt
 
   @@index([status, waitingSince])
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+model SupportTicket {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  status    SupportTicketStatus @default(OPEN)
+  messages  SupportMessage[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, updatedAt(sort: Desc)])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text      String        @db.Text
+  isAdmin   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+model Warning {
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  adminId   String
+  admin     User     @relation("AdminWarnings", fields: [adminId], references: [id])
+  reason    String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([profileId, createdAt])
+  @@index([adminId])
 }

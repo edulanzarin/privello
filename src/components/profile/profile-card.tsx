@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Star, Zap } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { formatBrl } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { ProfileCardPayload } from "@/lib/queries";
@@ -51,6 +51,10 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
   const imageUrl = cover?.url ?? "https://picsum.photos/seed/empty/480/720";
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
   const plan = isBoosted ? PLAN_CONFIG.BOOST : (PLAN_CONFIG[profile.planTier] ?? PLAN_CONFIG.ESSENCIAL);
+  // lastActiveAt is a new field — cast until prisma generate runs after server restart
+  const p = profile as typeof profile & { lastActiveAt?: Date | string | null };
+  const isOnline = p.lastActiveAt != null &&
+    (Date.now() - new Date(p.lastActiveAt).getTime()) < 5 * 60 * 1000;
 
   return (
     <Link
@@ -82,7 +86,7 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
               Verificada
             </span>
           ) : <span />}
-          {profile.isOnline ? (
+          {isOnline ? (
             <span className="flex items-center gap-1 bg-success/90 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-white backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-white" />
               Online
@@ -95,9 +99,7 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
           "absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] backdrop-blur-sm",
           plan.badgeBg, plan.badgeText,
         )}>
-          {isBoosted && <Zap className="h-2.5 w-2.5 fill-current" strokeWidth={0} />}
           {plan.badgeLabel}
-          {isBoosted && <Zap className="h-2.5 w-2.5 fill-current" strokeWidth={0} />}
         </div>
       </div>
 

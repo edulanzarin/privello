@@ -8,6 +8,7 @@ export type WhatsAppBookingPayload = {
   durationLabel: string;
   locationLabel: string;
   totalBrl: number;
+  isOvernight?: boolean;
   notes?: string;
 };
 
@@ -16,12 +17,21 @@ export function buildWhatsAppBookingMessage(p: WhatsAppBookingPayload): string {
     `Olá, ${p.displayName}! Vi seu perfil no Privello e gostaria de combinar:`,
     ``,
     `• Dia: ${p.dateLabel}`,
-    `• Início: ${p.startTime}`,
-    `• Término previsto: ${p.endTime}`,
-    `• Duração: ${p.durationLabel}`,
+  ];
+
+  if (p.isOvernight) {
+    lines.push(`• Modalidade: ${p.durationLabel} (horário a combinar)`);
+  } else {
+    lines.push(`• Início: ${p.startTime}`);
+    lines.push(`• Término previsto: ${p.endTime}`);
+    lines.push(`• Duração: ${p.durationLabel}`);
+  }
+
+  lines.push(
     `• Local: ${p.locationLabel}`,
     `• Valor combinado: ${formatBrl(p.totalBrl)}`,
-  ];
+  );
+
   if (p.notes?.trim()) {
     lines.push(``, `Obs.: ${p.notes.trim()}`);
   }

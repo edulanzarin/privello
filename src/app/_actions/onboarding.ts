@@ -200,12 +200,12 @@ export async function saveOnboardingValores(formData: FormData) {
 }
 
 // ── Step 4: Publicar ──────────────────────────────────────────────────────────
-export async function publishProfile() {
+export async function publishProfile(_?: FormData): Promise<void> {
   const profile = await getProviderProfile();
 
-  // Basic validation
+  // Basic validation: redirect back to previous step instead of returning error
   if (!profile.bio || profile.priceHour < 1) {
-    return { error: "Complete o perfil e os valores antes de publicar." };
+    redirect("/conta/onboarding/valores");
   }
 
   // Mark as online (visible in listings)

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
 import { getOrCreateCityBySlug } from "@/lib/queries";
+import { sendVerificationEmail } from "@/app/_actions/email-verification";
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 export async function loginAction(formData: FormData) {
@@ -18,10 +19,10 @@ export async function loginAction(formData: FormData) {
     select: { role: true },
   });
 
-  // Default redirect: providers go to /painel, clients go to /
-  // Never redirect clients to /painel
   let redirectTo = "/";
-  if (callbackUrl && !callbackUrl.startsWith("/painel")) {
+  if (user?.role === "ADMIN" || user?.role === "MODERATOR") {
+    redirectTo = "/admin/moderacao";
+  } else if (callbackUrl && !callbackUrl.startsWith("/painel")) {
     redirectTo = callbackUrl;
   } else if (user?.role === "PROVIDER") {
     redirectTo = "/painel";
@@ -62,9 +63,11 @@ export async function registerClientAction(formData: FormData) {
   const slugTaken = await prisma.user.findUnique({ where: { slug } });
   if (slugTaken) return { error: `O @ "${slug}" já está em uso. Tente um nome diferente.` };
 
-  await prisma.user.create({
+  const newClient = await prisma.user.create({
     data: { name, email, password: hash, role: "CLIENT", slug },
   });
+
+  await sendVerificationEmail(newClient.id).catch(() => {});
 
   // Auto-login after register
   try {
@@ -124,7 +127,7 @@ export async function registerProviderAction(formData: FormData) {
     create: { name: cityQuery.split(",")[0].trim() || "Centro", slug: "centro", cityId: city.id },
   });
 
-  await prisma.user.create({
+  const newProvider = await prisma.user.create({
     data: {
       name: displayName,
       email,
@@ -145,6 +148,8 @@ export async function registerProviderAction(formData: FormData) {
       },
     },
   });
+
+  await sendVerificationEmail(newProvider.id).catch(() => {});
 
   // Auto-login and redirect to onboarding step 1
   try {

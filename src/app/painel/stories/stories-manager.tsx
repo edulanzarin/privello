@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Trash2, Eye, Heart, Clock, Plus } from "lucide-react";
-import { deleteStory } from "@/app/_actions/stories";
+import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
@@ -53,11 +53,12 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
     if (!selectedFile) return;
     setUploading(true);
 
-    // Upload the file first
+    const isVideo = selectedFile.type.startsWith("video");
     const fd = new FormData();
     fd.set("file", selectedFile);
     fd.set("isPublic", "true");
-    fd.set("mediaType", selectedFile.type.startsWith("video") ? "VIDEO" : "IMAGE");
+    fd.set("purpose", "story");
+    fd.set("mediaType", isVideo ? "VIDEO" : "IMAGE");
 
     const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
     if (!uploadRes.ok) {
@@ -66,14 +67,19 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
       setUploading(false);
       return;
     }
-    const { media } = await uploadRes.json();
+    const data = await uploadRes.json();
+    const mediaUrl = data.url ?? data.media?.url;
+    if (!mediaUrl) {
+      toast("Erro ao obter URL do arquivo.", "error");
+      setUploading(false);
+      return;
+    }
 
-    // Create the story with the uploaded URL
     const storyFd = new FormData();
-    storyFd.set("mediaUrl", media.url);
+    storyFd.set("mediaUrl", mediaUrl);
+    storyFd.set("mediaType", isVideo ? "VIDEO" : "IMAGE");
     storyFd.set("caption", caption);
 
-    const { createStory } = await import("@/app/_actions/stories");
     await createStory(storyFd);
 
     setUploading(false);

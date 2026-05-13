@@ -19,6 +19,9 @@ export function parseDiscoverSearchParams(raw: Record<string, string | string[] 
   const gender: GenderFilter =
     genderRaw === "garotos" || genderRaw === "casais" ? genderRaw : undefined;
 
+  const searchRaw = get("q")?.trim();
+  const districtRaw = get("bairro")?.trim();
+
   const filters: DiscoverFilters = {
     gender,
     priceMin: pmin ? Number(pmin) : undefined,
@@ -29,6 +32,8 @@ export function parseDiscoverSearchParams(raw: Record<string, string | string[] 
     onlineOnly: get("online") === "1",
     hasOwnPlace: get("local") === "1",
     homeVisit: get("domicilio") === "1",
+    search: searchRaw || undefined,
+    districtSlug: districtRaw || undefined,
   };
 
   const sortRaw = get("ordem");

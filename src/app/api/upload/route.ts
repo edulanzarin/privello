@@ -4,8 +4,10 @@ import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const MAX_SIZE = 8 * 1024 * 1024; // 8 MB
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const IMAGE_MAX = 8 * 1024 * 1024;  // 8 MB
+const VIDEO_MAX = 200 * 1024 * 1024; // 200 MB
+const ALLOWED_IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -25,11 +27,18 @@ export async function POST(req: NextRequest) {
   const mediaType = (formData.get("mediaType") as string | null) ?? "IMAGE";
 
   if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
-  if (!ALLOWED.includes(file.type)) {
-    return NextResponse.json({ error: "Formato inválido. Use JPG, PNG ou WebP." }, { status: 400 });
+
+  const isVideoFile = ALLOWED_VIDEOS.includes(file.type);
+  const isImageFile = ALLOWED_IMAGES.includes(file.type);
+  if (!isImageFile && !isVideoFile) {
+    return NextResponse.json({ error: "Formato inválido. Use JPG, PNG, WebP ou MP4/WebM." }, { status: 400 });
   }
-  if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "Arquivo muito grande. Máximo 8 MB." }, { status: 400 });
+  const maxSize = isVideoFile ? VIDEO_MAX : IMAGE_MAX;
+  if (file.size > maxSize) {
+    return NextResponse.json(
+      { error: `Arquivo muito grande. Máximo ${isVideoFile ? "200" : "8"} MB.` },
+      { status: 400 },
+    );
   }
 
   const bytes = await file.arrayBuffer();
@@ -39,12 +48,22 @@ export async function POST(req: NextRequest) {
   const dir = join(process.cwd(), "public", "uploads", profile.id);
   await mkdir(dir, { recursive: true });
 
-  const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
-  const ext = extMap[file.type] ?? "jpg";
+  const extMap: Record<string, string> = {
+    "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif",
+    "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
+  };
+  const ext = extMap[file.type] ?? "bin";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   await writeFile(join(dir, filename), buffer);
 
   const url = `/uploads/${profile.id}/${filename}`;
+
+  // REEL and story uploads: the caller (createReel action / createStory action) handles
+  // the DB record — don't create a Media row here or we get duplicates.
+  const purpose = (formData.get("purpose") as string | null) ?? "";
+  if (mediaType === "REEL" || purpose === "story") {
+    return NextResponse.json({ ok: true, url });
+  }
 
   // Count existing photos to set sortOrder
   const count = await prisma.media.count({ where: { profileId: profile.id, isPublic } });

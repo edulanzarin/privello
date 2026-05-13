@@ -101,6 +101,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
   const durMin = durMinRaw ? Number(durMinRaw) : durations[0]?.minutes ?? 60;
   const durationPick = durations.find((d) => d.minutes === durMin) ?? durations[0]!;
   const durationMinutes = durationPick.minutes;
+  const isOvernight = durationPick.isOvernight;
 
   const local = get("local") ?? "proprio";
 
@@ -109,11 +110,15 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
     : new Date(year, month - 1, 1);
   const window = diaResolved ? getWindowForWeekday(rules, selectedDate.getDay()) : null;
   const allStarts = window ? generateHalfHourStarts(window) : [];
-  const starts = window ? filterStartsForDuration(allStarts, durationMinutes, window) : [];
+  const starts = isOvernight ? [] : (window ? filterStartsForDuration(allStarts, durationMinutes, window) : []);
 
   let hora = get("hora");
-  if (!hora && starts.length) hora = starts[0];
-  if (hora && !starts.includes(hora)) hora = starts[0] ?? "";
+  if (!isOvernight) {
+    if (!hora && starts.length) hora = starts[0];
+    if (hora && !starts.includes(hora)) hora = starts[0] ?? "";
+  } else {
+    hora = undefined;
+  }
 
   const cells = calendarMonthCells(year, month);
   const today = new Date();
@@ -241,25 +246,34 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
 
             <section>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted">02 · Horário e duração</p>
-              <p className="mt-3 text-[10px] font-semibold uppercase text-muted">Horários disponíveis</p>
-              {starts.length ? (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {starts.map((h) => (
-                    <Link
-                      key={h}
-                      href={buildSolicitarHref(slug, { hora: h }, sp)}
-                      scroll={false}
-                      className={cn(
-                        "border px-3 py-2 text-sm",
-                        hora === h ? "border-foreground bg-foreground text-white" : "border-line bg-white hover:border-foreground/30",
-                      )}
-                    >
-                      {h}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-2 text-sm text-muted">Não há horários para este dia — escolha outra data.</p>
+              {!isOvernight && (
+                <>
+                  <p className="mt-3 text-[10px] font-semibold uppercase text-muted">Horários disponíveis</p>
+                  {starts.length ? (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {starts.map((h) => (
+                        <Link
+                          key={h}
+                          href={buildSolicitarHref(slug, { hora: h }, sp)}
+                          scroll={false}
+                          className={cn(
+                            "border px-3 py-2 text-sm",
+                            hora === h ? "border-foreground bg-foreground text-white" : "border-line bg-white hover:border-foreground/30",
+                          )}
+                        >
+                          {h}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-muted">Não há horários para este dia — escolha outra data.</p>
+                  )}
+                </>
+              )}
+              {isOvernight && (
+                <p className="mt-3 text-sm text-muted">
+                  Pernoite não tem horário fixo — o início será combinado diretamente pelo WhatsApp.
+                </p>
               )}
 
               <p className="mt-6 text-[10px] font-semibold uppercase text-muted">Duração</p>
@@ -320,6 +334,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
 
           <SolicitarWhatsAppPanel
             profile={{
+              id: profile.id,
               slug: profile.slug,
               displayName: profile.displayName,
               age: profile.age,
@@ -336,6 +351,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
               durationLabel: durationPick.label,
               locationLabel,
               totalBrl: total,
+              isOvernight,
             }}
           />
         </div>

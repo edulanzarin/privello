@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MapPin, Star, ShieldCheck, Video, Clock3, MessageCircle, Lock } from "lucide-react";
+import { MapPin, Star, ShieldCheck, Video, Clock3, Lock } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProviderBanner } from "@/components/layout/provider-banner";
@@ -11,6 +11,8 @@ import { AudioPlayer } from "@/components/profile/audio-player";
 import { ProfileStoryCover } from "@/components/profile/profile-story-cover";
 import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
+import { ShareButton } from "@/components/profile/share-button";
+import { WhatsAppButton } from "@/components/profile/whatsapp-button";
 import { formatBrl } from "@/lib/money";
 import { getProfileBySlug, getStoriesForProfile, isSubscriber, getUserReviewForProfile } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
@@ -34,6 +36,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const isLoggedIn = !!session?.user?.id;
   const profile = await getProfileBySlug(slug, session?.user?.id);
   if (!profile) notFound();
+  const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
+  if (profile.isSuspended && !isAdmin) notFound();
 
   let isProvider = false;
   let ownerView = false;
@@ -101,7 +105,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {ownerView  && <ProviderBanner variant="own-profile" />}
       {isProvider && !ownerView && <ProviderBanner variant="other-profile" />}
 
-      <main className="min-h-screen pb-20">
+      <main className="min-h-screen pb-28">
 
         {/* ── Breadcrumb ── */}
         <div className="border-b border-line bg-white">
@@ -168,16 +172,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     >
                       Marcar horário
                     </Link>
-                    <a
-                      href={profile.whatsappPhone ? `https://wa.me/${profile.whatsappPhone.replace(/\D/g, "")}` : "#"}
-                      className="inline-flex items-center justify-center gap-2 bg-coral px-6 py-3 text-sm font-semibold text-white hover:bg-coral/90 transition"
-                    >
-                      <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
-                      WhatsApp
-                    </a>
+                    <WhatsAppButton phone={profile.whatsappPhone} profileId={profile.id} />
                     <FavoriteButton profileId={profile.id} initialFavorited={initialFavorited} isLoggedIn={isLoggedIn} />
                   </>
                 )}
+                <ShareButton displayName={profile.displayName} slug={profile.slug} />
                 {ownerView && (
                   <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 border border-foreground px-6 py-3 text-sm font-semibold text-foreground hover:bg-foreground hover:text-white transition">
                     Editar perfil
@@ -236,6 +235,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               isSubscriber={isSubscriberViewer}
               currentUserId={session?.user?.id}
               isOwner={ownerView}
+              reelsCount={allMedia.filter((m) => m.mediaType === "REEL").length}
             />
           </div>
         </section>
@@ -388,7 +388,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   </Link>
                 ) : (
                   <Link
-                    href="/assinar"
+                    href={`/assinar?from=/p/${profile.slug}`}
                     className="shrink-0 text-xs font-semibold text-coral hover:underline"
                   >
                     Assine para avaliar
@@ -424,7 +424,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     ) : (
                       <div className="mt-4 flex items-center gap-2 rounded bg-line/50 px-3 py-2">
                         <Lock className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
-                        <Link href="/assinar" className="text-xs text-coral hover:underline">
+                        <Link href={`/assinar?from=/p/${profile.slug}`} className="text-xs text-coral hover:underline">
                           Assine para ver o comentário
                         </Link>
                       </div>

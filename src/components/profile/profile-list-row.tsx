@@ -61,9 +61,7 @@ export function ProfileListRow({ profile, className }: { profile: ProfileCardPay
           "absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
           plan.badgeBg, plan.badgeText,
         )}>
-          {isBoosted && <Zap className="h-2.5 w-2.5 fill-white" strokeWidth={0} />}
           {plan.badgeLabel}
-          {isBoosted && <Zap className="h-2.5 w-2.5 fill-white" strokeWidth={0} />}
         </div>
       </div>
 

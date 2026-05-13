@@ -52,9 +52,14 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     if (viewerProfile) isProvider = true;
   }
 
-  const [profiles, storyGroups] = await Promise.all([
+  const [profiles, storyGroups, districts] = await Promise.all([
     listProfilesForCity(city.id, filters, sort),
     listStoriesForCity(city.id, session?.user?.id),
+    prisma.district.findMany({
+      where: { cityId: city.id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, slug: true },
+    }),
   ]);
   const count = profiles.length;
   const isClientUser = !!session?.user?.id && !isProvider;
@@ -98,6 +103,13 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   if (filters.homeVisit) {
     activePills.push({ label: "A domicílio", href: buildDiscoverHref(citySlug, { domicilio: null }, sp) });
   }
+  if (filters.search) {
+    activePills.push({ label: `"${filters.search}"`, href: buildDiscoverHref(citySlug, { q: null }, sp) });
+  }
+  if (filters.districtSlug) {
+    const d = districts.find((d) => d.slug === filters.districtSlug);
+    if (d) activePills.push({ label: d.name, href: buildDiscoverHref(citySlug, { bairro: null }, sp) });
+  }
 
   return (
     <>
@@ -105,7 +117,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
       <CitySessionSaver citySlug={citySlug} />
       <CitySwitcher currentCityName={city.name} citySlug={citySlug} />
       {isProvider && <ProviderBanner variant="search" />}
-      <main className="min-h-screen pb-16">
+      <main className="min-h-screen pb-28">
         {/* ── Header ── */}
         <div className="border-b border-line bg-white">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -207,8 +219,36 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
         ) : (
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[260px_1fr] lg:px-6">
             {/* ── Sidebar ── */}
-            <aside className="space-y-8 lg:sticky lg:top-24 lg:self-start">
-              <div className="flex items-center justify-between">
+            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+              {/* Search by name / @handle */}
+              <form method="get" className="flex gap-2">
+                <input type="hidden" name="ordem" value={sort === "relevance" ? "" : sort} />
+                <input
+                  name="q"
+                  defaultValue={filters.search ?? ""}
+                  placeholder="Nome ou @handle…"
+                  className="flex-1 border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground"
+                />
+                <button type="submit" className="bg-foreground px-4 py-2.5 text-xs font-bold uppercase text-white">
+                  Ir
+                </button>
+              </form>
+              {filters.search && (
+                <Link
+                  href={`/buscar?q=${encodeURIComponent(filters.search)}`}
+                  className="block text-center text-xs text-muted underline underline-offset-2 hover:text-foreground transition"
+                >
+                  Buscar em todas as cidades
+                </Link>
+              )}
+
+              <details className="group lg:open" open>
+                <summary className="flex cursor-pointer list-none items-center justify-between border border-line bg-white px-4 py-3 text-xs font-semibold uppercase tracking-wider lg:hidden">
+                  <span>Filtros</span>
+                  <span className="text-muted group-open:rotate-180 transition-transform">▾</span>
+                </summary>
+
+              <div className="flex items-center justify-between pt-2 lg:pt-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">Filtros</p>
                 <Link href={`/descobrir/${citySlug}`} className="text-xs text-muted underline">
                   limpar
@@ -217,6 +257,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
               <form method="get" className="space-y-8 border border-line bg-white p-4">
                 <input type="hidden" name="ordem" value={sort === "relevance" ? "" : sort} />
+                {filters.search && <input type="hidden" name="q" value={filters.search} />}
 
                 {/* Gênero */}
                 <div>
@@ -249,6 +290,23 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     Online agora
                   </label>
                 </div>
+
+                {/* Bairro */}
+                {districts.length > 1 && (
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Bairro</p>
+                    <select
+                      name="bairro"
+                      defaultValue={filters.districtSlug ?? ""}
+                      className="mt-2 w-full border border-line bg-white px-2 py-2 text-sm outline-none focus:border-foreground"
+                    >
+                      <option value="">Todos os bairros</option>
+                      {districts.map((d) => (
+                        <option key={d.id} value={d.slug}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <button
                   type="submit"
@@ -329,6 +387,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   </div>
                 </details>
               </form>
+              </details>
             </aside>
 
             {/* ── Results ── */}

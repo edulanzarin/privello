@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { Heart, X, Eye, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StoryGroup } from "@/lib/queries";
@@ -29,6 +31,7 @@ export function ProfileStoryCover({
   planBadge: { bg: string; label: string };
   isClient: boolean;
 }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -280,13 +283,23 @@ export function ProfileStoryCover({
                 <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {activeStory.viewCount}
               </span>
-              <button
-                className="pointer-events-auto flex items-center gap-1.5 text-[11px] text-white/80 hover:text-white"
-                onClick={(e) => { e.stopPropagation(); toggleLike(); }}
-              >
-                <Heart className={cn("h-3.5 w-3.5", activeStory.likedByMe && "fill-coral text-coral")} strokeWidth={1.5} />
-                {activeStory.likeCount}
-              </button>
+              {isClient ? (
+                <button
+                  className="pointer-events-auto flex items-center gap-1.5 text-[11px] text-white/80 hover:text-white"
+                  onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+                >
+                  <Heart className={cn("h-3.5 w-3.5", activeStory.likedByMe && "fill-coral text-coral")} strokeWidth={1.5} />
+                  {activeStory.likeCount}
+                </button>
+              ) : (
+                <Link
+                  href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
+                  className="pointer-events-auto text-[10px] text-white/50 hover:text-white/80 transition"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Entre para curtir
+                </Link>
+              )}
             </div>
           </div>
         </div>

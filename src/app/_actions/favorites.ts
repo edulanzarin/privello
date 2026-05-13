@@ -17,6 +17,10 @@ export async function toggleFavorite(profileId: string) {
 
   const userId = session.user.id;
 
+  // Guard against stale JWTs (e.g. after a DB re-seed)
+  const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!userExists) return { error: "Sessão expirada. Faça login novamente." };
+
   const existing = await prisma.favorite.findUnique({
     where: { userId_profileId: { userId, profileId } },
   });

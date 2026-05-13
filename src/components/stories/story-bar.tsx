@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, X, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StoryGroup } from "@/lib/queries";
@@ -50,6 +51,7 @@ export function StoryBar({
   const rafRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
+  const pathname = usePathname();
   const activeGroup = activeGroupIdx !== null ? localGroups[activeGroupIdx] : null;
   const activeStory = activeGroup?.stories[activeStoryIdx] ?? null;
 
@@ -257,7 +259,7 @@ export function StoryBar({
             </div>
 
             {/* Top bar */}
-            <div className="absolute inset-x-0 top-5 z-10 flex items-center justify-between px-3 pt-4">
+            <div className="absolute inset-x-0 top-5 z-20 flex items-center justify-between px-3 pt-4">
               <Link
                 href={`/p/${activeGroup.slug}`}
                 onClick={closeViewer}
@@ -301,7 +303,7 @@ export function StoryBar({
             </div>
 
             {/* Tap zones: left = prev, right = next */}
-            <div className="absolute inset-x-0" style={{ top: "15%", bottom: "15%" }}>
+            <div className="absolute inset-x-0 z-10" style={{ top: "15%", bottom: "15%" }}>
               <div className="flex h-full">
                 <button className="flex-1" onClick={goPrevStory} aria-label="Anterior" />
                 <button className="flex-1" onClick={goNextStory} aria-label="Próximo" />
@@ -309,7 +311,7 @@ export function StoryBar({
             </div>
 
             {/* Bottom bar: views + like */}
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-6 pt-12">
+            <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-6 pt-12">
               <div className="flex items-center gap-1.5 text-sm text-white/70">
                 <Eye className="h-4 w-4" strokeWidth={1.5} />
                 <span>{activeStory.viewCount}</span>
@@ -329,7 +331,13 @@ export function StoryBar({
                   <span className="text-xs text-white/70">{activeStory.likeCount}</span>
                 </button>
               ) : (
-                <p className="text-[10px] text-white/40">Entre para curtir</p>
+                <Link
+                  href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
+                  className="text-[10px] text-white/50 hover:text-white/80 transition"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Entre para curtir
+                </Link>
               )}
             </div>
           </div>

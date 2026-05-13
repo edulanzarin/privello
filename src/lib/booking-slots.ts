@@ -50,7 +50,10 @@ export type ResolvedDuration = {
   label: string;
   priceBrl: number;
   source: "db" | "fallback";
+  isOvernight: boolean;
 };
+
+export const OVERNIGHT_THRESHOLD_MIN = 420; // 7h+ = pernoite/diária
 
 export function resolveDurationOptions(
   profile: Pick<Profile, "priceHour" | "priceTwoHours" | "priceOvernight" | "priceTravelDay"> & {
@@ -66,22 +69,23 @@ export function resolveDurationOptions(
       label: o.label,
       priceBrl: o.priceBrl,
       source: "db" as const,
+      isOvernight: o.minutes >= OVERNIGHT_THRESHOLD_MIN,
     }));
   }
   const two = profile.priceTwoHours ?? Math.round(profile.priceHour * 1.75);
   const pernoite = profile.priceOvernight ?? profile.priceHour * 5;
   return [
-    { minutes: 60, label: "1 hora", priceBrl: profile.priceHour, source: "fallback" },
-    { minutes: 90, label: "1h30", priceBrl: Math.round((profile.priceHour + two) / 2), source: "fallback" },
-    { minutes: 120, label: "2 horas", priceBrl: two, source: "fallback" },
-    { minutes: 180, label: "3 horas", priceBrl: Math.round(two * 1.45), source: "fallback" },
-    { minutes: 720, label: "Pernoite", priceBrl: pernoite, source: "fallback" },
+    { minutes: 60,  label: "1 hora",   priceBrl: profile.priceHour,                  source: "fallback" as const, isOvernight: false },
+    { minutes: 90,  label: "1h30",     priceBrl: Math.round((profile.priceHour + two) / 2), source: "fallback" as const, isOvernight: false },
+    { minutes: 120, label: "2 horas",  priceBrl: two,                                source: "fallback" as const, isOvernight: false },
+    { minutes: 180, label: "3 horas",  priceBrl: Math.round(two * 1.45),             source: "fallback" as const, isOvernight: false },
+    { minutes: 720, label: "Pernoite", priceBrl: pernoite,                            source: "fallback" as const, isOvernight: true  },
   ];
 }
 
 export function calendarMonthCells(year: number, month: number): { date: Date | null }[] {
   const first = new Date(year, month - 1, 1);
-  const startPad = (first.getDay() + 6) % 7;
+  const startPad = first.getDay(); // 0 = Dom, semana começa no domingo
   const daysInMonth = new Date(year, month, 0).getDate();
   const cells: { date: Date | null }[] = [];
   for (let i = 0; i < startPad; i++) cells.push({ date: null });

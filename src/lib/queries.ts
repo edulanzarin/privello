@@ -93,7 +93,9 @@ export type DiscoverFilters = {
   onlineOnly?: boolean;
   hasOwnPlace?: boolean;
   homeVisit?: boolean;
-  excludeProfileId?: string; // hide own profile from search results
+  excludeProfileId?: string;
+  search?: string;
+  districtSlug?: string;
 };
 
 export type ProfileSort = "relevance" | "price_asc" | "price_desc" | "rating";
@@ -138,7 +140,7 @@ export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[
 }
 
 export async function listProfilesForCity(cityId: string, filters: DiscoverFilters, sort: ProfileSort = "relevance") {
-  const where: Prisma.ProfileWhereInput = { cityId };
+  const where: Prisma.ProfileWhereInput = { cityId, isSuspended: false };
 
   // Default: show profiles that serve men (garotas).
   // "garotos" = servesWomen, "casais" = servesCouples, default/undefined = servesMen
@@ -161,6 +163,16 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
   if (filters.hasOwnPlace) where.hasOwnPlace = true;
   if (filters.homeVisit) where.homeVisit = true;
   if (filters.excludeProfileId) where.id = { not: filters.excludeProfileId };
+  if (filters.search) {
+    const q = filters.search.replace(/^@/, "").trim();
+    where.OR = [
+      { displayName: { contains: q, mode: "insensitive" } },
+      { slug: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (filters.districtSlug) {
+    where.district = { slug: filters.districtSlug };
+  }
 
   const profiles = await prisma.profile.findMany({
     where,
@@ -170,6 +182,23 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
   });
 
   return finalizeDiscoverOrder(profiles, sort);
+}
+
+export async function searchProfilesGlobal(q: string, limit = 30) {
+  const term = q.replace(/^@/, "").trim();
+  if (!term) return [];
+  const profiles = await prisma.profile.findMany({
+    where: {
+      OR: [
+        { displayName: { contains: term, mode: "insensitive" } },
+        { slug: { contains: term, mode: "insensitive" } },
+      ],
+    },
+    include: profileCardInclude,
+    orderBy: [{ lastUpdatedAt: "desc" }],
+    take: limit,
+  });
+  return finalizeDiscoverOrder(profiles, "relevance");
 }
 
 export async function getProfileBySlug(slug: string, userId?: string) {
@@ -213,7 +242,7 @@ export async function getUserReviewForProfile(profileId: string, userId: string)
 
 export async function getPremiumWeekProfiles() {
   return prisma.profile.findMany({
-    where: { planTier: { in: ["PREMIUM", "DESTAQUE"] } },
+    where: { planTier: { in: ["PREMIUM", "DESTAQUE"] }, isSuspended: false },
     include: profileCardInclude,
     orderBy: [{ featuredUntil: "desc" }, { ratingAvg: "desc" }],
     take: 8,
@@ -226,6 +255,7 @@ export async function getPremiumWeekProfiles() {
  */
 export async function getHotProfiles(limit = 20) {
   const profiles = await prisma.profile.findMany({
+    where: { isSuspended: false },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
     take: limit,
@@ -241,7 +271,7 @@ export async function getHotProfiles(limit = 20) {
 export async function getBoostedProfiles(limit = 8) {
   const now = new Date();
   const profiles = await prisma.profile.findMany({
-    where: { featuredUntil: { gt: now } },
+    where: { featuredUntil: { gt: now }, isSuspended: false },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
     take: limit * 3,
@@ -259,6 +289,43 @@ export async function getBoostedProfiles(limit = 8) {
   return out.slice(0, limit);
 }
 
+const SECTION_PAGE_SIZE = 8;
+
+export async function getSectionProfiles(
+  type: "hot" | "boosted",
+  offset = 0,
+  limit = SECTION_PAGE_SIZE,
+) {
+  if (type === "hot") {
+    const rows = await prisma.profile.findMany({
+      where: { isSuspended: false },
+      include: profileCardInclude,
+      orderBy: { viewsCurrentPeriod: "desc" },
+      skip: offset,
+      take: limit + 1,
+    });
+    const hasMore = rows.length > limit;
+    return { profiles: rows.slice(0, limit), hasMore };
+  }
+
+  // boosted — in-memory tier sort, so fetch a generous batch
+  const now = new Date();
+  const rows = await prisma.profile.findMany({
+    where: { featuredUntil: { gt: now }, isSuspended: false },
+    include: profileCardInclude,
+    orderBy: { viewsCurrentPeriod: "desc" },
+    take: offset + limit + 100,
+  });
+  const sorted = [...rows].sort((a, b) => {
+    const order: Record<string, number> = { PREMIUM: 0, DESTAQUE: 1, ESSENCIAL: 2 };
+    const diff = (order[a.planTier] ?? 2) - (order[b.planTier] ?? 2);
+    return diff !== 0 ? diff : b.viewsCurrentPeriod - a.viewsCurrentPeriod;
+  });
+  const page = sorted.slice(offset, offset + limit);
+  const hasMore = sorted.length > offset + limit;
+  return { profiles: page, hasMore };
+}
+
 export async function getHotPeriodStart(): Promise<Date | null> {
   const cfg = await prisma.hotPeriodConfig.findUnique({ where: { id: "hot" } });
   return cfg?.startedAt ?? null;
@@ -266,6 +333,18 @@ export async function getHotPeriodStart(): Promise<Date | null> {
 
 export async function getAllCities() {
   return prisma.city.findMany({ orderBy: { name: "asc" } });
+}
+
+export async function getCitiesWithReels() {
+  const rows = await prisma.profile.findMany({
+    where: { media: { some: { mediaType: "REEL", isPublic: true } } },
+    select: { city: { select: { id: true, name: true, slug: true } } },
+    distinct: ["cityId"],
+  });
+  return rows
+    .map((r) => r.city)
+    .filter((c): c is NonNullable<typeof c> => !!c)
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getProfileBySlugForPainel(slug: string) {
@@ -276,28 +355,6 @@ export async function getProfileBySlugForPainel(slug: string) {
       city: true,
       district: true,
     },
-  });
-}
-
-export async function listPendingMeetingRequests(profileId: string) {
-  return prisma.meetingRequest.findMany({
-    where: { profileId, status: "PENDING" },
-    include: { client: { select: { name: true, verified: true, createdAt: true } } },
-    orderBy: { expiresAt: "asc" },
-  });
-}
-
-export async function listConfirmedAgenda(profileId: string, limit = 5) {
-  const now = new Date();
-  return prisma.meetingRequest.findMany({
-    where: {
-      profileId,
-      status: "CONFIRMED",
-      date: { gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) },
-    },
-    include: { client: { select: { name: true } } },
-    orderBy: { date: "asc" },
-    take: limit,
   });
 }
 
@@ -458,20 +515,28 @@ export async function listReels({
   cursor,
   limit = 10,
   userId,
+  viewerIsSubscriber = false,
+  ownerId,
 }: {
   cityId?: string;
   profileId?: string;
   cursor?: string;
   limit?: number;
   userId?: string;
+  viewerIsSubscriber?: boolean;
+  // If set, this user owns the profile — they always see their own private reels
+  ownerId?: string;
 }) {
-  const where: Parameters<typeof prisma.media.findMany>[0]["where"] = {
+  const profileFilter = {
+    isSuspended: false,
+    ...(cityId    ? { cityId }    : {}),
+    ...(profileId ? { id: profileId } : {}),
+  };
+
+  const where: import("@prisma/client").Prisma.MediaWhereInput = {
     mediaType: "REEL",
-    isPublic: true,
-    profile: {
-      ...(cityId    ? { cityId }    : {}),
-      ...(profileId ? { id: profileId } : {}),
-    },
+    // Include public reels always; include private reels too (they show as locked for non-subscribers)
+    profile: profileFilter,
   };
 
   const items = await prisma.media.findMany({
@@ -498,23 +563,30 @@ export async function listReels({
   if (hasMore) items.pop();
 
   return {
-    reels: items.map((r) => ({
-      id: r.id,
-      url: r.url,
-      caption: r.caption,
-      createdAt: r.createdAt.toISOString(),
-      likeCount: r._count.likes,
-      commentCount: r._count.comments,
-      likedByMe: userId ? (r.likes as { id: string }[]).length > 0 : false,
-      profile: {
-        id: r.profile.id,
-        slug: r.profile.slug,
-        displayName: r.profile.displayName,
-        coverUrl: r.profile.media[0]?.url ?? null,
-        cityName: r.profile.city.name,
-        citySlug: r.profile.city.slug,
-      },
-    })),
+    reels: items.map((r) => {
+      const isPrivate = !r.isPublic;
+      // Locked = private AND viewer is not subscriber AND viewer is not the owner
+      const isLocked = isPrivate && !viewerIsSubscriber && r.profile.id !== ownerId;
+      return {
+        id: r.id,
+        url: isLocked ? "" : r.url,
+        caption: isLocked ? null : r.caption,
+        isPrivate,
+        isLocked,
+        createdAt: r.createdAt.toISOString(),
+        likeCount: r._count.likes,
+        commentCount: r._count.comments,
+        likedByMe: userId ? (r.likes as { id: string }[]).length > 0 : false,
+        profile: {
+          id: r.profile.id,
+          slug: r.profile.slug,
+          displayName: r.profile.displayName,
+          coverUrl: r.profile.media[0]?.url ?? null,
+          cityName: r.profile.city.name,
+          citySlug: r.profile.city.slug,
+        },
+      };
+    }),
     hasMore,
     nextCursor: hasMore ? items[items.length - 1].id : null,
   };

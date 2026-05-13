@@ -3,10 +3,9 @@ import { Suspense } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
-import { ProfileCard } from "@/components/profile/profile-card";
+import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
-import { getPlatformStats, getHotProfiles, getBoostedProfiles } from "@/lib/queries";
-import type { ProfileCardPayload } from "@/lib/queries";
+import { getPlatformStats, getSectionProfiles } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -22,14 +21,18 @@ const pills = [
 
 export default async function HomePage() {
   let stats = FALLBACK_PLATFORM_STATS;
-  let hot: ProfileCardPayload[] = [];
-  let boosted: ProfileCardPayload[] = [];
+  let hot: { profiles: Awaited<ReturnType<typeof getSectionProfiles>>["profiles"]; hasMore: boolean } = { profiles: [], hasMore: false };
+  let boosted: typeof hot = { profiles: [], hasMore: false };
 
   try {
-    const [s, h, b] = await Promise.all([getPlatformStats(), getHotProfiles(8), getBoostedProfiles(8)]);
+    const [s, h, b] = await Promise.all([
+      getPlatformStats(),
+      getSectionProfiles("hot", 0),
+      getSectionProfiles("boosted", 0),
+    ]);
     stats = s;
-    hot = h as ProfileCardPayload[];
-    boosted = b as ProfileCardPayload[];
+    hot = h;
+    boosted = b;
   } catch {
     // use fallbacks
   }
@@ -96,41 +99,42 @@ export default async function HomePage() {
         </section>
 
         {/* ── Em destaque (boost ativo) — só aparece quando há perfis boosted ── */}
-        {boosted.length > 0 && (
+        {boosted.profiles.length > 0 && (
           <section className="border-t border-line bg-white py-16">
-            <div className="mx-auto flex max-w-6xl items-end justify-between gap-4 px-4 sm:px-6">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
               <h2 className="font-serif text-3xl font-light sm:text-4xl">
                 Em destaque{" "}
                 <em className="italic text-muted">· boost ativo</em>
               </h2>
             </div>
-            <div className="mx-auto mt-10 grid max-w-6xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
-              {boosted.map((p) => (
-                <ProfileCard key={p.id} profile={p} />
-              ))}
-            </div>
+            <ProfileSection
+              type="boosted"
+              initialProfiles={boosted.profiles}
+              initialHasMore={boosted.hasMore}
+              viewAllHref="/em-destaque"
+            />
           </section>
         )}
 
         {/* ── Em alta da semana ── */}
         <section className="border-t border-line bg-white py-16">
-          <div className="mx-auto flex max-w-6xl items-end justify-between gap-4 px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="font-serif text-3xl font-light sm:text-4xl">
               Em alta <em className="italic text-muted">da semana</em>
             </h2>
-            <Link href="/em-alta" className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Ver todas →
-            </Link>
           </div>
-          <div className="mx-auto mt-10 grid max-w-6xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
-            {hot.length ? (
-              hot.map((p) => <ProfileCard key={p.id} profile={p} />)
-            ) : (
-              <p className="col-span-full text-center text-sm text-muted">
-                Novos perfis em breve. Seja o primeiro a se cadastrar na sua cidade.
-              </p>
-            )}
-          </div>
+          {hot.profiles.length ? (
+            <ProfileSection
+              type="hot"
+              initialProfiles={hot.profiles}
+              initialHasMore={hot.hasMore}
+              viewAllHref="/em-alta"
+            />
+          ) : (
+            <p className="mx-auto mt-10 max-w-6xl px-4 text-center text-sm text-muted sm:px-6">
+              Novos perfis em breve. Seja o primeiro a se cadastrar na sua cidade.
+            </p>
+          )}
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">

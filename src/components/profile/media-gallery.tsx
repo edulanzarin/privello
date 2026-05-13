@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2, Expand, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 6;
@@ -37,6 +37,7 @@ type Props = {
   isSubscriber: boolean;
   currentUserId?: string;
   isOwner?: boolean;
+  reelsCount?: number;
 };
 
 function fmtDate(iso: string) {
@@ -75,6 +76,7 @@ function PostModal({
 }) {
   const [idx, setIdx] = useState(startIdx);
   const item = items[idx];
+  const [muted, setMuted] = useState(true);
 
   const [likes, setLikes] = useState<Record<string, { count: number; liked: boolean }>>({});
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
@@ -197,9 +199,18 @@ function PostModal({
           </button>
 
           {item.mediaType === "VIDEO" ? (
-            <video src={item.url} controls autoPlay className={cn("absolute inset-0 h-full w-full object-contain", !item.isPublic && !isSubscriber && "blur-xl")} />
+            <>
+              <video src={item.url} autoPlay loop muted={muted} playsInline className={cn("absolute inset-0 h-full w-full object-contain", !item.isPublic && !isSubscriber && "blur-xl")} />
+              <button
+                type="button"
+                onClick={() => setMuted((m) => !m)}
+                className="absolute right-3 top-3 z-10 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm hover:bg-black/70"
+              >
+                {muted ? <VolumeX className="h-4 w-4" strokeWidth={1.5} /> : <Volume2 className="h-4 w-4" strokeWidth={1.5} />}
+              </button>
+            </>
           ) : (
-            <Image src={item.url} alt={displayName} fill className={cn("object-contain", !item.isPublic && !isSubscriber && "blur-xl")} priority />
+            <Image src={item.url} alt={displayName} fill sizes="(min-width:640px) 50vw, 100vw" className={cn("object-contain", !item.isPublic && !isSubscriber && "blur-xl")} priority />
           )}
 
           {/* Lock overlay for private items when not subscribed */}
@@ -208,7 +219,7 @@ function PostModal({
               <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
               <p className="text-sm font-semibold text-white">Conteúdo exclusivo</p>
               <Link
-                href={isClient ? "/assinar" : "/entrar?callbackUrl=/assinar"}
+                href={isClient ? `/assinar?from=/p/${slug}` : `/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`}
                 className="rounded-full bg-coral px-5 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-coral/90"
               >
                 Assinar para ver
@@ -307,7 +318,7 @@ function PostModal({
                     </p>
                     <p className="text-xs text-muted">Assine para ler os comentários</p>
                     <Link
-                      href={isClient ? "/assinar" : "/entrar?callbackUrl=/assinar"}
+                      href={isClient ? `/assinar?from=/p/${slug}` : `/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`}
                       className="mt-1 rounded-full bg-coral px-4 py-1.5 text-xs font-bold text-white hover:bg-coral/90"
                     >
                       Assinar — R$19,90/mês
@@ -356,13 +367,13 @@ function PostModal({
             </div>
           ) : isClient ? (
             <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href="/assinar" className="text-xs font-semibold text-coral hover:underline">
+              <Link href={`/assinar?from=/p/${slug}`} className="text-xs font-semibold text-coral hover:underline">
                 Assine para comentar
               </Link>
             </div>
           ) : (
             <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href="/entrar" className="text-xs font-semibold text-coral hover:underline">
+              <Link href={`/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`} className="text-xs font-semibold text-coral hover:underline">
                 Entre para curtir e comentar
               </Link>
             </div>
@@ -374,7 +385,7 @@ function PostModal({
 }
 
 // ── Main gallery component ───────────────────────────────────────────────────
-export function MediaGallery({ media, displayName, slug, isClient, isSubscriber, currentUserId, isOwner }: Props) {
+export function MediaGallery({ media, displayName, slug, isClient, isSubscriber, currentUserId, isOwner, reelsCount }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<"fotos" | "videos" | "reels">("fotos");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -401,7 +412,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
   const tabs = [
     { key: "fotos" as const, label: "Fotos", count: imageItems.length },
     { key: "videos" as const, label: "Vídeos", count: videoItems.length },
-    { key: "reels" as const, label: "Reels", count: null },
+    { key: "reels" as const, label: "Reels", count: reelsCount ?? null },
   ];
 
   return (
@@ -483,18 +494,24 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
                     </div>
                   )}
 
-                  {/* Like/comment count on hover (public items only) */}
-                  {!locked && m.likeCount > 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition group-hover:opacity-100">
-                      <span className="flex items-center gap-1 text-sm font-bold text-white">
-                        <Heart className="h-4 w-4 fill-white" strokeWidth={0} />
-                        {m.likeCount}
-                      </span>
-                      {m.commentCount > 0 && (
-                        <span className="flex items-center gap-1 text-sm font-bold text-white">
-                          <MessageCircle className="h-4 w-4 fill-white" strokeWidth={0} />
-                          {m.commentCount}
-                        </span>
+                  {/* Hover/tap overlay — stats on desktop, expand hint on mobile */}
+                  {!locked && (
+                    <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition active:opacity-100 group-hover:opacity-100">
+                      {m.likeCount > 0 ? (
+                        <>
+                          <span className="flex items-center gap-1 text-sm font-bold text-white">
+                            <Heart className="h-4 w-4 fill-white" strokeWidth={0} />
+                            {m.likeCount}
+                          </span>
+                          {m.commentCount > 0 && (
+                            <span className="flex items-center gap-1 text-sm font-bold text-white">
+                              <MessageCircle className="h-4 w-4 fill-white" strokeWidth={0} />
+                              {m.commentCount}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <Expand className="h-5 w-5 text-white/80" strokeWidth={1.5} />
                       )}
                     </div>
                   )}

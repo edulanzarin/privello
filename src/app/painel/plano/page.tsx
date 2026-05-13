@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { UpgradeButton, BoostButton } from "./upgrade-button";
 
 export const dynamic = "force-dynamic";
 
@@ -67,9 +68,7 @@ export default async function PainelPlanoPage() {
         ) : (
           <>
             <p className="mt-2 text-sm text-muted">Sobe seu perfil ao topo da listagem por 24h. R$ 89 por disparo.</p>
-            <Link href="/planos" className="mt-3 inline-block bg-coral px-5 py-2 text-xs font-bold uppercase tracking-wider text-white">
-              Disparar boost
-            </Link>
+            <BoostButton />
           </>
         )}
       </div>
@@ -95,11 +94,7 @@ export default async function PainelPlanoPage() {
                   </li>
                 ))}
               </ul>
-              {!isCurrent && (
-                <Link href="/planos" className="mt-5 block w-full border border-foreground py-2 text-center text-xs font-bold uppercase tracking-wider text-foreground transition hover:bg-foreground hover:text-white">
-                  Fazer upgrade
-                </Link>
-              )}
+              {!isCurrent && <UpgradeButton tier={plan.tier} />}
             </div>
           );
         })}

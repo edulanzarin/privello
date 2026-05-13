@@ -1,8 +1,23 @@
-import { Play } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { ReelsManager } from "@/components/painel/reels-manager";
 
 export const dynamic = "force-dynamic";
 
-export default function PainelReelsPage() {
+export default async function PainelReelsPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/entrar");
+
+  const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
+  if (!profile) redirect("/conta/onboarding/perfil");
+
+  const reels = await prisma.media.findMany({
+    where: { profileId: profile.id, mediaType: "REEL" },
+    orderBy: { sortOrder: "asc" },
+    select: { id: true, url: true, caption: true, isPublic: true },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -11,18 +26,7 @@ export default function PainelReelsPage() {
           Vídeos curtos em formato vertical para destacar sua personalidade.
         </p>
       </div>
-
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 border border-dashed border-line bg-white text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-line">
-          <Play className="h-8 w-8 text-muted" strokeWidth={1.25} />
-        </div>
-        <div>
-          <p className="text-base font-semibold">Reels em breve</p>
-          <p className="mt-1 max-w-xs text-sm text-muted">
-            Estamos desenvolvendo a funcionalidade de reels. Em breve você poderá publicar vídeos curtos no seu perfil.
-          </p>
-        </div>
-      </div>
+      <ReelsManager initialReels={reels} />
     </div>
   );
 }

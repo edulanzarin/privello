@@ -14,7 +14,12 @@ const PERKS = [
   { icon: Lock, label: "Comentar nas fotos", sub: "Interaja diretamente com as acompanhantes" },
 ];
 
-export default async function AssinarPage() {
+type Props = { searchParams: Promise<{ from?: string }> };
+
+export default async function AssinarPage({ searchParams }: Props) {
+  const { from } = await searchParams;
+  const returnTo = from && from.startsWith("/") ? from : "/";
+
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
   const isClient = isLoggedIn && session?.user?.role === "CLIENT";
@@ -22,7 +27,13 @@ export default async function AssinarPage() {
   const alreadySubscribed = isClient ? await isSubscriber(session!.user!.id!) : false;
 
   if (!isLoggedIn) {
-    redirect("/entrar?callbackUrl=/assinar");
+    const callbackUrl = from ? `/assinar?from=${encodeURIComponent(from)}` : "/assinar";
+    redirect(`/entrar?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  }
+
+  // Already subscribed — send them back to where they came from
+  if (alreadySubscribed) {
+    redirect(returnTo);
   }
 
   return (
@@ -59,15 +70,8 @@ export default async function AssinarPage() {
           </ul>
 
           <div className="mt-8">
-            {alreadySubscribed ? (
-              <div className="rounded bg-success/10 px-4 py-3 text-center">
-                <p className="text-sm font-semibold text-success">Você já é assinante ✓</p>
-                <Link href="/" className="mt-1 block text-xs text-muted hover:text-foreground">
-                  Ir para a página inicial
-                </Link>
-              </div>
-            ) : isClient ? (
-              <SubscribeButton />
+            {isClient ? (
+              <SubscribeButton redirectTo={returnTo} />
             ) : (
               <p className="text-center text-sm text-muted">
                 Somente clientes podem assinar.{" "}

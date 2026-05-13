@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
+const extraOrigins = (process.env.NEXT_DEV_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["192.168.1.93"],
+  allowedDevOrigins: ["192.168.1.93", ...extraOrigins],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "picsum.photos", pathname: "/**" },

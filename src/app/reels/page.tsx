@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { listReels, getAllCities } from "@/lib/queries";
+import { listReels, getCitiesWithReels, getCityBySlug, isSubscriber } from "@/lib/queries";
+import { prisma } from "@/lib/prisma";
 import { ReelsFeed } from "@/components/reels/reels-feed";
 import { ReelsCityFilter } from "@/components/reels/city-filter";
-import { prisma } from "@/lib/prisma";
+import { ReelsCityRestorer } from "@/components/reels/city-restorer";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -15,19 +16,39 @@ export default async function ReelsPage({ searchParams }: PageProps) {
   const session = await auth();
   const userId = session?.user?.id;
 
-  // Resolve cityId from slug
   let cityId: string | undefined;
   let cityName: string | undefined;
   if (cidade) {
-    const city = await prisma.city.findFirst({ where: { slug: cidade }, select: { id: true, name: true } });
-    if (city) { cityId = city.id; cityName = city.name; }
+    const city = await getCityBySlug(cidade);
+    if (city) {
+      cityId = city.id;
+      const parts = city.slug.split("-");
+      const uf = parts[parts.length - 1].toUpperCase();
+      cityName = /^[A-Z]{2}$/.test(uf) ? `${city.name}, ${uf}` : city.name;
+    }
   }
 
   const isClient = !!userId && session?.user?.role !== "PROVIDER";
 
-  const { reels, hasMore, nextCursor } = await listReels({ cityId, limit: 10, userId: isClient ? userId : undefined });
+  let viewerIsSubscriber = false;
+  let ownerId: string | undefined;
+  if (userId) {
+    const [subStatus, profile] = await Promise.all([
+      isSubscriber(userId),
+      prisma.profile.findUnique({ where: { userId }, select: { id: true } }),
+    ]);
+    viewerIsSubscriber = subStatus;
+    if (profile) ownerId = profile.id;
+  }
 
-  const cities = await getAllCities();
+  const { reels, hasMore, nextCursor } = await listReels({
+    cityId, limit: 10,
+    userId: isClient ? userId : undefined,
+    viewerIsSubscriber,
+    ownerId,
+  });
+
+  const cities = await getCitiesWithReels();
 
   return (
     <div className="relative h-screen overflow-hidden bg-black">
@@ -51,11 +72,14 @@ export default async function ReelsPage({ searchParams }: PageProps) {
         </div>
       )}
 
+      {!cidade && <ReelsCityRestorer />}
+
       <ReelsFeed
         initialReels={reels}
         hasMore={hasMore}
         nextCursor={nextCursor}
         isClient={isClient}
+        isSubscriber={viewerIsSubscriber}
         cityId={cityId}
       />
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Eye, Heart, MessageCircle, TrendingUp, Zap, ArrowUpRight, AlertCircle } from "lucide-react";
+import { Eye, Heart, MessageCircle, TrendingUp, Zap, ArrowUpRight, AlertCircle, Ban } from "lucide-react";
+import { OnlineToggle } from "@/components/painel/online-toggle";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countWhatsAppClicksToday, listWhatsAppClicksRecent, listFinancialRecordsForMonth } from "@/lib/queries";
@@ -55,7 +56,7 @@ export default async function PainelOverviewPage() {
 
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
-    include: { city: true },
+    include: { city: true, _count: { select: { warnings: true } } },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
@@ -121,12 +122,7 @@ export default async function PainelOverviewPage() {
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <span className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-semibold ${
-            profile.isOnline ? "border-success/30 bg-success/10 text-success" : "border-line bg-white text-muted"
-          }`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${profile.isOnline ? "bg-success" : "bg-muted"}`} />
-            {profile.isOnline ? "Online" : "Pausado"}
-          </span>
+          <OnlineToggle initialOnline={profile.isOnline} />
           <Link href={`/p/${profile.slug}`}
             className="inline-flex items-center gap-1.5 border border-line bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:border-foreground transition">
             <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -134,6 +130,32 @@ export default async function PainelOverviewPage() {
           </Link>
         </div>
       </div>
+
+      {/* ── Suspension banner ── */}
+      {profile.isSuspended && (
+        <div className="flex items-start gap-3 border border-red-300 bg-red-50 px-4 py-4">
+          <Ban className="h-5 w-5 shrink-0 text-red-600 mt-0.5" strokeWidth={1.5} />
+          <div>
+            <p className="font-bold text-sm text-red-700">Conta suspensa</p>
+            <p className="mt-0.5 text-xs text-red-600 leading-relaxed">
+              Seu perfil está invisível e inacessível para visitantes.
+              {profile.suspensionNote && <> Motivo: <em>{profile.suspensionNote}</em></>}
+              {" "}Entre em contato com o suporte para contestar.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Warning notice ── */}
+      {!profile.isSuspended && profile._count.warnings > 0 && (
+        <div className="flex items-center gap-3 border border-yellow-300 bg-yellow-50 px-4 py-3">
+          <AlertCircle className="h-4 w-4 shrink-0 text-yellow-600" strokeWidth={1.5} />
+          <p className="text-xs text-yellow-700">
+            Você tem <strong>{profile._count.warnings} advertência{profile._count.warnings !== 1 ? "s" : ""}</strong>.
+            {" "}Ao atingir 3, sua conta será suspensa automaticamente.
+          </p>
+        </div>
+      )}
 
       {/* ── Incomplete warning ── */}
       {isIncomplete && (

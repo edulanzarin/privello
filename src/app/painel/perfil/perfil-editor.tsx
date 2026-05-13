@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, AtSign, Mic, X, Play, Pause } from "lucide-react";
+import { Loader2, AtSign, Mic, X, Play, Pause, Square, Circle } from "lucide-react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 import { changeHandle } from "@/app/painel/_actions/provider-settings";
@@ -65,6 +65,42 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const [audioUploading, setAudioUploading] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const audioPreviewRef = useRef<HTMLAudioElement>(null);
+
+  // Recording state
+  const [recording, setRecording] = useState(false);
+  const [recordSecs, setRecordSecs] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream);
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      mr.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const file = new File([blob], "gravacao.webm", { type: "audio/webm" });
+        await uploadAudio(file);
+        setRecording(false);
+        setRecordSecs(0);
+      };
+      mr.start();
+      mediaRecorderRef.current = mr;
+      setRecording(true);
+      setRecordSecs(0);
+      recordTimerRef.current = setInterval(() => setRecordSecs((s) => s + 1), 1000);
+    } catch {
+      toast("Permissão de microfone negada.", "error");
+    }
+  }
+
+  function stopRecording() {
+    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+    mediaRecorderRef.current?.stop();
+  }
 
   const initialLangs = profile.languages?.split(" · ").map((l) => l.trim()) ?? ["PT"];
   const [selectedLangs, setSelectedLangs] = useState<string[]>(initialLangs);
@@ -199,7 +235,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             </button>
           </div>
         ) : (
-          <div>
+          <div className="space-y-3">
             <input
               ref={audioInputRef}
               type="file"
@@ -207,18 +243,52 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAudio(f); }}
             />
-            <button
-              type="button"
-              onClick={() => audioInputRef.current?.click()}
-              disabled={audioUploading}
-              className="flex items-center gap-2 border border-dashed border-line bg-white px-5 py-3 text-sm text-muted hover:border-coral hover:text-coral disabled:opacity-50 transition"
-            >
-              {audioUploading
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <Mic className="h-4 w-4" strokeWidth={1.5} />
-              }
-              {audioUploading ? "Enviando…" : "Enviar áudio"}
-            </button>
+
+            {recording ? (
+              /* Recording in progress */
+              <div className="flex items-center gap-4 border border-coral/40 bg-coral/5 px-5 py-3">
+                <span className="flex h-3 w-3 shrink-0">
+                  <span className="absolute inline-flex h-3 w-3 animate-ping rounded-full bg-coral opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-coral" />
+                </span>
+                <span className="flex-1 text-sm font-medium text-coral">
+                  Gravando… {Math.floor(recordSecs / 60).toString().padStart(2, "0")}:{(recordSecs % 60).toString().padStart(2, "0")}
+                </span>
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="flex items-center gap-1.5 bg-coral px-4 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-coral/90"
+                >
+                  <Square className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
+                  Parar
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => audioInputRef.current?.click()}
+                  disabled={audioUploading}
+                  className="flex items-center gap-2 border border-dashed border-line bg-white px-5 py-3 text-sm text-muted hover:border-coral hover:text-coral disabled:opacity-50 transition"
+                >
+                  {audioUploading
+                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                    : <Mic className="h-4 w-4" strokeWidth={1.5} />
+                  }
+                  {audioUploading ? "Enviando…" : "Enviar arquivo"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={startRecording}
+                  disabled={audioUploading}
+                  className="flex items-center gap-2 border border-dashed border-coral/50 bg-white px-5 py-3 text-sm text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-50 transition"
+                >
+                  <Circle className="h-4 w-4 fill-coral text-coral" strokeWidth={0} />
+                  Gravar agora
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

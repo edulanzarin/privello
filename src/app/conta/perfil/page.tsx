@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
-import { Heart, LogOut } from "lucide-react";
+import { Heart, LogOut, Crown, Lock } from "lucide-react";
+import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { getClientFavorites } from "@/app/_actions/favorites";
+import { isSubscriber } from "@/lib/queries";
 import { FavoritesList } from "./favorites-list";
 
 export const dynamic = "force-dynamic";
@@ -14,9 +16,21 @@ export default async function ClientPerfilPage() {
   if (!session) redirect("/entrar?callbackUrl=/conta/perfil");
   if (session.user.role === "PROVIDER") redirect("/painel");
 
-  const [allFavorites, user] = await Promise.all([
+  const [allFavorites, user, subscribed] = await Promise.all([
     getClientFavorites(),
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { slug: true } }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        slug: true,
+        subscriptions: {
+          where: { status: "ACTIVE", expiresAt: { gt: new Date() } },
+          orderBy: { expiresAt: "desc" },
+          take: 1,
+          select: { expiresAt: true },
+        },
+      },
+    }),
+    isSubscriber(session.user.id),
   ]);
 
   const active = allFavorites.filter((f) => f.profile !== null);
@@ -24,6 +38,7 @@ export default async function ClientPerfilPage() {
   const cities = [...new Set(active.map((f) => f.profile.city.name))].sort();
 
   const handle = user?.slug ?? null;
+  const activeSub = user?.subscriptions?.[0] ?? null;
 
   const favoritesForClient = active.map((f) => ({
     profile: {
@@ -63,6 +78,37 @@ export default async function ClientPerfilPage() {
             </button>
           </form>
         </div>
+
+        {/* ── Subscription status ── */}
+        {subscribed && activeSub ? (
+          <div className="mt-6 flex items-center justify-between gap-4 border border-success/30 bg-success/5 px-4 py-3">
+            <div className="flex items-center gap-2 text-success">
+              <Crown className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+              <span className="text-sm font-semibold">Assinante ativo</span>
+            </div>
+            <span className="text-xs text-muted">
+              Renova em{" "}
+              {new Date(activeSub.expiresAt).toLocaleDateString("pt-BR", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        ) : (
+          <div className="mt-6 flex items-center justify-between gap-4 border border-line bg-white px-4 py-3">
+            <div className="flex items-center gap-2 text-muted">
+              <Lock className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+              <span className="text-sm">Sem assinatura ativa — fotos privadas e avaliações bloqueadas</span>
+            </div>
+            <Link
+              href="/assinar"
+              className="shrink-0 bg-foreground px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-foreground/80 transition"
+            >
+              Assinar
+            </Link>
+          </div>
+        )}
 
         {/* ── Stats row ── */}
         <div className="mt-8 grid grid-cols-3 gap-3">

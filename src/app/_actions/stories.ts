@@ -15,13 +15,14 @@ async function getProviderProfile() {
 
 export async function createStory(formData: FormData) {
   const profile = await getProviderProfile();
-  const mediaUrl = (formData.get("mediaUrl") as string).trim();
-  const caption  = (formData.get("caption") as string | null)?.trim() || null;
+  const mediaUrl  = (formData.get("mediaUrl") as string).trim();
+  const caption   = (formData.get("caption") as string | null)?.trim() || null;
+  const mediaType = (formData.get("mediaType") as string | null) || "IMAGE";
   if (!mediaUrl) return;
 
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   await prisma.story.create({
-    data: { profileId: profile.id, mediaUrl, caption, expiresAt },
+    data: { profileId: profile.id, mediaUrl, mediaType, caption, expiresAt },
   });
 
   revalidatePath("/painel/perfil");

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MapPin, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
@@ -13,7 +14,6 @@ function displayFromSlug(slug: string, fallback: string): string {
   const parts = slug.split("-");
   if (parts.length < 2) return fallback;
   const uf = parts[parts.length - 1].toUpperCase();
-  // If the fallback already contains a comma (e.g. "Blumenau, SC") use it directly
   if (fallback.includes(",")) return fallback;
   return `${fallback}, ${uf}`;
 }
@@ -57,13 +57,22 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
             </div>
           ) : (
             /* Static display mode */
-            <button
-              onClick={() => setSearching(true)}
-              className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-coral transition"
-            >
-              {displayName}
-              <ChevronDown className="h-3.5 w-3.5 text-muted" strokeWidth={2} />
-            </button>
+            <div className="flex flex-1 items-center gap-2">
+              <button
+                onClick={() => setSearching(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-coral transition"
+              >
+                {displayName}
+                <ChevronDown className="h-3.5 w-3.5 text-muted" strokeWidth={2} />
+              </button>
+              <Link
+                href="/buscar"
+                className="ml-1 rounded p-0.5 text-muted hover:text-foreground transition"
+                title="Limpar cidade — voltar à busca"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={2} />
+              </Link>
+            </div>
           )}
         </div>
       </div>

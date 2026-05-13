@@ -22,7 +22,11 @@ export function FavoriteButton({ profileId, initialFavorited, isLoggedIn }: Prop
     }
     startTransition(async () => {
       const res = await toggleFavorite(profileId);
-      if ("favorited" in res) setFavorited(res.favorited);
+      if ("error" in res) {
+        if (res.error?.includes("Sessão")) window.location.href = "/entrar";
+        return;
+      }
+      if ("favorited" in res) setFavorited(res.favorited ?? false);
     });
   }
 

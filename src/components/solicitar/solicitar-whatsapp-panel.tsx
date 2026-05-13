@@ -7,6 +7,7 @@ import { buildWhatsAppBookingMessage, buildWhatsAppUrl, whatsappDigits } from "@
 import { formatBrl } from "@/lib/money";
 
 type ProfileBits = {
+  id: string;
   slug: string;
   displayName: string;
   age: number;
@@ -24,12 +25,13 @@ type Summary = {
   durationLabel: string;
   locationLabel: string;
   totalBrl: number;
+  isOvernight: boolean;
 };
 
 export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileBits; summary: Summary }) {
   const [notes, setNotes] = useState("");
   const digits = whatsappDigits(profile.whatsappPhone);
-  const disabled = !digits || summary.startTime === "—";
+  const disabled = !digits || (!summary.isOvernight && summary.startTime === "—");
 
   const message = buildWhatsAppBookingMessage({
     displayName: profile.displayName,
@@ -39,6 +41,7 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
     durationLabel: summary.durationLabel,
     locationLabel: summary.locationLabel,
     totalBrl: summary.totalBrl,
+    isOvernight: summary.isOvernight,
     notes,
   });
 
@@ -71,12 +74,19 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
           <dt className="text-muted">Dia</dt>
           <dd className="text-right">{summary.dateLabel}</dd>
         </div>
-        <div className="flex justify-between gap-2">
-          <dt className="text-muted">Horário</dt>
-          <dd className="text-right">
-            {summary.startTime} → {summary.endTime}
-          </dd>
-        </div>
+        {summary.isOvernight ? (
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted">Horário</dt>
+            <dd className="text-right text-muted italic">a combinar</dd>
+          </div>
+        ) : (
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted">Horário</dt>
+            <dd className="text-right">
+              {summary.startTime} → {summary.endTime}
+            </dd>
+          </div>
+        )}
         <div className="flex justify-between gap-2">
           <dt className="text-muted">Duração</dt>
           <dd className="text-right">{summary.durationLabel}</dd>
@@ -104,6 +114,14 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
         href={href}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => {
+          if (disabled) return;
+          fetch("/api/wa-click", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ profileId: profile.id, source: "solicitar" }),
+          }).catch(() => {});
+        }}
         className={`mt-6 flex w-full items-center justify-center bg-foreground py-3 text-xs font-semibold uppercase tracking-wider text-white ${
           disabled ? "pointer-events-none opacity-40" : ""
         }`}
