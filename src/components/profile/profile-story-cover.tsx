@@ -160,68 +160,65 @@ export function ProfileStoryCover({
       {/* ── Cover photo ── */}
       <div
         className={cn(
-          hasStory && !allSeen && "bg-gradient-to-br from-coral via-orange-400 to-pink-500 p-[3px]",
-          hasStory && allSeen && "bg-line/50 p-[2px]",
+          "relative w-full aspect-[3/4] overflow-hidden bg-line",
+          hasStory && "cursor-pointer",
         )}
+        onClick={() => hasStory && setOpen(true)}
       >
-        <div
-          className="relative w-full aspect-[3/4] overflow-hidden bg-line"
-          onClick={() => hasStory && setOpen(true)}
-          style={{ cursor: hasStory ? "pointer" : "default" }}
-        >
-          {coverUrl ? (
-            <Image
-              src={coverUrl}
-              alt={displayName}
-              fill
-              className="object-cover"
-              sizes="(max-width:1024px) 100vw, 400px"
-              priority
-            />
-          ) : (
-            <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
-              <p className="text-sm text-muted">Sem foto</p>
-            </div>
-          )}
+        {/* Story ring — top gradient border effect via inset ring */}
+        {hasStory && (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-0 z-10",
+              !allSeen
+                ? "ring-[3px] ring-inset ring-transparent"
+                : "ring-[2px] ring-inset ring-white/20",
+            )}
+          />
+        )}
+        {hasStory && !allSeen && (
+          <div className="pointer-events-none absolute inset-0 z-10 rounded-none"
+            style={{ boxShadow: "inset 0 0 0 3px transparent, inset 0 0 0 3px #c8102e" }}
+          />
+        )}
 
-          {/* Plan badge */}
-          <div className={cn("absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white", planBadge.bg)}>
-            {planBadge.label}
+        {coverUrl ? (
+          <Image
+            src={coverUrl}
+            alt={displayName}
+            fill
+            className="object-cover"
+            sizes="(max-width:1024px) 100vw, 400px"
+            priority
+          />
+        ) : (
+          <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
+            <p className="text-sm text-muted">Sem foto</p>
           </div>
+        )}
 
-          {/* Story indicator — inside the cover, above the plan badge */}
-          {hasStory && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setOpen(true); }}
-              className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
-            >
-              <div className={cn(
-                "rounded-full p-[3px]",
-                !allSeen
-                  ? "bg-gradient-to-br from-coral via-orange-400 to-pink-500"
-                  : "bg-white/40",
-              )}>
-                <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-white bg-line">
-                  {coverUrl ? (
-                    <Image src={coverUrl} alt={displayName} fill className="object-cover" sizes="48px" />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white/70">
-                      {displayName[0]}
-                    </span>
-                  )}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/25">
-                    <Play className="h-3.5 w-3.5 fill-white text-white" strokeWidth={0} />
-                  </div>
-                </div>
-              </div>
-              <p className={cn(
-                "text-[10px] font-bold uppercase tracking-wider drop-shadow",
-                !allSeen ? "text-white" : "text-white/70",
-              )}>
-                Stories
-              </p>
-            </button>
-          )}
+        {/* Subtle dark gradient at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+
+        {/* Story pill indicator — bottom left */}
+        {hasStory && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+            className={cn(
+              "absolute bottom-10 left-3 z-20 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition hover:scale-105",
+              !allSeen
+                ? "bg-coral shadow-lg shadow-coral/30"
+                : "bg-white/20 border border-white/30",
+            )}
+          >
+            <Play className="h-2.5 w-2.5 fill-white" strokeWidth={0} />
+            {localGroup ? `${localGroup.stories.length} ${localGroup.stories.length === 1 ? "story" : "stories"}` : "Stories"}
+          </button>
+        )}
+
+        {/* Plan badge */}
+        <div className={cn("absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white z-20", planBadge.bg)}>
+          {planBadge.label}
         </div>
       </div>
 

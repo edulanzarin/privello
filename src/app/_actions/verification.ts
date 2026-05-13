@@ -19,10 +19,11 @@ export async function submitVerificationCase(formData: FormData): Promise<{ erro
   const documentFrontUrl = (formData.get("documentFrontUrl") as string | null)?.trim() || null;
   const documentBackUrl  = (formData.get("documentBackUrl")  as string | null)?.trim() || null;
   const selfieUrl        = (formData.get("selfieUrl")        as string | null)?.trim() || null;
+  const videoUrl         = (formData.get("videoUrl")         as string | null)?.trim() || null;
   const documentType     = (formData.get("documentType")     as string | null)?.trim() || "RG";
 
   if (!documentFrontUrl || !documentBackUrl || !selfieUrl) {
-    return { error: "Envie os três arquivos antes de submeter." };
+    return { error: "Envie o documento (frente e verso) e a selfie antes de submeter." };
   }
 
   // Upsert — replace previous pending case if any
@@ -33,11 +34,11 @@ export async function submitVerificationCase(formData: FormData): Promise<{ erro
   if (existing) {
     await prisma.verificationCase.update({
       where: { id: existing.id },
-      data: { documentFrontUrl, documentBackUrl, selfieUrl, documentType, waitingSince: new Date() },
+      data: { documentFrontUrl, documentBackUrl, selfieUrl, videoUrl, documentType, waitingSince: new Date() },
     });
   } else {
     await prisma.verificationCase.create({
-      data: { profileId: profile.id, documentFrontUrl, documentBackUrl, selfieUrl, documentType },
+      data: { profileId: profile.id, documentFrontUrl, documentBackUrl, selfieUrl, videoUrl, documentType },
     });
   }
 

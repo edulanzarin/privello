@@ -408,6 +408,7 @@ model VerificationCase {
   documentFrontUrl String?
   documentBackUrl  String?
   selfieUrl        String?
+  videoUrl         String?
   documentNote String?
   selfieMatch  Int?
   selfieNote   String?

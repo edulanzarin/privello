@@ -4,8 +4,10 @@ import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const MAX_SIZE_IMG   = 10 * 1024 * 1024;  // 10 MB for images
+const MAX_SIZE_VIDEO = 150 * 1024 * 1024; // 150 MB for video
+const ALLOWED_IMG   = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const ALLOWED_VIDEO = ["video/mp4", "video/quicktime", "video/webm", "video/x-msvideo"];
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -22,11 +24,18 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null;
 
   if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
-  if (!ALLOWED.includes(file.type)) {
-    return NextResponse.json({ error: "Formato inválido. Use JPG, PNG ou WebP." }, { status: 400 });
+
+  const isVideo = ALLOWED_VIDEO.includes(file.type);
+  const isImage = ALLOWED_IMG.includes(file.type);
+
+  if (!isVideo && !isImage) {
+    return NextResponse.json({ error: "Formato inválido. Imagens: JPG/PNG/WebP. Vídeos: MP4/MOV/WebM." }, { status: 400 });
   }
-  if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "Arquivo muito grande. Máximo 10 MB." }, { status: 400 });
+  if (isVideo && file.size > MAX_SIZE_VIDEO) {
+    return NextResponse.json({ error: "Vídeo muito grande. Máximo 150 MB." }, { status: 400 });
+  }
+  if (isImage && file.size > MAX_SIZE_IMG) {
+    return NextResponse.json({ error: "Imagem muito grande. Máximo 10 MB." }, { status: 400 });
   }
 
   const bytes = await file.arrayBuffer();
@@ -38,8 +47,9 @@ export async function POST(req: NextRequest) {
   const extMap: Record<string, string> = {
     "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
     "image/heic": "jpg", "image/heif": "jpg",
+    "video/mp4": "mp4", "video/quicktime": "mov", "video/webm": "webm", "video/x-msvideo": "avi",
   };
-  const ext = extMap[file.type] ?? "jpg";
+  const ext = extMap[file.type] ?? "bin";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   await writeFile(join(dir, filename), buffer);
 
