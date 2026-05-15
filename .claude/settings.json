@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\('mp:', p.dependencies.mercadopago ?? 'missing'\\); console.log\\('stripe:', p.dependencies.stripe ?? 'removed'\\)\")",
+      "Bash(mkdir -p \"c:/Users/edula_v/Documents/Dev/privello/src/app/painel/suporte/[id]\" \"c:/Users/edula_v/Documents/Dev/privello/src/app/admin/suporte/[id]\" && echo ok)",
+      "Read(//c/Users/edula_v/.claude/projects/c--Users-edula-v-Documents-Dev-privello/memory/**)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('recharts:', p.dependencies.recharts??'not installed'\\)\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('recharts:', p.dependencies.recharts\\)\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\edula_v\\\\Documents\\\\Dev\\\\privello\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(grep -v \"^/$\")",
+      "Bash(grep -v \"\\\\$\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\edula_v\\Documents\\Dev\\privello\\src\\app\\painel\\suporte",
+      "c:\\Users\\edula_v\\.claude\\projects\\c--Users-edula-v-Documents-Dev-privello\\memory"
+    ]
+  }
+}
