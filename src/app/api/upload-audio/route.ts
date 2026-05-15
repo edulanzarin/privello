@@ -3,11 +3,17 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { MAX_AUDIO_BYTES } from "@/lib/constants";
 
-const MAX_SIZE = 20 * 1024 * 1024; // 20 MB
 const ALLOWED = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4", "audio/webm", "audio/x-m4a"];
 
 export async function POST(req: NextRequest) {
+  // Rejeitar requests com Content-Length absurdo
+  const contentLength = parseInt(req.headers.get("content-length") ?? "0");
+  if (contentLength > MAX_AUDIO_BYTES + 1024) {
+    return NextResponse.json({ error: "Arquivo muito grande." }, { status: 413 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
@@ -28,7 +34,7 @@ export async function POST(req: NextRequest) {
   if (!isAudio) {
     return NextResponse.json({ error: "Formato inválido. Use MP3, WAV, OGG ou M4A." }, { status: 400 });
   }
-  if (file.size > MAX_SIZE) {
+  if (file.size > MAX_AUDIO_BYTES) {
     return NextResponse.json({ error: "Arquivo muito grande. Máximo 20 MB." }, { status: 400 });
   }
 

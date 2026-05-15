@@ -3,6 +3,7 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 const IMAGE_MAX = 8 * 1024 * 1024;  // 8 MB
 const VIDEO_MAX = 200 * 1024 * 1024; // 200 MB
@@ -10,6 +11,12 @@ const ALLOWED_IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
 
 export async function POST(req: NextRequest) {
+  // Rejeitar requests com Content-Length absurdo antes de processar o body
+  const contentLength = parseInt(req.headers.get("content-length") ?? "0");
+  if (contentLength > VIDEO_MAX + 1024) {
+    return NextResponse.json({ error: "Arquivo muito grande." }, { status: 413 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
@@ -21,9 +28,9 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const file      = formData.get("file") as File | null;
-  const isPublic  = formData.get("isPublic") !== "false";
-  const caption   = (formData.get("caption") as string | null)?.trim() || null;
+  const file = formData.get("file") as File | null;
+  const isPublic = formData.get("isPublic") !== "false";
+  const caption = (formData.get("caption") as string | null)?.trim() || null;
   const mediaType = (formData.get("mediaType") as string | null) ?? "IMAGE";
 
   if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });

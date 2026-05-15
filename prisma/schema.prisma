@@ -180,6 +180,7 @@ model Profile {
   lastUpdatedAt  DateTime @updatedAt
 
   planTier      PlanTier  @default(ESSENCIAL)
+  planExpiresAt DateTime?
   featuredUntil DateTime?
   boostLabel    String?
 
@@ -209,6 +210,9 @@ model Profile {
   @@index([slug])
   @@index([lastUpdatedAt])
   @@index([viewsCurrentPeriod])
+  @@index([planTier, planExpiresAt])
+  @@index([isOnline, cityId])
+  @@index([featuredUntil])
 }
 
 // Tracks when the "Em alta" period started — single row, id = "hot"
@@ -364,11 +368,12 @@ model Subscription {
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   status               SubscriptionStatus @default(ACTIVE)
   expiresAt            DateTime
-  stripeSubscriptionId String?            @unique
+  mpPaymentId          String?            @unique
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
   @@index([userId, status])
+  @@index([userId, status, expiresAt])
 }
 
 model FinancialRecord {
