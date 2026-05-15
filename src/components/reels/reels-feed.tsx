@@ -53,19 +53,19 @@ function LockedReelOverlay({ profileSlug }: { profileSlug: string }) {
         <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
       </div>
       <div className="text-center px-6">
-        <p className="text-base font-bold text-white">Reel exclusivo</p>
-        <p className="mt-1 text-sm text-white/60">Assine para desbloquear este e outros reels privados</p>
+        <p className="text-[15px] font-semibold text-white">Reel exclusivo</p>
+        <p className="mt-1 text-[13px] text-white/60">Assine para desbloquear reels privados</p>
       </div>
-      <div className="flex flex-col gap-2 w-40">
+      <div className="flex flex-col gap-2 w-44">
         <Link
           href="/assinar"
-          className="block rounded bg-coral py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition"
+          className="block rounded-full bg-coral py-2.5 text-center text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Assinar · R$19,90/mês
         </Link>
         <Link
           href={`/p/${profileSlug}`}
-          className="block rounded border border-white/20 py-2 text-center text-xs font-semibold text-white/70 hover:text-white transition"
+          className="block rounded-full border border-white/20 py-2 text-center text-[12px] font-medium text-white/70 transition hover:text-white hover:border-white/40"
         >
           Ver perfil
         </Link>
@@ -100,7 +100,7 @@ function ReelPlayer({
     const v = videoRef.current;
     if (!v || reel.isLocked) return;
     if (isActive) {
-      v.play().catch(() => {});
+      v.play().catch(() => { });
     } else {
       v.pause();
       v.currentTime = 0;
@@ -154,13 +154,13 @@ function ReelPlayer({
   }
 
   return (
-    <div className="relative h-screen w-full shrink-0 bg-black snap-start snap-always flex justify-center">
+    <div className="relative h-[calc(100dvh-52px)] w-full shrink-0 bg-black snap-start snap-always flex justify-center">
       <div className="relative h-full w-full max-w-[430px] overflow-hidden">
 
-        {/* Locked overlay (renders before video for non-subscribers) */}
+        {/* Locked overlay */}
         {reel.isLocked && <LockedReelOverlay profileSlug={reel.profile.slug} />}
 
-        {/* Video (hidden/muted for locked reels) */}
+        {/* Video */}
         {!reel.isLocked && (
           <video
             ref={videoRef}
@@ -174,34 +174,34 @@ function ReelPlayer({
         )}
 
         {/* Gradient overlays */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/50 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/50 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/70 to-transparent" />
 
-        {/* Private badge (always visible — teases the content exists) */}
+        {/* Private badge */}
         {reel.isPrivate && (
-          <div className="absolute left-3 top-14 flex items-center gap-1 rounded bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white/80 backdrop-blur-sm">
+          <div className="absolute left-3 top-14 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white/80 backdrop-blur-sm">
             <Lock className="h-2.5 w-2.5" strokeWidth={2} />
             Exclusivo
           </div>
         )}
 
         {/* Bottom left: profile + caption */}
-        <div className="absolute bottom-20 left-4 max-w-[calc(100%-80px)]">
+        <div className="absolute bottom-6 left-4 max-w-[calc(100%-80px)]">
           <Link href={`/p/${reel.profile.slug}`} className="flex items-center gap-2.5">
-            <div className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-white/60">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-white/40">
               {reel.profile.coverUrl ? (
-                <Image src={reel.profile.coverUrl} alt="" fill className="object-cover" sizes="36px" />
+                <Image src={reel.profile.coverUrl} alt="" fill className="object-cover" sizes="40px" />
               ) : (
                 <div className="h-full w-full bg-white/20" />
               )}
             </div>
             <div>
-              <p className="text-sm font-bold text-white drop-shadow">{reel.profile.displayName}</p>
-              <p className="text-[11px] text-white/70">{reel.profile.cityName}</p>
+              <p className="text-[14px] font-semibold text-white drop-shadow">{reel.profile.displayName}</p>
+              <p className="text-[11px] text-white/60">{reel.profile.cityName} · Reels</p>
             </div>
           </Link>
           {!reel.isLocked && reel.caption && (
-            <p className="mt-2.5 text-sm leading-snug text-white/90 drop-shadow line-clamp-3">
+            <p className="mt-3 text-[13px] leading-snug text-white/90 drop-shadow line-clamp-2">
               {reel.caption}
             </p>
           )}
@@ -209,7 +209,7 @@ function ReelPlayer({
 
         {/* Right sidebar: actions */}
         {!reel.isLocked && (
-          <div className="absolute bottom-20 right-3 flex flex-col items-center gap-5">
+          <div className="absolute bottom-6 right-3 flex flex-col items-center gap-6">
             <button onClick={() => setMuted((m) => !m)} className="flex flex-col items-center gap-1">
               {muted ? (
                 <VolumeX className="h-7 w-7 text-white drop-shadow" strokeWidth={1.5} />
@@ -221,86 +221,93 @@ function ReelPlayer({
             <button
               onClick={toggleLike}
               disabled={!isClient}
-              className={cn("flex flex-col items-center gap-1", !isClient && "opacity-60 cursor-not-allowed")}
+              className={cn("flex flex-col items-center gap-1", !isClient && "opacity-50 cursor-not-allowed")}
             >
               <Heart
                 className={cn("h-7 w-7 drop-shadow transition", liked ? "fill-coral text-coral" : "text-white")}
                 strokeWidth={1.5}
               />
-              <span className="text-xs font-semibold text-white drop-shadow">{likes}</span>
+              <span className="text-[11px] font-semibold text-white drop-shadow">{likes}</span>
             </button>
 
             <button onClick={openComments} className="flex flex-col items-center gap-1">
               <MessageCircle className="h-7 w-7 text-white drop-shadow" strokeWidth={1.5} />
-              <span className="text-xs font-semibold text-white drop-shadow">{commentCount}</span>
+              <span className="text-[11px] font-semibold text-white drop-shadow">{commentCount}</span>
             </button>
           </div>
         )}
 
-        {/* Comments panel */}
+        {/* Comments panel — slides up from bottom, above the bottom nav */}
         {showComments && (
           <div
-            className="absolute inset-0 z-10 flex items-end bg-black/50"
+            className="absolute inset-0 z-20 flex items-end"
             onClick={() => setShowComments(false)}
           >
+            <div className="absolute inset-0 bg-black/40" />
             <div
-              className="w-full max-h-[70vh] overflow-hidden rounded-t-2xl bg-white"
+              className="relative w-full max-h-[65%] flex flex-col rounded-t-2xl bg-white animate-fade-in"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-line">
-                <p className="font-semibold text-sm">{commentCount} comentários</p>
-                <button onClick={() => setShowComments(false)}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-black/[0.06] shrink-0">
+                <p className="text-[15px] font-semibold">{commentCount} comentários</p>
+                <button
+                  onClick={() => setShowComments(false)}
+                  className="rounded-full p-1 hover:bg-black/[0.04] transition-colors"
+                >
                   <X className="h-5 w-5 text-muted" strokeWidth={1.5} />
                 </button>
               </div>
 
-              <div className="overflow-y-auto max-h-[50vh] px-4 py-3 space-y-4">
+              {/* Comments list */}
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                 {loadingComments ? (
-                  <p className="text-center text-sm text-muted py-4">Carregando…</p>
+                  <p className="text-center text-[13px] text-muted py-6">Carregando…</p>
                 ) : comments.length === 0 ? (
-                  <p className="text-center text-sm text-muted py-4">Seja o primeiro a comentar.</p>
+                  <p className="text-center text-[13px] text-muted py-6">Seja o primeiro a comentar.</p>
                 ) : (
                   comments.map((c) => (
                     <div key={c.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-[11px] font-bold text-white">
                         {(c.user.name ?? "?")[0].toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-xs font-semibold text-foreground">
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-semibold text-foreground">
                           {c.user.slug ? `@${c.user.slug}` : c.user.name}
                         </p>
-                        <p className="text-sm text-foreground/80 leading-snug">{c.text}</p>
+                        <p className="text-[13px] text-foreground/80 leading-snug mt-0.5">{c.text}</p>
                       </div>
                     </div>
                   ))
                 )}
               </div>
 
+              {/* Comment input */}
               {isClient && isSubscriber ? (
-                <div className="flex items-center gap-2 border-t border-line px-4 py-3">
+                <div className="flex items-center gap-2 border-t border-black/[0.06] px-4 py-3 shrink-0">
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && postComment()}
                     placeholder="Adicionar comentário…"
                     maxLength={500}
-                    className="flex-1 bg-line px-3 py-2 text-sm outline-none rounded-full"
+                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-[14px] outline-none placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
                   />
                   <button
                     onClick={postComment}
                     disabled={!commentText.trim() || posting}
-                    className="text-coral disabled:opacity-40"
+                    className="rounded-full bg-coral p-2 text-white disabled:opacity-30 transition-opacity hover:brightness-110 active:scale-[0.95]"
                   >
-                    <Send className="h-5 w-5" strokeWidth={1.5} />
+                    <Send className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
               ) : (
-                <div className="border-t border-line px-4 py-3">
+                <div className="border-t border-black/[0.06] px-4 py-3 text-center shrink-0">
                   <Link
                     href={isClient ? "/assinar" : "/entrar"}
-                    className="block w-full bg-coral py-2 text-center text-xs font-bold uppercase tracking-wider text-white"
+                    className="text-[13px] font-medium text-[#0a84ff] hover:underline"
                   >
-                    {isClient ? "Assinar para comentar" : "Entrar para comentar"}
+                    {isClient ? "Assine para comentar" : "Entre para comentar"}
                   </Link>
                 </div>
               )}
@@ -309,8 +316,8 @@ function ReelPlayer({
         )}
 
         {/* Scroll hint */}
-        <div className="absolute left-1/2 top-4 -translate-x-1/2">
-          <ChevronDown className="h-5 w-5 animate-bounce text-white/50" strokeWidth={1.5} />
+        <div className="absolute left-1/2 top-3 -translate-x-1/2">
+          <ChevronDown className="h-5 w-5 animate-bounce text-white/40" strokeWidth={1.5} />
         </div>
       </div>
     </div>
@@ -373,7 +380,7 @@ export function ReelsFeed({
   if (reels.length === 0) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-3 text-white/50">
-        <p className="text-sm">Nenhum reel disponível ainda.</p>
+        <p className="text-[14px]">Nenhum reel disponível ainda.</p>
       </div>
     );
   }
@@ -381,7 +388,7 @@ export function ReelsFeed({
   return (
     <div
       ref={containerRef}
-      className="h-screen overflow-y-scroll snap-y snap-mandatory"
+      className="h-[calc(100dvh-52px)] overflow-y-scroll snap-y snap-mandatory"
       style={{ scrollbarWidth: "none" }}
     >
       {reels.map((reel, idx) => (
@@ -395,7 +402,7 @@ export function ReelsFeed({
         </div>
       ))}
 
-      <div ref={sentinelRef} className="flex h-20 items-center justify-center">
+      <div ref={sentinelRef} className="flex h-20 items-center justify-center bg-black">
         {loading && <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white/70" />}
       </div>
     </div>

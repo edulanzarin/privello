@@ -30,20 +30,20 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f9f9f7] px-4">
-      <div className="w-full max-w-md space-y-6 border border-line bg-white p-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#f5f5f7] px-4">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
         <div>
-          <Link href={`/p/${slug}`} className="text-xs text-muted hover:text-foreground">← Voltar ao perfil</Link>
-          <h1 className="mt-4 font-serif text-2xl">Avaliar @{slug}</h1>
-          <p className="mt-1 text-sm text-muted">Sua avaliação é visível para outros assinantes.</p>
+          <Link href={`/p/${slug}`} className="text-[13px] text-muted hover:text-foreground">← Voltar ao perfil</Link>
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight">Avaliar @{slug}</h1>
+          <p className="mt-1 text-[14px] text-muted">Sua avaliação é visível para outros assinantes.</p>
         </div>
 
         {error && (
-          <p className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{error}</p>
+          <p className="rounded-lg border border-coral/30 bg-coral/5 px-4 py-3 text-[14px] text-coral">{error}</p>
         )}
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted">Nota</p>
+          <p className="text-[13px] font-semibold text-muted">Nota</p>
           <div className="mt-2 flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
@@ -56,7 +56,7 @@ export default function ReviewPage() {
                 <Star
                   className={cn(
                     "h-8 w-8 transition-colors",
-                    n <= (hover || rating) ? "fill-coral text-coral" : "text-line",
+                    n <= (hover || rating) ? "fill-coral text-coral" : "text-black/10",
                   )}
                   strokeWidth={1.5}
                 />
@@ -64,15 +64,15 @@ export default function ReviewPage() {
             ))}
           </div>
           {rating > 0 && (
-            <p className="mt-1 text-xs text-muted">
+            <p className="mt-1 text-[13px] text-muted">
               {["", "Muito ruim", "Ruim", "Regular", "Boa", "Excelente"][rating]}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-            Comentário <span className="font-normal normal-case">(opcional)</span>
+          <label className="block text-[13px] font-semibold text-muted">
+            Comentário <span className="font-normal">(opcional)</span>
           </label>
           <textarea
             value={comment}
@@ -80,7 +80,7 @@ export default function ReviewPage() {
             rows={4}
             maxLength={600}
             placeholder="Conte sua experiência…"
-            className="mt-2 w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground resize-none"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none resize-none"
           />
           <p className="mt-1 text-right text-[11px] text-muted">{comment.length}/600</p>
         </div>
@@ -88,7 +88,7 @@ export default function ReviewPage() {
         <button
           onClick={submit}
           disabled={submitting || !rating}
-          className="w-full bg-coral py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50"
+          className="w-full rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
         >
           {submitting ? "Enviando…" : "Enviar avaliação"}
         </button>

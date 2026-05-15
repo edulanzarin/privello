@@ -32,7 +32,7 @@ export function SubscribeButton({ redirectTo = "/" }: { redirectTo?: string }) {
     <button
       onClick={handleClick}
       disabled={pending}
-      className="w-full bg-coral py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-60"
+      className="w-full rounded-full bg-coral py-3.5 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-60"
     >
       {pending ? "Ativando assinatura…" : "Assinar por R$19,90/mês"}
     </button>

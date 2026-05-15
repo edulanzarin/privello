@@ -108,24 +108,24 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
 
       {/* ── Reel grid ── */}
       <div>
         {reels.length === 0 ? (
-          <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 border border-dashed border-line bg-white text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-line">
+          <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-black/[0.08] bg-white text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black/[0.04]">
               <Clapperboard className="h-7 w-7 text-muted" strokeWidth={1.25} />
             </div>
-            <p className="text-sm font-semibold">Nenhum reel ainda</p>
-            <p className="max-w-xs text-xs text-muted">
+            <p className="text-[14px] font-semibold">Nenhum reel ainda</p>
+            <p className="max-w-xs text-[13px] text-muted">
               Publique vídeos curtos verticais. Reels privados só aparecem para assinantes.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {reels.map((reel) => (
-              <div key={reel.id} className="group relative aspect-[9/16] overflow-hidden border border-line bg-black">
+              <div key={reel.id} className="group relative aspect-[9/16] overflow-hidden rounded-xl bg-black ring-1 ring-black/[0.06]">
                 <video
                   src={reel.url}
                   className="h-full w-full object-cover"
@@ -134,35 +134,32 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
                   preload="metadata"
                 />
 
-                {/* Private badge */}
                 {!reel.isPublic && (
-                  <div className="absolute left-2 top-2 flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-[3px] text-[10px] font-semibold text-white backdrop-blur-sm">
                     <Lock className="h-3 w-3" strokeWidth={2} />
                     Privado
                   </div>
                 )}
 
-                {/* Hover overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60 opacity-0 transition group-hover:opacity-100">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 transition group-hover:opacity-100 rounded-xl">
                   <Play className="h-8 w-8 text-white" strokeWidth={1.5} />
                   <div className="flex flex-col items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleTogglePrivacy(reel.id)}
                       disabled={pending}
-                      title={reel.isPublic ? "Tornar privado" : "Tornar público"}
-                      className="flex items-center gap-1 rounded bg-white/20 px-2 py-1 text-[9px] font-bold uppercase text-white hover:bg-white/30 disabled:opacity-50"
+                      className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-[10px] font-medium text-white backdrop-blur-sm hover:bg-white/30 disabled:opacity-50"
                     >
                       {reel.isPublic
-                        ? <><EyeOff className="h-3 w-3" strokeWidth={2} /> Tornar privado</>
-                        : <><Eye className="h-3 w-3" strokeWidth={2} /> Tornar público</>
+                        ? <><EyeOff className="h-3 w-3" strokeWidth={2} /> Privado</>
+                        : <><Eye className="h-3 w-3" strokeWidth={2} /> Público</>
                       }
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(reel.id)}
                       disabled={pending}
-                      className="flex items-center gap-1 rounded bg-coral px-2 py-1 text-[9px] font-bold uppercase text-white disabled:opacity-50"
+                      className="flex items-center gap-1 rounded-full bg-coral/90 px-3 py-1 text-[10px] font-medium text-white disabled:opacity-50"
                     >
                       <Trash2 className="h-3 w-3" strokeWidth={2} />
                       Remover
@@ -171,7 +168,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
                 </div>
 
                 {reel.caption && (
-                  <p className="absolute bottom-0 left-0 right-0 truncate bg-black/60 px-2 py-1 text-[10px] text-white">
+                  <p className="absolute bottom-0 left-0 right-0 truncate bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-6 text-[11px] text-white">
                     {reel.caption}
                   </p>
                 )}
@@ -182,17 +179,19 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
       </div>
 
       {/* ── Publish panel ── */}
-      <div className="border border-line bg-white p-5 space-y-4 lg:sticky lg:top-24 lg:self-start">
-        <p className="font-semibold">Publicar reel</p>
-        <p className="text-xs text-muted">Vídeo vertical · MP4 ou WebM · máx. 200 MB</p>
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-5 space-y-5 shadow-sm lg:sticky lg:top-24 lg:self-start">
+        <div>
+          <p className="text-[15px] font-semibold">Publicar reel</p>
+          <p className="mt-0.5 text-[13px] text-muted">Vídeo vertical · MP4 ou WebM · máx. 200 MB</p>
+        </div>
 
         {preview ? (
-          <div className="relative aspect-[9/16] w-full overflow-hidden bg-black">
+          <div className="relative aspect-[9/16] w-full overflow-hidden rounded-xl bg-black">
             <video src={preview} className="h-full w-full object-cover" muted playsInline controls />
             <button
               type="button"
               onClick={clearPreview}
-              className="absolute right-2 top-2 rounded bg-black/60 p-1 text-white hover:bg-black/80"
+              className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
             >
               <X className="h-4 w-4" strokeWidth={2} />
             </button>
@@ -201,11 +200,11 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 border-2 border-dashed border-line py-12 text-muted hover:border-coral hover:text-coral transition"
+            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/[0.12] py-12 text-muted transition hover:border-coral hover:text-coral"
           >
             <Upload className="h-8 w-8" strokeWidth={1.25} />
-            <span className="text-sm font-semibold">Selecionar vídeo</span>
-            <span className="text-xs text-muted/60">MP4, WebM · máx. 200 MB</span>
+            <span className="text-[14px] font-semibold">Selecionar vídeo</span>
+            <span className="text-[11px] text-muted/60">MP4, WebM · máx. 200 MB</span>
           </button>
         )}
 
@@ -218,7 +217,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
         />
 
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted mb-1">
+          <label className="block text-[12px] font-medium text-muted mb-1.5">
             Legenda (opcional)
           </label>
           <input
@@ -227,46 +226,43 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
             onChange={(e) => setCaption(e.target.value)}
             maxLength={150}
             placeholder="Uma breve descrição…"
-            className="w-full border border-line px-3 py-2.5 text-sm outline-none focus:border-foreground"
+            className="w-full rounded-lg border border-black/10 px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <p className="mt-1 text-right text-[10px] text-muted">{caption.length}/150</p>
         </div>
 
-        {/* Privacy toggle */}
-        <button
-          type="button"
-          onClick={() => setIsPrivate((p) => !p)}
-          className={cn(
-            "flex w-full items-center gap-3 border px-3 py-3 text-sm transition",
-            isPrivate
-              ? "border-foreground bg-foreground text-white"
-              : "border-line text-muted hover:border-foreground hover:text-foreground",
-          )}
-        >
-          {isPrivate ? <Lock className="h-4 w-4 shrink-0" strokeWidth={1.5} /> : <Eye className="h-4 w-4 shrink-0" strokeWidth={1.5} />}
-          <div className="text-left">
-            <p className="text-xs font-semibold">{isPrivate ? "Privado" : "Público"}</p>
-            <p className={cn("text-[10px]", isPrivate ? "text-white/60" : "text-muted")}>
-              {isPrivate ? "Só assinantes veem este reel" : "Visível para todos"}
-            </p>
+        {/* Privacy — iOS toggle */}
+        <div className="flex items-center justify-between rounded-lg bg-black/[0.03] px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            {isPrivate ? <Lock className="h-4 w-4 text-muted" strokeWidth={1.5} /> : <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />}
+            <div>
+              <p className="text-[13px] font-medium">{isPrivate ? "Privado" : "Público"}</p>
+              <p className="text-[11px] text-muted">
+                {isPrivate ? "Só assinantes veem" : "Visível para todos"}
+              </p>
+            </div>
           </div>
-          <div className={cn(
-            "ml-auto h-5 w-9 rounded-full transition-colors",
-            isPrivate ? "bg-coral" : "bg-line",
-          )}>
-            <div className={cn(
-              "h-5 w-5 rounded-full bg-white shadow transition-transform",
-              isPrivate ? "translate-x-4" : "translate-x-0",
+          <button
+            type="button"
+            onClick={() => setIsPrivate((p) => !p)}
+            className={cn(
+              "flex h-[24px] w-[42px] items-center rounded-full transition-colors duration-200",
+              isPrivate ? "bg-[#30d158]" : "bg-black/[0.09]",
+            )}
+          >
+            <span className={cn(
+              "ml-[2px] h-[20px] w-[20px] rounded-full bg-white shadow-sm transition-transform duration-200",
+              isPrivate && "translate-x-[18px]",
             )} />
-          </div>
-        </button>
+          </button>
+        </div>
 
         {uploading && (
           <div>
-            <div className="h-1.5 w-full rounded bg-line">
-              <div className="h-full rounded bg-coral transition-all" style={{ width: `${uploadProgress}%` }} />
+            <div className="h-1.5 w-full rounded-full bg-black/[0.06] overflow-hidden">
+              <div className="h-full rounded-full bg-coral transition-all" style={{ width: `${uploadProgress}%` }} />
             </div>
-            <p className="mt-1 text-[10px] text-muted">Enviando… {uploadProgress}%</p>
+            <p className="mt-1 text-[11px] text-muted">Enviando… {uploadProgress}%</p>
           </div>
         )}
 
@@ -274,7 +270,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
           type="button"
           onClick={handlePublish}
           disabled={!selectedFile || uploading || pending}
-          className="w-full bg-coral py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-40"
+          className="w-full rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">

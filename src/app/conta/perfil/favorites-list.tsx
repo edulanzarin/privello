@@ -22,7 +22,7 @@ type Favorite = {
   createdAt: string;
 };
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
 
 export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -32,15 +32,15 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
 
   if (favorites.length === 0) {
     return (
-      <div className="border border-line bg-white px-6 py-14 text-center">
+      <div className="rounded-2xl border border-black/[0.06] bg-white px-6 py-14 text-center shadow-sm">
         <Heart className="mx-auto h-10 w-10 text-muted" strokeWidth={1} />
-        <p className="mt-4 text-lg font-semibold">Nenhum perfil curtido ainda.</p>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-4 text-[17px] font-semibold">Nenhum perfil curtido ainda.</p>
+        <p className="mt-2 text-[14px] text-muted">
           Explore acompanhantes e curta os perfis que te interessam.
         </p>
         <Link
-          href="/descobrir/sao-paulo-sp"
-          className="mt-6 inline-block bg-coral px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white"
+          href="/buscar"
+          className="mt-6 inline-block rounded-full bg-coral px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Explorar perfis
         </Link>
@@ -50,7 +50,7 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
 
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
         {visible.map(({ profile, createdAt }) => {
           const cover = profile.media[0];
           const imageUrl = cover?.url ?? "https://picsum.photos/seed/empty/480/720";
@@ -58,38 +58,34 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
             <Link
               key={profile.id}
               href={`/p/${profile.slug}`}
-              className="group flex gap-4 border border-line bg-white p-4 transition hover:border-foreground/20 hover:shadow-sm"
+              className="group overflow-hidden rounded-2xl bg-white border border-black/[0.06] shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
             >
-              <div className="relative h-20 w-16 shrink-0 overflow-hidden bg-line">
+              <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/[0.03]">
                 <Image
                   src={imageUrl}
                   alt=""
                   fill
-                  className="object-cover transition group-hover:scale-105"
-                  sizes="64px"
+                  className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                  sizes="(max-width:640px) 50vw, 25vw"
                 />
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-bold leading-tight">
-                    {profile.displayName}, {profile.age}
-                  </p>
-                  <p className="shrink-0 text-sm font-bold text-coral">
-                    {formatBrl(profile.priceHour)}/h
-                  </p>
-                </div>
-                <p className="mt-1 flex items-center gap-1 text-xs text-muted">
-                  <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.5} />
-                  {profile.district.name} · {profile.city.name}
+              <div className="p-3">
+                <p className="text-[13px] font-semibold leading-tight truncate">
+                  {profile.displayName}, {profile.age}
+                </p>
+                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted truncate">
+                  <MapPin className="h-2.5 w-2.5 shrink-0" strokeWidth={1.5} />
+                  {profile.city.name}
                 </p>
                 <div className="mt-1.5 flex items-center justify-between">
-                  <p className="flex items-center gap-1 text-xs text-muted">
-                    <Star className="h-3 w-3 fill-coral text-coral" strokeWidth={0} />
-                    {profile.ratingAvg.toFixed(1)} · {profile.ratingCount} av.
-                  </p>
-                  <p className="text-[10px] text-muted">
-                    {new Date(createdAt).toLocaleDateString("pt-BR")}
-                  </p>
+                  <span className="flex items-center gap-0.5 text-[11px]">
+                    <Star className="h-3 w-3 fill-[#ff9500] text-[#ff9500]" strokeWidth={0} />
+                    <span className="font-medium">{profile.ratingAvg.toFixed(1)}</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-coral">
+                    {formatBrl(profile.priceHour)}/h
+                  </span>
                 </div>
               </div>
             </Link>
@@ -100,7 +96,7 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
       {remaining > 0 && (
         <button
           onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-          className="mt-4 w-full border border-line bg-white py-3 text-xs font-semibold uppercase tracking-wider text-muted transition hover:border-foreground/30 hover:text-foreground"
+          className="mt-4 w-full rounded-xl border border-black/10 bg-white py-3 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.99]"
         >
           Ver mais · {remaining} restante{remaining !== 1 ? "s" : ""}
         </button>

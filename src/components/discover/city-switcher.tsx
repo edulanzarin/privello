@@ -9,7 +9,6 @@ import { LAST_CITY_KEY } from "@/components/layout/bottom-nav";
 
 type Props = { currentCityName: string; citySlug: string };
 
-/** Derives "São Paulo, SP" from slug "sao-paulo-sp" */
 function displayFromSlug(slug: string, fallback: string): string {
   const parts = slug.split("-");
   if (parts.length < 2) return fallback;
@@ -25,16 +24,15 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
   const displayName = displayFromSlug(citySlug, currentCityName);
 
   return (
-    <div className="sticky top-14 z-40 border-b border-line bg-white/95 backdrop-blur-md shadow-sm">
+    <div className="sticky top-11 z-40 border-b border-black/[0.06] bg-white">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex items-center gap-2 py-2">
           <MapPin className="h-3.5 w-3.5 shrink-0 text-coral" strokeWidth={2} />
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted whitespace-nowrap">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted whitespace-nowrap">
             Cidade:
           </span>
 
           {searching ? (
-            /* Autocomplete mode */
             <div className="flex flex-1 min-w-0 items-center gap-2">
               <div className="flex-1 min-w-0">
                 <CityAutocomplete
@@ -49,28 +47,27 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
               </div>
               <button
                 onClick={() => setSearching(false)}
-                className="shrink-0 p-1 text-muted hover:text-foreground"
+                className="shrink-0 rounded-full p-1 text-muted transition-colors hover:bg-black/[0.04] hover:text-foreground"
                 aria-label="Cancelar"
               >
                 <X className="h-4 w-4" strokeWidth={1.5} />
               </button>
             </div>
           ) : (
-            /* Static display mode */
             <div className="flex flex-1 items-center gap-2">
               <button
                 onClick={() => setSearching(true)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-coral transition"
+                className="flex items-center gap-1 text-[13px] font-semibold text-foreground transition-colors hover:text-coral"
               >
                 {displayName}
-                <ChevronDown className="h-3.5 w-3.5 text-muted" strokeWidth={2} />
+                <ChevronDown className="h-3 w-3 text-muted" strokeWidth={2} />
               </button>
               <Link
                 href="/buscar"
-                className="ml-1 rounded p-0.5 text-muted hover:text-foreground transition"
-                title="Limpar cidade — voltar à busca"
+                className="ml-1 rounded-full p-1 text-muted transition-colors hover:bg-black/[0.04] hover:text-foreground"
+                title="Limpar cidade"
               >
-                <X className="h-3.5 w-3.5" strokeWidth={2} />
+                <X className="h-3 w-3" strokeWidth={2} />
               </Link>
             </div>
           )}

@@ -72,7 +72,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
 
   // Pre-warm the cache as soon as the component mounts
   useEffect(() => {
-    getIbgeMunicipios().catch(() => {});
+    getIbgeMunicipios().catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -134,25 +134,25 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
     <div ref={containerRef} className="relative flex items-center gap-3 bg-white px-4 py-3 text-left">
       {!compact && <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />}
       <span className="w-full">
-        {!compact && <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted">Cidade</span>}
+        {!compact && <span className="block text-[10px] font-medium uppercase tracking-wider text-muted">Cidade</span>}
         <input
           type="text"
           value={query}
           onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); }}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={compact ? "Trocar cidade…" : "Ex: Blumenau, São Paulo…"}
+          placeholder={compact ? "Trocar cidade…" : "Ex: São Paulo, SP…"}
           autoComplete="off"
           className={compact
-            ? "w-full border-0 bg-transparent p-0 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-muted/60"
-            : "mt-0.5 w-full border-0 bg-transparent p-0 text-sm font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
+            ? "w-full border-0 bg-transparent p-0 text-[13px] font-semibold outline-none placeholder:font-normal placeholder:text-muted/60"
+            : "mt-0.5 w-full border-0 bg-transparent p-0 text-[14px] font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
           }
         />
       </span>
 
       {open && (
-        <ul className="absolute left-0 top-full z-30 mt-px w-full min-w-[240px] border border-line bg-white py-1 shadow-lg">
+        <ul className="absolute left-0 top-full z-50 mt-1 w-full min-w-[240px] rounded-xl border border-black/[0.06] bg-white py-1 shadow-xl overflow-hidden animate-scale-in">
           {loading && (
-            <li className="px-4 py-2 text-xs text-muted">Buscando…</li>
+            <li className="px-4 py-2 text-[12px] text-muted">Buscando…</li>
           )}
           {!loading &&
             results.map((r) => (
@@ -165,7 +165,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
                     setOpen(false);
                     onSelect(r.slug, r.label);
                   }}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm hover:bg-black/5"
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] transition-colors hover:bg-black/[0.04]"
                 >
                   <MapPin className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
                   {r.label}

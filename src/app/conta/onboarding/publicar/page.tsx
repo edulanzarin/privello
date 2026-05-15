@@ -18,21 +18,23 @@ export default async function OnboardingPublicarPage() {
     where: { userId: session.user.id },
     include: {
       city: true,
-      media: { where: { isPublic: true }, orderBy: { sortOrder: "asc" }, take: 1 },
+      media: { where: { isPublic: true }, orderBy: { sortOrder: "asc" } },
     },
   });
   if (!profile) redirect("/entrar");
 
+  const hasCoverPhoto = profile.media.some((m) => m.isCover);
+  const cover = profile.media.find((m) => m.isCover) ?? profile.media[0];
+
   const checks = [
-    { label: "Bio preenchida",       ok: profile.bio.length > 10 },
-    { label: "Cidade definida",      ok: !!profile.cityId },
-    { label: "WhatsApp cadastrado",  ok: !!profile.whatsappPhone },
-    { label: "Valor por hora",       ok: profile.priceHour > 0 },
-    { label: "Ao menos 1 foto",      ok: profile.media.length > 0 },
+    { label: "Bio preenchida", ok: profile.bio.length > 10, href: "/conta/onboarding/perfil" },
+    { label: "Cidade definida", ok: !!profile.cityId, href: "/conta/onboarding/perfil" },
+    { label: "WhatsApp cadastrado", ok: !!profile.whatsappPhone, href: "/conta/onboarding/perfil" },
+    { label: "Valor por hora", ok: profile.priceHour > 0, href: "/conta/onboarding/valores" },
+    { label: "Foto de perfil definida", ok: hasCoverPhoto, href: "/conta/onboarding/fotos" },
   ];
 
   const allOk = checks.every((c) => c.ok);
-  const cover = profile.media[0];
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">

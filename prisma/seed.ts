@@ -176,9 +176,9 @@ async function createProfile(opts: {
 
   await prisma.profileDurationOption.createMany({
     data: [
-      { profileId: prof.id, minutes: 60,  label: "1 hora",   priceBrl: opts.priceHour,                    sortOrder: 0, active: true },
-      { profileId: prof.id, minutes: 120, label: "2 horas",  priceBrl: Math.round(opts.priceHour * 1.75), sortOrder: 1, active: true },
-      { profileId: prof.id, minutes: 480, label: "Pernoite", priceBrl: Math.round(opts.priceHour * 5),    sortOrder: 2, active: true },
+      { profileId: prof.id, minutes: 60, label: "1 hora", priceBrl: opts.priceHour, sortOrder: 0, active: true },
+      { profileId: prof.id, minutes: 120, label: "2 horas", priceBrl: Math.round(opts.priceHour * 1.75), sortOrder: 1, active: true },
+      { profileId: prof.id, minutes: 480, label: "Pernoite", priceBrl: Math.round(opts.priceHour * 5), sortOrder: 2, active: true },
     ],
   });
 
@@ -188,7 +188,7 @@ async function createProfile(opts: {
         profileId: prof.id,
         weekday: wd,
         startTime: wd === 0 ? "00:00" : pick(["09:00", "10:00", "12:00", "14:00"]),
-        endTime:   wd === 0 ? "00:00" : pick(["20:00", "22:00", "23:00"]),
+        endTime: wd === 0 ? "00:00" : pick(["20:00", "22:00", "23:00"]),
         status: wd === 0 ? "CLOSED" : "AVAILABLE",
       },
     });
@@ -238,50 +238,50 @@ async function main() {
   console.log("✓ Admin criado");
 
   // ── Cities ────────────────────────────────────────────────────────────────
-  const sp  = await prisma.city.create({ data: { name: "São Paulo",      slug: "sao-paulo-sp",      heroImage: img("sp-city",  800, 600) } });
-  const rj  = await prisma.city.create({ data: { name: "Rio de Janeiro", slug: "rio-de-janeiro-rj", heroImage: img("rj-city",  800, 600) } });
-  const bh  = await prisma.city.create({ data: { name: "Belo Horizonte", slug: "belo-horizonte-mg", heroImage: img("bh-city",  800, 600) } });
-  const bsb = await prisma.city.create({ data: { name: "Brasília",       slug: "brasilia-df",       heroImage: img("bsb-city", 800, 600) } });
-  const cwb = await prisma.city.create({ data: { name: "Curitiba",       slug: "curitiba-pr",       heroImage: img("cwb-city", 800, 600) } });
-  const poa = await prisma.city.create({ data: { name: "Porto Alegre",   slug: "porto-alegre-rs",   heroImage: img("poa-city", 800, 600) } });
-  const fln = await prisma.city.create({ data: { name: "Florianópolis",  slug: "florianopolis-sc",  heroImage: img("fln-city", 800, 600) } });
-  const rec = await prisma.city.create({ data: { name: "Recife",         slug: "recife-pe",         heroImage: img("rec-city", 800, 600) } });
-  const ssa = await prisma.city.create({ data: { name: "Salvador",       slug: "salvador-ba",       heroImage: img("ssa-city", 800, 600) } });
-  const gyn = await prisma.city.create({ data: { name: "Goiânia",        slug: "goiania-go",        heroImage: img("gyn-city", 800, 600) } });
+  const sp = await prisma.city.create({ data: { name: "São Paulo, SP", slug: "sao-paulo-sp", heroImage: img("sp-city", 800, 600) } });
+  const rj = await prisma.city.create({ data: { name: "Rio de Janeiro, RJ", slug: "rio-de-janeiro-rj", heroImage: img("rj-city", 800, 600) } });
+  const bh = await prisma.city.create({ data: { name: "Belo Horizonte, MG", slug: "belo-horizonte-mg", heroImage: img("bh-city", 800, 600) } });
+  const bsb = await prisma.city.create({ data: { name: "Brasília, DF", slug: "brasilia-df", heroImage: img("bsb-city", 800, 600) } });
+  const cwb = await prisma.city.create({ data: { name: "Curitiba, PR", slug: "curitiba-pr", heroImage: img("cwb-city", 800, 600) } });
+  const poa = await prisma.city.create({ data: { name: "Porto Alegre, RS", slug: "porto-alegre-rs", heroImage: img("poa-city", 800, 600) } });
+  const fln = await prisma.city.create({ data: { name: "Florianópolis, SC", slug: "florianopolis-sc", heroImage: img("fln-city", 800, 600) } });
+  const rec = await prisma.city.create({ data: { name: "Recife, PE", slug: "recife-pe", heroImage: img("rec-city", 800, 600) } });
+  const ssa = await prisma.city.create({ data: { name: "Salvador, BA", slug: "salvador-ba", heroImage: img("ssa-city", 800, 600) } });
+  const gyn = await prisma.city.create({ data: { name: "Goiânia, GO", slug: "goiania-go", heroImage: img("gyn-city", 800, 600) } });
 
   // ── Districts ─────────────────────────────────────────────────────────────
-  const jardins   = await prisma.district.create({ data: { name: "Jardins",    slug: "jardins",    cityId: sp.id  } });
-  const itaim     = await prisma.district.create({ data: { name: "Itaim Bibi", slug: "itaim-bibi", cityId: sp.id  } });
-  const pinheiros = await prisma.district.create({ data: { name: "Pinheiros",  slug: "pinheiros",  cityId: sp.id  } });
-  const moema     = await prisma.district.create({ data: { name: "Moema",      slug: "moema",      cityId: sp.id  } });
-  const leblon    = await prisma.district.create({ data: { name: "Leblon",     slug: "leblon",     cityId: rj.id  } });
-  const botafogo  = await prisma.district.create({ data: { name: "Botafogo",   slug: "botafogo",   cityId: rj.id  } });
-  const ipanema   = await prisma.district.create({ data: { name: "Ipanema",    slug: "ipanema",    cityId: rj.id  } });
-  const savassi   = await prisma.district.create({ data: { name: "Savassi",    slug: "savassi",    cityId: bh.id  } });
-  const asasul    = await prisma.district.create({ data: { name: "Asa Sul",    slug: "asa-sul",    cityId: bsb.id } });
-  const batel     = await prisma.district.create({ data: { name: "Batel",      slug: "batel",      cityId: cwb.id } });
-  const moinhos   = await prisma.district.create({ data: { name: "Moinhos",    slug: "moinhos",    cityId: poa.id } });
-  const ctrofln   = await prisma.district.create({ data: { name: "Centro",     slug: "centro",     cityId: fln.id } });
+  const jardins = await prisma.district.create({ data: { name: "Jardins", slug: "jardins", cityId: sp.id } });
+  const itaim = await prisma.district.create({ data: { name: "Itaim Bibi", slug: "itaim-bibi", cityId: sp.id } });
+  const pinheiros = await prisma.district.create({ data: { name: "Pinheiros", slug: "pinheiros", cityId: sp.id } });
+  const moema = await prisma.district.create({ data: { name: "Moema", slug: "moema", cityId: sp.id } });
+  const leblon = await prisma.district.create({ data: { name: "Leblon", slug: "leblon", cityId: rj.id } });
+  const botafogo = await prisma.district.create({ data: { name: "Botafogo", slug: "botafogo", cityId: rj.id } });
+  const ipanema = await prisma.district.create({ data: { name: "Ipanema", slug: "ipanema", cityId: rj.id } });
+  const savassi = await prisma.district.create({ data: { name: "Savassi", slug: "savassi", cityId: bh.id } });
+  const asasul = await prisma.district.create({ data: { name: "Asa Sul", slug: "asa-sul", cityId: bsb.id } });
+  const batel = await prisma.district.create({ data: { name: "Batel", slug: "batel", cityId: cwb.id } });
+  const moinhos = await prisma.district.create({ data: { name: "Moinhos", slug: "moinhos", cityId: poa.id } });
+  const ctrofln = await prisma.district.create({ data: { name: "Centro", slug: "centro", cityId: fln.id } });
   const boaviagem = await prisma.district.create({ data: { name: "Boa Viagem", slug: "boa-viagem", cityId: rec.id } });
-  const barra     = await prisma.district.create({ data: { name: "Barra",      slug: "barra",      cityId: ssa.id } });
-  const setorsul  = await prisma.district.create({ data: { name: "Setor Sul",  slug: "setor-sul",  cityId: gyn.id } });
+  const barra = await prisma.district.create({ data: { name: "Barra", slug: "barra", cityId: ssa.id } });
+  const setorsul = await prisma.district.create({ data: { name: "Setor Sul", slug: "setor-sul", cityId: gyn.id } });
 
   const locs = [
-    { city: sp,  district: jardins   }, // 0
-    { city: sp,  district: itaim     }, // 1
-    { city: sp,  district: pinheiros }, // 2
-    { city: sp,  district: moema     }, // 3
-    { city: rj,  district: leblon    }, // 4
-    { city: rj,  district: botafogo  }, // 5
-    { city: rj,  district: ipanema   }, // 6
-    { city: bh,  district: savassi   }, // 7
-    { city: bsb, district: asasul    }, // 8
-    { city: cwb, district: batel     }, // 9
-    { city: poa, district: moinhos   }, // 10
-    { city: fln, district: ctrofln   }, // 11
+    { city: sp, district: jardins }, // 0
+    { city: sp, district: itaim }, // 1
+    { city: sp, district: pinheiros }, // 2
+    { city: sp, district: moema }, // 3
+    { city: rj, district: leblon }, // 4
+    { city: rj, district: botafogo }, // 5
+    { city: rj, district: ipanema }, // 6
+    { city: bh, district: savassi }, // 7
+    { city: bsb, district: asasul }, // 8
+    { city: cwb, district: batel }, // 9
+    { city: poa, district: moinhos }, // 10
+    { city: fln, district: ctrofln }, // 11
     { city: rec, district: boaviagem }, // 12
-    { city: ssa, district: barra     }, // 13
-    { city: gyn, district: setorsul  }, // 14
+    { city: ssa, district: barra }, // 13
+    { city: gyn, district: setorsul }, // 14
   ];
 
   console.log("✓ Cidades e bairros criados");
@@ -289,49 +289,49 @@ async function main() {
   // ── 43 Garotas ────────────────────────────────────────────────────────────
   type G = { name: string; handle: string; loc: number; price: number; tier: PlanTier; verified: boolean; online: boolean; age: number; hair: string; eyes: string; h: number; rating: number; rc: number };
   const garotas: G[] = [
-    { name: "Helena",    handle: "helena",    loc: 0,  price: 450, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 27, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.9, rc: 42 },
-    { name: "Luna",      handle: "luna",      loc: 0,  price: 650, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 25, hair: "Loiro",    eyes: "Azuis",     h: 172, rating: 4.8, rc: 38 },
-    { name: "Sophia",    handle: "sophia",    loc: 0,  price: 580, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 26, hair: "Preto",    eyes: "Castanhos", h: 165, rating: 4.7, rc: 29 },
-    { name: "Isabela",   handle: "isabela",   loc: 1,  price: 380, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 24, hair: "Castanho", eyes: "Verdes",    h: 163, rating: 4.5, rc: 18 },
-    { name: "Valentina", handle: "valentina", loc: 1,  price: 420, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 28, hair: "Ruivo",    eyes: "Castanhos", h: 166, rating: 4.3, rc: 11 },
-    { name: "Mariana",   handle: "mariana",   loc: 1,  price: 500, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 23, hair: "Loiro",    eyes: "Castanhos", h: 170, rating: 4.6, rc: 22 },
-    { name: "Camila",    handle: "camila",    loc: 2,  price: 520, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 31 },
-    { name: "Beatriz",   handle: "beatriz",   loc: 2,  price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: true,  age: 22, hair: "Preto",    eyes: "Pretos",    h: 160, rating: 4.2, rc: 8  },
-    { name: "Larissa",   handle: "larissa",   loc: 3,  price: 480, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 29, hair: "Loiro",    eyes: "Verdes",    h: 169, rating: 4.8, rc: 35 },
-    { name: "Fernanda",  handle: "fernanda",  loc: 3,  price: 400, tier: PlanTier.ESSENCIAL, verified: true,  online: false, age: 25, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.4, rc: 14 },
-    { name: "Aurora",    handle: "aurora",    loc: 4,  price: 600, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 24, hair: "Loiro",    eyes: "Verdes",    h: 170, rating: 4.8, rc: 31 },
-    { name: "Gabriela",  handle: "gabriela",  loc: 4,  price: 700, tier: PlanTier.PREMIUM,   verified: true,  online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 173, rating: 4.9, rc: 55 },
-    { name: "Natalia",   handle: "natalia",   loc: 4,  price: 550, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 25, hair: "Preto",    eyes: "Castanhos", h: 166, rating: 4.6, rc: 27 },
-    { name: "Leticia",   handle: "leticia",   loc: 5,  price: 430, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 23, hair: "Castanho", eyes: "Verdes",    h: 162, rating: 4.5, rc: 19 },
-    { name: "Rafaela",   handle: "rafaela",   loc: 5,  price: 480, tier: PlanTier.DESTAQUE,  verified: false, online: false, age: 26, hair: "Loiro",    eyes: "Azuis",     h: 168, rating: 4.4, rc: 12 },
-    { name: "Bianca",    handle: "bianca",    loc: 6,  price: 620, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 28, hair: "Castanho", eyes: "Castanhos", h: 171, rating: 4.9, rc: 48 },
-    { name: "Juliana",   handle: "juliana",   loc: 6,  price: 500, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 24, hair: "Preto",    eyes: "Pretos",    h: 164, rating: 4.6, rc: 23 },
-    { name: "Amanda",    handle: "amanda",    loc: 7,  price: 380, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 25, hair: "Castanho", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
-    { name: "Patricia",  handle: "patricia",  loc: 7,  price: 450, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 30, hair: "Loiro",    eyes: "Verdes",    h: 167, rating: 4.7, rc: 28 },
-    { name: "Renata",    handle: "renata",    loc: 7,  price: 320, tier: PlanTier.ESSENCIAL, verified: false, online: true,  age: 22, hair: "Preto",    eyes: "Castanhos", h: 160, rating: 4.1, rc: 7  },
-    { name: "Carolina",  handle: "carolina",  loc: 8,  price: 420, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 26, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.6, rc: 21 },
-    { name: "Daniela",   handle: "daniela",   loc: 8,  price: 380, tier: PlanTier.ESSENCIAL, verified: true,  online: false, age: 24, hair: "Loiro",    eyes: "Azuis",     h: 169, rating: 4.4, rc: 13 },
-    { name: "Priscila",  handle: "priscila",  loc: 8,  price: 500, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 28, hair: "Ruivo",    eyes: "Verdes",    h: 166, rating: 4.8, rc: 36 },
-    { name: "Aline",     handle: "aline",     loc: 9,  price: 360, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 15 },
-    { name: "Tatiane",   handle: "tatiane",   loc: 9,  price: 440, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 27, hair: "Preto",    eyes: "Pretos",    h: 164, rating: 4.6, rc: 24 },
-    { name: "Vanessa",   handle: "vanessa",   loc: 9,  price: 520, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 25, hair: "Loiro",    eyes: "Verdes",    h: 170, rating: 4.8, rc: 33 },
-    { name: "Bruna",     handle: "bruna",     loc: 10, price: 400, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 24, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.7, rc: 26 },
-    { name: "Claudia",   handle: "claudia",   loc: 10, price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 29, hair: "Loiro",    eyes: "Azuis",     h: 168, rating: 4.3, rc: 9  },
-    { name: "Debora",    handle: "debora",    loc: 10, price: 480, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 26, hair: "Preto",    eyes: "Castanhos", h: 163, rating: 4.6, rc: 20 },
-    { name: "Elisa",     handle: "elisa",     loc: 11, price: 390, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 23, hair: "Loiro",    eyes: "Verdes",    h: 166, rating: 4.5, rc: 17 },
-    { name: "Fabiana",   handle: "fabiana",   loc: 11, price: 460, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 169, rating: 4.7, rc: 30 },
-    { name: "Giovana",   handle: "giovana",   loc: 12, price: 340, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 24, hair: "Preto",    eyes: "Castanhos", h: 161, rating: 4.4, rc: 14 },
-    { name: "Heloisa",   handle: "heloisa",   loc: 12, price: 420, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.6, rc: 22 },
-    { name: "Ingrid",    handle: "ingrid",    loc: 12, price: 300, tier: PlanTier.ESSENCIAL, verified: false, online: true,  age: 22, hair: "Loiro",    eyes: "Azuis",     h: 162, rating: 4.2, rc: 8  },
-    { name: "Jessica",   handle: "jessica",   loc: 13, price: 360, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 25, hair: "Preto",    eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
-    { name: "Karen",     handle: "karen",     loc: 13, price: 450, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 28, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 27 },
-    { name: "Livia",     handle: "livia",     loc: 13, price: 520, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 26, hair: "Loiro",    eyes: "Verdes",    h: 170, rating: 4.8, rc: 34 },
-    { name: "Monica",    handle: "monica",    loc: 14, price: 330, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 13 },
-    { name: "Nathalia",  handle: "nathalia",  loc: 14, price: 400, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 27, hair: "Preto",    eyes: "Pretos",    h: 165, rating: 4.6, rc: 21 },
-    { name: "Olivia",    handle: "olivia",    loc: 0,  price: 600, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 26, hair: "Loiro",    eyes: "Azuis",     h: 172, rating: 4.9, rc: 51 },
-    { name: "Sabrina",   handle: "sabrina",   loc: 5,  price: 540, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 25, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.7, rc: 29 },
-    { name: "Thamires",  handle: "thamires",  loc: 2,  price: 470, tier: PlanTier.DESTAQUE,  verified: true,  online: true,  age: 24, hair: "Loiro",    eyes: "Castanhos", h: 166, rating: 4.6, rc: 19 },
-    { name: "Vitoria",   handle: "vitoria",   loc: 6,  price: 390, tier: PlanTier.ESSENCIAL, verified: true,  online: false, age: 23, hair: "Castanho", eyes: "Verdes",    h: 163, rating: 4.4, rc: 12 },
+    { name: "Helena", handle: "helena", loc: 0, price: 450, tier: PlanTier.PREMIUM, verified: true, online: true, age: 27, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.9, rc: 42 },
+    { name: "Luna", handle: "luna", loc: 0, price: 650, tier: PlanTier.PREMIUM, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.8, rc: 38 },
+    { name: "Sophia", handle: "sophia", loc: 0, price: 580, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Preto", eyes: "Castanhos", h: 165, rating: 4.7, rc: 29 },
+    { name: "Isabela", handle: "isabela", loc: 1, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 24, hair: "Castanho", eyes: "Verdes", h: 163, rating: 4.5, rc: 18 },
+    { name: "Valentina", handle: "valentina", loc: 1, price: 420, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 28, hair: "Ruivo", eyes: "Castanhos", h: 166, rating: 4.3, rc: 11 },
+    { name: "Mariana", handle: "mariana", loc: 1, price: 500, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 23, hair: "Loiro", eyes: "Castanhos", h: 170, rating: 4.6, rc: 22 },
+    { name: "Camila", handle: "camila", loc: 2, price: 520, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 31 },
+    { name: "Beatriz", handle: "beatriz", loc: 2, price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Preto", eyes: "Pretos", h: 160, rating: 4.2, rc: 8 },
+    { name: "Larissa", handle: "larissa", loc: 3, price: 480, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 29, hair: "Loiro", eyes: "Verdes", h: 169, rating: 4.8, rc: 35 },
+    { name: "Fernanda", handle: "fernanda", loc: 3, price: 400, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 25, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.4, rc: 14 },
+    { name: "Aurora", handle: "aurora", loc: 4, price: 600, tier: PlanTier.PREMIUM, verified: true, online: true, age: 24, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 31 },
+    { name: "Gabriela", handle: "gabriela", loc: 4, price: 700, tier: PlanTier.PREMIUM, verified: true, online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 173, rating: 4.9, rc: 55 },
+    { name: "Natalia", handle: "natalia", loc: 4, price: 550, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 166, rating: 4.6, rc: 27 },
+    { name: "Leticia", handle: "leticia", loc: 5, price: 430, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Verdes", h: 162, rating: 4.5, rc: 19 },
+    { name: "Rafaela", handle: "rafaela", loc: 5, price: 480, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 26, hair: "Loiro", eyes: "Azuis", h: 168, rating: 4.4, rc: 12 },
+    { name: "Bianca", handle: "bianca", loc: 6, price: 620, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 171, rating: 4.9, rc: 48 },
+    { name: "Juliana", handle: "juliana", loc: 6, price: 500, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 24, hair: "Preto", eyes: "Pretos", h: 164, rating: 4.6, rc: 23 },
+    { name: "Amanda", handle: "amanda", loc: 7, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
+    { name: "Patricia", handle: "patricia", loc: 7, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 30, hair: "Loiro", eyes: "Verdes", h: 167, rating: 4.7, rc: 28 },
+    { name: "Renata", handle: "renata", loc: 7, price: 320, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Preto", eyes: "Castanhos", h: 160, rating: 4.1, rc: 7 },
+    { name: "Carolina", handle: "carolina", loc: 8, price: 420, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 26, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.6, rc: 21 },
+    { name: "Daniela", handle: "daniela", loc: 8, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 24, hair: "Loiro", eyes: "Azuis", h: 169, rating: 4.4, rc: 13 },
+    { name: "Priscila", handle: "priscila", loc: 8, price: 500, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Ruivo", eyes: "Verdes", h: 166, rating: 4.8, rc: 36 },
+    { name: "Aline", handle: "aline", loc: 9, price: 360, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 15 },
+    { name: "Tatiane", handle: "tatiane", loc: 9, price: 440, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Preto", eyes: "Pretos", h: 164, rating: 4.6, rc: 24 },
+    { name: "Vanessa", handle: "vanessa", loc: 9, price: 520, tier: PlanTier.PREMIUM, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 33 },
+    { name: "Bruna", handle: "bruna", loc: 10, price: 400, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 24, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.7, rc: 26 },
+    { name: "Claudia", handle: "claudia", loc: 10, price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 29, hair: "Loiro", eyes: "Azuis", h: 168, rating: 4.3, rc: 9 },
+    { name: "Debora", handle: "debora", loc: 10, price: 480, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 26, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.6, rc: 20 },
+    { name: "Elisa", handle: "elisa", loc: 11, price: 390, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Loiro", eyes: "Verdes", h: 166, rating: 4.5, rc: 17 },
+    { name: "Fabiana", handle: "fabiana", loc: 11, price: 460, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 169, rating: 4.7, rc: 30 },
+    { name: "Giovana", handle: "giovana", loc: 12, price: 340, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 24, hair: "Preto", eyes: "Castanhos", h: 161, rating: 4.4, rc: 14 },
+    { name: "Heloisa", handle: "heloisa", loc: 12, price: 420, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.6, rc: 22 },
+    { name: "Ingrid", handle: "ingrid", loc: 12, price: 300, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Loiro", eyes: "Azuis", h: 162, rating: 4.2, rc: 8 },
+    { name: "Jessica", handle: "jessica", loc: 13, price: 360, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
+    { name: "Karen", handle: "karen", loc: 13, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 28, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 27 },
+    { name: "Livia", handle: "livia", loc: 13, price: 520, tier: PlanTier.PREMIUM, verified: true, online: true, age: 26, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 34 },
+    { name: "Monica", handle: "monica", loc: 14, price: 330, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 13 },
+    { name: "Nathalia", handle: "nathalia", loc: 14, price: 400, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Preto", eyes: "Pretos", h: 165, rating: 4.6, rc: 21 },
+    { name: "Olivia", handle: "olivia", loc: 0, price: 600, tier: PlanTier.PREMIUM, verified: true, online: true, age: 26, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.9, rc: 51 },
+    { name: "Sabrina", handle: "sabrina", loc: 5, price: 540, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.7, rc: 29 },
+    { name: "Thamires", handle: "thamires", loc: 2, price: 470, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 24, hair: "Loiro", eyes: "Castanhos", h: 166, rating: 4.6, rc: 19 },
+    { name: "Vitoria", handle: "vitoria", loc: 6, price: 390, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 23, hair: "Castanho", eyes: "Verdes", h: 163, rating: 4.4, rc: 12 },
   ];
 
   const profiles: ProfileRecord[] = [];
@@ -374,10 +374,10 @@ async function main() {
 
   // ── 4 Garotos ─────────────────────────────────────────────────────────────
   const garotos = [
-    { name: "Rafael",   handle: "rafael",   loc: 0,  price: 500, tier: PlanTier.PREMIUM,   verified: true,  online: true,  age: 28, hair: "Castanho", eyes: "Castanhos", h: 182, rating: 4.8, rc: 24 },
-    { name: "Bruno",    handle: "bruno",    loc: 4,  price: 450, tier: PlanTier.DESTAQUE,  verified: true,  online: false, age: 26, hair: "Preto",    eyes: "Castanhos", h: 178, rating: 4.6, rc: 17 },
-    { name: "Thiago",   handle: "thiago",   loc: 9,  price: 380, tier: PlanTier.ESSENCIAL, verified: true,  online: true,  age: 25, hair: "Loiro",    eyes: "Azuis",     h: 180, rating: 4.5, rc: 12 },
-    { name: "Leonardo", handle: "leonardo", loc: 8,  price: 420, tier: PlanTier.DESTAQUE,  verified: false, online: false, age: 30, hair: "Castanho", eyes: "Verdes",    h: 176, rating: 4.4, rc: 9  },
+    { name: "Rafael", handle: "rafael", loc: 0, price: 500, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 182, rating: 4.8, rc: 24 },
+    { name: "Bruno", handle: "bruno", loc: 4, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Preto", eyes: "Castanhos", h: 178, rating: 4.6, rc: 17 },
+    { name: "Thiago", handle: "thiago", loc: 9, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Azuis", h: 180, rating: 4.5, rc: 12 },
+    { name: "Leonardo", handle: "leonardo", loc: 8, price: 420, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 30, hair: "Castanho", eyes: "Verdes", h: 176, rating: 4.4, rc: 9 },
   ];
 
   for (const g of garotos) {
@@ -416,9 +416,9 @@ async function main() {
 
   // ── 3 Casais ──────────────────────────────────────────────────────────────
   const casais = [
-    { name: "Casal SP",  handle: "casalsp",  loc: 0,  price: 800, tier: PlanTier.PREMIUM,  verified: true,  online: true,  age: 27, hair: "Variado", eyes: "Castanhos", h: 170, rating: 4.9, rc: 31 },
-    { name: "Casal RJ",  handle: "casalrj",  loc: 4,  price: 700, tier: PlanTier.DESTAQUE, verified: true,  online: false, age: 26, hair: "Variado", eyes: "Variados",  h: 168, rating: 4.7, rc: 22 },
-    { name: "Casal CWB", handle: "casalcwb", loc: 9,  price: 550, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 25, hair: "Variado", eyes: "Variados",  h: 167, rating: 4.4, rc: 11 },
+    { name: "Casal SP", handle: "casalsp", loc: 0, price: 800, tier: PlanTier.PREMIUM, verified: true, online: true, age: 27, hair: "Variado", eyes: "Castanhos", h: 170, rating: 4.9, rc: 31 },
+    { name: "Casal RJ", handle: "casalrj", loc: 4, price: 700, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Variado", eyes: "Variados", h: 168, rating: 4.7, rc: 22 },
+    { name: "Casal CWB", handle: "casalcwb", loc: 9, price: 550, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 25, hair: "Variado", eyes: "Variados", h: 167, rating: 4.4, rc: 11 },
   ];
 
   for (const g of casais) {
@@ -498,25 +498,25 @@ async function main() {
 
   // ── 19 Clientes genéricos ─────────────────────────────────────────────────
   const clientNames = [
-    { name: "Carlos Silva",      email: "carlos.silva@email.local"      },
-    { name: "Pedro Alves",       email: "pedro.alves@email.local"       },
-    { name: "Lucas Ferreira",    email: "lucas.ferreira@email.local"    },
-    { name: "Mateus Costa",      email: "mateus.costa@email.local"      },
-    { name: "Gabriel Santos",    email: "gabriel.santos@email.local"    },
-    { name: "Felipe Oliveira",   email: "felipe.oliveira@email.local"   },
-    { name: "Andre Sousa",       email: "andre.sousa@email.local"       },
-    { name: "Rodrigo Lima",      email: "rodrigo.lima@email.local"      },
-    { name: "Diego Pereira",     email: "diego.pereira@email.local"     },
-    { name: "Marcos Ribeiro",    email: "marcos.ribeiro@email.local"    },
+    { name: "Carlos Silva", email: "carlos.silva@email.local" },
+    { name: "Pedro Alves", email: "pedro.alves@email.local" },
+    { name: "Lucas Ferreira", email: "lucas.ferreira@email.local" },
+    { name: "Mateus Costa", email: "mateus.costa@email.local" },
+    { name: "Gabriel Santos", email: "gabriel.santos@email.local" },
+    { name: "Felipe Oliveira", email: "felipe.oliveira@email.local" },
+    { name: "Andre Sousa", email: "andre.sousa@email.local" },
+    { name: "Rodrigo Lima", email: "rodrigo.lima@email.local" },
+    { name: "Diego Pereira", email: "diego.pereira@email.local" },
+    { name: "Marcos Ribeiro", email: "marcos.ribeiro@email.local" },
     { name: "Vinicius Carvalho", email: "vinicius.carvalho@email.local" },
-    { name: "Thiago Nunes",      email: "thiago.nunes@email.local"      },
-    { name: "Bruno Martins",     email: "bruno.martins@email.local"     },
-    { name: "Rafael Gomes",      email: "rafael.gomes@email.local"      },
-    { name: "Gustavo Torres",    email: "gustavo.torres@email.local"    },
-    { name: "Leonardo Dias",     email: "leonardo.dias@email.local"     },
-    { name: "Henrique Araujo",   email: "henrique.araujo@email.local"   },
-    { name: "Samuel Barbosa",    email: "samuel.barbosa@email.local"    },
-    { name: "Igor Nascimento",   email: "igor.nascimento@email.local"   },
+    { name: "Thiago Nunes", email: "thiago.nunes@email.local" },
+    { name: "Bruno Martins", email: "bruno.martins@email.local" },
+    { name: "Rafael Gomes", email: "rafael.gomes@email.local" },
+    { name: "Gustavo Torres", email: "gustavo.torres@email.local" },
+    { name: "Leonardo Dias", email: "leonardo.dias@email.local" },
+    { name: "Henrique Araujo", email: "henrique.araujo@email.local" },
+    { name: "Samuel Barbosa", email: "samuel.barbosa@email.local" },
+    { name: "Igor Nascimento", email: "igor.nascimento@email.local" },
   ];
 
   const clientUsers: { id: string }[] = [];
@@ -710,7 +710,7 @@ async function main() {
           rating: rnd(4, 5),
           comment: Math.random() > 0.3 ? pick(REVIEW_TEXTS) : null,
         },
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
   console.log("✓ Reviews criadas");

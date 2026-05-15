@@ -30,8 +30,8 @@ export function HeroSearchForm() {
   };
 
   return (
-    <form onSubmit={submit} className="border border-line bg-white shadow-sm">
-      <div className="grid gap-px bg-line md:grid-cols-[1.5fr_1fr_auto]">
+    <form onSubmit={submit} className="overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
+      <div className="grid gap-px bg-black/[0.06] md:grid-cols-[1.5fr_1fr_auto]">
         {/* Cidade — autocomplete IBGE */}
         <CityAutocomplete
           onSelect={(slug) => setCitySlug(slug)}
@@ -41,11 +41,11 @@ export function HeroSearchForm() {
         <label className="flex items-center gap-3 bg-white px-4 py-3">
           <Users className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
           <span className="w-full">
-            <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted">Procuro</span>
+            <span className="block text-[10px] font-medium uppercase tracking-wider text-muted">Procuro</span>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="mt-0.5 w-full cursor-pointer border-0 bg-transparent p-0 text-sm font-medium outline-none focus:ring-0"
+              className="mt-0.5 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-[14px] font-medium outline-none focus:ring-0"
             >
               {GENDER_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -58,7 +58,7 @@ export function HeroSearchForm() {
 
         <button
           type="submit"
-          className="flex items-center justify-center gap-2 bg-foreground px-6 py-4 text-xs font-semibold uppercase tracking-wider text-white md:min-w-[140px]"
+          className="flex items-center justify-center gap-2 bg-foreground px-6 py-4 text-[13px] font-semibold text-white transition-all hover:brightness-110 active:scale-[0.98] md:min-w-[140px] md:rounded-r-2xl"
         >
           <Search className="h-4 w-4" strokeWidth={2} />
           Descobrir

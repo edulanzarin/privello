@@ -2,6 +2,8 @@
 
 import { useTransition } from "react";
 import { loginAction } from "@/app/_actions/auth";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const [pending, startTransition] = useTransition();
@@ -14,42 +16,34 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-      <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-          E-mail
-        </label>
-        <input
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          className="mt-2 w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground"
-          placeholder="seu@email.com"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <Input
+        name="email"
+        type="email"
+        required
+        autoComplete="email"
+        label="E-mail"
+        placeholder="seu@email.com"
+      />
 
-      <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-          Senha
-        </label>
-        <input
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          className="mt-2 w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground"
-          placeholder="••••••••"
-        />
-      </div>
+      <Input
+        name="password"
+        type="password"
+        required
+        autoComplete="current-password"
+        label="Senha"
+        placeholder="••••••••"
+      />
 
-      <button
+      <Button
         type="submit"
-        disabled={pending}
-        className="w-full bg-coral py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-60"
+        variant="coral"
+        size="lg"
+        loading={pending}
+        className="w-full mt-2"
       >
         {pending ? "Entrando…" : "Entrar"}
-      </button>
+      </Button>
     </form>
   );
 }

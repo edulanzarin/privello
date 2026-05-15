@@ -23,6 +23,7 @@ export function StoryBar({
   isClient,
 }: {
   groups: StoryGroup[];
+  /** Whether the viewer is a logged-in user (client OR provider) who can interact */
   isClient: boolean;
 }) {
   const [activeGroupIdx, setActiveGroupIdx] = useState<number | null>(null);
@@ -45,7 +46,7 @@ export function StoryBar({
         }),
       );
     } catch { /* ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -148,9 +149,9 @@ export function StoryBar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ storyId: activeStory.id }),
-      });
+      }).catch(() => { });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeGroupIdx, activeStoryIdx]);
 
   // Close on Escape
@@ -179,13 +180,13 @@ export function StoryBar({
           gi !== activeGroupIdx
             ? g
             : {
-                ...g,
-                stories: g.stories.map((s, si) =>
-                  si !== activeStoryIdx
-                    ? s
-                    : { ...s, likedByMe: liked, likeCount: liked ? s.likeCount + 1 : s.likeCount - 1 },
-                ),
-              },
+              ...g,
+              stories: g.stories.map((s, si) =>
+                si !== activeStoryIdx
+                  ? s
+                  : { ...s, likedByMe: liked, likeCount: liked ? s.likeCount + 1 : s.likeCount - 1 },
+              ),
+            },
         ),
       );
     }

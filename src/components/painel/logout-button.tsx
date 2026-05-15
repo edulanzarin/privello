@@ -10,8 +10,6 @@ export function LogoutButton() {
   function handleLogout() {
     startTransition(async () => {
       await logoutAction();
-      // Hard redirect after session is cleared
-      window.location.href = "/";
     });
   }
 

@@ -23,7 +23,6 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin }: BottomNavProps) {
 
   function handleAcompanhantes(e: React.MouseEvent) {
     e.preventDefault();
-    // If already on a discover page, just stay (link handles it)
     const saved = sessionStorage.getItem(LAST_CITY_KEY);
     if (saved) {
       router.push(`/descobrir/${saved}`);
@@ -59,29 +58,29 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin }: BottomNavProps) {
     },
     isAdmin
       ? {
-          key: "admin",
-          href: "/admin/moderacao",
-          label: "Admin",
-          icon: ShieldCheck,
-          active: pathname.startsWith("/admin"),
-          onClick: undefined as React.MouseEventHandler | undefined,
-        }
+        key: "admin",
+        href: "/admin/moderacao",
+        label: "Admin",
+        icon: ShieldCheck,
+        active: pathname.startsWith("/admin"),
+        onClick: undefined as React.MouseEventHandler | undefined,
+      }
       : {
-          key: "perfil",
-          href: profileHref,
-          label: isLoggedIn ? "Perfil" : "Entrar",
-          icon: User,
-          active:
-            pathname.startsWith("/painel") ||
-            pathname.startsWith("/conta") ||
-            pathname === "/entrar",
-          onClick: undefined as React.MouseEventHandler | undefined,
-        },
+        key: "perfil",
+        href: profileHref,
+        label: isLoggedIn ? "Perfil" : "Entrar",
+        icon: User,
+        active:
+          pathname.startsWith("/painel") ||
+          pathname.startsWith("/conta") ||
+          pathname === "/entrar",
+        onClick: undefined as React.MouseEventHandler | undefined,
+      },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-line bg-white/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.08] bg-white">
+      <div className="mx-auto flex h-[52px] max-w-lg items-center justify-around px-2">
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -90,25 +89,16 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin }: BottomNavProps) {
               href={item.href}
               onClick={item.onClick}
               className={cn(
-                "relative flex flex-col items-center gap-1 px-4 py-2 text-[10px] font-semibold uppercase tracking-wider transition",
-                item.active ? "text-foreground" : "text-muted hover:text-foreground",
+                "relative flex flex-col items-center gap-[2px] px-5 py-1 text-[10px] font-medium transition-colors",
+                item.active ? "text-coral" : "text-[#8e8e93] hover:text-foreground",
               )}
             >
-              <div className="relative">
-                <Icon
-                  className="h-5 w-5 transition"
-                  strokeWidth={item.active ? 2 : 1.5}
-                />
-                {"soon" in item && (item as { soon?: boolean }).soon && (
-                  <span className="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-coral text-[7px] font-bold text-white">
-                    +
-                  </span>
-                )}
-              </div>
+              <Icon
+                className="h-[22px] w-[22px]"
+                strokeWidth={item.active ? 2.2 : 1.5}
+                fill={item.active ? "currentColor" : "none"}
+              />
               <span>{item.label}</span>
-              {item.active && (
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 bg-coral" />
-              )}
             </Link>
           );
         })}

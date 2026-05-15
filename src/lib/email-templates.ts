@@ -31,17 +31,6 @@ export function passwordResetTemplate(resetUrl: string) {
   `);
 }
 
-export function emailVerificationTemplate(verifyUrl: string, name?: string | null) {
-  return base(`
-    <h1 style="margin:0 0 8px;font-size:22px;font-weight:normal;">Confirme seu email</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#666;line-height:1.6;">
-      Olá${name ? `, <strong>${name}</strong>` : ""}! Para ativar sua conta no Privello, confirme seu endereço de email clicando no botão abaixo.
-    </p>
-    ${btn(verifyUrl, "Confirmar email")}
-    <p style="margin:0;font-size:12px;color:#bbb;">O link expira em 24 horas. Se você não criou uma conta, ignore este email.</p>
-  `);
-}
-
 export function warningTemplate(name: string, reason: string, warningCount: number, panelUrl: string) {
   const plural = warningCount === 1 ? "advertência" : "advertências";
   const danger = warningCount >= 2;
@@ -56,9 +45,9 @@ export function warningTemplate(name: string, reason: string, warningCount: numb
     </div>
     <p style="margin:0 0 24px;font-size:13px;color:${danger ? "#c8102e" : "#666"};line-height:1.6;">
       ${danger
-        ? `<strong>Atenção:</strong> você já acumulou <strong>${warningCount} ${plural}</strong>. Ao atingir 3 advertências sua conta será suspensa automaticamente.`
-        : `Esta é sua <strong>${warningCount}ª ${plural === "advertência" ? "advertência" : "advertência"}</strong>. Ao atingir 3 advertências sua conta será suspensa.`
-      }
+      ? `<strong>Atenção:</strong> você já acumulou <strong>${warningCount} ${plural}</strong>. Ao atingir 3 advertências sua conta será suspensa automaticamente.`
+      : `Esta é sua <strong>${warningCount}ª ${plural === "advertência" ? "advertência" : "advertência"}</strong>. Ao atingir 3 advertências sua conta será suspensa.`
+    }
     </p>
     ${btn(panelUrl, "Acessar painel")}
     <p style="margin:0;font-size:12px;color:#bbb;">Em caso de dúvidas, entre em contato pelo suporte.</p>

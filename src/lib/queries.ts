@@ -49,7 +49,6 @@ export async function getCityBySlug(slug: string) {
 /**
  * Derives a human-readable city name from a slug like "blumenau-sc" → "Blumenau, SC"
  * or "sao-paulo-sp" → "São Paulo, SP".
- * This is a best-effort display name used when the city doesn't exist in the DB yet.
  */
 function cityNameFromSlug(slug: string): { displayName: string; uf: string } {
   const parts = slug.split("-");
@@ -60,18 +59,15 @@ function cityNameFromSlug(slug: string): { displayName: string; uf: string } {
 
 /**
  * Like getCityBySlug but creates the city on-the-fly if it doesn't exist.
- * This allows any Brazilian city to have a working discover page even before
- * any provider registers there.
  */
 export async function getOrCreateCityBySlug(slug: string) {
   const existing = await getCityBySlug(slug);
   if (existing) return existing;
 
-  // City not in DB — create it so the page can render (empty state)
+  // City not in DB — create it with "Name, UF" format
   const { displayName, uf } = cityNameFromSlug(slug);
   const name = uf ? `${displayName}, ${uf}` : displayName;
 
-  // Use upsert to avoid race conditions
   const city = await prisma.city.upsert({
     where: { slug },
     update: {},
@@ -95,7 +91,6 @@ export type DiscoverFilters = {
   homeVisit?: boolean;
   excludeProfileId?: string;
   search?: string;
-  districtSlug?: string;
 };
 
 export type ProfileSort = "relevance" | "price_asc" | "price_desc" | "rating";
@@ -123,7 +118,7 @@ export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[
 
   // Boosted profiles always come first, sorted by plan then views
   const boosted = profiles.filter((p) => p.featuredUntil != null && new Date(p.featuredUntil) > now);
-  const rest    = profiles.filter((p) => !(p.featuredUntil != null && new Date(p.featuredUntil) > now));
+  const rest = profiles.filter((p) => !(p.featuredUntil != null && new Date(p.featuredUntil) > now));
 
   const sortedBoosted: T[] = [];
   for (const tier of PLAN_ORDER) {
@@ -140,7 +135,12 @@ export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[
 }
 
 export async function listProfilesForCity(cityId: string, filters: DiscoverFilters, sort: ProfileSort = "relevance") {
-  const where: Prisma.ProfileWhereInput = { cityId, isSuspended: false };
+  const where: Prisma.ProfileWhereInput = {
+    cityId,
+    isSuspended: false,
+    // Only show profiles that have a cover photo (registration complete)
+    media: { some: { isCover: true } },
+  };
 
   // Default: show profiles that serve men (garotas).
   // "garotos" = servesWomen, "casais" = servesCouples, default/undefined = servesMen
@@ -169,9 +169,6 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
       { displayName: { contains: q, mode: "insensitive" } },
       { slug: { contains: q, mode: "insensitive" } },
     ];
-  }
-  if (filters.districtSlug) {
-    where.district = { slug: filters.districtSlug };
   }
 
   const profiles = await prisma.profile.findMany({
@@ -255,7 +252,10 @@ export async function getPremiumWeekProfiles() {
  */
 export async function getHotProfiles(limit = 20) {
   const profiles = await prisma.profile.findMany({
-    where: { isSuspended: false },
+    where: {
+      isSuspended: false,
+      media: { some: { isCover: true } },
+    },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
     take: limit,
@@ -271,7 +271,11 @@ export async function getHotProfiles(limit = 20) {
 export async function getBoostedProfiles(limit = 8) {
   const now = new Date();
   const profiles = await prisma.profile.findMany({
-    where: { featuredUntil: { gt: now }, isSuspended: false },
+    where: {
+      featuredUntil: { gt: now },
+      isSuspended: false,
+      media: { some: { isCover: true } },
+    },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
     take: limit * 3,
@@ -298,7 +302,10 @@ export async function getSectionProfiles(
 ) {
   if (type === "hot") {
     const rows = await prisma.profile.findMany({
-      where: { isSuspended: false },
+      where: {
+        isSuspended: false,
+        media: { some: { isCover: true } },
+      },
       include: profileCardInclude,
       orderBy: { viewsCurrentPeriod: "desc" },
       skip: offset,
@@ -311,7 +318,11 @@ export async function getSectionProfiles(
   // boosted — in-memory tier sort, so fetch a generous batch
   const now = new Date();
   const rows = await prisma.profile.findMany({
-    where: { featuredUntil: { gt: now }, isSuspended: false },
+    where: {
+      featuredUntil: { gt: now },
+      isSuspended: false,
+      media: { some: { isCover: true } },
+    },
     include: profileCardInclude,
     orderBy: { viewsCurrentPeriod: "desc" },
     take: offset + limit + 100,
@@ -529,7 +540,7 @@ export async function listReels({
 }) {
   const profileFilter = {
     isSuspended: false,
-    ...(cityId    ? { cityId }    : {}),
+    ...(cityId ? { cityId } : {}),
     ...(profileId ? { id: profileId } : {}),
   };
 

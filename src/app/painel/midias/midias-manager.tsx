@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ImagePlus, Loader2, Lock, Trash2, Star,
+  ImagePlus, Loader2, Lock, Trash2, Star, Eye,
   ChevronLeft, ChevronRight, X, Play, Plus, ArrowLeft,
 } from "lucide-react";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
@@ -25,7 +25,7 @@ type Props = {
 };
 
 const PAGE_SIZE = 6;
-type VisTab  = "publica" | "privada";
+type VisTab = "publica" | "privada";
 type TypeTab = "todos" | "imagens" | "videos";
 
 function isVideo(m: Media) { return m.mediaType === "VIDEO"; }
@@ -37,7 +37,7 @@ function fmtDate(iso: string) {
 // Cover first, then createdAt DESC
 function sortMedia(arr: Media[]): Media[] {
   const cover = arr.filter((m) => m.isCover);
-  const rest  = arr
+  const rest = arr
     .filter((m) => !m.isCover)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return [...cover, ...rest];
@@ -47,38 +47,38 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
   const router = useRouter();
   const { toast } = useToast();
 
-  const [visTab,   setVisTab]   = useState<VisTab>("publica");
-  const [typeTab,  setTypeTab]  = useState<TypeTab>("todos");
-  const [visible,  setVisible]  = useState(PAGE_SIZE);
+  const [visTab, setVisTab] = useState<VisTab>("publica");
+  const [typeTab, setTypeTab] = useState<TypeTab>("todos");
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   // Upload panel state
-  const [uploading,    setUploading]    = useState(false);
-  const [mediaType,    setMediaType]    = useState("IMAGE");
+  const [uploading, setUploading] = useState(false);
+  const [mediaType, setMediaType] = useState("IMAGE");
   const [uploadPublic, setUploadPublic] = useState(true);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [previews,     setPreviews]     = useState<string[]>([]);
-  const [caption,      setCaption]      = useState("");
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [caption, setCaption] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setVisible(PAGE_SIZE); setLightbox(null); }, [visTab, typeTab]);
 
-  const sortedPublic  = sortMedia(publicMedia.filter((m) => m.mediaType !== "REEL"));
+  const sortedPublic = sortMedia(publicMedia.filter((m) => m.mediaType !== "REEL"));
   const sortedPrivate = sortMedia(privateMedia.filter((m) => m.mediaType !== "REEL"));
   const pool = visTab === "publica" ? sortedPublic : sortedPrivate;
 
   const filtered = pool.filter((m) => {
     if (typeTab === "imagens") return !isVideo(m);
-    if (typeTab === "videos")  return isVideo(m);
+    if (typeTab === "videos") return isVideo(m);
     return true;
   });
-  const shown   = filtered.slice(0, visible);
+  const shown = filtered.slice(0, visible);
   const hasMore = visible < filtered.length;
 
   // Lightbox
   const closeLb = useCallback(() => setLightbox(null), []);
-  const prevLb  = useCallback(() => setLightbox((i) => (i === null || i === 0 ? filtered.length - 1 : i - 1)), [filtered.length]);
-  const nextLb  = useCallback(() => setLightbox((i) => (i === null ? 0 : (i + 1) % filtered.length)), [filtered.length]);
+  const prevLb = useCallback(() => setLightbox((i) => (i === null || i === 0 ? filtered.length - 1 : i - 1)), [filtered.length]);
+  const nextLb = useCallback(() => setLightbox((i) => (i === null ? 0 : (i + 1) % filtered.length)), [filtered.length]);
 
   useEffect(() => {
     if (lightbox === null) return;
@@ -101,7 +101,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
   async function handleSetCover(id: string) {
     await setCoverPhoto(id);
-    toast("Capa definida.");
+    toast("Foto de perfil definida.");
     router.refresh();
   }
 
@@ -121,7 +121,9 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       const fd = new FormData();
       fd.set("file", file);
       fd.set("isPublic", String(uploadPublic));
-      fd.set("mediaType", mediaType);
+      // Auto-detect media type from file
+      const detectedType = file.type.startsWith("video") ? "VIDEO" : "IMAGE";
+      fd.set("mediaType", detectedType);
       fd.set("caption", caption);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       if (!res.ok) { const d = await res.json(); toast(d.error ?? "Erro ao enviar.", "error"); break; }
@@ -144,9 +146,9 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
   ];
 
   const TYPE_TABS: { key: TypeTab; label: string }[] = [
-    { key: "todos",   label: "Todos" },
+    { key: "todos", label: "Todos" },
     { key: "imagens", label: "Fotos" },
-    { key: "videos",  label: "Vídeos" },
+    { key: "videos", label: "Vídeos" },
   ];
 
   const curItem = lightbox !== null ? filtered[lightbox] : null;
@@ -158,19 +160,19 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       <div className="space-y-4 min-w-0">
 
         {/* Vis tabs */}
-        <div className="flex border-b border-line">
+        <div className="flex border-b border-black/[0.06]">
           {VIS_TABS.map((t) => (
             <button key={t.key} type="button" onClick={() => setVisTab(t.key)}
               className={cn(
-                "flex items-center gap-1.5 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider transition",
+                "flex items-center gap-1.5 px-4 py-3 text-[12px] font-semibold transition",
                 visTab === t.key
-                  ? "border-b-2 border-coral text-foreground"
+                  ? "border-b-2 border-coral text-foreground -mb-px"
                   : "text-muted hover:text-foreground",
               )}>
               {t.label}
               <span className={cn(
-                "rounded px-1.5 py-0.5 text-[10px]",
-                visTab === t.key ? "bg-coral/10 text-coral" : "bg-line text-muted",
+                "rounded-full px-1.5 py-0.5 text-[10px]",
+                visTab === t.key ? "bg-coral/10 text-coral" : "bg-black/[0.04] text-muted",
               )}>{t.count}</span>
             </button>
           ))}
@@ -178,7 +180,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Alerts */}
         {visTab === "publica" && (
-          <p className="text-xs text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
+          <p className="text-[12px] text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
         )}
         {visTab === "privada" && (
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -189,31 +191,31 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Cover info */}
         {visTab === "publica" && cover && (
-          <div className="flex items-center gap-3 border border-coral/20 bg-coral/5 px-4 py-2.5">
-            <div className="relative h-10 w-7 shrink-0 overflow-hidden border border-coral">
+          <div className="flex items-center gap-3 rounded-xl rounded-lg ring-1 ring-coral/20 bg-coral/5 px-4 py-3">
+            <div className="relative h-10 w-7 shrink-0 overflow-hidden rounded-lg ring-1 ring-coral">
               <Image src={cover.url} alt="" fill className="object-cover" sizes="28px" />
             </div>
             <p className="text-xs text-muted">
-              <span className="font-semibold text-coral">Capa atual</span> — aparece nos cards de busca.
-              Para trocar, abra outra foto e clique em &ldquo;Definir como capa&rdquo;.
+              <span className="font-semibold text-coral">Foto de perfil</span> — aparece nos cards de busca.
+              Para trocar, abra outra foto e clique em &ldquo;Definir como perfil&rdquo;.
             </p>
           </div>
         )}
 
         {/* Type sub-tabs */}
-        <div className="flex gap-0 border-b border-line">
+        <div className="flex gap-0 border-b border-black/[0.06]">
           {TYPE_TABS.map((t) => {
             const count = pool.filter((m) => {
               if (t.key === "imagens") return !isVideo(m);
-              if (t.key === "videos")  return isVideo(m);
+              if (t.key === "videos") return isVideo(m);
               return true;
             }).length;
             return (
               <button key={t.key} type="button" onClick={() => setTypeTab(t.key)}
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition",
+                  "flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium transition",
                   typeTab === t.key
-                    ? "border-b-2 border-foreground text-foreground"
+                    ? "border-b-2 border-foreground text-foreground -mb-px"
                     : "text-muted hover:text-foreground",
                 )}>
                 {t.label} <span className="text-[10px] text-muted">({count})</span>
@@ -230,16 +232,16 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-3 gap-0.5">
+            <div className="grid grid-cols-3 gap-2">
               {shown.map((m) => {
                 const globalIdx = filtered.indexOf(m);
                 return (
                   <button key={m.id} type="button"
                     className={cn(
-                      "group relative overflow-hidden border-2",
-                      m.isCover ? "border-coral" : "border-transparent",
+                      "group relative overflow-hidden rounded-xl",
+                      m.isCover ? "ring-2 ring-coral" : "ring-1 ring-black/[0.06]",
                     )}
-                    style={{ aspectRatio: "3/4" }}
+                    style={{ aspectRatio: "1/1" }}
                     onClick={() => setLightbox(globalIdx)}
                   >
                     {isVideo(m) ? (
@@ -259,7 +261,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                       </div>
                     )}
                     {m.isCover && (
-                      <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[8px] font-bold uppercase text-white">
+                      <span className="absolute left-1.5 top-1.5 rounded-full bg-coral px-2 py-[2px] text-[9px] font-semibold text-white">
                         Capa
                       </span>
                     )}
@@ -272,7 +274,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
               <div className="pt-2 text-center">
                 <button
                   onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  className="border border-line bg-white px-8 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted transition hover:border-foreground hover:text-foreground"
+                  className="rounded-full border border-black/10 bg-white px-6 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
                 >
                   Ver mais · {filtered.length - visible} restantes
                 </button>
@@ -283,53 +285,17 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       </div>
 
       {/* ── RIGHT: sticky upload panel ── */}
-      <div className="space-y-4 border border-line bg-white p-5 lg:sticky lg:top-24 lg:self-start">
+      <div className="space-y-5 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm lg:sticky lg:top-24 lg:self-start">
         <div>
-          <p className="font-semibold">Adicionar mídia</p>
-          <p className="mt-0.5 text-xs text-muted">Foto ou vídeo para o seu perfil.</p>
-        </div>
-
-        {/* Type */}
-        <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-muted">Tipo</label>
-          <div className="flex gap-2">
-            {[{ v: "IMAGE", l: "Foto" }, { v: "VIDEO", l: "Vídeo" }].map((o) => (
-              <button key={o.v} type="button" onClick={() => setMediaType(o.v)}
-                className={cn(
-                  "flex-1 border py-2 text-xs font-semibold transition",
-                  mediaType === o.v
-                    ? "border-foreground bg-foreground text-white"
-                    : "border-line bg-white text-muted hover:border-foreground/30",
-                )}>
-                {o.l}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Visibility */}
-        <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-muted">Visibilidade</label>
-          <div className="flex gap-2">
-            {[{ v: true, l: "Pública" }, { v: false, l: "Privada" }].map((o) => (
-              <button key={String(o.v)} type="button" onClick={() => setUploadPublic(o.v)}
-                className={cn(
-                  "flex-1 border py-2 text-xs font-semibold transition",
-                  uploadPublic === o.v
-                    ? "border-foreground bg-foreground text-white"
-                    : "border-line bg-white text-muted hover:border-foreground/30",
-                )}>
-                {o.l}
-              </button>
-            ))}
-          </div>
+          <p className="text-[15px] font-semibold">Adicionar mídia</p>
+          <p className="mt-0.5 text-[13px] text-muted">Foto ou vídeo para o seu perfil.</p>
         </div>
 
         {/* Preview grid or drop zone */}
         {previews.length > 0 ? (
           <div className="grid grid-cols-3 gap-1.5">
             {previews.map((src, i) => (
-              <div key={i} className="relative overflow-hidden bg-line" style={{ aspectRatio: "3/4" }}>
+              <div key={i} className="relative overflow-hidden rounded-xl bg-black/[0.03]" style={{ aspectRatio: "1/1" }}>
                 {pendingFiles[i]?.type.startsWith("video") ? (
                   <video src={src} className="h-full w-full object-cover" muted playsInline />
                 ) : (
@@ -341,61 +307,88 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                     setPendingFiles((f) => f.filter((_, j) => j !== i));
                     setPreviews((p) => p.filter((_, j) => j !== i));
                   }}
-                  className="absolute right-0.5 top-0.5 rounded-full bg-black/60 p-0.5 text-white hover:bg-coral"
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white hover:bg-coral"
                 >
-                  <X className="h-2.5 w-2.5" strokeWidth={2} />
+                  <X className="h-3 w-3" strokeWidth={2} />
                 </button>
               </div>
             ))}
             <button type="button" onClick={() => fileRef.current?.click()}
-              className="flex items-center justify-center border-2 border-dashed border-line bg-white text-muted hover:border-coral hover:text-coral transition"
-              style={{ aspectRatio: "3/4" }}>
+              className="flex items-center justify-center border-2 border-dashed border-black/[0.12] rounded-xl bg-white text-muted hover:border-coral hover:text-coral transition"
+              style={{ aspectRatio: "1/1" }}>
               <Plus className="h-5 w-5" strokeWidth={1.5} />
             </button>
           </div>
         ) : (
           <button type="button" onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 border-2 border-dashed border-line bg-white py-10 text-muted transition hover:border-coral hover:text-coral">
+            className="flex w-full flex-col items-center justify-center gap-3 border-2 border-dashed border-black/[0.12] rounded-xl py-12 text-muted transition hover:border-coral hover:text-coral">
             <ImagePlus className="h-8 w-8" strokeWidth={1.25} />
-            <span className="text-sm font-semibold">Selecionar arquivos</span>
+            <span className="text-[14px] font-semibold">Selecionar arquivos</span>
             <span className="text-[11px] text-muted/60">
-              {mediaType === "IMAGE" ? "JPG, PNG, WebP · máx 8MB" : "MP4, WebM, MOV · máx 50MB"}
+              JPG, PNG, WebP, MP4, WebM · máx 50MB
             </span>
           </button>
         )}
 
         <input ref={fileRef} type="file"
-          accept={mediaType === "IMAGE" ? "image/*" : "video/*"}
+          accept="image/*,video/*"
           multiple className="hidden"
           onChange={(e) => handleFileSelect(e.target.files)} />
 
         {/* Caption */}
         <div>
-          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Legenda <span className="normal-case font-normal">(opcional)</span>
+          <label className="mb-1.5 block text-[12px] font-medium text-muted">
+            Legenda (opcional)
           </label>
-          <textarea
+          <input
+            type="text"
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            maxLength={300}
-            rows={3}
-            placeholder="Uma frase sobre esta foto…"
-            className="w-full resize-none border border-line px-3 py-2 text-sm outline-none focus:border-foreground"
+            maxLength={150}
+            placeholder="Uma breve descrição…"
+            className="w-full rounded-lg border border-black/10 px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
-          <p className="mt-0.5 text-right text-[10px] text-muted">{caption.length}/300</p>
+          <p className="mt-0.5 text-right text-[10px] text-muted">{caption.length}/150</p>
         </div>
 
-        {previews.length > 0 && (
-          <button type="button" onClick={uploadFiles} disabled={uploading}
-            className="flex w-full items-center justify-center gap-2 bg-coral py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50">
-            {uploading
-              ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando…</>
-              : `Publicar ${pendingFiles.length} arquivo${pendingFiles.length > 1 ? "s" : ""}`}
+        {/* Privacy — iOS toggle (same as Reels) */}
+        <div className="flex items-center justify-between rounded-lg bg-black/[0.03] px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            {!uploadPublic ? <Lock className="h-4 w-4 text-muted" strokeWidth={1.5} /> : <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />}
+            <div>
+              <p className="text-[13px] font-medium">{uploadPublic ? "Público" : "Privado"}</p>
+              <p className="text-[11px] text-muted">
+                {uploadPublic ? "Visível para todos" : "Só assinantes veem"}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setUploadPublic((p) => !p)}
+            className={cn(
+              "flex h-[24px] w-[42px] items-center rounded-full transition-colors duration-200",
+              !uploadPublic ? "bg-[#30d158]" : "bg-black/[0.09]",
+            )}
+          >
+            <span className={cn(
+              "ml-[2px] h-[20px] w-[20px] rounded-full bg-white shadow-sm transition-transform duration-200",
+              !uploadPublic && "translate-x-[18px]",
+            )} />
           </button>
-        )}
+        </div>
+
+        {/* Publish button */}
+        <button type="button" onClick={uploadFiles} disabled={!pendingFiles.length || uploading}
+          className="w-full rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40">
+          {uploading
+            ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Enviando…</span>
+            : pendingFiles.length > 0
+              ? `Publicar ${pendingFiles.length} arquivo${pendingFiles.length > 1 ? "s" : ""}`
+              : "Publicar"}
+        </button>
 
         {!uploadPublic && (
-          <p className="text-[10px] text-muted">Conteúdo explícito permitido na galeria privada.</p>
+          <p className="text-[11px] text-muted">Conteúdo explícito permitido na galeria privada.</p>
         )}
       </div>
 
@@ -463,12 +456,12 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                       onClick={() => handleSetCover(curItem.id)}
                       className="flex items-center gap-1.5 rounded border border-white/20 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/60 hover:text-white"
                     >
-                      <Star className="h-3 w-3" strokeWidth={1.5} /> Definir capa
+                      <Star className="h-3 w-3" strokeWidth={1.5} /> Definir perfil
                     </button>
                   )}
                   {curItem.isCover ? (
                     <p className="text-[10px] text-white/30 text-center max-w-[100px]">
-                      Defina outra capa antes de remover
+                      Defina outra foto de perfil antes de remover
                     </p>
                   ) : (
                     <button

@@ -203,12 +203,17 @@ export async function saveOnboardingValores(formData: FormData) {
 export async function publishProfile(_?: FormData): Promise<void> {
   const profile = await getProviderProfile();
 
-  // Basic validation: redirect back to previous step instead of returning error
   if (!profile.bio || profile.priceHour < 1) {
     redirect("/conta/onboarding/valores");
   }
 
-  // Mark as online (visible in listings)
+  const coverPhoto = await prisma.media.findFirst({
+    where: { profileId: profile.id, isPublic: true, isCover: true },
+  });
+  if (!coverPhoto) {
+    redirect("/conta/onboarding/fotos");
+  }
+
   await prisma.profile.update({
     where: { id: profile.id },
     data: { isOnline: true },

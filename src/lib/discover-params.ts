@@ -33,7 +33,6 @@ export function parseDiscoverSearchParams(raw: Record<string, string | string[] 
     hasOwnPlace: get("local") === "1",
     homeVisit: get("domicilio") === "1",
     search: searchRaw || undefined,
-    districtSlug: districtRaw || undefined,
   };
 
   const sortRaw = get("ordem");

@@ -44,9 +44,9 @@ export default async function CadastroPage() {
             {/* Cliente */}
             <Link
               href="/cadastro/cliente"
-              className="group flex flex-col gap-4 border-2 border-line bg-white p-6 transition hover:border-foreground"
+              className="group flex flex-col gap-4 rounded-2xl border border-white/30 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-lg hover:-translate-y-0.5 hover:bg-white"
             >
-              <div className="flex h-12 w-12 items-center justify-center bg-line transition group-hover:bg-foreground">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-line transition group-hover:bg-foreground">
                 <UserRound className="h-6 w-6 text-muted transition group-hover:text-white" strokeWidth={1.5} />
               </div>
               <div>
@@ -55,7 +55,7 @@ export default async function CadastroPage() {
                   Quero encontrar e entrar em contato com acompanhantes.
                 </p>
               </div>
-              <span className="mt-auto text-xs font-semibold uppercase tracking-wider text-coral">
+              <span className="mt-auto text-xs font-semibold text-coral">
                 Cadastro gratuito →
               </span>
             </Link>
@@ -63,9 +63,9 @@ export default async function CadastroPage() {
             {/* Acompanhante */}
             <Link
               href="/cadastro/acompanhante"
-              className="group flex flex-col gap-4 border-2 border-coral bg-white p-6 transition hover:bg-coral"
+              className="group flex flex-col gap-4 rounded-2xl border-2 border-coral bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-lg hover:-translate-y-0.5 hover:bg-coral"
             >
-              <div className="flex h-12 w-12 items-center justify-center bg-coral transition group-hover:bg-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-coral transition group-hover:bg-white">
                 <Users className="h-6 w-6 text-white transition group-hover:text-coral" strokeWidth={1.5} />
               </div>
               <div>
@@ -74,7 +74,7 @@ export default async function CadastroPage() {
                   Quero criar meu perfil e anunciar meus serviços.
                 </p>
               </div>
-              <span className="mt-auto text-xs font-semibold uppercase tracking-wider text-coral transition group-hover:text-white">
+              <span className="mt-auto text-xs font-semibold text-coral transition group-hover:text-white">
                 Criar perfil →
               </span>
             </Link>

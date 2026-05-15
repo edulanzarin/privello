@@ -39,7 +39,7 @@ export function ProfileStoryCover({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef(0);
-  const nextRef = useRef<() => void>(() => {});
+  const nextRef = useRef<() => void>(() => { });
   const stopTimers = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -81,7 +81,7 @@ export function ProfileStoryCover({
         return { ...g, stories, allSeen: stories.every((s) => s.seenByMe) };
       });
     } catch { /* ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export function ProfileStoryCover({
     rafRef.current = requestAnimationFrame(tick);
     timerRef.current = setTimeout(() => nextRef.current(), DURATION);
     return stopTimers;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, idx]);
 
   useEffect(() => {
@@ -132,9 +132,9 @@ export function ProfileStoryCover({
         method: "POST",
         body: JSON.stringify({ storyId }),
         headers: { "Content-Type": "application/json" },
-      }).catch(() => {});
+      }).catch(() => { });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, idx]);
 
   async function toggleLike() {
@@ -145,7 +145,7 @@ export function ProfileStoryCover({
       method: "POST",
       body: JSON.stringify({ storyId, liked }),
       headers: { "Content-Type": "application/json" },
-    }).catch(() => {});
+    }).catch(() => { });
     setLocalGroup((g) => {
       if (!g) return g;
       const stories = g.stories.map((s, si) =>
@@ -160,66 +160,44 @@ export function ProfileStoryCover({
       {/* ── Cover photo ── */}
       <div
         className={cn(
-          "relative w-full aspect-[3/4] overflow-hidden bg-line",
+          "relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full bg-line mx-auto",
+          "shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_32px_rgba(0,0,0,0.08)]",
           hasStory && "cursor-pointer",
+          hasStory && !allSeen && "ring-[3px] ring-coral ring-offset-2 ring-offset-white",
+          hasStory && allSeen && "ring-[2px] ring-black/10 ring-offset-2 ring-offset-white",
         )}
         onClick={() => hasStory && setOpen(true)}
       >
-        {/* Story ring — top gradient border effect via inset ring */}
-        {hasStory && (
-          <div
-            className={cn(
-              "pointer-events-none absolute inset-0 z-10",
-              !allSeen
-                ? "ring-[3px] ring-inset ring-transparent"
-                : "ring-[2px] ring-inset ring-white/20",
-            )}
-          />
-        )}
-        {hasStory && !allSeen && (
-          <div className="pointer-events-none absolute inset-0 z-10 rounded-none"
-            style={{ boxShadow: "inset 0 0 0 3px transparent, inset 0 0 0 3px #c8102e" }}
-          />
-        )}
-
         {coverUrl ? (
           <Image
             src={coverUrl}
             alt={displayName}
             fill
             className="object-cover"
-            sizes="(max-width:1024px) 100vw, 400px"
+            sizes="192px"
             priority
           />
         ) : (
-          <div className="flex h-full min-h-[300px] items-center justify-center bg-line">
-            <p className="text-sm text-muted">Sem foto</p>
+          <div className="flex h-full w-full items-center justify-center bg-black/[0.04]">
+            <p className="text-[13px] text-muted">Sem foto</p>
           </div>
         )}
 
-        {/* Subtle dark gradient at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-
-        {/* Story pill indicator — bottom left */}
+        {/* Story pill indicator */}
         {hasStory && (
           <button
             onClick={(e) => { e.stopPropagation(); setOpen(true); }}
             className={cn(
-              "absolute bottom-10 left-3 z-20 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition hover:scale-105",
+              "absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition hover:scale-105",
               !allSeen
-                ? "bg-coral shadow-lg shadow-coral/30"
-                : "bg-white/20 border border-white/30",
+                ? "bg-coral shadow-sm"
+                : "bg-black/40",
             )}
           >
-            <Play className="h-2.5 w-2.5 fill-white" strokeWidth={0} />
-            {localGroup ? `${localGroup.stories.length} ${localGroup.stories.length === 1 ? "story" : "stories"}` : "Stories"}
+            <Play className="h-2 w-2 fill-white" strokeWidth={0} />
+            {localGroup?.stories.length}
           </button>
         )}
-
-        {/* Plan badge */}
-        <div className={cn("absolute inset-x-0 bottom-0 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-white z-20", planBadge.bg)}>
-          {planBadge.label}
-        </div>
       </div>
 
       {/* ── Story viewer overlay ── */}
@@ -275,18 +253,18 @@ export function ProfileStoryCover({
             </div>
 
             {/* Bottom bar */}
-            <div className="absolute inset-x-0 bottom-0 z-30 flex items-center justify-between px-4 py-4 pointer-events-none">
-              <span className="flex items-center gap-1 text-[11px] text-white/60 pointer-events-none">
-                <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <div className="absolute inset-x-0 bottom-0 z-30 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-6 pt-12 pointer-events-none">
+              <span className="flex items-center gap-1.5 text-sm text-white/70 pointer-events-none">
+                <Eye className="h-4 w-4" strokeWidth={1.5} />
                 {activeStory.viewCount}
               </span>
               {isClient ? (
                 <button
-                  className="pointer-events-auto flex items-center gap-1.5 text-[11px] text-white/80 hover:text-white"
+                  className="pointer-events-auto flex items-center gap-1.5 text-sm text-white"
                   onClick={(e) => { e.stopPropagation(); toggleLike(); }}
                 >
-                  <Heart className={cn("h-3.5 w-3.5", activeStory.likedByMe && "fill-coral text-coral")} strokeWidth={1.5} />
-                  {activeStory.likeCount}
+                  <Heart className={cn("h-6 w-6 transition", activeStory.likedByMe ? "fill-coral text-coral scale-110" : "text-white/80")} strokeWidth={1.5} />
+                  <span className="text-xs text-white/70">{activeStory.likeCount}</span>
                 </button>
               ) : (
                 <Link

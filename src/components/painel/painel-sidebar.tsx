@@ -13,10 +13,10 @@ import { useTransition } from "react";
 import { cn } from "@/lib/utils";
 
 type NavItem =
-  | { type: "link";   href: string; label: string; icon: typeof LayoutDashboard; badge?: string }
-  | { type: "muted";  label: string; icon: typeof LayoutDashboard; badge?: string }
+  | { type: "link"; href: string; label: string; icon: typeof LayoutDashboard; badge?: string }
+  | { type: "muted"; label: string; icon: typeof LayoutDashboard; badge?: string }
   | { type: "logout"; label: string; icon: typeof LayoutDashboard }
-  | { type: "sep";    label: string };
+  | { type: "sep"; label: string };
 
 const PLAN_LABELS: Record<string, string> = {
   PREMIUM: "Premium", DESTAQUE: "Plus", ESSENCIAL: "Basic",
@@ -25,28 +25,28 @@ const PLAN_LABELS: Record<string, string> = {
 function buildItems(slug: string, planTier?: string): NavItem[] {
   const canStories = planTier === "DESTAQUE" || planTier === "PREMIUM";
   return [
-    { type: "link",  href: "/painel",       label: "Visão geral",    icon: LayoutDashboard },
-    { type: "link",  href: `/p/${slug}`,    label: "Ver perfil",     icon: User },
+    { type: "link", href: "/painel", label: "Visão geral", icon: LayoutDashboard },
+    { type: "link", href: `/p/${slug}`, label: "Ver perfil", icon: User },
 
-    { type: "sep",   label: "Conteúdo" },
-    { type: "link",  href: "/painel/midias",  label: "Mídias",       icon: Images },
-    { type: "link",  href: "/painel/reels",   label: "Reels",        icon: Clapperboard },
+    { type: "sep", label: "Conteúdo" },
+    { type: "link", href: "/painel/midias", label: "Mídias", icon: Images },
+    { type: "link", href: "/painel/reels", label: "Reels", icon: Clapperboard },
     canStories
-      ? { type: "link",  href: "/painel/stories", label: "Stories",  icon: BookImage }
-      : { type: "muted", label: "Stories",  icon: BookImage, badge: "Plus" },
+      ? { type: "link", href: "/painel/stories", label: "Stories", icon: BookImage }
+      : { type: "muted", label: "Stories", icon: BookImage, badge: "Plus" },
 
-    { type: "sep",   label: "Perfil" },
-    { type: "link",  href: "/painel/perfil",         label: "Editar perfil",   icon: Pencil },
-    { type: "link",  href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
-    { type: "link",  href: "/painel/valores",         label: "Valores",         icon: CircleDollarSign },
+    { type: "sep", label: "Perfil" },
+    { type: "link", href: "/painel/perfil", label: "Editar perfil", icon: Pencil },
+    { type: "link", href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
+    { type: "link", href: "/painel/valores", label: "Valores", icon: CircleDollarSign },
 
-    { type: "sep",   label: "Negócio" },
-    { type: "link",  href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
-    { type: "link",  href: "/painel/financeiro", label: "Financeiro", icon: BarChart3, badge: "Premium" },
-    { type: "link",  href: "/painel/plano",      label: "Plano",      icon: Diamond },
+    { type: "sep", label: "Negócio" },
+    { type: "link", href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
+    { type: "link", href: "/painel/financeiro", label: "Financeiro", icon: BarChart3, badge: "Premium" },
+    { type: "link", href: "/painel/plano", label: "Plano", icon: Diamond },
 
-    { type: "sep",   label: "Conta" },
-    { type: "link",   href: "/painel/suporte", label: "Suporte", icon: HeadphonesIcon },
+    { type: "sep", label: "Conta" },
+    { type: "link", href: "/painel/suporte", label: "Suporte", icon: HeadphonesIcon },
     { type: "logout", label: "Sair", icon: LogOut },
   ];
 }
@@ -66,7 +66,6 @@ function NavContent({
   function handleLogout() {
     startLogout(async () => {
       await logoutAction();
-      window.location.href = "/";
     });
   }
 
@@ -120,8 +119,8 @@ function NavContent({
           return (
             <Link key={item.href} href={item.href} onClick={onClose}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-white/75 transition hover:bg-white/5 hover:text-white",
-                isActive && "border-l-2 border-coral bg-white/5 pl-[10px] text-white",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white",
+                isActive && "bg-white/[0.08] text-white font-medium",
               )}>
               <item.icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
               <span className="flex-1">{item.label}</span>

@@ -25,11 +25,11 @@ export function ShareButton({ displayName, slug }: { displayName: string; slug: 
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex items-center justify-center gap-2 border border-line px-4 py-3 text-sm font-medium text-muted transition hover:border-foreground/30 hover:text-foreground"
+      className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]"
       title="Compartilhar perfil"
     >
       {copied ? (
-        <Check className="h-4 w-4 text-success" strokeWidth={2} />
+        <Check className="h-4 w-4 text-[#30d158]" strokeWidth={2} />
       ) : (
         <Share2 className="h-4 w-4" strokeWidth={1.5} />
       )}

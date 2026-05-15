@@ -48,9 +48,9 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
   const href = digits && !disabled ? buildWhatsAppUrl(digits, message) : "#";
 
   return (
-    <aside className="h-fit border border-line bg-white p-6 shadow-sm lg:sticky lg:top-24">
+    <aside className="h-fit rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
       <div className="flex gap-3">
-        <div className="relative h-14 w-14 shrink-0 bg-line">
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-black/[0.04]">
           {profile.imageUrl ? (
             <Image src={profile.imageUrl} alt="" fill className="object-cover" sizes="56px" />
           ) : null}
@@ -59,16 +59,16 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
           <p className="font-semibold">
             {profile.displayName}, {profile.age}
           </p>
-          <p className="text-xs text-muted">
-            {profile.cityName} · {profile.districtName}
+          <p className="text-[13px] text-muted">
+            {profile.cityName}
           </p>
           {profile.isOnline ? (
-            <p className="mt-1 text-[10px] font-semibold uppercase text-success">Online agora</p>
+            <p className="mt-1 text-[11px] font-semibold text-[#30d158]">Online agora</p>
           ) : null}
         </div>
       </div>
 
-      <h2 className="mt-6 text-[10px] font-semibold uppercase tracking-wider text-muted">Resumo</h2>
+      <h2 className="mt-6 text-[11px] font-medium text-muted">Resumo</h2>
       <dl className="mt-3 space-y-2 text-sm">
         <div className="flex justify-between gap-2">
           <dt className="text-muted">Dia</dt>
@@ -96,17 +96,17 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
           <dd className="text-right">{summary.locationLabel}</dd>
         </div>
       </dl>
-      <p className="mt-6 font-serif text-3xl font-semibold">{formatBrl(summary.totalBrl)}</p>
+      <p className="mt-6 text-3xl font-semibold tracking-tight">{formatBrl(summary.totalBrl)}</p>
       <p className="mt-2 text-xs leading-relaxed text-muted">
         Pagamento direto à anunciante. A Privello não intermedia valores neste fluxo.
       </p>
 
-      <label className="mt-6 block text-[10px] font-semibold uppercase tracking-wider text-muted">Observações</label>
+      <label className="mt-6 block text-[11px] font-medium text-muted">Observações</label>
       <textarea
         rows={3}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        className="mt-2 w-full border border-line bg-[#fdfcfa] p-3 text-sm"
+        className="mt-2 w-full rounded-lg border border-black/10 bg-white p-3 text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none"
         placeholder="Ex.: primeira vez, preferência de roupa, chegada discreta…"
       />
 
@@ -120,11 +120,10 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ profileId: profile.id, source: "solicitar" }),
-          }).catch(() => {});
+          }).catch(() => { });
         }}
-        className={`mt-6 flex w-full items-center justify-center bg-foreground py-3 text-xs font-semibold uppercase tracking-wider text-white ${
-          disabled ? "pointer-events-none opacity-40" : ""
-        }`}
+        className={`mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] ${disabled ? "pointer-events-none opacity-40" : ""
+          }`}
       >
         Marcar no WhatsApp
       </a>

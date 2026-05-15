@@ -72,13 +72,13 @@ function MediaGrid({
               <Image src={m.url} alt="" fill className="object-cover" sizes="128px" />
             )}
             {m.isCover && (
-              <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Capa</span>
+              <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Perfil</span>
             )}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/60 opacity-0 transition group-hover:opacity-100">
               {onSetCover && !m.isCover && (
                 <button type="button" onClick={() => onSetCover(m.id)}
                   className="flex items-center gap-1 rounded bg-coral px-2 py-1 text-[9px] font-bold uppercase text-white">
-                  <Star className="h-2.5 w-2.5" /> Capa
+                  <Star className="h-2.5 w-2.5" /> Perfil
                 </button>
               )}
               <button type="button" onClick={() => onRemove(m.id)}
@@ -139,7 +139,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
 
   async function handleSetCover(id: string) {
     await setCoverPhoto(id);
-    toast("Capa definida.");
+    toast("Foto de perfil definida.");
     router.refresh();
   }
 

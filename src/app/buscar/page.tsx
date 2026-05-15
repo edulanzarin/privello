@@ -27,11 +27,11 @@ export default async function BuscarPage({ searchParams }: PageProps) {
           <>
             {/* Global search results */}
             <div className="mb-6 flex items-baseline justify-between">
-              <h1 className="text-xl font-bold tracking-tight">
+              <h1 className="text-[20px] font-semibold tracking-tight">
                 Resultados para{" "}
                 <span className="text-coral">&ldquo;{q}&rdquo;</span>
               </h1>
-              <Link href="/buscar" className="text-xs text-muted underline underline-offset-2 hover:text-foreground">
+              <Link href="/buscar" className="text-[12px] text-[#0a84ff] hover:underline">
                 Limpar
               </Link>
             </div>
@@ -42,54 +42,51 @@ export default async function BuscarPage({ searchParams }: PageProps) {
                 name="q"
                 defaultValue={q}
                 placeholder="Nome ou @handle…"
-                className="flex-1 border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
               />
-              <button type="submit" className="bg-foreground px-4 py-2.5 text-xs font-bold uppercase text-white">
+              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                 Buscar
               </button>
             </form>
 
             {results.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-muted">Nenhum perfil encontrado para &ldquo;{q}&rdquo;.</p>
-                <p className="mt-2 text-xs text-muted">
+                <p className="text-[14px] text-muted">Nenhum perfil encontrado para &ldquo;{q}&rdquo;.</p>
+                <p className="mt-2 text-[13px] text-muted">
                   Tente um nome diferente ou{" "}
-                  <Link href="/buscar" className="underline">busque por cidade</Link>.
+                  <Link href="/buscar" className="text-[#0a84ff] hover:underline">busque por cidade</Link>.
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-xs text-muted">{results.length} perfil{results.length !== 1 ? "s" : ""} encontrado{results.length !== 1 ? "s" : ""}</p>
+                <p className="text-[12px] text-muted">{results.length} perfil{results.length !== 1 ? "s" : ""} encontrado{results.length !== 1 ? "s" : ""}</p>
                 {results.map((p) => {
                   const cover = p.media[0]?.url;
                   return (
                     <Link
                       key={p.id}
                       href={`/p/${p.slug}`}
-                      className="flex items-center gap-3 border border-line bg-white p-3 hover:bg-line/40 transition"
+                      className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white p-3 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
                     >
-                      <div className="relative h-14 w-11 shrink-0 overflow-hidden bg-line">
-                        {cover && <Image src={cover} alt="" fill className="object-cover" sizes="44px" />}
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-black/[0.04]">
+                        {cover && <Image src={cover} alt="" fill className="object-cover" sizes="48px" />}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <p className="truncate text-sm font-bold">{p.displayName}, {p.age}</p>
+                          <p className="truncate text-[14px] font-semibold">{p.displayName}, {p.age}</p>
                           {p.isVerified && (
-                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2} />
+                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={2} />
                           )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted">
+                        <div className="flex items-center gap-1 text-[12px] text-muted">
                           <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.5} />
                           <span className="truncate">{p.city.name}</span>
-                          <span>·</span>
+                          <span className="text-black/20">·</span>
                           <span className="text-muted/70">@{p.slug}</span>
                         </div>
-                        {p.tagline && (
-                          <p className="mt-0.5 truncate text-[11px] text-muted">&ldquo;{p.tagline}&rdquo;</p>
-                        )}
                       </div>
                       {p.priceHour > 0 && (
-                        <p className="shrink-0 text-xs font-semibold text-coral">
+                        <p className="shrink-0 text-[13px] font-semibold text-coral">
                           R${p.priceHour}/h
                         </p>
                       )}
@@ -101,8 +98,8 @@ export default async function BuscarPage({ searchParams }: PageProps) {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold tracking-tight">Buscar</h1>
-            <p className="mt-2 text-sm text-muted">
+            <h1 className="text-[28px] font-semibold tracking-tight">Buscar</h1>
+            <p className="mt-2 text-[14px] text-muted">
               Encontre por cidade, nome ou @handle.
             </p>
 
@@ -111,17 +108,17 @@ export default async function BuscarPage({ searchParams }: PageProps) {
               <input
                 name="q"
                 placeholder="Nome ou @handle em qualquer cidade…"
-                className="flex-1 border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
               />
-              <button type="submit" className="bg-foreground px-4 py-2.5 text-xs font-bold uppercase text-white">
+              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                 Buscar
               </button>
             </form>
 
-            <div className="relative my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-line" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted">ou busque por cidade</span>
-              <div className="h-px flex-1 bg-line" />
+            <div className="relative my-8 flex items-center gap-3">
+              <div className="h-px flex-1 bg-black/[0.06]" />
+              <span className="text-[11px] font-medium text-muted">ou busque por cidade</span>
+              <div className="h-px flex-1 bg-black/[0.06]" />
             </div>
 
             <BuscarForm />

@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { LAST_CITY_KEY } from "@/components/layout/bottom-nav";
-import { Users } from "lucide-react";
+import { Users, Search } from "lucide-react";
 
 const GENDER_OPTIONS = [
   { value: "", label: "Garotas" },
@@ -16,6 +16,14 @@ export function BuscarForm() {
   const router = useRouter();
   const [citySlug, setCitySlug] = useState("");
   const [gender, setGender] = useState("");
+  const [topCities, setTopCities] = useState<{ slug: string; label: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/top-cities")
+      .then((r) => r.json())
+      .then((data) => setTopCities(data.cities ?? []))
+      .catch(() => { });
+  }, []);
 
   function handleCitySearch() {
     if (!citySlug) return;
@@ -27,67 +35,59 @@ export function BuscarForm() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* ── Busca por cidade ── */}
-      <div className="space-y-3">
-        <div className="border border-line bg-white">
+    <div className="space-y-5">
+      {/* Search form - same style as home */}
+      <div className="overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
+        <div className="grid gap-px bg-black/[0.06] md:grid-cols-[1.5fr_1fr]">
           <CityAutocomplete onSelect={(slug) => setCitySlug(slug)} />
-        </div>
 
-        <div className="border border-line bg-white px-4 py-3">
-          <div className="flex items-center gap-3">
+          <label className="flex items-center gap-3 bg-white px-4 py-3">
             <Users className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
             <span className="w-full">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted">Procuro</span>
+              <span className="block text-[10px] font-medium uppercase tracking-wider text-muted">Procuro</span>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="mt-0.5 w-full cursor-pointer border-0 bg-transparent p-0 text-sm font-medium outline-none focus:ring-0"
+                className="mt-0.5 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-[14px] font-medium outline-none focus:ring-0"
               >
                 {GENDER_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </span>
+          </label>
+        </div>
+      </div>
+
+      <button
+        onClick={handleCitySearch}
+        disabled={!citySlug}
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
+      >
+        <Search className="h-4 w-4" strokeWidth={2} />
+        Buscar acompanhantes
+      </button>
+
+      {/* Top cities */}
+      {topCities.length > 0 && (
+        <div className="pt-2">
+          <p className="text-[11px] font-medium text-muted">Cidades com mais perfis</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {topCities.map((c) => (
+              <button
+                key={c.slug}
+                onClick={() => {
+                  sessionStorage.setItem(LAST_CITY_KEY, c.slug);
+                  router.push(`/descobrir/${c.slug}`);
+                }}
+                className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
+              >
+                {c.label}
+              </button>
+            ))}
           </div>
         </div>
-
-        <button
-          onClick={handleCitySearch}
-          disabled={!citySlug}
-          className="w-full bg-coral py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-40"
-        >
-          Buscar acompanhantes
-        </button>
-      </div>
-
-      {/* ── Cidades populares ── */}
-      <div className="pt-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Cidades populares</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {[
-            { slug: "sao-paulo-sp",        label: "São Paulo" },
-            { slug: "rio-de-janeiro-rj",    label: "Rio de Janeiro" },
-            { slug: "curitiba-pr",          label: "Curitiba" },
-            { slug: "belo-horizonte-mg",    label: "Belo Horizonte" },
-            { slug: "florianopolis-sc",     label: "Florianópolis" },
-            { slug: "porto-alegre-rs",      label: "Porto Alegre" },
-            { slug: "brasilia-df",          label: "Brasília" },
-            { slug: "salvador-ba",          label: "Salvador" },
-          ].map((c) => (
-            <button
-              key={c.slug}
-              onClick={() => {
-                sessionStorage.setItem(LAST_CITY_KEY, c.slug);
-                router.push(`/descobrir/${c.slug}`);
-              }}
-              className="rounded-full border border-line bg-white px-3 py-1.5 text-xs text-muted transition hover:border-foreground/30 hover:text-foreground"
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

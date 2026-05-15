@@ -6,33 +6,37 @@ import { HeroSearchForm } from "@/components/marketing/hero-search-form";
 import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
 import { getPlatformStats, getSectionProfiles } from "@/lib/queries";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// Quick-access pills below the search form
-const pills = [
-  { href: "/descobrir/sao-paulo-sp", label: "São Paulo" },
-  { href: "/descobrir/rio-de-janeiro-rj", label: "Rio de Janeiro" },
-  { href: "/descobrir/curitiba-pr", label: "Curitiba" },
-  { href: "/descobrir/balneario-camboriu-sc", label: "Balneário Camboriú" },
-  { href: "/descobrir/florianopolis-sc", label: "Florianópolis" },
-  { href: "/descobrir/porto-alegre-rs", label: "Porto Alegre" },
-];
+async function getTopCities(limit = 5) {
+  const cities = await prisma.city.findMany({
+    where: { profiles: { some: {} } },
+    select: { name: true, slug: true, _count: { select: { profiles: true } } },
+    orderBy: { profiles: { _count: "desc" } },
+    take: limit,
+  });
+  return cities.map((c) => ({ href: `/descobrir/${c.slug}`, label: c.name }));
+}
 
 export default async function HomePage() {
   let stats = FALLBACK_PLATFORM_STATS;
   let hot: { profiles: Awaited<ReturnType<typeof getSectionProfiles>>["profiles"]; hasMore: boolean } = { profiles: [], hasMore: false };
   let boosted: typeof hot = { profiles: [], hasMore: false };
+  let pills: { href: string; label: string }[] = [];
 
   try {
-    const [s, h, b] = await Promise.all([
+    const [s, h, b, p] = await Promise.all([
       getPlatformStats(),
       getSectionProfiles("hot", 0),
       getSectionProfiles("boosted", 0),
+      getTopCities(5),
     ]);
     stats = s;
     hot = h;
     boosted = b;
+    pills = p;
   } catch {
     // use fallbacks
   }
@@ -44,28 +48,28 @@ export default async function HomePage() {
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
           <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
-              <h1 className="font-serif text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+              <h1 className="text-[44px] font-bold leading-[1.05] tracking-tight sm:text-[56px] lg:text-[64px]">
                 Encontros sem pressa,{" "}
                 <span className="text-coral">
-                  com presença<span className="not-italic">.</span>
+                  com presença.
                 </span>
               </h1>
-              <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
+              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted">
                 Curadoria editorial, verificação manual e perfis auditáveis. Você escolhe a cidade, o ritmo e com quem
                 conversar — com transparência e respeito mútuo.
               </p>
             </div>
-            <aside className="border-l-4 border-coral bg-white p-6 shadow-sm">
-              <ul className="space-y-4 text-sm">
-                <li className="flex justify-between gap-4 border-b border-line pb-3">
+            <aside className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
+              <ul className="space-y-4 text-[14px]">
+                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
                   <span className="text-muted">Perfis ativos</span>
                   <span className="font-semibold tabular-nums">{stats.profiles.toLocaleString("pt-BR")}</span>
                 </li>
-                <li className="flex justify-between gap-4 border-b border-line pb-3">
+                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
                   <span className="text-muted">Verificados</span>
                   <span className="font-semibold tabular-nums">{stats.verifiedPct}%</span>
                 </li>
-                <li className="flex justify-between gap-4 border-b border-line pb-3">
+                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
                   <span className="text-muted">Cidades</span>
                   <span className="font-semibold tabular-nums">{stats.cities}</span>
                 </li>
@@ -74,7 +78,7 @@ export default async function HomePage() {
                   <span className="font-semibold">24h</span>
                 </li>
               </ul>
-              <p className="mt-4 text-xs leading-relaxed text-muted">
+              <p className="mt-4 text-[12px] leading-relaxed text-muted">
                 Verificação por documento + selfie obrigatória. Conteúdo adulto (+18).
               </p>
             </aside>
@@ -89,7 +93,7 @@ export default async function HomePage() {
                 <Link
                   key={p.href}
                   href={p.href}
-                  className="rounded-full border border-line bg-white px-3 py-1.5 text-xs text-muted transition hover:border-foreground/30 hover:text-foreground"
+                  className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
                 >
                   {p.label}
                 </Link>
@@ -100,11 +104,11 @@ export default async function HomePage() {
 
         {/* ── Em destaque (boost ativo) — só aparece quando há perfis boosted ── */}
         {boosted.profiles.length > 0 && (
-          <section className="border-t border-line bg-white py-16">
+          <section className="border-t border-black/[0.06] py-16">
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="font-serif text-3xl font-light sm:text-4xl">
+              <h2 className="text-[28px] font-semibold tracking-tight">
                 Em destaque{" "}
-                <em className="italic text-muted">· boost ativo</em>
+                <span className="text-muted font-normal">· boost ativo</span>
               </h2>
             </div>
             <ProfileSection
@@ -117,10 +121,10 @@ export default async function HomePage() {
         )}
 
         {/* ── Em alta da semana ── */}
-        <section className="border-t border-line bg-white py-16">
+        <section className="border-t border-black/[0.06] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="font-serif text-3xl font-light sm:text-4xl">
-              Em alta <em className="italic text-muted">da semana</em>
+            <h2 className="text-[28px] font-semibold tracking-tight">
+              Em alta <span className="text-muted font-normal">da semana</span>
             </h2>
           </div>
           {hot.profiles.length ? (
@@ -139,26 +143,26 @@ export default async function HomePage() {
 
         <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-2">
-            <h2 className="font-serif text-3xl sm:text-4xl">
-              Verificação <em className="text-coral not-italic">séria.</em> Sem rodeios.
+            <h2 className="text-[28px] font-semibold tracking-tight sm:text-[34px]">
+              Verificação <span className="text-coral">séria.</span> Sem rodeios.
             </h2>
-            <ol className="space-y-8 text-sm">
+            <ol className="space-y-8 text-[14px]">
               <li className="flex gap-4">
-                <span className="font-serif text-2xl text-coral">01</span>
+                <span className="text-[22px] font-bold text-coral">01</span>
                 <div>
                   <p className="font-semibold">Cadastro do perfil</p>
                   <p className="mt-1 text-muted">Informações, valores e fotos públicas/privadas com diretrizes claras.</p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <span className="font-serif text-2xl text-coral">02</span>
+                <span className="text-[22px] font-bold text-coral">02</span>
                 <div>
                   <p className="font-semibold">Documento + selfie</p>
                   <p className="mt-1 text-muted">Conferência humana e trilha de auditoria. Nada de atalhos.</p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <span className="font-serif text-2xl text-coral">03</span>
+                <span className="text-[22px] font-bold text-coral">03</span>
                 <div>
                   <p className="font-semibold">Publicação</p>
                   <p className="mt-1 text-muted">Após aprovação, seu perfil entra na listagem com selo e ranking editorial.</p>

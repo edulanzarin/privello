@@ -53,6 +53,7 @@ model User {
   password         String?
   verified         Boolean  @default(false)
   stripeCustomerId String?  @unique
+  slugChangedAt    DateTime?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

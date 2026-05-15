@@ -174,18 +174,18 @@ function PostModal({
   return (
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/80 sm:flex sm:items-center sm:justify-center sm:p-4"
+      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/60 sm:backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:p-4"
       onClick={(e) => { if ((e.target as HTMLElement) === e.currentTarget) onClose(); }}
     >
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-20 hidden rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60 sm:block"
+        className="absolute right-4 top-4 z-20 hidden rounded-full bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 sm:block"
       >
         <X className="h-5 w-5" strokeWidth={1.5} />
       </button>
 
       <div
-        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[90vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-lg"
+        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[85vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-2xl sm:shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Photo ── */}
@@ -256,10 +256,10 @@ function PostModal({
         </div>
 
         {/* ── Info + Comments ── */}
-        <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-line">
-          <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:shrink-0">
+        <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-black/[0.06]">
+          <div className="flex items-center gap-3 border-b border-black/[0.06] px-4 py-3 sm:shrink-0">
             <div className="min-w-0 flex-1">
-              <Link href={`/p/${slug}`} className="text-sm font-bold hover:underline">@{slug}</Link>
+              <Link href={`/p/${slug}`} className="text-[14px] font-semibold hover:underline">@{slug}</Link>
             </div>
             <p className="text-[11px] text-muted">{fmtDate(item.createdAt)}</p>
           </div>
@@ -331,7 +331,7 @@ function PostModal({
             )}
           </div>
 
-          <div className="border-t border-line px-4 py-3 sm:shrink-0">
+          <div className="border-t border-black/[0.06] px-4 py-3 sm:shrink-0">
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleLike}
@@ -346,34 +346,34 @@ function PostModal({
               <MessageCircle className="h-6 w-6 text-foreground" strokeWidth={1.5} />
               <span className="ml-auto text-[11px] text-muted">{idx + 1} / {items.length}</span>
             </div>
-            <p className="mt-1.5 text-sm font-bold">
+            <p className="mt-1.5 text-[14px] font-semibold">
               {curLike.count} {curLike.count === 1 ? "curtida" : "curtidas"}
             </p>
           </div>
 
           {isClient && isSubscriber ? (
-            <div className="sticky bottom-0 flex items-center gap-2 border-t border-line bg-white px-4 py-3 sm:static sm:shrink-0">
+            <div className="sticky bottom-0 flex items-center gap-2 border-t border-black/[0.06] bg-white px-4 py-3 sm:static sm:shrink-0">
               <input
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && postComment()}
                 placeholder="Adicione um comentário…"
                 maxLength={500}
-                className="flex-1 text-sm outline-none placeholder:text-muted/60"
+                className="flex-1 text-[14px] outline-none placeholder:text-muted/60"
               />
-              <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-xs font-bold text-coral disabled:opacity-30">
+              <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-[13px] font-semibold text-[#0a84ff] disabled:opacity-30 transition-opacity">
                 Publicar
               </button>
             </div>
           ) : isClient ? (
-            <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href={`/assinar?from=/p/${slug}`} className="text-xs font-semibold text-coral hover:underline">
+            <div className="sticky bottom-0 border-t border-black/[0.06] bg-white px-4 py-3 text-center sm:static sm:shrink-0">
+              <Link href={`/assinar?from=/p/${slug}`} className="text-[13px] font-medium text-[#0a84ff] hover:underline">
                 Assine para comentar
               </Link>
             </div>
           ) : (
-            <div className="sticky bottom-0 border-t border-line bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href={`/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`} className="text-xs font-semibold text-coral hover:underline">
+            <div className="sticky bottom-0 border-t border-black/[0.06] bg-white px-4 py-3 text-center sm:static sm:shrink-0">
+              <Link href={`/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`} className="text-[13px] font-medium text-[#0a84ff] hover:underline">
                 Entre para curtir e comentar
               </Link>
             </div>
@@ -417,21 +417,21 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
 
   return (
     <div className="mb-10">
-      <div className="flex border-b border-line">
+      <div className="flex gap-1 border-b border-black/[0.06] pt-4">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => switchTab(t.key)}
             className={cn(
-              "relative flex items-center gap-1.5 px-5 py-3 text-xs font-semibold uppercase tracking-wider transition",
+              "relative flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-[12px] font-semibold uppercase tracking-wider transition-colors",
               tab === t.key
-                ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-coral"
+                ? "text-foreground bg-white border border-black/[0.06] border-b-white -mb-px"
                 : "text-muted hover:text-foreground",
             )}
           >
             {t.label}
             {t.count !== null && (
-              <span className={cn("rounded px-1.5 py-0.5 text-[10px]", tab === t.key ? "bg-coral/10 text-coral" : "bg-line text-muted")}>
+              <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold", tab === t.key ? "bg-coral/10 text-coral" : "bg-black/[0.04] text-muted")}>
                 {t.count}
               </span>
             )}
@@ -441,13 +441,13 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
 
       {activeItems.length === 0 ? (
         <div className="flex min-h-[200px] items-center justify-center">
-          <p className="text-sm text-muted">
+          <p className="text-[14px] text-muted">
             {tab === "videos" ? "Nenhum vídeo publicado." : "Nenhuma foto publicada."}
           </p>
         </div>
       ) : (
         <div className="pb-6">
-          <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
+          <div className="grid grid-cols-3 gap-1 mt-4 rounded-xl overflow-hidden">
             {displayed.map((m, i) => {
               const isPrivate = !m.isPublic;
               const locked = isPrivate && !isSubscriber;

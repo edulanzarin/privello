@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toggleOnlineStatus } from "@/app/painel/_actions/provider-settings";
+import { cn } from "@/lib/utils";
 
 export function OnlineToggle({ initialOnline }: { initialOnline: boolean }) {
   const [online, setOnline] = useState(initialOnline);
@@ -19,14 +20,15 @@ export function OnlineToggle({ initialOnline }: { initialOnline: boolean }) {
       type="button"
       onClick={handleToggle}
       disabled={pending}
-      title={online ? "Clique para pausar o perfil" : "Clique para ficar online"}
-      className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
+      title={online ? "Clique para pausar" : "Clique para ficar online"}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-3.5 py-[6px] text-[12px] font-medium transition-all active:scale-[0.97] disabled:opacity-50",
         online
-          ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
-          : "border-line bg-white text-muted hover:border-foreground/30 hover:text-foreground"
-      }`}
+          ? "bg-[#30d158]/12 text-[#248a3d]"
+          : "bg-black/[0.04] text-muted hover:bg-black/[0.06]",
+      )}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${online ? "bg-success" : "bg-muted"}`} />
+      <span className={cn("h-[6px] w-[6px] rounded-full", online ? "bg-[#30d158]" : "bg-muted")} />
       {online ? "Online" : "Pausado"}
     </button>
   );

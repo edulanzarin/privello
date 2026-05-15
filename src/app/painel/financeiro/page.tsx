@@ -7,6 +7,11 @@ import { formatBrl } from "@/lib/money";
 import { listFinancialRecordsForMonth } from "@/lib/queries";
 import { addFinancialRecord } from "@/app/painel/_actions/provider-settings";
 import { FinancialTable } from "./financial-table";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { StatCard } from "@/components/ui/stat-card";
 
 export const dynamic = "force-dynamic";
 
@@ -26,33 +31,32 @@ export default async function PainelFinanceiroPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
         <Diamond className="h-10 w-10 text-coral" strokeWidth={1} />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Gestão financeira</h1>
-          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Disponível no plano <strong>Premium</strong>. Acompanhe faturamento, ticket médio, histórico
+          <h1 className="text-[22px] font-semibold tracking-tight">Gestão financeira</h1>
+          <p className="mx-auto mt-3 max-w-sm text-[14px] leading-relaxed text-muted">
+            Disponível no plano <strong className="text-foreground">Premium</strong>. Acompanhe faturamento, ticket médio, histórico
             completo e registre cada encontro com privacidade total.
           </p>
         </div>
-        <Link
-          href="/painel/plano"
-          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition"
-        >
-          Fazer upgrade para Premium
+        <Link href="/painel/plano">
+          <Button variant="coral" size="lg" className="uppercase tracking-wider">
+            Fazer upgrade para Premium
+          </Button>
         </Link>
-        <p className="text-xs text-muted">Sem fidelidade. Cancele quando quiser.</p>
+        <p className="text-[12px] text-muted">Sem fidelidade. Cancele quando quiser.</p>
       </div>
     );
   }
 
-  const now    = new Date();
-  const year   = now.getFullYear();
-  const month  = now.getMonth() + 1;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
 
   const rows = await listFinancialRecordsForMonth(profile.id, year, month);
 
-  const total  = rows.reduce((a, r) => a + r.amountBrl, 0);
-  const paid   = rows.filter((r) => !r.isNoShow);
+  const total = rows.reduce((a, r) => a + r.amountBrl, 0);
+  const paid = rows.filter((r) => !r.isNoShow);
   const noshow = rows.filter((r) => r.isNoShow).length;
-  const avg    = paid.length > 0 ? Math.round(paid.reduce((a, r) => a + r.amountBrl, 0) / paid.length) : 0;
+  const avg = paid.length > 0 ? Math.round(paid.reduce((a, r) => a + r.amountBrl, 0) / paid.length) : 0;
 
   const monthName = now.toLocaleDateString("pt-BR", { month: "long" });
 
@@ -61,129 +65,116 @@ export default async function PainelFinanceiroPage() {
       {/* Header + form */}
       <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">Financeiro</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight capitalize">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Financeiro</p>
+          <h1 className="mt-1 text-[22px] font-semibold tracking-tight capitalize">
             {monthName} {year}
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-[14px] text-muted">
             {rows.length} {rows.length === 1 ? "registro" : "registros"} · apenas você vê isso
           </p>
         </div>
 
         {/* Add form */}
-        <div className="border border-line bg-white p-5 xl:w-[420px] shrink-0">
-          <p className="text-xs font-bold uppercase tracking-wider mb-4">+ Registrar encontro</p>
+        <Card variant="solid" padding="md" className="xl:w-[420px] shrink-0">
+          <p className="text-[13px] font-semibold tracking-tight mb-4">+ Registrar encontro</p>
           <form action={addFinancialRecord} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Cliente</label>
-                <input
+                <Input
                   name="clientLabel"
                   required
+                  label="Cliente"
                   placeholder="Nome ou iniciais"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Valor (R$)</label>
-                <input
+                <Input
                   name="amountBrl"
                   type="number"
                   required
                   min={1}
+                  label="Valor (R$)"
                   placeholder="500"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Duração</label>
-                <select
+                <Select
                   name="durationLabel"
+                  label="Duração"
                   defaultValue="2 horas"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white"
-                >
-                  <option>30 minutos</option>
-                  <option>1 hora</option>
-                  <option>1h30</option>
-                  <option>2 horas</option>
-                  <option>3 horas</option>
-                  <option>4 horas</option>
-                  <option>Pernoite</option>
-                  <option>Diária</option>
-                </select>
+                  options={[
+                    { value: "30 minutos", label: "30 minutos" },
+                    { value: "1 hora", label: "1 hora" },
+                    { value: "1h30", label: "1h30" },
+                    { value: "2 horas", label: "2 horas" },
+                    { value: "3 horas", label: "3 horas" },
+                    { value: "4 horas", label: "4 horas" },
+                    { value: "Pernoite", label: "Pernoite" },
+                    { value: "Diária", label: "Diária" },
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Local</label>
-                <select
+                <Select
                   name="locationLabel"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white"
-                >
-                  <option>Local próprio</option>
-                  <option>A domicílio</option>
-                  <option>Motel / hotel</option>
-                </select>
+                  label="Local"
+                  options={[
+                    { value: "Local próprio", label: "Local próprio" },
+                    { value: "A domicílio", label: "A domicílio" },
+                    { value: "Motel / hotel", label: "Motel / hotel" },
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Pagamento</label>
-                <select
+                <Select
                   name="paymentLabel"
-                  className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground cursor-pointer bg-white"
-                >
-                  <option>Pix</option>
-                  <option>Dinheiro</option>
-                  <option>Cartão</option>
-                  <option>Pix · Dinheiro</option>
-                </select>
+                  label="Pagamento"
+                  options={[
+                    { value: "Pix", label: "Pix" },
+                    { value: "Dinheiro", label: "Dinheiro" },
+                    { value: "Cartão", label: "Cartão" },
+                    { value: "Pix · Dinheiro", label: "Pix · Dinheiro" },
+                  ]}
+                />
               </div>
               <div className="flex items-end pb-1">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" name="isNoShow" className="h-4 w-4 accent-coral" />
+                <label className="flex items-center gap-2 text-[13px] cursor-pointer">
+                  <input type="checkbox" name="isNoShow" className="h-4 w-4 accent-coral rounded" />
                   No-show
                 </label>
               </div>
             </div>
-            <button
-              type="submit"
-              className="w-full bg-coral py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition"
-            >
+            <Button type="submit" variant="coral" className="w-full uppercase tracking-wider">
               Registrar
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          ["Faturamento", formatBrl(total), `em ${monthName}`],
-          ["Encontros realizados", String(paid.length), "este mês"],
-          ["Ticket médio", avg > 0 ? formatBrl(avg) : "—", "por encontro"],
-          ["No-shows", String(noshow), "este mês"],
-        ].map(([t, v, s]) => (
-          <div key={t as string} className="border border-line bg-white p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">{t}</p>
-            <p className="mt-2 text-2xl font-bold tabular-nums">{v}</p>
-            <p className="mt-1 text-xs text-muted">{s}</p>
-          </div>
-        ))}
+        <StatCard label="Faturamento" value={formatBrl(total)} subtitle={`em ${monthName}`} />
+        <StatCard label="Encontros realizados" value={String(paid.length)} subtitle="este mês" />
+        <StatCard label="Ticket médio" value={avg > 0 ? formatBrl(avg) : "—"} subtitle="por encontro" />
+        <StatCard label="No-shows" value={String(noshow)} subtitle="este mês" />
       </div>
 
       {/* Table */}
-      <div className="border border-line bg-white">
-        <div className="border-b border-line px-4 py-3 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+      <Card variant="solid" padding="none">
+        <div className="border-b border-black/[0.06] px-5 py-4 flex items-center justify-between">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">
             Registros · {rows.length} {rows.length === 1 ? "encontro" : "encontros"} · {formatBrl(total)} total
           </p>
-          <p className="text-[10px] text-muted">Passe o mouse para editar ou excluir</p>
+          <p className="text-[11px] text-muted">Passe o mouse para editar ou excluir</p>
         </div>
         {rows.length === 0 ? (
-          <p className="px-4 py-10 text-center text-sm text-muted">
+          <p className="px-5 py-10 text-center text-[14px] text-muted">
             Nenhum registro este mês. Use o formulário acima para registrar um encontro.
           </p>
         ) : (
           <FinancialTable rows={rows} />
         )}
-      </div>
+      </Card>
     </div>
   );
 }
