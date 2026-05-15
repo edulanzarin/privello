@@ -54,7 +54,7 @@ export function PhotoUploader({ isPublic }: Props) {
           ? <Loader2 className="h-6 w-6 animate-spin" strokeWidth={1.5} />
           : <ImagePlus className="h-6 w-6" strokeWidth={1.25} />
         }
-        <span className="text-[10px] font-semibold uppercase tracking-wider">
+        <span className="text-[11px] font-semibold">
           {uploading ? "Enviando…" : "Adicionar"}
         </span>
       </button>

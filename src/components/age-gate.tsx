@@ -45,13 +45,13 @@ export function AgeGate() {
         <button
           type="button"
           onClick={confirm}
-          className="bg-coral py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90"
+          className="rounded-full bg-coral py-3.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Tenho 18 anos — Entrar
         </button>
         <a
           href="https://www.google.com"
-          className="border border-white/15 py-3 text-sm font-semibold text-white/50 transition hover:border-white/30 hover:text-white/70"
+          className="rounded-full border border-white/15 py-3 text-sm font-semibold text-white/50 transition hover:border-white/30 hover:text-white/70"
         >
           Sou menor de idade — Sair
         </a>

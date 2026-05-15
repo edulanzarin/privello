@@ -52,7 +52,7 @@ export default async function EmAltaPage() {
               </p>
               <Link
                 href="/descobrir/sao-paulo-sp"
-                className="mt-6 inline-block border border-foreground px-6 py-2.5 text-xs font-semibold uppercase tracking-wider"
+                className="mt-6 inline-block rounded-lg border border-foreground px-6 py-2.5 text-xs font-semibold"
               >
                 Explorar perfis
               </Link>

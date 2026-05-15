@@ -10,7 +10,7 @@ import { formatBrl } from "@/lib/money";
 export const dynamic = "force-dynamic";
 
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────────
-function BarChart({ data, color = "#c8102e" }: { data: number[]; color?: string }) {
+function BarChart({ data, color = "#ff375f" }: { data: number[]; color?: string }) {
   const max = Math.max(...data, 1);
   const n = data.length;
   const slotW = 100 / n;
@@ -37,7 +37,7 @@ function BarChart({ data, color = "#c8102e" }: { data: number[]; color?: string 
 }
 
 // ── Sparkline ─────────────────────────────────────────────────────────────────
-function Sparkline({ data, color = "#c8102e" }: { data: number[]; color?: string }) {
+function Sparkline({ data, color = "#86868b" }: { data: number[]; color?: string }) {
   if (data.length < 2) return null;
   const max = Math.max(...data, 1);
   const pts = data

@@ -37,7 +37,7 @@ export default async function PainelStoriesPage() {
           </p>
         </div>
         <Link href="/painel/plano"
-          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition">
+          className="rounded-full bg-coral px-8 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition">
           Fazer upgrade
         </Link>
       </div>

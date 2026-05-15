@@ -52,7 +52,7 @@ export function ProfileSection({ type, initialProfiles, initialHasMore, viewAllH
         </div>
         <Link
           href={viewAllHref}
-          className="text-xs font-semibold uppercase tracking-wider text-foreground hover:text-coral transition"
+          className="text-xs font-semibold text-foreground hover:text-coral transition"
         >
           Ver todas →
         </Link>

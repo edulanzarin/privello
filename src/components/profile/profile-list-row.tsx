@@ -58,7 +58,7 @@ export function ProfileListRow({ profile, className }: { profile: ProfileCardPay
         <Image src={imageUrl} alt="" fill className="object-cover" sizes="96px" />
         {/* Plan / boost badge on photo */}
         <div className={cn(
-          "absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+          "absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 py-0.5 text-[9px] font-bold",
           plan.badgeBg, plan.badgeText,
         )}>
           {plan.badgeLabel}

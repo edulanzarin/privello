@@ -11,6 +11,7 @@ import { LogoutButton } from "@/components/painel/logout-button";
 import { logoutAction } from "@/app/_actions/logout";
 import { useTransition } from "react";
 import { cn } from "@/lib/utils";
+import { Avatar } from "@/components/ui/avatar";
 
 type NavItem =
   | { type: "link"; href: string; label: string; icon: typeof LayoutDashboard; badge?: string }
@@ -52,13 +53,14 @@ function buildItems(slug: string, planTier?: string): NavItem[] {
 }
 
 function NavContent({
-  navItems, pathname, displayName, planTier, handle, onClose,
+  navItems, pathname, displayName, planTier, handle, avatarUrl, onClose,
 }: {
   navItems: NavItem[];
   pathname: string;
   displayName: string;
   planTier?: string;
   handle?: string;
+  avatarUrl?: string | null;
   onClose?: () => void;
 }) {
   const [logoutPending, startLogout] = useTransition();
@@ -148,7 +150,7 @@ function NavContent({
       </div>
 
       <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
-        <div className="h-8 w-8 shrink-0 rounded-full bg-white/10" />
+        <Avatar src={avatarUrl} fallback={displayName} size="sm" className="shrink-0 bg-white/10 text-white/60" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">{displayName}</p>
           {handle && <p className="truncate text-[11px] text-white/40">@{handle}</p>}
@@ -160,9 +162,9 @@ function NavContent({
 }
 
 export function PainelSidebar({
-  displayName, profileSlug, planTier, handle,
+  displayName, profileSlug, planTier, handle, avatarUrl,
 }: {
-  displayName: string; profileSlug: string; planTier?: string; handle?: string;
+  displayName: string; profileSlug: string; planTier?: string; handle?: string; avatarUrl?: string | null;
 }) {
   const pathname = usePathname();
   const navItems = buildItems(profileSlug, planTier);
@@ -171,7 +173,7 @@ export function PainelSidebar({
   return (
     <>
       {/* ── Desktop sidebar (md+) ── */}
-      <aside className="hidden md:flex md:fixed md:left-0 md:top-0 md:h-screen md:w-56 md:flex-col md:overflow-y-auto border-r border-white/10 bg-sidebar px-4 py-6 text-white">
+      <aside className="hidden md:flex md:fixed md:left-0 md:top-0 md:h-screen md:w-56 md:flex-col md:overflow-y-auto border-r border-white/10 bg-sidebar px-4 py-6 pb-16 text-white">
         <Link href="/" className="text-lg font-black tracking-tight">
           privello<span className="text-coral">.</span>
         </Link>
@@ -181,6 +183,7 @@ export function PainelSidebar({
           displayName={displayName}
           planTier={planTier}
           handle={handle}
+          avatarUrl={avatarUrl}
         />
       </aside>
 
@@ -213,7 +216,7 @@ export function PainelSidebar({
 
           {/* Drawer */}
           <aside
-            className="relative flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-sidebar px-4 py-6 text-white"
+            className="relative flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-sidebar px-4 py-6 pb-20 text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -234,6 +237,7 @@ export function PainelSidebar({
               displayName={displayName}
               planTier={planTier}
               handle={handle}
+              avatarUrl={avatarUrl}
               onClose={() => setOpen(false)}
             />
           </aside>

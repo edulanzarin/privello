@@ -69,27 +69,28 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
     });
   }
 
-  const inputCls = "w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground transition";
-  const selectCls = "w-full border border-line bg-white px-4 py-3 text-sm outline-none focus:border-foreground transition cursor-pointer";
-  const labelCls = "block text-xs font-semibold uppercase tracking-wider text-muted mb-2";
+  const inputCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
+  const selectCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer";
+  const labelCls = "block text-[13px] font-medium text-foreground mb-1.5";
   const sectionCls = "space-y-2";
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">
       {error && (
-        <div className="border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
+        <div className="rounded-xl border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
           {error}
         </div>
       )}
 
       {/* ── Localização e contato ── */}
-      <div className="border border-line bg-white p-6 space-y-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Localização e contato</p>
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
+        <p className="text-[14px] font-semibold">Localização e contato</p>
 
         <div className={sectionCls}>
           <span className={labelCls}>Cidade onde atende <span className="text-coral">*</span></span>
-          <div className="border border-line">
+          <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-[#0a84ff] focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
             <CityAutocomplete
+              compact
               initialLabel={cityName}
               onSelect={(slug, lbl) => { setSelectedCitySlug(slug); setSelectedCityLabel(lbl); }}
             />
@@ -109,8 +110,8 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
       </div>
 
       {/* ── Apresentação ── */}
-      <div className="border border-line bg-white p-6 space-y-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Apresentação</p>
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
+        <p className="text-[14px] font-semibold">Apresentação</p>
 
         <div className={sectionCls}>
           <label className={labelCls}>Frase de destaque <span className="text-muted font-normal normal-case">(aparece no topo do perfil)</span></label>
@@ -138,8 +139,8 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
       </div>
 
       {/* ── Características físicas ── */}
-      <div className="border border-line bg-white p-6 space-y-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Características físicas</p>
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
+        <p className="text-[14px] font-semibold">Características físicas</p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className={sectionCls}>
@@ -191,7 +192,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
                 key={lang.value}
                 type="button"
                 onClick={() => toggleLang(lang.value)}
-                className={`border px-3 py-1.5 text-xs font-semibold transition ${
+                className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
                   selectedLangs.includes(lang.value)
                     ? "border-foreground bg-foreground text-white"
                     : "border-line bg-white text-muted hover:border-foreground/30"
@@ -208,8 +209,8 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
       </div>
 
       {/* ── Atendimento ── */}
-      <div className="border border-line bg-white p-6 space-y-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Atendimento</p>
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
+        <p className="text-[14px] font-semibold">Atendimento</p>
 
         <div className={sectionCls}>
           <label className={labelCls}>Atende a</label>
@@ -219,7 +220,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
               { name: "servesWomen",   label: "Mulheres", checked: profile.servesWomen },
               { name: "servesCouples", label: "Casais",  checked: profile.servesCouples },
             ].map((opt) => (
-              <label key={opt.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
+              <label key={opt.name} className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
                 <input type="checkbox" name={opt.name} defaultChecked={opt.checked} className="hidden" />
                 {opt.label}
               </label>
@@ -236,7 +237,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
               { name: "travelsNational",       label: "Viagens nacionais",   checked: profile.travelsNational },
               { name: "travelsInternational",  label: "Viagens internacionais", checked: profile.travelsInternational },
             ].map((opt) => (
-              <label key={opt.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
+              <label key={opt.name} className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
                 <input type="checkbox" name={opt.name} defaultChecked={opt.checked} className="hidden" />
                 {opt.label}
               </label>
@@ -250,7 +251,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
         <button
           type="submit"
           disabled={pending || selectedLangs.length === 0}
-          className="bg-coral px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50"
+          className="rounded-lg bg-coral px-8 py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
         >
           {pending ? "Salvando…" : "Continuar →"}
         </button>

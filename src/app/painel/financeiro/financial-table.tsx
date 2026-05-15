@@ -31,9 +31,9 @@ function originBadge(origin: FinancialOrigin) {
   }
 }
 
-const inp = "w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground bg-white";
+const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
 const sel = `${inp} cursor-pointer`;
-const lbl = "block text-[10px] font-semibold uppercase text-muted mb-1";
+const lbl = "block text-[13px] font-medium text-foreground mb-1.5";
 
 export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[700px] text-left text-sm">
         <thead>
-          <tr className="border-b border-line text-[10px] font-semibold uppercase tracking-wider text-muted">
+          <tr className="border-b border-line text-[10px] font-semibold text-muted">
             <th className="px-4 py-3">Data</th>
             <th className="px-4 py-3">Cliente</th>
             <th className="px-4 py-3">Duração</th>
@@ -157,13 +157,13 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
                           <button
                             type="button"
                             onClick={() => setEditingId(null)}
-                            className="flex items-center gap-1.5 border border-line px-4 py-2 text-xs font-semibold text-muted hover:text-foreground transition"
+                            className="flex items-center gap-1.5 rounded-lg border border-line px-4 py-2 text-xs font-semibold text-muted hover:text-foreground transition"
                           >
                             <X className="h-3.5 w-3.5" /> Cancelar
                           </button>
                           <button
                             type="submit"
-                            className="flex items-center gap-1.5 bg-foreground px-4 py-2 text-xs font-semibold text-white hover:bg-foreground/80 transition"
+                            className="flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-xs font-semibold text-white hover:bg-foreground/80 transition"
                           >
                             <Check className="h-3.5 w-3.5" /> Salvar
                           </button>

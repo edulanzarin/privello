@@ -63,7 +63,7 @@ function MediaGrid({
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8">
         {items.map((m) => (
           <div key={m.id} className={cn(
-            "group relative aspect-square overflow-hidden border-2",
+            "group relative aspect-square overflow-hidden rounded-xl border-2",
             m.isCover ? "border-coral" : "border-line",
           )}>
             {isVideo(m.url, m.mediaType) ? (
@@ -92,7 +92,7 @@ function MediaGrid({
           onChange={(e) => onUpload(e.target.files)} />
         <button type="button" onClick={() => ref.current?.click()} disabled={uploading}
           className={cn(
-            "flex aspect-square flex-col items-center justify-center gap-2 border-2 border-dashed bg-white text-muted transition disabled:opacity-50",
+            "flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-white text-muted transition disabled:opacity-50",
             isPrivate ? "border-line hover:border-foreground hover:text-foreground" : "border-line hover:border-coral hover:text-coral",
           )}>
           {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" strokeWidth={1.25} />}
@@ -158,7 +158,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
               type="button"
               onClick={() => setActiveTab(t.key)}
               className={cn(
-                "flex shrink-0 items-center gap-2 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider transition",
+                "flex shrink-0 items-center gap-2 px-5 py-3.5 text-xs font-semibold transition",
                 activeTab === t.key
                   ? "border-b-2 border-coral text-foreground"
                   : "text-muted hover:text-foreground",
@@ -176,7 +176,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {activeTab === "fotos" && (
           <>
             <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted">Fotos públicas · {pubImages.length}</p>
+              <p className="mb-1 text-xs font-medium text-muted">Fotos públicas · {pubImages.length}</p>
               <p className="mb-3 text-xs text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
               <MediaGrid
                 items={pubImages}
@@ -189,7 +189,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
               />
             </div>
             <div className="border-t border-line pt-5">
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Galeria privada · {privatePhotos.length}</p>
+              <p className="mb-3 text-xs font-medium text-muted">Galeria privada · {privatePhotos.length}</p>
               <MediaGrid
                 items={privatePhotos}
                 onRemove={handleRemove}
@@ -206,7 +206,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {/* ── Vídeos ── */}
         {activeTab === "videos" && (
           <div>
-            <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted">Vídeos públicos · {pubVideos.length}</p>
+            <p className="mb-1 text-xs font-medium text-muted">Vídeos públicos · {pubVideos.length}</p>
             <p className="mb-3 text-xs text-muted">Vídeos curtos do seu perfil. Formatos: MP4, WebM, MOV.</p>
             <MediaGrid
               items={pubVideos}
@@ -222,7 +222,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {/* ── Reels ── */}
         {activeTab === "reels" && (
           <div>
-            <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted">Reels · {pubReels.length}</p>
+            <p className="mb-1 text-xs font-medium text-muted">Reels · {pubReels.length}</p>
             <p className="mb-3 text-xs text-muted">Vídeos verticais curtos (até 60s). Aparecem na aba Reels da plataforma.</p>
             <MediaGrid
               items={pubReels}
@@ -246,7 +246,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
             ) : (
               <>
                 <div>
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">
+                  <p className="mb-3 text-xs font-medium text-muted">
                     Stories ativos · {activeStories.length}
                   </p>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
@@ -281,20 +281,20 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
 
                 {/* Post new story */}
                 <div className="border-t border-line pt-5">
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Publicar story</p>
+                  <p className="mb-3 text-xs font-medium text-muted">Publicar story</p>
                   <form action={createStory} className="space-y-3 max-w-sm">
                     <div>
-                      <label className="block text-[10px] font-semibold uppercase text-muted mb-1">URL da imagem / vídeo</label>
+                      <label className="block text-[13px] font-medium text-foreground mb-1.5">URL da imagem / vídeo</label>
                       <input name="mediaUrl" required placeholder="https://..."
-                        className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-semibold uppercase text-muted mb-1">Legenda (opcional)</label>
+                      <label className="block text-[13px] font-medium text-foreground mb-1.5">Legenda (opcional)</label>
                       <input name="caption" placeholder="Uma frase..." maxLength={150}
-                        className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground" />
+                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <button type="submit" disabled={storyPending}
-                      className="bg-coral px-5 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-coral/90 transition disabled:opacity-50">
+                      className="rounded-lg bg-coral px-5 py-2.5 text-[13px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition disabled:opacity-50">
                       Publicar (24h)
                     </button>
                   </form>

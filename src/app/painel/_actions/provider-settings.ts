@@ -44,7 +44,7 @@ export async function saveAvailabilityWindows(formData: FormData) {
   const rows: { weekday: number; startTime: string; endTime: string; status: string }[] = [];
 
   for (let weekday = 0; weekday <= 6; weekday++) {
-    const closed = formData.get(`wd_${weekday}_closed`) === "on";
+    const closed = formData.get(`wd_${weekday}_open`) !== "on";
     const start = String(formData.get(`wd_${weekday}_start`) ?? "09:00").trim();
     const end   = String(formData.get(`wd_${weekday}_end`)   ?? "18:00").trim();
     if (closed) {

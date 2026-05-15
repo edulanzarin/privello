@@ -14,7 +14,17 @@ export default async function PainelLayout({ children }: { children: React.React
   // Clients don't have a provider profile — redirect them to home
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
-    select: { displayName: true, slug: true, planTier: true },
+    select: {
+      displayName: true,
+      slug: true,
+      planTier: true,
+      media: {
+        where: { isPublic: true },
+        orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }],
+        take: 1,
+        select: { url: true },
+      },
+    },
   });
   if (!profile) redirect("/");
 
@@ -29,9 +39,9 @@ export default async function PainelLayout({ children }: { children: React.React
     <ToastProvider>
       <ProviderHeartbeat />
       <div className="min-h-screen bg-background text-foreground">
-        <PainelSidebar displayName={displayName} profileSlug={profileSlug} planTier={profile.planTier} handle={profile.slug || undefined} />
+        <PainelSidebar displayName={displayName} profileSlug={profileSlug} planTier={profile.planTier} handle={profile.slug || undefined} avatarUrl={profile.media[0]?.url ?? null} />
         <div className="pt-14 md:pl-56 md:pt-0">
-          <div className="px-4 py-8 sm:px-6 lg:px-8">{children}</div>
+          <div className="px-4 py-8 pb-20 sm:px-6 lg:px-8">{children}</div>
         </div>
       </div>
     </ToastProvider>

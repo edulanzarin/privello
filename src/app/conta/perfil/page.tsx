@@ -161,7 +161,7 @@ export default async function ClientPerfilPage() {
         <section className="mt-10">
           <div className="flex items-center gap-2 mb-5">
             <Heart className="h-4 w-4 fill-coral text-coral" strokeWidth={0} />
-            <h2 className="text-sm font-bold uppercase tracking-wider">
+            <h2 className="text-sm font-semibold">
               Curtidos · {active.length}
             </h2>
           </div>

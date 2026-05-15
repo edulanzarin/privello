@@ -71,19 +71,19 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-bold text-lg">Perfis <span className="text-muted font-normal text-sm">({total})</span></h1>
         <form method="get" action="/admin/perfis" className="flex flex-wrap gap-2">
-          <input name="q" defaultValue={q} placeholder="Nome ou @handle…" className="border border-line px-2.5 py-1.5 text-xs outline-none focus:border-foreground/40 w-44" />
-          <select name="plan" defaultValue={planFilter} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <input name="q" defaultValue={q} placeholder="Nome ou @handle…" className="rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none w-44 hover:border-black/20 focus:border-[#0a84ff] transition-all" />
+          <select name="plan" defaultValue={planFilter} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all">
             <option value="">Todos os planos</option>
             <option value="PREMIUM">Premium</option>
             <option value="DESTAQUE">Plus</option>
             <option value="ESSENCIAL">Basic</option>
           </select>
-          <select name="verified" defaultValue={verifiedFilter} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <select name="verified" defaultValue={verifiedFilter} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all">
             <option value="">Verificação</option>
             <option value="1">Verificadas</option>
             <option value="0">Não verificadas</option>
           </select>
-          <select name="city" defaultValue={cityFilter} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <select name="city" defaultValue={cityFilter} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all">
             <option value="">Todas as cidades</option>
             {cities.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
           </select>

@@ -15,13 +15,13 @@ export default function NotFound() {
         <div className="mt-8 flex gap-3">
           <Link
             href="/buscar"
-            className="bg-foreground px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-foreground/80 transition"
+            className="rounded-lg bg-foreground px-5 py-2.5 text-[13px] font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
           >
             Buscar acompanhantes
           </Link>
           <Link
             href="/"
-            className="border border-line px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground hover:bg-line transition"
+            className="rounded-lg border border-line px-5 py-2.5 text-[13px] font-semibold text-foreground hover:bg-line active:scale-[0.97] transition"
           >
             Início
           </Link>

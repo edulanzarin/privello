@@ -131,10 +131,10 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
   }, []);
 
   return (
-    <div ref={containerRef} className="relative flex items-center gap-3 bg-white px-4 py-3 text-left">
+    <div ref={containerRef} className={`relative flex items-center gap-3 bg-white text-left ${compact ? "px-3 py-[7px]" : "px-4 py-3"}`}>
       {!compact && <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />}
       <span className="w-full">
-        {!compact && <span className="block text-[10px] font-medium uppercase tracking-wider text-muted">Cidade</span>}
+        {!compact && <span className="block text-[11px] font-medium text-muted">Cidade</span>}
         <input
           type="text"
           value={query}
@@ -143,7 +143,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
           placeholder={compact ? "Trocar cidade…" : "Ex: São Paulo, SP…"}
           autoComplete="off"
           className={compact
-            ? "w-full border-0 bg-transparent p-0 text-[13px] font-semibold outline-none placeholder:font-normal placeholder:text-muted/60"
+            ? "w-full border-0 bg-transparent p-0 text-[14px] text-foreground outline-none placeholder:text-muted/60"
             : "mt-0.5 w-full border-0 bg-transparent p-0 text-[14px] font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
           }
         />

@@ -13,9 +13,9 @@ const statusLabel: Record<string, string> = {
   CLOSED: "Fechado",
 };
 const statusClass: Record<string, string> = {
-  OPEN: "bg-sky-100 text-sky-900",
-  IN_PROGRESS: "bg-amber-100 text-amber-900",
-  CLOSED: "bg-zinc-100 text-zinc-600",
+  OPEN: "bg-[#0a84ff]/10 text-[#0a84ff]",
+  IN_PROGRESS: "bg-[#ff9500]/10 text-[#b36200]",
+  CLOSED: "bg-black/[0.06] text-muted",
 };
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -46,21 +46,24 @@ export default async function TicketDetailPage({ params }: PageProps) {
   }));
 
   return (
-    <div className="space-y-4">
-      <Link href="/painel/suporte" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition">
-        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+    <div className="space-y-4 max-w-xl mx-auto">
+      <Link
+        href="/painel/suporte"
+        className="inline-flex items-center gap-1.5 text-[13px] text-muted transition hover:text-foreground"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
         Todos os chamados
       </Link>
 
-      <div className="border border-line bg-white">
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+      <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center justify-between border-b border-black/[0.06] px-5 py-4">
           <div>
-            <p className="font-semibold">{ticket.subject}</p>
-            <p className="text-xs text-muted">
+            <p className="text-[14px] font-semibold">{ticket.subject}</p>
+            <p className="mt-0.5 text-[12px] text-muted">
               Aberto em {new Date(ticket.createdAt).toLocaleDateString("pt-BR")}
             </p>
           </div>
-          <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${statusClass[ticket.status]}`}>
+          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusClass[ticket.status]}`}>
             {statusLabel[ticket.status]}
           </span>
         </div>

@@ -149,7 +149,7 @@ export default function ContaVerificacaoPage() {
               Identidade em análise
             </div>
           </div>
-          <Link href="/painel" className="mt-4 bg-foreground px-10 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-foreground/80 transition">
+          <Link href="/painel" className="mt-4 rounded-lg bg-foreground px-10 py-3 text-[13px] font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition">
             Voltar ao painel
           </Link>
         </main>
@@ -289,7 +289,7 @@ export default function ContaVerificacaoPage() {
                       <button
                         type="button"
                         onClick={() => inputRefs.current[field.key]?.click()}
-                        className="mt-4 flex w-full items-center justify-center gap-2 border border-line bg-zinc-50 py-3 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-line transition"
+                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-zinc-50 py-3 text-xs font-semibold text-foreground hover:bg-line transition"
                       >
                         <Upload className="h-3.5 w-3.5" strokeWidth={1.5} />
                         {field.accept.startsWith("video") ? "Enviar vídeo" : "Enviar foto"}
@@ -336,12 +336,12 @@ export default function ContaVerificacaoPage() {
         <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-2">
             {step > 1 && (
-              <button onClick={() => setStep(step - 1)} className="border border-line bg-white px-5 py-2.5 text-sm font-medium hover:bg-line transition">
+              <button onClick={() => setStep(step - 1)} className="rounded-lg border border-black/10 bg-white px-5 py-2.5 text-sm font-medium hover:bg-black/[0.03] active:scale-[0.97] transition">
                 ← Voltar
               </button>
             )}
             {step === 1 && (
-              <Link href="/painel" className="border border-line bg-white px-5 py-2.5 text-sm font-medium text-center hover:bg-line transition">
+              <Link href="/painel" className="rounded-lg border border-black/10 bg-white px-5 py-2.5 text-sm font-medium text-center hover:bg-black/[0.03] active:scale-[0.97] transition">
                 Cancelar
               </Link>
             )}
@@ -352,7 +352,7 @@ export default function ContaVerificacaoPage() {
               <button
                 onClick={() => setStep(step + 1)}
                 disabled={!stepDone(currentStep)}
-                className="flex items-center gap-2 bg-foreground px-8 py-2.5 text-sm font-semibold text-white hover:bg-foreground/80 transition disabled:opacity-40"
+                className="flex items-center gap-2 rounded-lg bg-foreground px-8 py-2.5 text-sm font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition disabled:opacity-40"
               >
                 Próximo <ChevronRight className="h-4 w-4" strokeWidth={2} />
               </button>
@@ -360,7 +360,7 @@ export default function ContaVerificacaoPage() {
               <button
                 onClick={handleSubmit}
                 disabled={!requiredDone || pending}
-                className="flex items-center gap-2 bg-foreground px-8 py-2.5 text-sm font-semibold text-white hover:bg-foreground/80 transition disabled:opacity-40"
+                className="flex items-center gap-2 rounded-lg bg-foreground px-8 py-2.5 text-sm font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition disabled:opacity-40"
               >
                 {pending ? "Enviando…" : "Enviar para revisão"}
                 {!pending && <CheckCircle className="h-4 w-4" strokeWidth={2} />}

@@ -32,11 +32,13 @@ export default async function PainelPerfilPage() {
           Alterações são salvas imediatamente e refletem no seu anúncio público.
         </p>
       </div>
-      <PerfilEditor
-        profile={profile}
-        cityName={profile.city ? `${profile.city.name}, ${profile.city.slug.split("-").pop()?.toUpperCase()}` : ""}
-        citySlug={profile.city?.slug ?? ""}
-      />
+      <div className="max-w-xl mx-auto">
+        <PerfilEditor
+          profile={profile}
+          cityName={profile.city?.name ?? ""}
+          citySlug={profile.city?.slug ?? ""}
+        />
+      </div>
     </div>
   );
 }

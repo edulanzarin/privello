@@ -104,18 +104,18 @@ export function TicketChat({
             placeholder="Escreva sua mensagem… (Enter para enviar)"
             rows={2}
             maxLength={2000}
-            className="flex-1 resize-none rounded-lg border border-line bg-background px-3 py-2 text-sm outline-none focus:border-foreground/40"
+            className="flex-1 resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-[14px] text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <button
             onClick={handleSend}
             disabled={!text.trim() || isPending}
-            className="shrink-0 rounded-lg bg-foreground p-2.5 text-white disabled:opacity-40 hover:bg-foreground/80 transition"
+            className="shrink-0 rounded-xl bg-foreground p-2.5 text-white transition hover:bg-foreground/80 active:scale-[0.97] disabled:opacity-40"
           >
             <Send className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
       ) : (
-        <div className="border-t border-line px-4 py-3 text-center text-xs text-muted">
+        <div className="border-t border-black/[0.06] px-4 py-3 text-center text-[13px] text-muted">
           Ticket fechado.
         </div>
       )}

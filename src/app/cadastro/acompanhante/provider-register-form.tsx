@@ -224,7 +224,7 @@ export function ProviderRegisterForm() {
       {step === 1 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Como você é conhecida</p>
+            <p className="text-[14px] font-semibold mb-5">Como você é conhecida</p>
 
             <div className="space-y-5">
               <Input
@@ -255,7 +255,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card className="overflow-visible">
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Dados básicos</p>
+            <p className="text-[14px] font-semibold mb-5">Dados básicos</p>
 
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -286,7 +286,7 @@ export function ProviderRegisterForm() {
       {step === 2 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Contato</p>
+            <p className="text-[14px] font-semibold mb-5">Contato</p>
             <Input
               label="WhatsApp (com DDD)"
               type="tel"
@@ -297,7 +297,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Apresentação</p>
+            <p className="text-[14px] font-semibold mb-5">Apresentação</p>
 
             <div className="space-y-5">
               <Input
@@ -322,7 +322,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Características</p>
+            <p className="text-[14px] font-semibold mb-5">Características</p>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <Input
@@ -377,7 +377,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-5">Atendimento</p>
+            <p className="text-[14px] font-semibold mb-5">Atendimento</p>
 
             <div className="space-y-4">
               <div>
@@ -408,7 +408,7 @@ export function ProviderRegisterForm() {
         <div className="space-y-5 animate-fade-in">
           <Card padding="none">
             <div className="border-b border-line/50 px-6 py-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-foreground">Durações e valores</p>
+              <p className="text-[14px] font-semibold">Durações e valores</p>
               <p className="mt-1 text-xs text-muted">Ative as durações que você oferece.</p>
             </div>
             <div className="divide-y divide-line/50">
@@ -447,7 +447,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-4">Formas de pagamento</p>
+            <p className="text-[14px] font-semibold mb-4">Formas de pagamento</p>
             <div className="flex flex-wrap gap-2">
               {PAYMENT_OPTIONS.map((p) => (
                 <ToggleChip
@@ -467,7 +467,7 @@ export function ProviderRegisterForm() {
       {step === 4 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-2">Dados de acesso</p>
+            <p className="text-[14px] font-semibold mb-2">Dados de acesso</p>
             <p className="text-xs text-muted mb-5">Privados — não aparecem no seu anúncio.</p>
 
             <div className="space-y-4">
@@ -493,7 +493,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card variant="glass">
-            <p className="text-xs font-bold uppercase tracking-wider text-foreground mb-3">Resumo</p>
+            <p className="text-[14px] font-semibold mb-3">Resumo</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
               <span className="text-muted">Nome artístico</span>
               <span className="font-semibold">{displayName}</span>

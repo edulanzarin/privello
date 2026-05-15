@@ -38,7 +38,7 @@ export default async function PainelFinanceiroPage() {
           </p>
         </div>
         <Link href="/painel/plano">
-          <Button variant="coral" size="lg" className="uppercase tracking-wider">
+          <Button variant="coral" size="lg">
             Fazer upgrade para Premium
           </Button>
         </Link>
@@ -65,7 +65,7 @@ export default async function PainelFinanceiroPage() {
       {/* Header + form */}
       <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Financeiro</p>
+          <p className="text-[11px] font-medium text-muted">Financeiro</p>
           <h1 className="mt-1 text-[22px] font-semibold tracking-tight capitalize">
             {monthName} {year}
           </h1>
@@ -144,7 +144,7 @@ export default async function PainelFinanceiroPage() {
                 </label>
               </div>
             </div>
-            <Button type="submit" variant="coral" className="w-full uppercase tracking-wider">
+            <Button type="submit" variant="coral" className="w-full">
               Registrar
             </Button>
           </form>
@@ -162,7 +162,7 @@ export default async function PainelFinanceiroPage() {
       {/* Table */}
       <Card variant="solid" padding="none">
         <div className="border-b border-black/[0.06] px-5 py-4 flex items-center justify-between">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted">
+          <p className="text-[11px] font-medium text-muted">
             Registros · {rows.length} {rows.length === 1 ? "encontro" : "encontros"} · {formatBrl(total)} total
           </p>
           <p className="text-[11px] text-muted">Passe o mouse para editar ou excluir</p>

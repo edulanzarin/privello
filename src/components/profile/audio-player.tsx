@@ -36,11 +36,11 @@ export function AudioPlayer({ src }: { src: string }) {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
   return (
-    <div className="mt-6 flex items-center gap-4 rounded-none border border-line bg-white px-4 py-3">
+    <div className="mt-6 flex items-center gap-4 rounded-xl border border-black/[0.06] bg-white px-4 py-3">
       <audio ref={audioRef} src={src} preload="metadata" />
       <Volume2 className="h-4 w-4 shrink-0 text-coral" strokeWidth={1.5} />
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Ouça minha voz</p>
+        <p className="text-[11px] font-medium text-muted">Ouça minha voz</p>
         {/* Waveform progress bar */}
         <div
           className="mt-1.5 h-1.5 w-full cursor-pointer rounded-full bg-line overflow-hidden"

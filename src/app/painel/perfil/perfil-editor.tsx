@@ -3,11 +3,16 @@
 import Image from "next/image";
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, AtSign, Mic, X, Play, Pause, Square, Circle } from "lucide-react";
+import { Loader2, AtSign, Mic, X, Play, Pause, Square, Upload } from "lucide-react";
 import { CityAutocomplete } from "@/components/marketing/city-autocomplete";
 import { saveOnboardingPerfil } from "@/app/_actions/onboarding";
 import { changeHandle } from "@/app/painel/_actions/provider-settings";
 import { useToast } from "@/components/ui/toast";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const LANGUAGE_OPTIONS = [
   { value: "PT", label: "Português" },
@@ -72,6 +77,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const [pendingAudio, setPendingAudio] = useState<{ file: File; localUrl: string } | null>(null);
+  const pendingPreviewRef = useRef<HTMLAudioElement>(null);
 
   async function startRecording() {
     try {
@@ -79,11 +86,12 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
       const mr = new MediaRecorder(stream);
       chunksRef.current = [];
       mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-      mr.onstop = async () => {
+      mr.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(chunksRef.current, { type: "audio/webm" });
         const file = new File([blob], "gravacao.webm", { type: "audio/webm" });
-        await uploadAudio(file);
+        const localUrl = URL.createObjectURL(blob);
+        setPendingAudio({ file, localUrl });
         setRecording(false);
         setRecordSecs(0);
       };
@@ -161,54 +169,106 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     });
   }
 
-  const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]";
-  const sel = `${inp} appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2386868b%22%20stroke-width%3D%222.5%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_10px_center] bg-no-repeat pr-8`;
-  const lbl = "block text-[13px] font-medium text-foreground mb-1.5";
-  const card = "rounded-2xl border border-black/[0.06] bg-white p-6 space-y-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]";
-
   return (
-    <>
+    <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-[13px] text-[#ff3b30]">{error}</div>}
+        {error && (
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-[13px] text-[#ff3b30]">{error}</div>
+        )}
 
         {/* ── Localização e contato ── */}
-        <div className={card}>
+        <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-[14px] font-semibold">Localização e contato</p>
-          <div>
-            <span className={lbl}>Cidade onde atende</span>
-            <div className="border border-line"><CityAutocomplete initialLabel={cityName} onSelect={(s, l) => { setSelectedCitySlug(s); setSelectedCityLabel(l); }} /></div>
+          <div className="space-y-1.5">
+            <span className="block text-[13px] font-medium text-foreground">Cidade onde atende</span>
+            <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-[#0a84ff] focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
+              <CityAutocomplete
+                compact
+                initialLabel={cityName}
+                onSelect={(s, l) => { setSelectedCitySlug(s); setSelectedCityLabel(l); }}
+              />
+            </div>
           </div>
-          <div>
-            <label className={lbl}>WhatsApp</label>
-            <input name="whatsappPhone" type="tel" defaultValue={profile.whatsappPhone ?? ""} placeholder="+55 11 99999-9999" className={inp} />
-          </div>
-        </div>
+          <Input
+            name="whatsappPhone"
+            type="tel"
+            defaultValue={profile.whatsappPhone ?? ""}
+            placeholder="+55 11 99999-9999"
+            label="WhatsApp"
+          />
+        </Card>
 
         {/* ── Apresentação ── */}
-        <div className={card}>
+        <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-[14px] font-semibold">Apresentação</p>
-          <div>
-            <label className={lbl}>Frase de destaque</label>
-            <input name="tagline" defaultValue={profile.tagline ?? ""} placeholder="Ex: Encontros com calma e presença." className={inp} maxLength={120} />
-          </div>
-          <div>
-            <label className={lbl}>Bio <span className="text-coral">*</span></label>
-            <textarea name="bio" defaultValue={profile.bio} rows={5} required className={`${inp} resize-none`} placeholder="Fale sobre você..." />
-          </div>
-        </div>
+          <Input
+            name="tagline"
+            defaultValue={profile.tagline ?? ""}
+            placeholder="Ex: Encontros com calma e presença."
+            label="Frase de destaque"
+            maxLength={120}
+          />
+          <Textarea
+            name="bio"
+            defaultValue={profile.bio}
+            rows={5}
+            required
+            label="Bio"
+            placeholder="Fale sobre você..."
+          />
+        </Card>
 
         {/* ── Voz ── */}
-        <div className={card}>
-          <div className="flex items-center gap-2">
-            <Mic className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            <p className="text-[14px] font-semibold">Voz — "Ouça minha voz"</p>
+        <Card variant="solid" padding="lg" className="space-y-4">
+          <div>
+            <p className="text-[14px] font-semibold">Áudio — Ouça minha voz</p>
+            <p className="mt-0.5 text-[13px] text-muted">Aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.</p>
           </div>
-          <p className="text-xs text-muted">
-            Um áudio curto (até 2 min) que aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.
-          </p>
 
-          {audioUrl ? (
-            <div className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white px-4 py-3">
+          {pendingAudio ? (
+            /* ── Preview before upload ── */
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-xl bg-black/[0.03] px-4 py-3">
+                <audio ref={pendingPreviewRef} src={pendingAudio.localUrl} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const a = pendingPreviewRef.current;
+                    if (!a) return;
+                    a.paused ? a.play() : a.pause();
+                  }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-white shadow-sm transition hover:brightness-110 active:scale-95"
+                >
+                  <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
+                </button>
+                <p className="flex-1 text-[13px] text-muted">Ouça antes de confirmar</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { URL.revokeObjectURL(pendingAudio.localUrl); setPendingAudio(null); }}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-[13px] font-medium text-muted transition hover:bg-black/[0.03] hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" strokeWidth={2} /> Descartar
+                </button>
+                <button
+                  type="button"
+                  disabled={audioUploading}
+                  onClick={async () => {
+                    await uploadAudio(pendingAudio.file);
+                    URL.revokeObjectURL(pendingAudio.localUrl);
+                    setPendingAudio(null);
+                  }}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-foreground/80 disabled:opacity-40"
+                >
+                  {audioUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                  {audioUploading ? "Enviando…" : "Confirmar"}
+                </button>
+              </div>
+            </div>
+          ) : audioUrl ? (
+            /* ── Player ── */
+            <div className="flex items-center gap-3 rounded-xl bg-black/[0.03] px-4 py-3">
               <audio ref={audioPreviewRef} src={audioUrl} onEnded={() => setAudioPlaying(false)} />
               <button
                 type="button"
@@ -218,24 +278,24 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   if (audioPlaying) { a.pause(); setAudioPlaying(false); }
                   else { a.play(); setAudioPlaying(true); }
                 }}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral text-white hover:bg-coral/90"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral text-white shadow-sm transition hover:brightness-110 active:scale-95"
               >
                 {audioPlaying
                   ? <Pause className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
                   : <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
                 }
               </button>
-              <p className="flex-1 truncate text-xs text-muted">{audioUrl.split("/").pop()}</p>
+              <p className="flex-1 truncate text-[13px] text-muted">{audioUrl.split("/").pop()}</p>
               <button
                 type="button"
                 onClick={removeAudio}
-                className="flex items-center gap-1 text-xs text-muted hover:text-coral"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-muted transition hover:bg-black/10 hover:text-foreground"
               >
-                <X className="h-3.5 w-3.5" /> Remover
+                <X className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <input
                 ref={audioInputRef}
                 type="file"
@@ -245,105 +305,131 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               />
 
               {recording ? (
-                /* Recording in progress */
-                <div className="flex items-center gap-4 rounded-xl border border-coral/30 bg-coral/5 px-5 py-3">
-                  <span className="flex h-3 w-3 shrink-0">
-                    <span className="absolute inline-flex h-3 w-3 animate-ping rounded-full bg-coral opacity-75" />
+                /* ── Recording in progress ── */
+                <div className="flex items-center gap-4 rounded-2xl bg-coral/[0.06] border border-coral/15 px-5 py-4">
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-50" />
                     <span className="relative inline-flex h-3 w-3 rounded-full bg-coral" />
                   </span>
-                  <span className="flex-1 text-sm font-medium text-coral">
-                    Gravando… {Math.floor(recordSecs / 60).toString().padStart(2, "0")}:{(recordSecs % 60).toString().padStart(2, "0")}
+                  <span className="flex-1 text-[14px] font-semibold text-coral tabular-nums">
+                    {Math.floor(recordSecs / 60).toString().padStart(2, "0")}:{(recordSecs % 60).toString().padStart(2, "0")}
                   </span>
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="flex items-center gap-1.5 bg-coral px-4 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-coral/90"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-coral text-white shadow-sm transition hover:brightness-110 active:scale-95"
                   >
                     <Square className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
-                    Parar
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => audioInputRef.current?.click()}
-                    disabled={audioUploading}
-                    className="flex items-center gap-2 border border-dashed border-line bg-white px-5 py-3 text-sm text-muted hover:border-coral hover:text-coral disabled:opacity-50 transition"
-                  >
-                    {audioUploading
-                      ? <Loader2 className="h-4 w-4 animate-spin" />
-                      : <Mic className="h-4 w-4" strokeWidth={1.5} />
-                    }
-                    {audioUploading ? "Enviando…" : "Enviar arquivo"}
-                  </button>
-
+                /* ── Idle state ── */
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/[0.06] bg-black/[0.02] px-6 py-5">
                   <button
                     type="button"
                     onClick={startRecording}
                     disabled={audioUploading}
-                    className="flex items-center gap-2 border border-dashed border-coral/50 bg-white px-5 py-3 text-sm text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-50 transition"
+                    className="flex h-14 w-14 items-center justify-center rounded-full bg-coral text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:opacity-40"
                   >
-                    <Circle className="h-4 w-4 fill-coral text-coral" strokeWidth={0} />
-                    Gravar agora
+                    <Mic className="h-6 w-6" strokeWidth={1.5} />
+                  </button>
+                  <p className="text-[13px] font-medium text-foreground">Gravar agora</p>
+                  <button
+                    type="button"
+                    onClick={() => audioInputRef.current?.click()}
+                    disabled={audioUploading}
+                    className="flex items-center gap-1.5 text-[12px] text-muted transition hover:text-foreground disabled:opacity-40"
+                  >
+                    {audioUploading
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Upload className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    }
+                    {audioUploading ? "Enviando…" : "ou enviar arquivo"}
                   </button>
                 </div>
               )}
             </div>
           )}
-        </div>
+        </Card>
 
-        {/* ── Características ── */}
-        <div className={card}>
+        {/* ── Características físicas ── */}
+        <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-[14px] font-semibold">Características físicas</p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div><label className={lbl}>Altura (cm)</label><input name="heightCm" type="number" defaultValue={profile.heightCm ?? ""} placeholder="168" className={inp} min={140} max={220} /></div>
-            <div><label className={lbl}>Manequim</label><input name="dressSize" defaultValue={profile.dressSize ?? ""} placeholder="38" className={inp} /></div>
-            <div><label className={lbl}>Cabelo</label>
-              <select name="hair" defaultValue={profile.hair ?? ""} className={sel}>
-                <option value="">Selecione</option>
-                {HAIR_OPTIONS.map((h) => <option key={h} value={h}>{h}</option>)}
-              </select>
-            </div>
-            <div><label className={lbl}>Olhos</label>
-              <select name="eyes" defaultValue={profile.eyes ?? ""} className={sel}>
-                <option value="">Selecione</option>
-                {EYES_OPTIONS.map((e) => <option key={e} value={e}>{e}</option>)}
-              </select>
-            </div>
+            <Input
+              name="heightCm"
+              type="number"
+              defaultValue={profile.heightCm ?? ""}
+              placeholder="168"
+              label="Altura (cm)"
+              min={140}
+              max={220}
+            />
+            <Input
+              name="dressSize"
+              defaultValue={profile.dressSize ?? ""}
+              placeholder="38"
+              label="Manequim"
+            />
+            <Select
+              name="hair"
+              defaultValue={profile.hair ?? ""}
+              label="Cabelo"
+              placeholder="Selecione"
+              options={HAIR_OPTIONS.map((h) => ({ value: h, label: h }))}
+            />
+            <Select
+              name="eyes"
+              defaultValue={profile.eyes ?? ""}
+              label="Olhos"
+              placeholder="Selecione"
+              options={EYES_OPTIONS.map((e) => ({ value: e, label: e }))}
+            />
           </div>
-          <div>
-            <label className={lbl}>Idiomas</label>
+          <div className="space-y-1.5">
+            <label className="block text-[13px] font-medium text-foreground">Idiomas</label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGE_OPTIONS.map((lang) => (
-                <button key={lang.value} type="button" onClick={() => toggleLang(lang.value)}
-                  className={`border px-3 py-1.5 text-xs font-semibold transition ${selectedLangs.includes(lang.value) ? "border-foreground bg-foreground text-white" : "border-line bg-white text-muted hover:border-foreground/30"}`}>
+                <button
+                  key={lang.value}
+                  type="button"
+                  onClick={() => toggleLang(lang.value)}
+                  className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
+                    selectedLangs.includes(lang.value)
+                      ? "border-foreground bg-foreground text-white"
+                      : "border-line bg-white text-muted hover:border-foreground/30"
+                  }`}
+                >
                   {lang.label}
                 </button>
               ))}
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* ── Atendimento ── */}
-        <div className={card}>
+        <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-[14px] font-semibold">Atendimento</p>
-          <div>
-            <label className={lbl}>Atende a</label>
+          <div className="space-y-1.5">
+            <label className="block text-[13px] font-medium text-foreground">Atende a</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "servesMen", label: "Homens", checked: profile.servesMen },
                 { name: "servesWomen", label: "Mulheres", checked: profile.servesWomen },
                 { name: "servesCouples", label: "Casais", checked: profile.servesCouples },
               ].map((o) => (
-                <label key={o.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
-                  <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />{o.label}
+                <label
+                  key={o.name}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+                >
+                  <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />
+                  {o.label}
                 </label>
               ))}
             </div>
           </div>
-          <div>
-            <label className={lbl}>Modalidade</label>
+          <div className="space-y-1.5">
+            <label className="block text-[13px] font-medium text-foreground">Modalidade</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "hasOwnPlace", label: "Local próprio", checked: profile.hasOwnPlace },
@@ -351,25 +437,28 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                 { name: "travelsNational", label: "Viagens nacionais", checked: profile.travelsNational },
                 { name: "travelsInternational", label: "Viagens internacionais", checked: profile.travelsInternational },
               ].map((o) => (
-                <label key={o.name} className="flex cursor-pointer items-center gap-2 border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white">
-                  <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />{o.label}
+                <label
+                  key={o.name}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+                >
+                  <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />
+                  {o.label}
                 </label>
               ))}
             </div>
           </div>
-        </div>
+        </Card>
 
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted"><span className="text-coral">*</span> obrigatório</p>
-          <button type="submit" disabled={pending}
-            className="bg-coral px-8 py-3 text-[14px] font-semibold uppercase tracking-wider text-white transition hover:bg-coral/90 disabled:opacity-50">
+          <Button type="submit" variant="coral" size="lg" disabled={pending}>
             {pending ? "Salvando…" : "Salvar alterações"}
-          </button>
+          </Button>
         </div>
       </form>
 
       {/* ── @handle ── */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
+      <Card variant="solid" padding="lg" className="space-y-4">
         <div className="flex items-center gap-2">
           <AtSign className="h-4 w-4 text-muted" strokeWidth={1.5} />
           <p className="text-[14px] font-semibold">Seu @handle</p>
@@ -386,10 +475,13 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               onChange={(e) => setHandleValue(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
               placeholder="seuhandle"
               maxLength={30}
-              className="w-full border border-line bg-white py-3 pl-7 pr-4 text-sm outline-none focus:border-foreground transition"
+              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
             />
           </div>
-          <button
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
             disabled={handlePending || handleValue === (profile.slug ?? "")}
             onClick={() => {
               setHandleError(null);
@@ -402,15 +494,14 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                 router.refresh();
               });
             }}
-            className="bg-foreground px-5 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-foreground/80 disabled:opacity-40"
           >
             {handlePending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
-          </button>
+          </Button>
         </div>
         <p className="text-[10px] text-muted">
           Letras minúsculas, números, _ e - · 3 a 30 caracteres · Link do perfil muda ao trocar
         </p>
-      </div>
-    </>
+      </Card>
+    </div>
   );
 }

@@ -188,7 +188,7 @@ export function ProfileStoryCover({
           <button
             onClick={(e) => { e.stopPropagation(); setOpen(true); }}
             className={cn(
-              "absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition hover:scale-105",
+              "absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur-sm transition hover:scale-105",
               !allSeen
                 ? "bg-coral shadow-sm"
                 : "bg-black/40",

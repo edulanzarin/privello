@@ -9,7 +9,7 @@ export default function AssinaturaSuccessPage() {
           privello<span className="text-coral">.</span>
         </Link>
 
-        <div className="mt-10 border border-line bg-white p-8">
+        <div className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
           <CheckCircle className="mx-auto h-12 w-12 text-success" strokeWidth={1.5} />
           <h1 className="mt-4 font-serif text-2xl">Assinatura ativada!</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -17,13 +17,13 @@ export default function AssinaturaSuccessPage() {
           </p>
           <Link
             href="/"
-            className="mt-6 inline-block w-full bg-foreground py-3 text-xs font-bold uppercase tracking-wider text-white"
+            className="mt-6 inline-block w-full rounded-lg bg-foreground py-3 text-center text-[13px] font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
           >
             Explorar conteúdo
           </Link>
           <Link
             href="/reels"
-            className="mt-2 inline-block w-full border border-line py-3 text-xs font-semibold text-muted hover:text-foreground transition"
+            className="mt-2 inline-block w-full rounded-lg border border-line py-3 text-center text-[13px] font-semibold text-muted hover:text-foreground hover:bg-line/40 transition"
           >
             Ver Reels exclusivos
           </Link>

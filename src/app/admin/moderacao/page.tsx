@@ -230,9 +230,9 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                   name="q"
                   defaultValue={searchQ}
                   placeholder="Buscar por nome…"
-                  className="w-40 border border-line px-2.5 py-1.5 text-xs outline-none focus:border-foreground/40"
+                  className="w-40 rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all"
                 />
-                <button type="submit" className="bg-foreground px-3 py-1.5 text-xs font-bold text-white">
+                <button type="submit" className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition">
                   Buscar
                 </button>
               </form>

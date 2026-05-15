@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -39,27 +38,29 @@ export default async function PainelPlanoPage() {
   if (!profile) redirect("/conta/onboarding/perfil");
 
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
+  const currentName = { ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Plano</h1>
-        <p className="mt-1 text-sm text-muted">
-          Plano atual:{" "}
-          <span className="font-semibold text-foreground">
-            {{ ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier}
-          </span>
+        <h1 className="text-[22px] font-semibold tracking-tight">Plano</h1>
+        <p className="mt-1 text-[14px] text-muted">
+          Plano atual: <span className="font-semibold text-foreground">{currentName}</span>
         </p>
       </div>
 
-      {/* Boost status */}
-      <div className={`border p-5 ${isBoosted ? "border-orange-500/30 bg-orange-50" : "border-line bg-white"}`}>
+      {/* Boost card */}
+      <div className={`rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${
+        isBoosted
+          ? "border-[#ff9500]/25 bg-[#ff9500]/[0.05]"
+          : "border-black/[0.06] bg-white"
+      }`}>
         <div className="flex items-center gap-2">
-          <Zap className={`h-5 w-5 ${isBoosted ? "text-orange-500" : "text-muted"}`} strokeWidth={1.5} />
-          <p className="font-semibold">Boost de 24h</p>
+          <Zap className={`h-4 w-4 ${isBoosted ? "text-[#ff9500]" : "text-muted"}`} strokeWidth={1.5} />
+          <p className="text-[14px] font-semibold">Boost de 24h</p>
         </div>
         {isBoosted ? (
-          <p className="mt-2 text-sm text-orange-600">
+          <p className="mt-2 text-[13px] text-[#b36200]">
             Boost ativo — expira em{" "}
             {new Date(profile.featuredUntil!).toLocaleString("pt-BR", {
               day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
@@ -67,40 +68,56 @@ export default async function PainelPlanoPage() {
           </p>
         ) : (
           <>
-            <p className="mt-2 text-sm text-muted">Sobe seu perfil ao topo da listagem por 24h. R$ 89 por disparo.</p>
-            <BoostButton />
+            <p className="mt-1.5 text-[13px] text-muted">Sobe seu perfil ao topo da listagem por 24h. R$ 89 por disparo.</p>
+            <div className="mt-3">
+              <BoostButton />
+            </div>
           </>
         )}
       </div>
 
       {/* Plan cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {PLANS.map((plan) => {
           const isCurrent = profile.planTier === plan.tier;
           return (
-            <div key={plan.tier} className={`border p-6 ${isCurrent ? "border-coral bg-coral/5" : "border-line bg-white"}`}>
+            <div
+              key={plan.tier}
+              className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${
+                isCurrent
+                  ? "border-coral/25 bg-coral/[0.04]"
+                  : "border-black/[0.06] bg-white"
+              }`}
+            >
               {isCurrent && (
-                <span className="mb-3 inline-block bg-coral px-2 py-0.5 text-[10px] font-bold uppercase text-white">
+                <span className="mb-3 inline-flex items-center rounded-full bg-coral/10 px-2.5 py-0.5 text-[11px] font-semibold text-coral">
                   Plano atual
                 </span>
               )}
-              <p className="text-lg font-bold">{plan.name}</p>
-              <p className="mt-1 text-2xl font-bold">{plan.price}<span className="text-sm font-normal text-muted"> /mês</span></p>
-              <ul className="mt-4 space-y-2">
+              <p className="text-[15px] font-semibold">{plan.name}</p>
+              <p className="mt-1">
+                <span className="text-[22px] font-semibold tabular-nums tracking-tight">{plan.price}</span>
+                <span className="ml-1 text-[12px] text-muted">/mês</span>
+              </p>
+              <ul className="mt-4 space-y-2.5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-muted">
-                    <Check className="h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2} />
+                  <li key={f} className="flex items-start gap-2 text-[13px] text-muted">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={2.5} />
                     {f}
                   </li>
                 ))}
               </ul>
-              {!isCurrent && <UpgradeButton tier={plan.tier} />}
+              {!isCurrent && (
+                <div className="mt-5">
+                  <UpgradeButton tier={plan.tier} />
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      <p className="text-xs text-muted">
+      <p className="text-[12px] text-muted">
         Pagamentos via PIX, cartão ou boleto. Sem comissão sobre encontros. Cancele quando quiser.
       </p>
     </div>

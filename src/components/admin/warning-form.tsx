@@ -105,17 +105,17 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
               onChange={(e) => setReason(e.target.value)}
               placeholder={mode === "warn" ? "Motivo da advertência…" : "Motivo da suspensão…"}
               rows={3}
-              className="w-full border border-line px-3 py-2 text-sm outline-none focus:border-foreground/40 resize-none"
+              className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all resize-none"
             />
             {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
             <div className="mt-4 flex gap-2 justify-end">
-              <button onClick={() => setOpen(false)} className="px-3 py-1.5 text-xs border border-line hover:bg-line transition">
+              <button onClick={() => setOpen(false)} className="rounded-lg px-3 py-1.5 text-xs border border-line hover:bg-line active:scale-[0.97] transition">
                 Cancelar
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={pending || !reason.trim()}
-                className={`px-4 py-1.5 text-xs font-bold text-white transition disabled:opacity-40 ${mode === "warn" ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}`}
+                className={`rounded-lg px-4 py-1.5 text-xs font-semibold text-white transition active:scale-[0.97] disabled:opacity-40 ${mode === "warn" ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}`}
               >
                 {pending ? "Enviando…" : mode === "warn" ? "Confirmar advertência" : "Confirmar suspensão"}
               </button>

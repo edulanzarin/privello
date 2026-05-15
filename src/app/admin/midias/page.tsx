@@ -129,9 +129,9 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={q}
             placeholder="Perfil ou @handle…"
-            className="border border-line px-2.5 py-1.5 text-xs outline-none focus:border-foreground/40 w-44"
+            className="rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none w-44 hover:border-black/20 focus:border-[#0a84ff] transition-all"
           />
-          <select name="type" defaultValue={typeF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <select name="type" defaultValue={typeF} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all">
             <option value="">Todos os tipos</option>
             <option value="IMAGE">Foto</option>
             <option value="VIDEO">Vídeo</option>

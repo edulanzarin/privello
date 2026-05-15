@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
         pending: successUrl,
       },
       auto_return: "approved",
-      metadata: { userId: session.user.id, type, tier: tier ?? "" },
+      external_reference: `${session.user.id}|${type}|${tier ?? ""}|${Date.now()}`,
+      metadata: { user_id: session.user.id, type, tier: tier ?? "" },
       notification_url: `${BASE_URL}/api/mp/webhook`,
     },
   });

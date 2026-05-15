@@ -41,7 +41,7 @@ export function HeroSearchForm() {
         <label className="flex items-center gap-3 bg-white px-4 py-3">
           <Users className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
           <span className="w-full">
-            <span className="block text-[10px] font-medium uppercase tracking-wider text-muted">Procuro</span>
+            <span className="block text-[11px] font-medium text-muted">Procuro</span>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}

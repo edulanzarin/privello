@@ -220,7 +220,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
               )}
 
               <details className="group lg:open" open>
-                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-[12px] font-semibold uppercase tracking-wider shadow-sm lg:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-[12px] font-semibold shadow-sm lg:hidden">
                   <span>Filtros</span>
                   <span className="text-muted group-open:rotate-180 transition-transform">▾</span>
                 </summary>
@@ -238,7 +238,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   {/* Gênero */}
                   <div>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Procuro</p>
+                    <p className="text-[11px] font-medium text-muted">Procuro</p>
                     <div className="mt-2.5 flex flex-col gap-2">
                       {GENDER_OPTIONS.map((o) => (
                         <label key={o.value} className="flex cursor-pointer items-center gap-2 text-[13px]">
@@ -257,7 +257,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   {/* Sinais de confiança */}
                   <div className="space-y-2">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Confiança</p>
+                    <p className="text-[11px] font-medium text-muted">Confiança</p>
                     <label className="flex cursor-pointer items-center gap-2 text-[13px]">
                       <input type="checkbox" name="verified" value="1" defaultChecked={filters.verifiedOnly} className="accent-coral rounded" />
                       Apenas verificadas
@@ -277,12 +277,12 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   {/* Filtros avançados */}
                   <details className="group">
-                    <summary className="cursor-pointer list-none text-[11px] font-medium uppercase tracking-wider text-muted group-open:mb-4">
+                    <summary className="cursor-pointer list-none text-[11px] font-medium text-muted group-open:mb-4">
                       Avançados ▾
                     </summary>
                     <div className="space-y-4">
                       <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Preço /h</p>
+                        <p className="text-[11px] font-medium text-muted">Preço /h</p>
                         <div className="mt-2 flex gap-2">
                           <input
                             name="pmin"
@@ -299,7 +299,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                         </div>
                       </div>
                       <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Idade</p>
+                        <p className="text-[11px] font-medium text-muted">Idade</p>
                         <div className="mt-2 flex gap-2">
                           <input
                             name="amin"
@@ -316,7 +316,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Atendimento</p>
+                        <p className="text-[11px] font-medium text-muted">Atendimento</p>
                         <label className="flex cursor-pointer items-center gap-2 text-[13px]">
                           <input type="checkbox" name="local" value="1" defaultChecked={filters.hasOwnPlace} className="accent-coral rounded" />
                           Local próprio

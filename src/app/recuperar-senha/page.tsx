@@ -28,7 +28,7 @@ export default function RecuperarSenhaPage() {
         </Link>
 
         {done ? (
-          <div className="mt-10 border border-line bg-white p-8">
+          <div className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
             <h1 className="font-serif text-2xl">Verifique seu email</h1>
             <p className="mt-3 text-sm leading-relaxed text-muted">
               Se existe uma conta com esse email, enviamos um link para redefinir
@@ -45,13 +45,13 @@ export default function RecuperarSenhaPage() {
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-10 border border-line bg-white p-8">
+          <form onSubmit={handleSubmit} className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
             <h1 className="font-serif text-2xl">Recuperar acesso</h1>
             <p className="mt-2 text-sm text-muted">
               Informe seu email e enviaremos um link para redefinir a senha.
             </p>
 
-            <label className="mt-6 block text-[10px] font-semibold uppercase tracking-wider text-muted">
+            <label className="mt-6 block text-[13px] font-medium text-foreground">
               Email
             </label>
             <input
@@ -59,7 +59,7 @@ export default function RecuperarSenhaPage() {
               type="email"
               required
               autoComplete="email"
-              className="mt-1 w-full border border-line bg-[#fdfcfa] px-3 py-2.5 text-sm outline-none focus:border-foreground"
+              className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
               placeholder="seu@email.com"
             />
 
@@ -70,7 +70,7 @@ export default function RecuperarSenhaPage() {
             <button
               type="submit"
               disabled={pending}
-              className="mt-6 w-full bg-foreground py-3 text-xs font-bold uppercase tracking-wider text-white disabled:opacity-60"
+              className="mt-6 w-full rounded-lg bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
             >
               {pending ? "Enviando…" : "Enviar link"}
             </button>
