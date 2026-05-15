@@ -8,6 +8,7 @@ import {
   ChevronDown, X, Send, Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SUBSCRIPTION_PRICE_LABEL } from "@/lib/constants";
 
 export type Reel = {
   id: string;
@@ -61,7 +62,7 @@ function LockedReelOverlay({ profileSlug }: { profileSlug: string }) {
           href="/assinar"
           className="block rounded-full bg-coral py-2.5 text-center text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
-          Assinar · R$19,90/mês
+          Assinar · {SUBSCRIPTION_PRICE_LABEL}
         </Link>
         <Link
           href={`/p/${profileSlug}`}

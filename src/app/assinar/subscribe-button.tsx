@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createSubscriptionAction } from "@/app/_actions/subscription";
+import { SUBSCRIPTION_PRICE_LABEL } from "@/lib/constants";
 
 const MP_ENABLED = !!process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
 
@@ -34,7 +35,7 @@ export function SubscribeButton({ redirectTo = "/" }: { redirectTo?: string }) {
       disabled={pending}
       className="w-full rounded-full bg-coral py-3.5 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-60"
     >
-      {pending ? "Ativando assinatura…" : "Assinar por R$19,90/mês"}
+      {pending ? "Ativando assinatura…" : `Assinar por ${SUBSCRIPTION_PRICE_LABEL}`}
     </button>
   );
 }

@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2, Expand, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SUBSCRIPTION_PRICE_LABEL } from "@/lib/constants";
 
 const PAGE_SIZE = 6;
 
@@ -321,7 +322,7 @@ function PostModal({
                       href={isClient ? `/assinar?from=/p/${slug}` : `/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`}
                       className="mt-1 rounded-full bg-coral px-4 py-1.5 text-xs font-bold text-white hover:bg-coral/90"
                     >
-                      Assinar — R$19,90/mês
+                      Assinar — {SUBSCRIPTION_PRICE_LABEL}
                     </Link>
                   </>
                 ) : !item.caption ? (
@@ -423,7 +424,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
             key={t.key}
             onClick={() => switchTab(t.key)}
             className={cn(
-              "relative flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-[12px] font-semibold uppercase tracking-wider transition-colors",
+              "relative flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-[12px] font-semibold transition-colors",
               tab === t.key
                 ? "text-foreground bg-white border border-black/[0.06] border-b-white -mb-px"
                 : "text-muted hover:text-foreground",
@@ -524,7 +525,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
             <div className="border-t border-line bg-white p-4 text-center">
               <button
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                className="text-xs font-semibold uppercase tracking-wider text-muted underline-offset-2 hover:text-foreground hover:underline"
+                className="text-xs font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline"
               >
                 Ver mais · {activeItems.length - visibleCount} restantes
               </button>

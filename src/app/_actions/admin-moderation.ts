@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { sendEmail } from "@/lib/email";
 import { warningTemplate, suspensionTemplate, unsuspensionTemplate } from "@/lib/email-templates";
+import { SUSPENSION_THRESHOLD, SITE_URL } from "@/lib/constants";
 
-const SUSPENSION_THRESHOLD = 3;
-const APP_URL = process.env.NEXTAUTH_URL ?? "https://privello.com.br";
+const APP_URL = process.env.NEXTAUTH_URL ?? SITE_URL;
 
 async function requireAdmin() {
   const session = await auth();

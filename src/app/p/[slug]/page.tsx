@@ -18,10 +18,9 @@ import { formatBrl } from "@/lib/money";
 import { getProfileBySlug, getStoriesForProfile, isSubscriber, getUserReviewForProfile } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { DAYS_PT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
-
-const dias = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 const PLAN_BADGE: Record<string, { bg: string; label: string }> = {
   PREMIUM: { bg: "bg-coral", label: "PREMIUM" },
@@ -240,11 +239,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* Quick stats */}
                 <div className="mt-6 grid grid-cols-2 gap-2 max-w-xs">
                   <div className="rounded-lg bg-black/[0.03] px-3 py-2.5">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted">Visualizações</p>
+                    <p className="text-[11px] font-medium text-muted">Visualizações</p>
                     <p className="mt-0.5 text-[14px] font-semibold">{profile.viewsThisMonth.toLocaleString("pt-BR")}<span className="text-muted font-normal text-[11px]"> /mês</span></p>
                   </div>
                   <div className="rounded-lg bg-black/[0.03] px-3 py-2.5">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted">Membro desde</p>
+                    <p className="text-[11px] font-medium text-muted">Membro desde</p>
                     <p className="mt-0.5 text-[14px] font-semibold">{memberLabel}</p>
                   </div>
                 </div>
@@ -283,7 +282,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
               <div className="grid gap-8 sm:grid-cols-2">
                 <div>
-                  <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted">Características</h3>
+                  <h3 className="text-[11px] font-medium text-muted">Características</h3>
                   <ul className="mt-3 space-y-0">
                     {[
                       ["Altura", profile.heightCm ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m` : "—"],
@@ -300,7 +299,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted">Valores</h3>
+                  <h3 className="text-[11px] font-medium text-muted">Valores</h3>
                   <ul className="mt-3 space-y-0">
                     <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
                       <span className="text-muted">1 hora</span>
@@ -333,7 +332,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
 
               <div>
-                <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted">Atende a</h3>
+                <h3 className="text-[11px] font-medium text-muted">Atende a</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {[
                     ["Homens", profile.servesMen],
@@ -363,7 +362,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               <ul className="mt-4 space-y-0">
                 {profile.availabilityRules.map((r) => (
                   <li key={r.id} className="flex items-center justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
-                    <span>{dias[r.weekday]} · {r.startTime} – {r.endTime}</span>
+                    <span>{DAYS_PT[r.weekday]} · {r.startTime} – {r.endTime}</span>
                     <span className="text-[11px] font-medium uppercase">
                       {r.status === "CLOSED" ? (
                         <span className="text-muted">Fechado</span>

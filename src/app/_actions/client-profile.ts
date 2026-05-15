@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PLAN_DURATION_MS } from "@/lib/constants";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -78,9 +79,9 @@ export async function updateClientSlugAction(formData: FormData) {
 
     // Check 30-day cooldown
     if (user.slugChangedAt) {
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = new Date(Date.now() - PLAN_DURATION_MS);
         if (user.slugChangedAt > thirtyDaysAgo) {
-            const nextDate = new Date(user.slugChangedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+            const nextDate = new Date(user.slugChangedAt.getTime() + PLAN_DURATION_MS);
             return {
                 error: `Você só pode alterar o @ uma vez por mês. Próxima alteração disponível em ${nextDate.toLocaleDateString("pt-BR")}.`,
             };
