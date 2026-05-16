@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UpgradeButton, BoostButton } from "./upgrade-button";
+import { UpgradeButton, BoostButton, FreeBoostButton } from "./upgrade-button";
 
 export const dynamic = "force-dynamic";
 
@@ -33,20 +33,32 @@ export default async function PainelPlanoPage() {
 
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
-    select: { planTier: true, featuredUntil: true, slug: true },
+    select: { planTier: true, planExpiresAt: true, featuredUntil: true, slug: true },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
-  const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
-  const currentName = { ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier;
+  const now = new Date();
+  const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > now;
+  const hasPlan = profile.planExpiresAt != null && new Date(profile.planExpiresAt) > now;
+  const currentName = { ESSENCIAL: "Essencial", DESTAQUE: "Destaque", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier;
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-[22px] font-semibold tracking-tight">Plano</h1>
-        <p className="mt-1 text-[14px] text-muted">
-          Plano atual: <span className="font-semibold text-foreground">{currentName}</span>
-        </p>
+        {hasPlan ? (
+          <p className="mt-1 text-[14px] text-muted">
+            Plano <span className="font-semibold text-foreground">{currentName}</span> ativo até{" "}
+            <span className="font-semibold text-foreground">
+              {new Date(profile.planExpiresAt!).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}
+            </span>
+          </p>
+        ) : (
+          <div className="mt-2 flex items-center gap-2 rounded-xl border border-amber-200/60 bg-amber-50 px-4 py-3">
+            <span className="h-2 w-2 rounded-full bg-amber-400 shrink-0" />
+            <p className="text-[13px] text-amber-800 font-medium">Nenhum plano ativo — você não aparece nas buscas.</p>
+          </div>
+        )}
       </div>
 
       {/* Boost card */}
@@ -58,6 +70,9 @@ export default async function PainelPlanoPage() {
         <div className="flex items-center gap-2">
           <Zap className={`h-4 w-4 ${isBoosted ? "text-[#ff9500]" : "text-muted"}`} strokeWidth={1.5} />
           <p className="text-[14px] font-semibold">Boost de 24h</p>
+          {hasPlan && profile.planTier === "PREMIUM" && (
+            <span className="ml-auto rounded-full bg-coral/10 px-2 py-0.5 text-[10px] font-semibold text-coral">1 grátis/mês · Premium</span>
+          )}
         </div>
         {isBoosted ? (
           <p className="mt-2 text-[13px] text-[#b36200]">
@@ -68,9 +83,12 @@ export default async function PainelPlanoPage() {
           </p>
         ) : (
           <>
-            <p className="mt-1.5 text-[13px] text-muted">Sobe seu perfil ao topo da listagem por 24h. R$ 89 por disparo.</p>
+            <p className="mt-1.5 text-[13px] text-muted">
+              Sobe seu perfil ao topo por 24h.{" "}
+              {hasPlan && profile.planTier === "PREMIUM" ? "Grátis para Premium — use 1x por mês." : "R$ 89 por disparo."}
+            </p>
             <div className="mt-3">
-              <BoostButton />
+              {hasPlan && profile.planTier === "PREMIUM" ? <FreeBoostButton /> : <BoostButton />}
             </div>
           </>
         )}
@@ -79,17 +97,17 @@ export default async function PainelPlanoPage() {
       {/* Plan cards */}
       <div className="grid gap-3 sm:grid-cols-3">
         {PLANS.map((plan) => {
-          const isCurrent = profile.planTier === plan.tier;
+          const isActive = hasPlan && profile.planTier === plan.tier;
           return (
             <div
               key={plan.tier}
               className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${
-                isCurrent
+                isActive
                   ? "border-coral/25 bg-coral/[0.04]"
                   : "border-black/[0.06] bg-white"
               }`}
             >
-              {isCurrent && (
+              {isActive && (
                 <span className="mb-3 inline-flex items-center rounded-full bg-coral/10 px-2.5 py-0.5 text-[11px] font-semibold text-coral">
                   Plano atual
                 </span>
@@ -107,7 +125,7 @@ export default async function PainelPlanoPage() {
                   </li>
                 ))}
               </ul>
-              {!isCurrent && (
+              {!isActive && (
                 <div className="mt-5">
                   <UpgradeButton tier={plan.tier} />
                 </div>

@@ -15,7 +15,7 @@ type Favorite = {
     priceHour: number;
     ratingAvg: number;
     ratingCount: number;
-    district: { name: string };
+    district: { name: string } | null;
     city: { name: string };
     media: { url: string }[];
   };

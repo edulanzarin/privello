@@ -29,7 +29,7 @@ export default async function OnboardingPerfilPage() {
         </p>
         <PerfilForm
           profile={profile}
-          cityName={profile.city ? `${profile.city.name}, ${profile.city.slug.split("-").pop()?.toUpperCase()}` : ""}
+          cityName={profile.city?.name ?? ""}
           citySlug={profile.city?.slug ?? ""}
         />
       </main>

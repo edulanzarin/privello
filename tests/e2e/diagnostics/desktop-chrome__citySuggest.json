@@ -1,0 +1,19 @@
+{
+  "isSecureContext": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36",
+  "navigatorShare": "undefined",
+  "navigatorClipboardWriteText": "function",
+  "clickCounts": {
+    "story-circle": 0,
+    "comments-trigger": 0,
+    "share-button": 0,
+    "city-option": 0
+  },
+  "network": [],
+  "notes": {
+    "query": "São Pa",
+    "resultsLength": 0,
+    "dropdownHtml": null,
+    "propertyHeld": false
+  }
+}

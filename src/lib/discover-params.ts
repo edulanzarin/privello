@@ -29,7 +29,6 @@ export function parseDiscoverSearchParams(raw: Record<string, string | string[] 
     ageMin: amin ? Number(amin) : undefined,
     ageMax: amax ? Number(amax) : undefined,
     verifiedOnly: get("verified") === "1",
-    onlineOnly: get("online") === "1",
     hasOwnPlace: get("local") === "1",
     homeVisit: get("domicilio") === "1",
     search: searchRaw || undefined,

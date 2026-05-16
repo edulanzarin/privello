@@ -74,7 +74,7 @@ export function ProfileListRow({ profile, className }: { profile: ProfileCardPay
           <p className="mt-0.5 text-[10px] text-muted/50">@{profile.slug}</p>
           <p className="mt-1 flex items-center gap-1 text-xs text-muted">
             <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.5} />
-            {profile.district.name} · {profile.city.name}
+            {profile.district?.name ? `${profile.district.name} · ` : ""}{profile.city.name}
           </p>
           <p className="mt-1.5 flex items-center gap-1 text-xs text-muted">
             <Star className="h-3.5 w-3.5 fill-coral text-coral" strokeWidth={0} />

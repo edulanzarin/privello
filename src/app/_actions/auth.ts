@@ -99,6 +99,7 @@ export async function registerProviderAction(formData: FormData) {
   const travelsInternational = formData.get("travelsInternational") === "1";
   const paymentMethods = (formData.get("paymentMethods") as string | null)?.trim() || null;
   const durationsJson = (formData.get("durationsJson") as string | null) ?? "[]";
+  const photoFile = formData.get("photo") as File | null;
 
   if (!email || !password || !displayName || !slug || !ageStr) {
     return { error: "Preencha todos os campos obrigatórios." };
@@ -106,6 +107,7 @@ export async function registerProviderAction(formData: FormData) {
   if (!citySlug) return { error: "Selecione a cidade onde você atende." };
   if (!bio) return { error: "Escreva uma bio." };
   if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
+  if (!photoFile || photoFile.size === 0) return { error: "Selecione uma foto de perfil." };
 
   const age = parseInt(ageStr, 10);
   if (isNaN(age) || age < 18) return { error: "Você deve ter ao menos 18 anos." };
@@ -131,16 +133,10 @@ export async function registerProviderAction(formData: FormData) {
   const city = await getOrCreateCityBySlug(citySlug);
   if (!city) return { error: "Cidade não encontrada. Tente novamente." };
 
-  const district = await prisma.district.upsert({
-    where: { cityId_slug: { cityId: city.id, slug: "centro" } },
-    update: {},
-    create: { name: cityQuery.split(",")[0].trim() || "Centro", slug: "centro", cityId: city.id },
-  });
-
   const count = await prisma.profile.count();
   const publicCode = `PRV-${String(count + 1).padStart(3, "0")}`;
 
-  const newProvider = await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       name: displayName,
       email,
@@ -156,7 +152,6 @@ export async function registerProviderAction(formData: FormData) {
           tagline,
           whatsappPhone: whatsapp,
           cityId: city.id,
-          districtId: district.id,
           priceHour: oneHour.priceBrl,
           priceTwoHours: durations.find((d) => d.minutes === 120)?.priceBrl ?? null,
           priceOvernight: durations.find((d) => d.minutes === 720)?.priceBrl ?? null,
@@ -175,6 +170,7 @@ export async function registerProviderAction(formData: FormData) {
           travelsNational,
           travelsInternational,
           planTier: "ESSENCIAL",
+          isOnline: false,
           durationOptions: {
             createMany: {
               data: durations.map((d, i) => ({
@@ -189,11 +185,34 @@ export async function registerProviderAction(formData: FormData) {
         },
       },
     },
+    include: { profile: { select: { id: true } } },
   });
 
-  try {
-    await signIn("credentials", { email, password, redirectTo: "/conta/onboarding/fotos" });
-  } catch (err) {
-    throw err;
+  // Save profile photo
+  const profile = newUser.profile;
+  if (profile) {
+    try {
+      const { writeFile, mkdir } = await import("fs/promises");
+      const { join } = await import("path");
+
+      const extMap: Record<string, string> = {
+        "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
+      };
+      const ext = extMap[photoFile.type] ?? "jpg";
+      const filename = `${Date.now()}.${ext}`;
+      const dir = join(process.cwd(), "public", "uploads", profile.id);
+      await mkdir(dir, { recursive: true });
+      const bytes = await photoFile.arrayBuffer();
+      await writeFile(join(dir, filename), Buffer.from(bytes));
+      const url = `/uploads/${profile.id}/${filename}`;
+
+      await prisma.media.create({
+        data: { profileId: profile.id, url, isPublic: true, sortOrder: 0, isCover: true },
+      });
+    } catch {
+      // Non-fatal: account is created, photo can be added later from painel
+    }
   }
+
+  await signIn("credentials", { email, password, redirectTo: "/painel" });
 }

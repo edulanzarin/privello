@@ -62,7 +62,7 @@ export default async function ClientPerfilPage() {
       priceHour: f.profile.priceHour,
       ratingAvg: f.profile.ratingAvg,
       ratingCount: f.profile.ratingCount,
-      district: { name: f.profile.district.name },
+      district: f.profile.district ? { name: f.profile.district.name } : null,
       city: { name: f.profile.city.name },
       media: f.profile.media.slice(0, 1).map((m) => ({ url: m.url })),
     },

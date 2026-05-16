@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";
@@ -13,6 +14,20 @@ import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ citySlug: string }> }): Promise<Metadata> {
+  const { citySlug } = await params;
+  const city = await getOrCreateCityBySlug(citySlug);
+  const title = `Acompanhantes em ${city.name}`;
+  return {
+    title,
+    description: `Encontre acompanhantes em ${city.name}. Perfis verificados com fotos reais, áudio e vídeo. Acesse agora no Privello.`,
+    openGraph: {
+      title: `${title} · privello.`,
+      description: `Acompanhantes verificadas em ${city.name}. Fotos reais, áudio e vídeo.`,
+    },
+  };
+}
 
 type PageProps = {
   params: Promise<{ citySlug: string }>;
@@ -43,7 +58,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
   const [profiles, storyGroups] = await Promise.all([
     listProfilesForCity(city.id, filters, sort),
-    listStoriesForCity(city.id, session?.user?.id),
+    listStoriesForCity(city.id, session?.user?.id, filters.gender),
   ]);
   const count = profiles.length;
 
@@ -76,9 +91,6 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   }
   if (filters.verifiedOnly) {
     activePills.push({ label: "Verificadas", href: buildDiscoverHref(citySlug, { verified: null }, sp) });
-  }
-  if (filters.onlineOnly) {
-    activePills.push({ label: "Online agora", href: buildDiscoverHref(citySlug, { online: null }, sp) });
   }
   if (filters.hasOwnPlace) {
     activePills.push({ label: "Local próprio", href: buildDiscoverHref(citySlug, { local: null }, sp) });
@@ -115,7 +127,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     <summary className="cursor-pointer list-none rounded-lg border border-black/10 bg-white px-3.5 py-[6px] text-[13px] font-medium shadow-sm">
                       {sortLabel}
                     </summary>
-                    <ul className="absolute right-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-[13px] shadow-xl overflow-hidden animate-scale-in">
+                    <ul className="absolute left-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-[13px] shadow-xl overflow-hidden animate-scale-in">
                       {(
                         [
                           ["relevance", "Relevância"],
@@ -262,10 +274,6 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                       <input type="checkbox" name="verified" value="1" defaultChecked={filters.verifiedOnly} className="accent-coral rounded" />
                       Apenas verificadas
                     </label>
-                    <label className="flex cursor-pointer items-center gap-2 text-[13px]">
-                      <input type="checkbox" name="online" value="1" defaultChecked={filters.onlineOnly} className="accent-coral rounded" />
-                      Online agora
-                    </label>
                   </div>
 
                   <button
@@ -350,7 +358,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   ))}
                 </div>
               ) : (
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="mt-6 columns-1 gap-5 sm:columns-2 xl:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
                   {profiles.map((p) => (
                     <ProfileCard key={p.id} profile={p} />
                   ))}

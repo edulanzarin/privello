@@ -58,7 +58,7 @@ export default async function EmAltaPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="columns-1 gap-6 sm:columns-2 lg:columns-4 [&>*]:mb-6 [&>*]:break-inside-avoid">
               {profiles.map((p) => (
                 <ProfileCard key={p.id} profile={p} />
               ))}

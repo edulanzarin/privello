@@ -90,8 +90,8 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOpen(false)}>
-          <div className="w-full max-w-sm bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 cursor-pointer" onClick={() => setOpen(false)}>
+          <div className="w-full max-w-sm bg-white p-6 shadow-xl cursor-default" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-bold text-sm mb-1">
               {mode === "warn" ? "Advertir" : "Suspender"} — <span className="font-normal text-muted">{profileName}</span>
             </h2>

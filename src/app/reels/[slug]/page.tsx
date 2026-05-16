@@ -26,7 +26,7 @@ export default async function ProfileReelsPage({ params }: PageProps) {
 
   const session = await auth();
   const userId = session?.user?.id;
-  const isClient = !!userId && session?.user?.role !== "PROVIDER";
+  const isClient = !!userId;
 
   let viewerIsSubscriber = false;
   let ownerId: string | undefined;

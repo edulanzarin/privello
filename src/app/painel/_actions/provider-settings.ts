@@ -204,14 +204,55 @@ export async function addFinancialRecord(formData: FormData) {
   revalidatePath("/painel/financeiro");
 }
 
-export async function toggleOnlineStatus(): Promise<{ isOnline: boolean }> {
+// ── Boost grátis para Premium (1x por mês) ────────────────────────────────────
+export async function useFreeBoost() {
   const profile = await getSessionProfile();
-  const updated = await prisma.profile.update({
+
+  const now = new Date();
+  const hasPlan = profile.planExpiresAt != null && new Date(profile.planExpiresAt) > now;
+  if (!hasPlan || profile.planTier !== "PREMIUM") {
+    return { error: "Boost grátis disponível apenas no plano Premium." };
+  }
+
+  const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > now;
+  if (isBoosted) {
+    return { error: "Você já tem um boost ativo." };
+  }
+
+  await prisma.profile.update({
     where: { id: profile.id },
-    data: { isOnline: !profile.isOnline },
-    select: { isOnline: true },
+    data: {
+      featuredUntil: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+      boostLabel: "Em destaque",
+    },
   });
+
+  revalidatePath("/painel/plano");
   revalidatePath("/painel");
-  revalidatePath(`/p/${profile.slug}`);
-  return { isOnline: updated.isOnline };
+  redirect("/painel/plano");
+}
+
+// ── Dev only: ativar plano sem pagamento ───────────────────────────────────────
+export async function devActivatePlan(formData: FormData) {
+  if (process.env.NODE_ENV === "production") return;
+
+  const tier = formData.get("tier") as string;
+  const validTiers = ["ESSENCIAL", "DESTAQUE", "PREMIUM"] as const;
+  if (!validTiers.includes(tier as (typeof validTiers)[number])) return;
+
+  const profile = await getSessionProfile();
+  const planExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  await prisma.profile.update({
+    where: { id: profile.id },
+    data: {
+      planTier: tier as (typeof validTiers)[number],
+      planExpiresAt,
+      isOnline: true,
+    },
+  });
+
+  revalidatePath("/painel/plano");
+  revalidatePath("/painel");
+  redirect("/painel/plano");
 }

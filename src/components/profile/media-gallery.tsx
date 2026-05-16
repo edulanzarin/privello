@@ -175,7 +175,7 @@ function PostModal({
   return (
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/60 sm:backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:p-4"
+      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/60 sm:backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:p-4 cursor-pointer"
       onClick={(e) => { if ((e.target as HTMLElement) === e.currentTarget) onClose(); }}
     >
       <button
@@ -186,7 +186,7 @@ function PostModal({
       </button>
 
       <div
-        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[85vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-2xl sm:shadow-2xl"
+        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[85vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-2xl sm:shadow-2xl cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Photo ── */}
@@ -388,14 +388,13 @@ function PostModal({
 // ── Main gallery component ───────────────────────────────────────────────────
 export function MediaGallery({ media, displayName, slug, isClient, isSubscriber, currentUserId, isOwner, reelsCount }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"fotos" | "videos" | "reels">("fotos");
+  const [tab, setTab] = useState<"fotos" | "reels">("fotos");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   const imageItems = sortMedia(media.filter((m) => m.mediaType !== "VIDEO" && m.mediaType !== "REEL"));
-  const videoItems = sortMedia(media.filter((m) => m.mediaType === "VIDEO"));
 
-  const activeItems = tab === "fotos" ? imageItems : tab === "videos" ? videoItems : [];
+  const activeItems = tab === "fotos" ? imageItems : [];
   const displayed = activeItems.slice(0, visibleCount);
   const hasMore = visibleCount < activeItems.length;
 
@@ -412,7 +411,6 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
 
   const tabs = [
     { key: "fotos" as const, label: "Fotos", count: imageItems.length },
-    { key: "videos" as const, label: "Vídeos", count: videoItems.length },
     { key: "reels" as const, label: "Reels", count: reelsCount ?? null },
   ];
 
@@ -443,7 +441,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
       {activeItems.length === 0 ? (
         <div className="flex min-h-[200px] items-center justify-center">
           <p className="text-[14px] text-muted">
-            {tab === "videos" ? "Nenhum vídeo publicado." : "Nenhuma foto publicada."}
+            {"Nenhuma foto publicada."}
           </p>
         </div>
       ) : (

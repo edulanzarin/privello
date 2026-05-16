@@ -28,7 +28,7 @@ export default async function ReelsPage({ searchParams }: PageProps) {
     }
   }
 
-  const isClient = !!userId && session?.user?.role !== "PROVIDER";
+  const isClient = !!userId;
 
   let viewerIsSubscriber = false;
   let ownerId: string | undefined;

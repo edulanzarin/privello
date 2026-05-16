@@ -158,15 +158,17 @@ export function ProfileStoryCover({
   return (
     <>
       {/* ── Cover photo ── */}
-      <div
+      <button
+        type="button"
+        disabled={!hasStory}
+        onClick={() => setOpen(true)}
         className={cn(
-          "relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full bg-line mx-auto",
+          "relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full bg-line mx-auto block",
           "shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_32px_rgba(0,0,0,0.08)]",
-          hasStory && "cursor-pointer",
+          hasStory ? "cursor-pointer" : "cursor-default",
           hasStory && !allSeen && "ring-[3px] ring-coral ring-offset-2 ring-offset-white",
           hasStory && allSeen && "ring-[2px] ring-black/10 ring-offset-2 ring-offset-white",
         )}
-        onClick={() => hasStory && setOpen(true)}
       >
         {coverUrl ? (
           <Image
@@ -185,29 +187,26 @@ export function ProfileStoryCover({
 
         {/* Story pill indicator */}
         {hasStory && (
-          <button
-            onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+          <span
             className={cn(
-              "absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur-sm transition hover:scale-105",
-              !allSeen
-                ? "bg-coral shadow-sm"
-                : "bg-black/40",
+              "pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur-sm",
+              !allSeen ? "bg-coral shadow-sm" : "bg-black/40",
             )}
           >
             <Play className="h-2 w-2 fill-white" strokeWidth={0} />
             {localGroup?.stories.length}
-          </button>
+          </span>
         )}
-      </div>
+      </button>
 
       {/* ── Story viewer overlay ── */}
       {open && localGroup && activeStory && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm cursor-pointer"
           onClick={close}
         >
           <div
-            className="relative mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden sm:h-[90vh] sm:rounded-xl"
+            className="relative mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden sm:h-[90vh] sm:rounded-xl cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Progress bars */}
@@ -248,8 +247,8 @@ export function ProfileStoryCover({
 
             {/* Tap zones */}
             <div className="absolute inset-0 z-20 grid grid-cols-2">
-              <div className="cursor-pointer" onClick={(e) => { e.stopPropagation(); prev(); }} />
-              <div className="cursor-pointer" onClick={(e) => { e.stopPropagation(); next(); }} />
+              <button type="button" className="cursor-pointer touch-manipulation" onClick={(e) => { e.stopPropagation(); prev(); }} />
+              <button type="button" className="cursor-pointer touch-manipulation" onClick={(e) => { e.stopPropagation(); next(); }} />
             </div>
 
             {/* Bottom bar */}

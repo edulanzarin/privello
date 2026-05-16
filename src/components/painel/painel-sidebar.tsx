@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   BarChart3, Diamond, Images, LayoutDashboard,
-  Star, User, Clock, CircleDollarSign, BookImage, Pencil, Clapperboard, Menu, X, LogOut, HeadphonesIcon,
+  Star, User, Clock, CircleDollarSign, BookImage, Pencil, Clapperboard, Menu, X, LogOut, HeadphonesIcon, ShieldCheck, CheckCircle2,
 } from "lucide-react";
 import { LogoutButton } from "@/components/painel/logout-button";
 import { logoutAction } from "@/app/_actions/logout";
-import { useTransition } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 
@@ -20,7 +19,7 @@ type NavItem =
   | { type: "sep"; label: string };
 
 const PLAN_LABELS: Record<string, string> = {
-  PREMIUM: "Premium", DESTAQUE: "Plus", ESSENCIAL: "Basic",
+  PREMIUM: "Premium", DESTAQUE: "Destaque", ESSENCIAL: "Essencial",
 };
 
 function buildItems(slug: string, planTier?: string): NavItem[] {
@@ -38,6 +37,7 @@ function buildItems(slug: string, planTier?: string): NavItem[] {
 
     { type: "sep", label: "Perfil" },
     { type: "link", href: "/painel/perfil", label: "Editar perfil", icon: Pencil },
+    { type: "link", href: "/conta/verificacao", label: "Verificação", icon: ShieldCheck },
     { type: "link", href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
     { type: "link", href: "/painel/valores", label: "Valores", icon: CircleDollarSign },
 
@@ -53,12 +53,13 @@ function buildItems(slug: string, planTier?: string): NavItem[] {
 }
 
 function NavContent({
-  navItems, pathname, displayName, planTier, handle, avatarUrl, onClose,
+  navItems, pathname, displayName, planTier, hasPlan, handle, avatarUrl, onClose,
 }: {
   navItems: NavItem[];
   pathname: string;
   displayName: string;
   planTier?: string;
+  hasPlan: boolean;
   handle?: string;
   avatarUrl?: string | null;
   onClose?: () => void;
@@ -139,14 +140,21 @@ function NavContent({
         })}
       </nav>
 
-      <div className="mt-4 rounded border border-white/10 p-3 text-xs">
-        <p className="text-white/40">Plano atual</p>
-        <p className="mt-0.5 font-semibold">{PLAN_LABELS[planTier ?? ""] ?? "Basic"}</p>
-        {planTier !== "PREMIUM" && (
-          <Link href="/painel/plano" onClick={onClose} className="mt-1.5 block text-xs text-coral hover:underline">
-            Fazer upgrade →
-          </Link>
-        )}
+      {/* Plan status */}
+      <div className="mt-4 rounded-lg border border-white/10 p-3">
+        <div className="flex items-center gap-2">
+          {hasPlan ? (
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={2} />
+          ) : (
+            <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-amber-400" />
+          )}
+          <p className={cn("text-[12px] font-medium", hasPlan ? "text-[#30d158]" : "text-amber-400")}>
+            {hasPlan ? (PLAN_LABELS[planTier ?? ""] ?? planTier) : "Sem plano ativo"}
+          </p>
+        </div>
+        <Link href="/painel/plano" onClick={onClose} className="mt-2 block text-[11px] text-coral/80 hover:text-coral transition">
+          {hasPlan ? "Gerenciar plano →" : "Assinar um plano →"}
+        </Link>
       </div>
 
       <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
@@ -162,9 +170,14 @@ function NavContent({
 }
 
 export function PainelSidebar({
-  displayName, profileSlug, planTier, handle, avatarUrl,
+  displayName, profileSlug, planTier, hasPlan, handle, avatarUrl,
 }: {
-  displayName: string; profileSlug: string; planTier?: string; handle?: string; avatarUrl?: string | null;
+  displayName: string;
+  profileSlug: string;
+  planTier?: string;
+  hasPlan: boolean;
+  handle?: string;
+  avatarUrl?: string | null;
 }) {
   const pathname = usePathname();
   const navItems = buildItems(profileSlug, planTier);
@@ -182,6 +195,7 @@ export function PainelSidebar({
           pathname={pathname}
           displayName={displayName}
           planTier={planTier}
+          hasPlan={hasPlan}
           handle={handle}
           avatarUrl={avatarUrl}
         />
@@ -236,6 +250,7 @@ export function PainelSidebar({
               pathname={pathname}
               displayName={displayName}
               planTier={planTier}
+              hasPlan={hasPlan}
               handle={handle}
               avatarUrl={avatarUrl}
               onClose={() => setOpen(false)}

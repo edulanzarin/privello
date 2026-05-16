@@ -18,6 +18,7 @@ export default async function PainelLayout({ children }: { children: React.React
       displayName: true,
       slug: true,
       planTier: true,
+      planExpiresAt: true,
       media: {
         where: { isPublic: true },
         orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }],
@@ -35,13 +36,24 @@ export default async function PainelLayout({ children }: { children: React.React
     if (profile?.slug) profileSlug = profile.slug;
   } catch { /* offline */ }
 
+  const hasPlan = profile.planExpiresAt != null && new Date(profile.planExpiresAt) > new Date();
+
   return (
     <ToastProvider>
       <ProviderHeartbeat />
       <div className="min-h-screen bg-background text-foreground">
-        <PainelSidebar displayName={displayName} profileSlug={profileSlug} planTier={profile.planTier} handle={profile.slug || undefined} avatarUrl={profile.media[0]?.url ?? null} />
+        <PainelSidebar
+          displayName={displayName}
+          profileSlug={profileSlug}
+          planTier={profile.planTier}
+          hasPlan={hasPlan}
+          handle={profile.slug || undefined}
+          avatarUrl={profile.media[0]?.url ?? null}
+        />
         <div className="pt-14 md:pl-56 md:pt-0">
-          <div className="px-4 py-8 pb-20 sm:px-6 lg:px-8">{children}</div>
+          <div className="px-4 py-8 pb-20 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-5xl">{children}</div>
+          </div>
         </div>
       </div>
     </ToastProvider>

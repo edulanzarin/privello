@@ -37,8 +37,8 @@ export function BuscarForm() {
   return (
     <div className="space-y-5">
       {/* Search form - same style as home */}
-      <div className="overflow-hidden rounded-2xl border border-black/[0.08] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
-        <div className="grid gap-px bg-black/[0.06] md:grid-cols-[1.5fr_1fr]">
+      <div className="rounded-2xl border border-black/[0.08] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
+        <div className="grid gap-px bg-black/[0.06] md:grid-cols-[1.5fr_1fr] [&>*:first-child]:rounded-tl-2xl [&>*:first-child]:rounded-tr-2xl md:[&>*:first-child]:rounded-tr-none md:[&>*:first-child]:rounded-bl-2xl [&>*:last-child]:rounded-bl-2xl [&>*:last-child]:rounded-br-2xl md:[&>*:last-child]:rounded-bl-none md:[&>*:last-child]:rounded-tr-2xl">
           <CityAutocomplete onSelect={(slug) => setCitySlug(slug)} />
 
           <label className="flex items-center gap-3 bg-white px-4 py-3">

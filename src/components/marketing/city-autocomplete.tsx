@@ -19,6 +19,8 @@ type CityResult = {
   label: string; // "Blumenau, SC"
   slug: string; // "blumenau-sc"
   ibgeId: number;
+  /** Whether this city exists in our local database */
+  isLocal?: boolean;
 };
 
 function toSlug(name: string, uf: string) {
@@ -34,7 +36,32 @@ function toSlug(name: string, uf: string) {
   );
 }
 
-// Module-level cache so the list is fetched once per page load
+// --- Local cities cache (from our database) ---
+type LocalCity = { slug: string; label: string };
+let localCitiesCache: LocalCity[] | null = null;
+let localCitiesFetchPromise: Promise<LocalCity[]> | null = null;
+
+async function getLocalCities(): Promise<LocalCity[]> {
+  if (localCitiesCache) return localCitiesCache;
+  if (!localCitiesFetchPromise) {
+    localCitiesFetchPromise = fetch("/api/cities")
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to fetch local cities");
+        return r.json() as Promise<{ cities: LocalCity[] }>;
+      })
+      .then((data) => {
+        localCitiesCache = data.cities;
+        return data.cities;
+      })
+      .catch(() => {
+        localCitiesFetchPromise = null;
+        return [] as LocalCity[];
+      });
+  }
+  return localCitiesFetchPromise;
+}
+
+// --- IBGE cache (all Brazilian municipalities) ---
 let ibgeCache: IbgeMunicipio[] | null = null;
 let ibgeFetchPromise: Promise<IbgeMunicipio[]> | null = null;
 
@@ -44,13 +71,28 @@ async function getIbgeMunicipios(): Promise<IbgeMunicipio[]> {
     ibgeFetchPromise = fetch(
       "https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome",
     )
-      .then((r) => r.json() as Promise<IbgeMunicipio[]>)
+      .then((r) => {
+        if (!r.ok) throw new Error("IBGE API error");
+        return r.json() as Promise<IbgeMunicipio[]>;
+      })
       .then((data) => {
         ibgeCache = data;
         return data;
+      })
+      .catch(() => {
+        // Reset promise so it can be retried
+        ibgeFetchPromise = null;
+        return [] as IbgeMunicipio[];
       });
   }
   return ibgeFetchPromise;
+}
+
+function normalize(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 type Props = {
@@ -70,8 +112,9 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
   // Only open the dropdown when the user actually types — not on initial render
   const userTypedRef = useRef(false);
 
-  // Pre-warm the cache as soon as the component mounts
+  // Pre-warm both caches as soon as the component mounts
   useEffect(() => {
+    getLocalCities().catch(() => { });
     getIbgeMunicipios().catch(() => { });
   }, []);
 
@@ -87,19 +130,24 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const all = await getIbgeMunicipios();
-        const lower = trimmed
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "");
-        const filtered = all
-          .filter((m) =>
-            m.nome
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .startsWith(lower),
-          )
+        const lower = normalize(trimmed);
+
+        // 1. First, search local cities (instant, reliable)
+        const localCities = await getLocalCities();
+        const localMatches: CityResult[] = localCities
+          .filter((c) => normalize(c.label).startsWith(lower) || normalize(c.slug).startsWith(lower))
+          .map((c) => ({
+            label: c.label,
+            slug: c.slug,
+            ibgeId: 0,
+            isLocal: true,
+          }));
+
+        // 2. Then, search IBGE for additional results
+        const ibgeAll = await getIbgeMunicipios();
+        const localSlugs = new Set(localMatches.map((m) => m.slug));
+        const ibgeMatches: CityResult[] = ibgeAll
+          .filter((m) => normalize(m.nome).startsWith(lower))
           .slice(0, 8)
           .map((m) => {
             const uf = m.microrregiao.mesorregiao.UF.sigla;
@@ -108,26 +156,34 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
               slug: toSlug(m.nome, uf),
               ibgeId: m.id,
             };
-          });
-        setResults(filtered);
-        setOpen(filtered.length > 0);
+          })
+          .filter((r) => !localSlugs.has(r.slug)); // avoid duplicates
+
+        // Combine: local cities first, then IBGE results
+        const combined = [...localMatches, ...ibgeMatches].slice(0, 8);
+        setResults(combined);
+        setOpen(combined.length > 0);
       } catch {
-        // silently fail — user can still type
+        // silently fail — user can still type and submit manually
       } finally {
         setLoading(false);
       }
-    }, 250);
+    }, 150);
   }, [query]);
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click/touch
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleOutside(e: MouseEvent | TouchEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
   }, []);
 
   return (
@@ -156,10 +212,10 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
           )}
           {!loading &&
             results.map((r) => (
-              <li key={r.ibgeId}>
+              <li key={r.slug}>
                 <button
                   type="button"
-                  onMouseDown={(e) => {
+                  onPointerDown={(e) => {
                     e.preventDefault();
                     setQuery(r.label);
                     setOpen(false);

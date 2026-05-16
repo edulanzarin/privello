@@ -51,14 +51,6 @@ export async function saveOnboardingPerfil(formData: FormData) {
     },
   });
 
-  // Get or create a default district for this city
-  let district = await prisma.district.findFirst({ where: { cityId: city.id } });
-  if (!district) {
-    district = await prisma.district.create({
-      data: { name: "Centro", slug: "centro", cityId: city.id },
-    });
-  }
-
   await prisma.profile.update({
     where: { id: profile.id },
     data: {
@@ -66,7 +58,6 @@ export async function saveOnboardingPerfil(formData: FormData) {
       tagline: tagline || null,
       whatsappPhone: whatsapp || null,
       cityId: city.id,
-      districtId: district.id,
       heightCm: heightCm && !isNaN(heightCm) ? heightCm : null,
       dressSize,
       hair,
@@ -175,7 +166,7 @@ export async function saveOnboardingValores(formData: FormData) {
   if (!oneHour) return { error: "Informe o valor para 1 hora (obrigatório)." };
 
   const twoHours  = options.find((o) => o.minutes === 120);
-  const overnight = options.find((o) => o.minutes === 600);
+  const overnight = options.find((o) => o.minutes === 720);
   const travel    = options.find((o) => o.minutes === 1440);
 
   await prisma.$transaction([

@@ -104,7 +104,7 @@ export default async function VerificationDetailPage({ params }: PageProps) {
             <div>
               <p className="text-xl font-bold">{profile.displayName}</p>
               <p className="text-sm text-muted">
-                {profile.city.name} · {profile.district.name}
+                {profile.city.name}{profile.district ? ` · ${profile.district.name}` : ""}
               </p>
               <p className="mt-1 text-xs text-muted">{profile.user?.email}</p>
             </div>

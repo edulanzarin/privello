@@ -3,7 +3,7 @@
 import { Share2, Check } from "lucide-react";
 import { useState } from "react";
 
-export function ShareButton({ displayName, slug }: { displayName: string; slug: string }) {
+export function ShareButton({ displayName, slug, className }: { displayName: string; slug: string; className?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
@@ -16,16 +16,21 @@ export function ShareButton({ displayName, slug }: { displayName: string; slug: 
         // User cancelled or not supported — fall through to clipboard
       }
     }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard unavailable (HTTP / no permission) — show prompt as last resort
+      window.prompt("Copie o link:", url);
+    }
   }
 
   return (
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]"
+      className={`inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]${className ? ` ${className}` : ""}`}
       title="Compartilhar perfil"
     >
       {copied ? (

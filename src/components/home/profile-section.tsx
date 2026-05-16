@@ -32,7 +32,7 @@ export function ProfileSection({ type, initialProfiles, initialHasMore, viewAllH
 
   return (
     <>
-      <div className="mx-auto mt-10 grid max-w-6xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
+      <div className="mx-auto mt-10 max-w-6xl columns-1 gap-6 px-4 sm:columns-2 sm:px-6 lg:columns-4 [&>*]:mb-6 [&>*]:break-inside-avoid">
         {profiles.map((p) => (
           <ProfileCard key={p.id} profile={p} />
         ))}

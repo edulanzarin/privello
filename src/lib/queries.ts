@@ -7,8 +7,8 @@ const profileCardInclude = {
   media: {
     where: { isPublic: true },
     orderBy: { sortOrder: "asc" as const },
-    take: 4,
-    select: { url: true, isCover: true },
+    take: 20,
+    select: { url: true, isCover: true, mediaType: true },
   },
 } satisfies Prisma.ProfileInclude;
 
@@ -86,7 +86,6 @@ export type DiscoverFilters = {
   ageMin?: number;
   ageMax?: number;
   verifiedOnly?: boolean;
-  onlineOnly?: boolean;
   hasOwnPlace?: boolean;
   homeVisit?: boolean;
   excludeProfileId?: string;
@@ -135,10 +134,11 @@ export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[
 }
 
 export async function listProfilesForCity(cityId: string, filters: DiscoverFilters, sort: ProfileSort = "relevance") {
+  const now = new Date();
   const where: Prisma.ProfileWhereInput = {
     cityId,
     isSuspended: false,
-    // Only show profiles that have a cover photo (registration complete)
+    planExpiresAt: { gt: now },
     media: { some: { isCover: true } },
   };
 
@@ -159,7 +159,6 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
     if (filters.ageMax != null) where.age.lte = filters.ageMax;
   }
   if (filters.verifiedOnly) where.isVerified = true;
-  if (filters.onlineOnly) where.isOnline = true;
   if (filters.hasOwnPlace) where.hasOwnPlace = true;
   if (filters.homeVisit) where.homeVisit = true;
   if (filters.excludeProfileId) where.id = { not: filters.excludeProfileId };
@@ -184,8 +183,11 @@ export async function listProfilesForCity(cityId: string, filters: DiscoverFilte
 export async function searchProfilesGlobal(q: string, limit = 30) {
   const term = q.replace(/^@/, "").trim();
   if (!term) return [];
+  const now = new Date();
   const profiles = await prisma.profile.findMany({
     where: {
+      isSuspended: false,
+      planExpiresAt: { gt: now },
       OR: [
         { displayName: { contains: term, mode: "insensitive" } },
         { slug: { contains: term, mode: "insensitive" } },
@@ -238,8 +240,9 @@ export async function getUserReviewForProfile(profileId: string, userId: string)
 }
 
 export async function getPremiumWeekProfiles() {
+  const now = new Date();
   return prisma.profile.findMany({
-    where: { planTier: { in: ["PREMIUM", "DESTAQUE"] }, isSuspended: false },
+    where: { planTier: { in: ["PREMIUM", "DESTAQUE"] }, isSuspended: false, planExpiresAt: { gt: now } },
     include: profileCardInclude,
     orderBy: [{ featuredUntil: "desc" }, { ratingAvg: "desc" }],
     take: 8,
@@ -251,9 +254,11 @@ export async function getPremiumWeekProfiles() {
  * Most viewed profiles this week, regardless of plan tier.
  */
 export async function getHotProfiles(limit = 20) {
+  const now = new Date();
   const profiles = await prisma.profile.findMany({
     where: {
       isSuspended: false,
+      planExpiresAt: { gt: now },
       media: { some: { isCover: true } },
     },
     include: profileCardInclude,
@@ -274,6 +279,7 @@ export async function getBoostedProfiles(limit = 8) {
     where: {
       featuredUntil: { gt: now },
       isSuspended: false,
+      planExpiresAt: { gt: now },
       media: { some: { isCover: true } },
     },
     include: profileCardInclude,
@@ -301,9 +307,11 @@ export async function getSectionProfiles(
   limit = SECTION_PAGE_SIZE,
 ) {
   if (type === "hot") {
+    const now = new Date();
     const rows = await prisma.profile.findMany({
       where: {
         isSuspended: false,
+        planExpiresAt: { gt: now },
         media: { some: { isCover: true } },
       },
       include: profileCardInclude,
@@ -321,6 +329,7 @@ export async function getSectionProfiles(
     where: {
       featuredUntil: { gt: now },
       isSuspended: false,
+      planExpiresAt: { gt: now },
       media: { some: { isCover: true } },
     },
     include: profileCardInclude,
@@ -447,15 +456,22 @@ export async function getStoriesForProfile(profileId: string, userId?: string): 
   return group;
 }
 
-export async function listStoriesForCity(cityId: string, userId?: string): Promise<StoryGroup[]> {
+export async function listStoriesForCity(cityId: string, userId?: string, gender?: string): Promise<StoryGroup[]> {
   const now = new Date();
+
+  // Build profile filter matching the same gender logic as listProfilesForCity
+  const profileWhere: Prisma.ProfileWhereInput = {
+    cityId,
+    planTier: { in: ["DESTAQUE", "PREMIUM"] },
+  };
+  if (gender === "garotos") profileWhere.servesWomen = true;
+  else if (gender === "casais") profileWhere.servesCouples = true;
+  else profileWhere.servesMen = true;
+
   const rawStories = await prisma.story.findMany({
     where: {
       expiresAt: { gt: now },
-      profile: {
-        cityId,
-        planTier: { in: ["DESTAQUE", "PREMIUM"] },
-      },
+      profile: profileWhere,
     },
     include: {
       profile: {

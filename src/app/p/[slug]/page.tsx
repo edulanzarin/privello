@@ -1,7 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { MapPin, Star, ShieldCheck, Video, Clock3, Lock } from "lucide-react";
+import { MapPin, Star, ShieldCheck, Video, Clock3, Lock, Eye } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProviderBanner } from "@/components/layout/provider-banner";
@@ -21,6 +22,37 @@ import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const profile = await prisma.profile.findUnique({
+    where: { slug },
+    select: {
+      displayName: true,
+      age: true,
+      tagline: true,
+      city: { select: { name: true, slug: true } },
+      media: { where: { isCover: true }, select: { url: true }, take: 1 },
+    },
+  });
+  if (!profile) return {};
+
+  const title = `${profile.displayName}, ${profile.age} anos — Acompanhante em ${profile.city.name}`;
+  const description = profile.tagline
+    ? `${profile.tagline} · Acompanhante em ${profile.city.name}. Perfil verificado no Privello.`
+    : `Acompanhante em ${profile.city.name}. Veja fotos, áudio e vídeo no Privello.`;
+  const coverUrl = profile.media[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} · privello.`,
+      description,
+      ...(coverUrl ? { images: [{ url: coverUrl, width: 800, height: 1000 }] } : {}),
+    },
+  };
+}
 
 const PLAN_BADGE: Record<string, { bg: string; label: string }> = {
   PREMIUM: { bg: "bg-coral", label: "PREMIUM" },
@@ -56,15 +88,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
     }
   }
 
-  // Any logged-in user can interact (favorite, like, etc.) — except on their own profile
-  const canInteract = isLoggedIn && !ownerView;
+  // Only non-provider users can interact — providers are read-only on all profiles
+  const canInteract = isLoggedIn && !ownerView && !isProvider;
   const initialFavorited = canInteract ? await getFavoriteStatus(profile.id) : false;
 
   // Stories ativos deste perfil
   const storyGroup = await getStoriesForProfile(profile.id, session?.user?.id);
-  const isClientUser = isLoggedIn && !ownerView;
+  const isClientUser = isLoggedIn && !ownerView && !isProvider;
   const isSubscriberViewer = session?.user?.id ? await isSubscriber(session.user.id) : false;
-  const userReview = isLoggedIn && !ownerView && !isProvider && session?.user?.id
+  const userReview = isLoggedIn && !ownerView && session?.user?.id
     ? await getUserReviewForProfile(profile.id, session.user.id)
     : null;
 
@@ -91,21 +123,22 @@ export default async function PublicProfilePage({ params }: PageProps) {
     : (PLAN_BADGE[profile.planTier] ?? PLAN_BADGE.ESSENCIAL);
 
   // Verification seals
-  const seals: { icon: typeof ShieldCheck; label: string; sub: string }[] = [];
+  const seals: { icon: typeof ShieldCheck; label: string; sub: string; color: string }[] = [];
   if (profile.isVerified) {
-    seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie" });
+    seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie", color: "text-[#30d158]" });
   }
   if (profile.videoVerified) {
-    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada" });
+    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada", color: "text-[#5856d6]" });
   }
-  seals.push({ icon: Clock3, label: `Membro há ${monthsVerified} meses`, sub: `Desde ${memberLabel}` });
+  seals.push({ icon: Clock3, label: `Membro há ${monthsVerified} meses`, sub: `Desde ${memberLabel}`, color: "text-muted" });
+  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`, sub: "este mês", color: "text-[#0a84ff]" });
 
   return (
     <>
       <SiteHeader activeHref={`/descobrir/${profile.city.slug}`} />
       {!ownerView && <ViewTracker profileId={profile.id} />}
       {ownerView && <ProviderBanner variant="own-profile" />}
-      {isProvider && !ownerView && <ProviderBanner variant="other-profile" />}
+
 
       <main className="min-h-screen pb-28">
 
@@ -203,50 +236,45 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
                 {/* Verification seals */}
                 {seals.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-5 w-full max-w-sm sm:max-w-none divide-y divide-black/[0.05] rounded-xl border border-black/[0.07] bg-black/[0.02]">
                     {seals.map((s) => (
-                      <div key={s.label} className="flex items-center gap-1.5 rounded-lg bg-black/[0.03] px-3 py-1.5 text-[12px]">
-                        <s.icon className="h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={1.5} />
-                        <span className="font-medium text-foreground">{s.label}</span>
-                        <span className="text-muted">· {s.sub}</span>
+                      <div key={s.label} className="flex items-center gap-3 px-3.5 py-2.5">
+                        <s.icon className={`h-4 w-4 shrink-0 ${s.color}`} strokeWidth={1.5} />
+                        <div className="min-w-0">
+                          <span className="text-[12px] font-semibold text-foreground">{s.label}</span>
+                          <span className="ml-1.5 text-[11px] text-muted">{s.sub}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* CTAs */}
-                <div className="mt-6 flex flex-wrap gap-2.5">
-                  {!ownerView && (
-                    <>
+                {/* CTAs primários */}
+                {!ownerView ? (
+                  <>
+                    <div className="mt-5 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:max-w-none">
                       <Link
                         href={`/solicitar/${profile.slug}`}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-coral px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+                        className="flex items-center justify-center gap-2 rounded-full bg-coral py-3 text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
                       >
                         Marcar horário
                       </Link>
-                      <WhatsAppButton phone={profile.whatsappPhone} profileId={profile.id} />
-                      <FavoriteButton profileId={profile.id} initialFavorited={initialFavorited} isLoggedIn={isLoggedIn} />
-                    </>
-                  )}
-                  <ShareButton displayName={profile.displayName} slug={profile.slug} />
-                  {ownerView && (
+                      <WhatsAppButton phone={profile.whatsappPhone} profileId={profile.id} className="w-full py-3" />
+                    </div>
+                    <div className="mt-2 grid w-full max-w-sm grid-cols-2 gap-2 sm:max-w-none">
+                      <FavoriteButton profileId={profile.id} initialFavorited={initialFavorited} isLoggedIn={isLoggedIn} className="w-full py-2.5" />
+                      <ShareButton displayName={profile.displayName} slug={profile.slug} className="w-full py-2.5" />
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-5 flex gap-2.5">
                     <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
                       Editar perfil
                     </Link>
-                  )}
-                </div>
+                    <ShareButton displayName={profile.displayName} slug={profile.slug} />
+                  </div>
+                )}
 
-                {/* Quick stats */}
-                <div className="mt-6 grid grid-cols-2 gap-2 max-w-xs">
-                  <div className="rounded-lg bg-black/[0.03] px-3 py-2.5">
-                    <p className="text-[11px] font-medium text-muted">Visualizações</p>
-                    <p className="mt-0.5 text-[14px] font-semibold">{profile.viewsThisMonth.toLocaleString("pt-BR")}<span className="text-muted font-normal text-[11px]"> /mês</span></p>
-                  </div>
-                  <div className="rounded-lg bg-black/[0.03] px-3 py-2.5">
-                    <p className="text-[11px] font-medium text-muted">Membro desde</p>
-                    <p className="mt-0.5 text-[14px] font-semibold">{memberLabel}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

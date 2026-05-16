@@ -142,8 +142,8 @@ model Profile {
 
   cityId     String
   city       City     @relation(fields: [cityId], references: [id])
-  districtId String
-  district   District @relation(fields: [districtId], references: [id])
+  districtId String?
+  district   District? @relation(fields: [districtId], references: [id])
 
   priceHour       Int
   priceTwoHours   Int?
@@ -469,4 +469,12 @@ model Warning {
 
   @@index([profileId, createdAt])
   @@index([adminId])
+}
+
+model PendingRegistration {
+  id        String   @id @default(cuid())
+  data      Json
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }

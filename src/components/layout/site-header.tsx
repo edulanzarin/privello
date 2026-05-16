@@ -38,7 +38,7 @@ export async function SiteHeader({ variant = "default", activeHref }: SiteHeader
     <header className="sticky top-0 z-50 border-b border-black/[0.08] bg-[#f5f5f7]">
       <div className="mx-auto flex h-11 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <Link href="/" className="text-[17px] font-bold tracking-tight text-foreground">
+        <Link href={session?.user?.role === "PROVIDER" ? "/painel" : "/"} className="text-[17px] font-bold tracking-tight text-foreground">
           privello<span className="text-coral">.</span>
         </Link>
 

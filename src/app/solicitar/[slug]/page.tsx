@@ -353,7 +353,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
               displayName: profile.displayName,
               age: profile.age,
               cityName: profile.city.name,
-              districtName: profile.district.name,
+              districtName: profile.district?.name ?? "",
               isOnline: profile.isOnline,
               whatsappPhone: profile.whatsappPhone,
               imageUrl: pubImg?.url ?? null,

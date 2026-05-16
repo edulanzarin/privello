@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Eye, Heart, MessageCircle, TrendingUp, Zap, ArrowUpRight, AlertCircle, Ban } from "lucide-react";
-import { OnlineToggle } from "@/components/painel/online-toggle";
+import { Eye, Heart, TrendingUp, Zap, ArrowUpRight, AlertCircle, Ban } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { countWhatsAppClicksToday, listWhatsAppClicksRecent, listFinancialRecordsForMonth } from "@/lib/queries";
+import { listFinancialRecordsForMonth } from "@/lib/queries";
 import { formatBrl } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -65,18 +64,14 @@ export default async function PainelOverviewPage() {
   const month = now.getMonth() + 1;
   const today = now.getDate();
 
-  const [clicks, clicksToday, financialRows] = await Promise.all([
-    listWhatsAppClicksRecent(profile.id, 5),
-    countWhatsAppClicksToday(profile.id),
+  const [financialRows, favRows] = await Promise.all([
     listFinancialRecordsForMonth(profile.id, year, month),
+    prisma.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM "Favorite" WHERE "profileId" = ${profile.id}`,
   ]);
 
-  const favRows = await prisma.$queryRaw<[{ count: bigint }]>`
-    SELECT COUNT(*) as count FROM "Favorite" WHERE "profileId" = ${profile.id}
-  `;
   const favoritesCount = Number(favRows[0]?.count ?? 0);
+  const hasPlan = profile.planExpiresAt != null && new Date(profile.planExpiresAt) > new Date();
   const viewsPeriod = (profile as Record<string, unknown>).viewsCurrentPeriod as number ?? 0;
-  const uniqueVisitors = new Set(clicks.map((c) => c.visitor)).size;
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
 
   // Financial stats
@@ -92,14 +87,6 @@ export default async function PainelOverviewPage() {
     return financialRows
       .filter((r) => new Date(r.occurredAt).toDateString() === dayStr && !r.isNoShow)
       .reduce((a, r) => a + r.amountBrl, 0);
-  });
-
-  // WhatsApp clicks last 7 days (mock from recent clicks count)
-  const clicksByDay = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(now);
-    d.setDate(today - 6 + i);
-    const dayStr = d.toDateString();
-    return clicks.filter((c) => new Date(c.clickedAt).toDateString() === dayStr).length;
   });
 
   const hour = new Date().getHours();
@@ -122,7 +109,6 @@ export default async function PainelOverviewPage() {
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <OnlineToggle initialOnline={profile.isOnline} />
           <Link href={`/p/${profile.slug}`}
             className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[12px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
             <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -130,6 +116,27 @@ export default async function PainelOverviewPage() {
           </Link>
         </div>
       </div>
+
+      {/* ── No plan banner ── */}
+      {!profile.isSuspended && !hasPlan && (
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-200/60 bg-amber-50 px-5 py-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" strokeWidth={1.5} />
+            <div>
+              <p className="text-[13px] font-semibold text-amber-800">Perfil desabilitado</p>
+              <p className="mt-0.5 text-[12px] text-amber-700">
+                Você não aparece nas buscas enquanto não tiver um plano ativo.
+              </p>
+            </div>
+          </div>
+          <a
+            href="/painel/plano"
+            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-[12px] font-semibold text-white transition hover:bg-amber-600 active:scale-[0.97]"
+          >
+            Ativar plano
+          </a>
+        </div>
+      )}
 
       {/* ── Suspension banner ── */}
       {profile.isSuspended && (
@@ -187,19 +194,6 @@ export default async function PainelOverviewPage() {
           <p className="mt-0.5 text-[11px] text-muted">acumulado</p>
           <div className="mt-3 h-8">
             <Sparkline data={[...Array(7)].map((_, i) => Math.max(0, viewsPeriod - (6 - i) * 2))} color="#86868b" />
-          </div>
-        </div>
-
-        {/* WhatsApp */}
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted">WhatsApp hoje</p>
-            <MessageCircle className="h-4 w-4 text-muted" strokeWidth={1.5} />
-          </div>
-          <p className="mt-3 text-[22px] font-semibold tabular-nums tracking-tight">{clicksToday}</p>
-          <p className="mt-0.5 text-[11px] text-muted">{uniqueVisitors} visitante{uniqueVisitors !== 1 ? "s" : ""} único{uniqueVisitors !== 1 ? "s" : ""}</p>
-          <div className="mt-3 h-8">
-            <BarChart data={clicksByDay} color="#30d158" />
           </div>
         </div>
 
@@ -296,26 +290,11 @@ export default async function PainelOverviewPage() {
             )}
           </div>
 
-          {/* Recent WhatsApp clicks */}
+          {/* Views do período */}
           <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
-            <p className="text-[11px] font-medium text-muted mb-3">
-              WhatsApp recente
-            </p>
-            {clicks.length === 0 ? (
-              <p className="text-[13px] text-muted">Nenhum clique ainda.</p>
-            ) : (
-              <ul className="space-y-2">
-                {clicks.map((c) => (
-                  <li key={c.id} className="flex items-center justify-between text-[12px]">
-                    <span className="text-muted">
-                      {c.clickedAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    <span className="font-medium truncate mx-2">{c.visitor}</span>
-                    <span className="text-muted shrink-0">{c.source}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <p className="text-[11px] font-medium text-muted mb-1">Visualizações · período atual</p>
+            <p className="text-[28px] font-semibold tabular-nums tracking-tight">{viewsPeriod.toLocaleString("pt-BR")}</p>
+            <p className="mt-0.5 text-[11px] text-muted">desde o início do período de ranking</p>
           </div>
         </div>
       </div>

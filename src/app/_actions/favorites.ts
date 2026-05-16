@@ -8,12 +8,12 @@ export async function toggleFavorite(profileId: string) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Faça login para curtir perfis." };
 
-  // Providers cannot favorite other profiles
+  // Prevent self-favoriting
   const viewerProfile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
     select: { id: true },
   });
-  if (viewerProfile) return { error: "Acompanhantes não podem curtir outros perfis." };
+  if (viewerProfile?.id === profileId) return { error: "Você não pode curtir seu próprio perfil." };
 
   const userId = session.user.id;
 

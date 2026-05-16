@@ -316,7 +316,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                       <td className="px-3 py-2">
                         <p className="font-semibold leading-tight">{row.profile.displayName}, {row.profile.age}</p>
                         <p className="text-[11px] text-muted">
-                          {row.profile.city.name} · {row.profile.district.name}
+                          {row.profile.city.name}{row.profile.district ? ` · ${row.profile.district.name}` : ""}
                         </p>
                       </td>
                       <td className="px-3 py-2">

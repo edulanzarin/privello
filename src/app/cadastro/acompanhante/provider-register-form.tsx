@@ -58,12 +58,16 @@ function cleanSlug(s: string) {
     .replace(/^-/, "");
 }
 
-const STEP_LABELS = ["Identidade", "Perfil", "Valores", "Acesso"];
+const STEP_LABELS = ["Identidade", "Perfil", "Valores", "Acesso", "Foto"];
 
 export function ProviderRegisterForm() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  // Step 5 — photo
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
   // Step 1
   const [displayName, setDisplayName] = useState("");
@@ -125,21 +129,22 @@ export function ProviderRegisterForm() {
     return null;
   }
 
-  function next() {
-    const err = validate(step);
-    if (err) { setError(err); return; }
+  function handlePhotoChange(file: File) {
+    if (!file.type.startsWith("image/")) {
+      setError("Use uma imagem (JPG, PNG, WebP).");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Imagem muito grande. Máximo 8 MB.");
+      return;
+    }
     setError(null);
-    setStep((s) => s + 1);
+    setPhotoFile(file);
+    setPhotoPreviewUrl(URL.createObjectURL(file));
   }
 
-  function back() {
-    setError(null);
-    setStep((s) => s - 1);
-  }
-
-  function handleSubmit() {
-    const err = validate(4);
-    if (err) { setError(err); return; }
+  function handleFinish() {
+    if (!photoFile) { setError("Selecione uma foto de perfil."); return; }
     setError(null);
 
     const durations = DURATIONS
@@ -176,6 +181,7 @@ export function ProviderRegisterForm() {
     fd.set("travelsInternational", travelsInternational ? "1" : "0");
     fd.set("paymentMethods", payments.join(" · "));
     fd.set("durationsJson", JSON.stringify(durations));
+    fd.set("photo", photoFile);
 
     startTransition(async () => {
       const res = await registerProviderAction(fd);
@@ -183,10 +189,38 @@ export function ProviderRegisterForm() {
     });
   }
 
+  function next() {
+    const err = validate(step);
+    if (err) { setError(err); return; }
+    setError(null);
+    setStep((s) => s + 1);
+  }
+
+  function back() {
+    setError(null);
+    setStep((s) => s - 1);
+  }
+
+
   return (
     <div className="mt-8">
-      {/* Step indicator - macOS style */}
-      <div className="mb-8 flex items-center justify-center gap-0">
+      {/* Step indicator */}
+      {/* Mobile: barra de progresso compacta */}
+      <div className="mb-8 sm:hidden">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-muted">Passo {step} de {STEP_LABELS.length}</span>
+          <span className="text-xs font-semibold text-coral">{STEP_LABELS[step - 1]}</span>
+        </div>
+        <div className="h-1 w-full rounded-full bg-line overflow-hidden">
+          <div
+            className="h-full rounded-full bg-coral transition-all duration-300"
+            style={{ width: `${(step / STEP_LABELS.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Desktop: círculos */}
+      <div className="mb-8 hidden sm:flex items-center justify-center gap-0">
         {STEP_LABELS.map((label, i) => {
           const n = i + 1;
           const done = n < step;
@@ -196,18 +230,18 @@ export function ProviderRegisterForm() {
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
-                    done ? "bg-success text-white shadow-md" : active ? "bg-coral text-white shadow-lg scale-110" : "bg-line text-muted",
+                    "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
+                    done ? "bg-success text-white" : active ? "bg-coral text-white scale-110" : "bg-line text-muted",
                   )}
                 >
                   {done ? "✓" : n}
                 </div>
-                <span className={cn("mt-1.5 text-[10px] font-medium", active ? "text-foreground" : "text-muted")}>
+                <span className={cn("mt-1.5 text-[9px] font-medium", active ? "text-foreground" : "text-muted")}>
                   {label}
                 </span>
               </div>
               {i < STEP_LABELS.length - 1 && (
-                <div className={cn("mx-3 mb-5 h-0.5 w-10 rounded-full transition-all", done ? "bg-success" : "bg-line")} />
+                <div className={cn("mx-2 mb-5 h-0.5 w-8 rounded-full transition-all", done ? "bg-success" : "bg-line")} />
               )}
             </div>
           );
@@ -507,11 +541,61 @@ export function ProviderRegisterForm() {
               <span className="font-semibold">R$ {durPrice["1h"] || "—"}</span>
             </div>
           </Card>
+        </div>
+      )}
+
+      {/* ── Step 5: Foto de perfil ── */}
+      {step === 5 && (
+        <div className="space-y-5 animate-fade-in">
+          <Card>
+            <p className="text-[14px] font-semibold mb-1">Foto de perfil</p>
+            <p className="text-xs text-muted mb-5">
+              Será sua foto principal — você pode trocar depois no painel.
+            </p>
+
+            <div className="flex flex-col items-center gap-4">
+              {/* Preview */}
+              <div
+                className="relative h-48 w-36 overflow-hidden rounded-2xl bg-line cursor-pointer border-2 border-dashed border-black/15 transition hover:border-coral/50"
+                onClick={() => document.getElementById("photo-input")?.click()}
+              >
+                {photoPreviewUrl ? (
+                  <img src={photoPreviewUrl} alt="Preview" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-2 text-muted">
+                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-[11px]">Toque para selecionar</span>
+                  </div>
+                )}
+              </div>
+
+              <input
+                id="photo-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoChange(file);
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => document.getElementById("photo-input")?.click()}
+                className="rounded-xl border border-black/10 bg-white px-4 py-2 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
+              >
+                {photoPreviewUrl ? "Trocar foto" : "Selecionar foto"}
+              </button>
+            </div>
+          </Card>
 
           <p className="text-center text-xs text-muted">
-            Ao criar perfil você confirma ter +18 anos e concorda com os termos.
-            <br />
-            <strong>Importante:</strong> Você precisará enviar pelo menos uma foto de perfil para ativar seu perfil.
+            Ao finalizar você confirma ter +18 anos e concorda com os termos.
+            <br />Após o cadastro você precisará ativar um plano para aparecer nas buscas.
           </p>
         </div>
       )}
@@ -526,13 +610,13 @@ export function ProviderRegisterForm() {
           <span />
         )}
 
-        {step < 4 ? (
+        {step < 5 ? (
           <Button variant="coral" size="lg" onClick={next}>
-            Continuar →
+            {step < 4 ? "Continuar →" : "Próximo →"}
           </Button>
         ) : (
-          <Button variant="coral" size="lg" onClick={handleSubmit} loading={pending}>
-            {pending ? "Criando perfil…" : "Criar perfil e continuar"}
+          <Button variant="coral" size="lg" onClick={handleFinish} loading={pending}>
+            {pending ? "Criando perfil…" : "Finalizar cadastro"}
           </Button>
         )}
       </div>

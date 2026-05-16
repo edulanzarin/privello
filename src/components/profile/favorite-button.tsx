@@ -9,9 +9,10 @@ type Props = {
   profileId: string;
   initialFavorited: boolean;
   isLoggedIn: boolean;
+  className?: string;
 };
 
-export function FavoriteButton({ profileId, initialFavorited, isLoggedIn }: Props) {
+export function FavoriteButton({ profileId, initialFavorited, isLoggedIn, className: extraClass }: Props) {
   const [favorited, setFavorited] = useState(initialFavorited);
   const [pending, startTransition] = useTransition();
 
@@ -42,6 +43,7 @@ export function FavoriteButton({ profileId, initialFavorited, isLoggedIn }: Prop
           ? "bg-coral text-white shadow-sm hover:brightness-110"
           : "bg-white border border-black/10 text-foreground shadow-sm hover:bg-black/[0.03]",
         pending && "opacity-50",
+        extraClass,
       )}
     >
       <Heart

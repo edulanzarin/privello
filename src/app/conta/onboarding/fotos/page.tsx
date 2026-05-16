@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import { Camera } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { setCoverPhoto } from "@/app/_actions/onboarding";
-import { PhotoUploader } from "./photo-uploader";
+import { ProfilePhotoUploader } from "./photo-uploader";
 
 export const dynamic = "force-dynamic";
 
@@ -36,45 +35,10 @@ export default async function OnboardingFotosPage() {
           Escolha a foto que aparecerá como foto de perfil do seu anúncio. É obrigatória para ativar seu perfil.
         </p>
 
-        {/* Photo area */}
+        {/* Clickable profile circle — opens file picker */}
         <div className="mt-8 flex justify-center">
-          {coverPhoto ? (
-            <div className="relative">
-              <div className="relative h-40 w-40 overflow-hidden rounded-full ring-2 ring-coral ring-offset-4 ring-offset-[#f5f5f7]">
-                <Image src={coverPhoto.url} alt="Foto de perfil" fill className="object-cover" sizes="160px" />
-              </div>
-              <p className="mt-4 text-[13px] font-medium text-[#248a3d]">✓ Foto definida</p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex h-40 w-40 items-center justify-center rounded-full bg-black/[0.04] border-2 border-dashed border-black/[0.12]">
-                <Camera className="h-10 w-10 text-muted" strokeWidth={1.2} />
-              </div>
-              <p className="text-[13px] text-muted">Nenhuma foto enviada ainda</p>
-            </div>
-          )}
+          <ProfilePhotoUploader coverUrl={coverPhoto?.url ?? null} />
         </div>
-
-        {/* Upload button */}
-        <div className="mt-6">
-          <PhotoUploader isPublic={true} />
-        </div>
-
-        {/* If there are photos but none is cover, show them to select */}
-        {profile.media.length > 0 && !coverPhoto && (
-          <div className="mt-6">
-            <p className="text-[12px] text-muted mb-3">Selecione uma como foto de perfil:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {profile.media.map((m) => (
-                <form key={m.id} action={setCoverPhoto.bind(null, m.id)}>
-                  <button type="submit" className="relative h-16 w-16 overflow-hidden rounded-full ring-1 ring-black/[0.08] transition hover:ring-2 hover:ring-coral">
-                    <Image src={m.url} alt="" fill className="object-cover" sizes="64px" />
-                  </button>
-                </form>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* CTA */}
         <div className="mt-8">

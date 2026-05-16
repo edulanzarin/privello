@@ -170,7 +170,6 @@ function ReelPlayer({
             muted={muted}
             playsInline
             className="h-full w-full object-cover"
-            onClick={() => setMuted((m) => !m)}
           />
         )}
 
@@ -241,12 +240,12 @@ function ReelPlayer({
         {/* Comments panel — slides up from bottom, above the bottom nav */}
         {showComments && (
           <div
-            className="absolute inset-0 z-20 flex items-end"
+            className="absolute inset-0 z-20 flex items-end cursor-pointer"
             onClick={() => setShowComments(false)}
           >
             <div className="absolute inset-0 bg-black/40" />
             <div
-              className="relative w-full max-h-[65%] flex flex-col rounded-t-2xl bg-white animate-fade-in"
+              className="relative w-full max-h-[65%] flex flex-col rounded-t-2xl bg-white animate-fade-in cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

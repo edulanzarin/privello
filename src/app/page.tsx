@@ -49,14 +49,13 @@ export default async function HomePage() {
           <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
               <h1 className="text-[44px] font-bold leading-[1.05] tracking-tight sm:text-[56px] lg:text-[64px]">
-                Encontros sem pressa,{" "}
+                Acompanhantes verificadas,{" "}
                 <span className="text-coral">
-                  com presença.
+                  perto de você.
                 </span>
               </h1>
               <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted">
-                Curadoria editorial, verificação manual e perfis auditáveis. Você escolhe a cidade, o ritmo e com quem
-                conversar — com transparência e respeito mútuo.
+                Fotos reais, áudio e vídeo. Perfis com verificação de identidade. Você escolhe a cidade, o horário e com quem se encontrar.
               </p>
             </div>
             <aside className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
@@ -79,7 +78,7 @@ export default async function HomePage() {
                 </li>
               </ul>
               <p className="mt-4 text-[12px] leading-relaxed text-muted">
-                Verificação por documento + selfie obrigatória. Conteúdo adulto (+18).
+                Selo de verificação via documento + selfie. Conteúdo adulto (+18).
               </p>
             </aside>
           </div>
@@ -157,15 +156,15 @@ export default async function HomePage() {
               <li className="flex gap-4">
                 <span className="text-[22px] font-bold text-coral">02</span>
                 <div>
-                  <p className="font-semibold">Documento + selfie</p>
-                  <p className="mt-1 text-muted">Conferência humana e trilha de auditoria. Nada de atalhos.</p>
+                  <p className="font-semibold">Publicação imediata</p>
+                  <p className="mt-1 text-muted">Seu perfil entra na listagem assim que completar o cadastro.</p>
                 </div>
               </li>
               <li className="flex gap-4">
                 <span className="text-[22px] font-bold text-coral">03</span>
                 <div>
-                  <p className="font-semibold">Publicação</p>
-                  <p className="mt-1 text-muted">Após aprovação, seu perfil entra na listagem com selo e ranking editorial.</p>
+                  <p className="font-semibold">Verificação opcional → selo</p>
+                  <p className="mt-1 text-muted">Envie documento + selfie para ganhar o selo de verificada. Conferência humana e trilha de auditoria.</p>
                 </div>
               </li>
             </ol>

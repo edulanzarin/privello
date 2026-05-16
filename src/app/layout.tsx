@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s · privello.",
   },
   description:
-    "Encontros com curadoria, verificação manual e perfis verificados. Descubra acompanhantes por cidade com privacidade e estrutura de marca.",
+    "As melhores acompanhantes do Brasil. Perfis verificados, fotos reais, áudio e vídeo. Encontre acompanhantes por cidade com discrição e segurança.",
 };
 
 export default async function RootLayout({

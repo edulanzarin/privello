@@ -1,0 +1,692 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\playwright.config.ts",
+    "rootDir": "C:/Users/edulanzarin/Documents/Dev/privello/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/edulanzarin/Documents/Dev/privello/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "ios-safari",
+        "name": "ios-safari",
+        "testDir": "C:/Users/edulanzarin/Documents/Dev/privello/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/edulanzarin/Documents/Dev/privello/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop-chrome",
+        "name": "desktop-chrome",
+        "testDir": "C:/Users/edulanzarin/Documents/Dev/privello/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tests/e2e/diagnostics/last-run.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://192.168.1.96:3000",
+      "reuseExistingServer": true,
+      "timeout": 180000,
+      "stdout": "pipe",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "preservation.spec.ts",
+      "file": "preservation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Preservation 3.1 — desktop city autocomplete still shows suggestions",
+          "file": "preservation.spec.ts",
+          "line": 134,
+          "column": 6,
+          "specs": [
+            {
+              "title": "renders dropdown options for query \"São P\"",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "TypeError: Cannot read properties of undefined (reading 'project')",
+                        "stack": "TypeError: Cannot read properties of undefined (reading 'project')\n    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:136:37)",
+                        "location": {
+                          "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                          "column": 37,
+                          "line": 136
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 134 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.1 — desktop city autocomplete still shows suggestions\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 135 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 136 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 137 |\u001b[39m         \u001b[32m\"preservation 3.1 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 138 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 139 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                            "column": 37,
+                            "line": 136
+                          },
+                          "message": "TypeError: Cannot read properties of undefined (reading 'project')\n\n\u001b[0m \u001b[90m 134 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.1 — desktop city autocomplete still shows suggestions\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 135 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 136 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 137 |\u001b[39m         \u001b[32m\"preservation 3.1 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 138 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 139 |\u001b[39m\u001b[0m\n\u001b[2m    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:136:37)\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:31.857Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--5367f-wn-options-for-query-São-P--desktop-chrome\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--5367f-wn-options-for-query-São-P--desktop-chrome\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                        "column": 37,
+                        "line": 136
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "916db4927fed39d072d2-436b5994b9ac1906c94f",
+              "file": "preservation.spec.ts",
+              "line": 143,
+              "column": 13
+            },
+            {
+              "title": "renders dropdown options for query \"Rio\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:31.899Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-18bbc5ce01a4676e8bad",
+              "file": "preservation.spec.ts",
+              "line": 143,
+              "column": 13
+            },
+            {
+              "title": "renders dropdown options for query \"Belo H\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:31.907Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-6098f227bb93cde1113d",
+              "file": "preservation.spec.ts",
+              "line": 143,
+              "column": 13
+            },
+            {
+              "title": "renders dropdown options for query \"Curitib\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:31.912Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-36a98a983b315595a103",
+              "file": "preservation.spec.ts",
+              "line": 143,
+              "column": 13
+            }
+          ]
+        },
+        {
+          "title": "Preservation 3.2 — desktop story click still opens viewer",
+          "file": "preservation.spec.ts",
+          "line": 220,
+          "column": 6,
+          "specs": [
+            {
+              "title": "clicking a story circle mounts the viewer overlay with progress + top bar + image",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "TypeError: Cannot read properties of undefined (reading 'project')",
+                        "stack": "TypeError: Cannot read properties of undefined (reading 'project')\n    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:222:37)",
+                        "location": {
+                          "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                          "column": 37,
+                          "line": 222
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 220 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.2 — desktop story click still opens viewer\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 221 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 222 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 223 |\u001b[39m         \u001b[32m\"preservation 3.2 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 224 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 225 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                            "column": 37,
+                            "line": 222
+                          },
+                          "message": "TypeError: Cannot read properties of undefined (reading 'project')\n\n\u001b[0m \u001b[90m 220 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.2 — desktop story click still opens viewer\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 221 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 222 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 223 |\u001b[39m         \u001b[32m\"preservation 3.2 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 224 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 225 |\u001b[39m\u001b[0m\n\u001b[2m    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:222:37)\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:32.308Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--a9a26-with-progress-top-bar-image-desktop-chrome\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--a9a26-with-progress-top-bar-image-desktop-chrome\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                        "column": 37,
+                        "line": 222
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "916db4927fed39d072d2-857038ae73038840c745",
+              "file": "preservation.spec.ts",
+              "line": 226,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Preservation 3.3 — desktop comments click still opens panel",
+          "file": "preservation.spec.ts",
+          "line": 287,
+          "column": 6,
+          "specs": [
+            {
+              "title": "clicking the comments icon mounts the panel with header, list region, and footer",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "TypeError: Cannot read properties of undefined (reading 'project')",
+                        "stack": "TypeError: Cannot read properties of undefined (reading 'project')\n    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:289:37)",
+                        "location": {
+                          "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                          "column": 37,
+                          "line": 289
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 287 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.3 — desktop comments click still opens panel\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 288 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 289 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 290 |\u001b[39m         \u001b[32m\"preservation 3.3 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 291 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 292 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                            "column": 37,
+                            "line": 289
+                          },
+                          "message": "TypeError: Cannot read properties of undefined (reading 'project')\n\n\u001b[0m \u001b[90m 287 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.3 — desktop comments click still opens panel\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 288 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 289 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 290 |\u001b[39m         \u001b[32m\"preservation 3.3 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 291 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 292 |\u001b[39m\u001b[0m\n\u001b[2m    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:289:37)\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:32.726Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--9278c-ader-list-region-and-footer-desktop-chrome\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--9278c-ader-list-region-and-footer-desktop-chrome\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                        "column": 37,
+                        "line": 289
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "916db4927fed39d072d2-396338e75cb2a71f1026",
+              "file": "preservation.spec.ts",
+              "line": 293,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Preservation 3.4 — desktop share button still triggers existing flow",
+          "file": "preservation.spec.ts",
+          "line": 348,
+          "column": 6,
+          "specs": [
+            {
+              "title": "native-share path: pressing share invokes navigator.share exactly once with the expected payload",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "TypeError: Cannot read properties of undefined (reading 'project')",
+                        "stack": "TypeError: Cannot read properties of undefined (reading 'project')\n    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:350:37)",
+                        "location": {
+                          "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                          "column": 37,
+                          "line": 350
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 348 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.4 — desktop share button still triggers existing flow\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 349 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 350 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 351 |\u001b[39m         \u001b[32m\"preservation 3.4 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 352 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 353 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                            "column": 37,
+                            "line": 350
+                          },
+                          "message": "TypeError: Cannot read properties of undefined (reading 'project')\n\n\u001b[0m \u001b[90m 348 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.4 — desktop share button still triggers existing flow\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 349 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 350 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 351 |\u001b[39m         \u001b[32m\"preservation 3.4 only runs on desktop-chrome\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 352 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 353 |\u001b[39m\u001b[0m\n\u001b[2m    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:350:37)\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:33.108Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--29dab-e-with-the-expected-payload-desktop-chrome\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--29dab-e-with-the-expected-payload-desktop-chrome\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                        "column": 37,
+                        "line": 350
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "916db4927fed39d072d2-d516a24cac5455aeac7e",
+              "file": "preservation.spec.ts",
+              "line": 354,
+              "column": 9
+            },
+            {
+              "title": "clipboard path: with no navigator.share, the URL is copied and the button reads 'Copiado!'",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:33.144Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-aa36b3adfff12808725a",
+              "file": "preservation.spec.ts",
+              "line": 410,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Preservation 3.5 — iOS Safari unrelated features unchanged",
+          "file": "preservation.spec.ts",
+          "line": 480,
+          "column": 6,
+          "specs": [
+            {
+              "title": "home feed renders and is scrollable",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "TypeError: Cannot read properties of undefined (reading 'project')",
+                        "stack": "TypeError: Cannot read properties of undefined (reading 'project')\n    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:482:37)",
+                        "location": {
+                          "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                          "column": 37,
+                          "line": 482
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 480 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.5 — iOS Safari unrelated features unchanged\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 481 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 482 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"ios-safari\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 483 |\u001b[39m         \u001b[32m\"preservation 3.5 only runs on ios-safari\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 484 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 485 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                            "column": 37,
+                            "line": 482
+                          },
+                          "message": "TypeError: Cannot read properties of undefined (reading 'project')\n\n\u001b[0m \u001b[90m 480 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m\"Preservation 3.5 — iOS Safari unrelated features unchanged\"\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 481 |\u001b[39m     test\u001b[33m.\u001b[39mskip(\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 482 |\u001b[39m         ({ }\u001b[33m,\u001b[39m testInfo) \u001b[33m=>\u001b[39m testInfo\u001b[33m.\u001b[39mproject\u001b[33m.\u001b[39mname \u001b[33m!==\u001b[39m \u001b[32m\"ios-safari\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 483 |\u001b[39m         \u001b[32m\"preservation 3.5 only runs on ios-safari\"\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 484 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 485 |\u001b[39m\u001b[0m\n\u001b[2m    at Object.fn (C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts:482:37)\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:33.491Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--948f7-d-renders-and-is-scrollable-desktop-chrome\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\test-results\\preservation-Preservation--948f7-d-renders-and-is-scrollable-desktop-chrome\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\edulanzarin\\Documents\\Dev\\privello\\tests\\e2e\\preservation.spec.ts",
+                        "column": 37,
+                        "line": 482
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "916db4927fed39d072d2-c5e1fb2841d81ff42450",
+              "file": "preservation.spec.ts",
+              "line": 486,
+              "column": 9
+            },
+            {
+              "title": "bottom-nav 'Reels' link navigates to /reels",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:33.545Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-c4b52a5b1f23cacd1a8b",
+              "file": "preservation.spec.ts",
+              "line": 510,
+              "column": 9
+            },
+            {
+              "title": "login page renders the email + password form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-chrome",
+                  "projectName": "desktop-chrome",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T00:39:33.554Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "916db4927fed39d072d2-afe6e766aa652c1fa749",
+              "file": "preservation.spec.ts",
+              "line": 529,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-16T00:39:30.829Z",
+    "duration": 2752.0519999999997,
+    "expected": 0,
+    "skipped": 6,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}
