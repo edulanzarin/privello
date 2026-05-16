@@ -373,12 +373,13 @@ Restrições importantes:
     - **DONE**: §3 vazio (sem `OutOfScopeFinding`); §4 com 3 linhas preenchidas (cache-components/route-segment-config/server-actions). `queries.ts` no estado híbrido (a) re-exports + (b) JUSTIFICADO para `sortProfileCards`/`finalizeDiscoverOrder`/`profileCardInclude`/`ProfileCardPayload`. Property 1: 2/2 verde (`549e8c3`); Properties 2,3: 6/6 verde (`549e8c3`). Métricas baseline cobertas em §4.1 (3 linhas com behavior-change) + §4.2 (7 migrações de paridade pura). Decisões consolidadas em §5.1 (Cache Components não ativar), §5.2 (Sort relevance JS), §5.3 (4 entradas: queries.ts final, Server Actions com prisma direto, cacheLife n/a, cursor pagination listReels).
     - _Requirements: 1.5, 2.2, 3.4, 4.5, 5.4, 6.1, 7.1_
 
-  - [ ] 11.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
+  - [x] 11.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
     - `state: InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601
     - Adicionar `child_spec_path: c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-3-backend\` (se ainda não estiver)
     - Re-rodar Spawn-Readiness Gate em `fase-7-dx-infra` (dependente direta — depende de fase-1, fase-2 e fase-3)
     - Documentar no `handoff.md` que `fase-3-backend` está `Done` e listar fases destravadas a seguir
+    - **DONE em 2026-05-17T00:00:00Z** — Phase Card no master atualizado para `state: Done`. Spawn-Readiness Gate de fase-7-dx-infra re-avaliado: dependências fase-1+fase-2+fase-3 satisfeitas, gate plenamente atendido. `handoff.md` atualizado.
     - _Requirements: 7.1, 8.3_
 
 ## Notes

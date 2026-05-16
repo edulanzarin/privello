@@ -371,12 +371,13 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Seção `OutOfScopeFinding` em `requirements.md` está vazia ou cada linha aponta commit no master spec
     - _Requirements: 7.2_
 
-  - [ ] 15.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
+  - [x] 15.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
     - **Esta tarefa é executada pelo orquestrador, não pelo executor da fase**
     - `state: InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601 no formato `YYYY-MM-DDTHH:MM:SSZ`
     - Manter `child_spec_path` apontando para esta pasta
     - Re-rodar Spawn-Readiness Gate em `fase-5-ux` e `fase-6-mobile-cross-browser` (dependentes diretas)
+    - **DONE em 2026-05-17T00:00:00Z** — Phase Card no master atualizado para `state: Done`. Spawn-Readiness Gate: fase-5-ux agora tem fase-2+fase-4 satisfeitas; fase-6-mobile-cross-browser ainda aguarda fase-5.
     - _Requirements: 7.2_
 
 ## Notes

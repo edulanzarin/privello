@@ -194,9 +194,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\backend-performance-phase5`
 - **agents_rule_areas**: `cache-components` (`"use cache"`, `cacheLife`, `cacheTag` quando aplicáveis), `route-segment-config` (classificação das 43 rotas com `force-dynamic` quanto a `dynamic`/`revalidate`/`fetchCache`), `server-actions` (revisão de Server Actions tocadas durante a migração `queries.ts` → `services/`).
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-3-backend\`
 - **promoted_at**: 2026-05-16
+- **doneAt**: 2026-05-17T00:00:00Z
+- **spawn_readiness_note**: Spawn-Readiness Gate re-avaliado para fase-7-dx-infra (dependente direta — depende de fase-1, fase-2 e fase-3); todas as 3 dependências satisfeitas, gate plenamente atendido — orquestrador pode iniciar fase-7 a seguir.
 
 <!-- Já resolvido (cf. `design.md > Estado de partida`) — entram como `Resolvido` na Revalidação do spec-filho e NÃO viram tarefa de entrega:
   - Camada `src/lib/services/` já iniciada com `subscription`, `profile`, `city` e `media`; o trabalho desta fase é concluir a migração (EAR 5), não criar a estrutura inicial.
@@ -232,9 +234,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\design-system`
 - **agents_rule_areas**: nenhuma (a fase NÃO toca APIs do Next.js)
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-4-design-system\`
 - **promoted_at**: 2026-05-16
+- **doneAt**: 2026-05-17T00:00:00Z
+- **spawn_readiness_note**: Spawn-Readiness Gate re-avaliado para fase-5-ux e fase-6-mobile-cross-browser (dependentes diretas). fase-5 agora tem fase-2 + fase-4 satisfeitas — gate plenamente atendido. fase-6 ainda aguarda fase-5 (que destrava fase-6 quando concluir).
 
 #### Acceptance Criteria
 
