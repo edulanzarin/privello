@@ -295,6 +295,57 @@ Transformar a meta em gate (failing build quando coverage cair abaixo de 80%) é
 
 ---
 
+## 6.5 ESLint coverage de `*.test.ts` / `*.pbt.ts`
+
+> Decisão produzida pela Tarefa 2.2. Cobre o critério `Requirement 2.4` deste spec.
+
+### Estado atual do `eslint.config.mjs`
+
+Citação: `c:\Users\edulanzarin\Documents\Dev\privello\eslint.config.mjs:5-15`.
+
+```js
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+```
+
+A config:
+
+- **Não declara** nenhum bloco `files: [...]` próprio. Isso faz com que ela herde os patterns padrão de `eslint-config-next/core-web-vitals` e `eslint-config-next/typescript`, que cobrem `*.{js,jsx,mjs,cjs,ts,tsx}` em todo o repositório (excluindo apenas o que está em `globalIgnores`).
+- **Não declara** `ignores` ou `globalIgnores` entries que excluam `*.test.ts` ou `*.pbt.ts`. As únicas exclusões são `.next/**`, `out/**`, `build/**` e `next-env.d.ts` — nenhuma delas captura os sufixos de teste em `src/**`.
+
+Portanto, **arquivos `src/**/*.test.ts` e `src/**/*.pbt.ts` produzidos pelas Tarefas 3.x e 4.x já entram automaticamente no escopo do ESLint** sob as regras gerais do preset Next + TypeScript. Não há gap de cobertura de lint a corrigir nesta fase.
+
+### Decisão: **A** (inclusão automática, sem alteração de config)
+
+Critérios usados (extraídos do enunciado da Tarefa 2.2):
+
+- A — config atual já lint todos os `*.ts` via padrão permissivo, sem exclusão dos sufixos de teste → `documentar` (esta seção).
+- B — config atual exclui os sufixos via `ignores`/`files` restritivos → registrar como `OutOfScopeFinding` para `fase-7-dx-infra`.
+- C — adicionar bloco `files: ["src/**/*.{test,pbt}.ts"]` ao `eslint.config.mjs` apenas se for trivial.
+
+Como a leitura do arquivo confirma que **A** é o caso (o preset Next lint os arquivos por default e não há exclusão), **nenhuma edição em `eslint.config.mjs` é executada nesta tarefa**.
+
+### O que fica para `fase-7-dx-infra`
+
+Esta tarefa cobre apenas o **escopo** (quais arquivos o ESLint lê). O que **não** está sendo decidido aqui:
+
+- **Regras específicas de teste** — por exemplo, permitir/exigir `expect.assertions` em `*.pbt.ts`, relaxar `max-lines` para fixtures grandes, plugin equivalente a `eslint-plugin-testing-library` quando a Fase futura introduzir Testing Library, ou desligar `no-magic-numbers` em testes de propriedade.
+- **Override blocks** dedicados (`{ files: ["**/*.{test,pbt}.ts"], rules: { ... } }`) só serão necessários quando uma regra real começar a falhar contra os arquivos produzidos pelas Tarefas 3.x e 4.x. Se isso acontecer durante esta fase, vira `OutOfScopeFinding` em `requirements.md > §3` apontando para `fase-7-dx-infra` — segue a regra E4 do `design.md > Error Handling` (sem absorção silenciosa).
+
+A Fase 7 (`fase-7-dx-infra`) é a fase canônica de configuração de DX/lint/CI, e regras específicas de teste pertencem a ela.
+
+---
+
 ## 7. Referências cruzadas
 
 - Requisitos desta fase: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-2-testes\requirements.md`

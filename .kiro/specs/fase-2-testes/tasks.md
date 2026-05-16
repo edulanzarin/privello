@@ -60,7 +60,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Seção "Cobertura": meta declarada de 80% statements/branches por módulo puro, sem gate
     - _Requirements: 2.2, 2.3, 3.2, 3.3, 5.2, 5.4_
 
-  - [~] 2.2 Avaliar inclusão dos sufixos no `eslint.config.mjs`
+  - [x] 2.2 Avaliar inclusão dos sufixos no `eslint.config.mjs`
     - Decidir: incluir `*.test.ts`/`*.pbt.ts` no escopo do lint nesta fase OU registrar como `OutOfScopeFinding` para `fase-7-dx-infra`
     - Documentar a escolha em `testing-conventions.md`
     - _Requirements: 2.4_
