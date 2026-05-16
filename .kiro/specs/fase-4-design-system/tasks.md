@@ -358,7 +358,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Anexar log
     - _Requirements: 7.2_
 
-- [ ] 15. Saída desta fase
+- [x] 15. Saída desta fase
   - [x] 15.1 Validar saída
     - Todos os 8 Requirements de `requirements.md` têm evidência (path:linha de código, log de teste, ou link de PR) anexada
     - `tokens.md` cobre: Tokens semânticos, Variantes de opacidade (com `path:linha` por variante adotada), Escala tipográfica, Exceções declaradas, API conventions, Migration log, Lint anti-regressão, Contrato com CI Fase 7, Smoke checks finais
