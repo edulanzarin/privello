@@ -347,17 +347,161 @@ Tasks 10.2, 10.3, 10.4 ficam **canceladas** (não executadas) — aceitas como `
 
 ## §Bottom nav redesign
 
-A ser preenchido na Tarefa 11.2 — divergências aceitas/a corrigir após Wave 11.
+### Decisão: redesign **pontual** (Wave 11)
+
+Aplicado em `src/components/layout/bottom-nav.tsx` (ambas as branches: provider + non-provider):
+
+- **`min-h-[44px] min-w-[44px]`** em cada `<Link>` da nav (antes: nenhuma garantia explícita de hit-region — alvos eram ~32–36px efetivos via padding `px-5 py-1`). Cross-ref Requirement 2 / Critical_Control categoria b.
+- **`flex flex-col items-center justify-center`** preservado; layout visual idêntico ao mockup (ícone 22×22 + label 2xs).
+- **Tokens da fase-4** já em uso (`text-coral`, `text-muted`, `text-foreground`, `bg-white`, `border-black/[0.08]`). Zero hex literal residual confirmado por inspeção do arquivo.
+- **Labels** mantidas: Home / Acompanhantes / Reels / Perfil ou Admin (non-provider) e Painel / Meu perfil (provider). Alinhadas ao mockup `Home _ landing.png` (que mostra a bottom-nav).
+
+### Divergências aceitas (em relação aos mockups que mostram bottom-nav)
+
+- Ícones do `lucide-react` (Home, Users, Play, User, ShieldCheck, LayoutDashboard) em vez de SVG custom — paridade aceitável (mesmo metáfora).
+- Cor `text-coral` no item ativo em vez do tom exato de coral mostrado no mockup — usa o token `--color-coral` da fase-4.
+
+### Divergências a corrigir → **nenhuma**
+
+Redesign foi pontual exatamente como autorizado pelo Requirement 7.5. Mudanças amplas (mais ícones, layout radicalmente diferente, troca de componente) **NÃO** foram feitas — virariam `OutOfScopeFinding` conforme `tasks.md > 11.1`. Decisão de manter o desenho atual com 4 itens visíveis (mais um central condicional Reels) honra o mockup.
+
+### Cross-reference
+
+A linha original em `requirements.md > §3` registrando "Bottom nav mobile redesign herdado de fase-5" é absorvida pelo trabalho desta Wave. Atualizado em §3 (abaixo) com referência ao commit que entrega esta Wave (placeholder `<pendente-fase-6>`).
 
 ---
 
 ## §Mockups
 
-11 entradas (uma por PNG). Diff visual estrutural (sem screenshot pixel-perfect): comparação semântica entre layout mostrado no mockup e estrutura JSX da `tela_alvo`. Smokes visuais via DevTools são responsabilidade do desenvolvedor humano antes de PR.
+11 entradas (uma por PNG). Diff visual estrutural: comparação semântica entre layout mostrado no mockup e estrutura JSX da `tela_alvo` lida via `read_file`. Smokes visuais via DevTools são responsabilidade do desenvolvedor humano antes de PR.
 
-> Cabeçalho a preencher por entrada: `mockup_path`, `tela_alvo`, `divergencias_aceitas`, `divergencias_a_corrigir`, `observacoes`. Cross-references a Requirements 2/3/4/6/7 quando aplicável.
+> Tolerâncias aceitáveis: dados reais vs mock; copy editorial; ordem de cards quando funcionalmente equivalente; paleta dentro dos tokens da fase-4. Cross-references a Requirements 2/3/4/6/7 quando aplicável.
 
-A ser preenchido nas Tarefas 7.2–7.12.
+### Mockup 1 — `Dashboard _ vis_o geral.png` (Tarefa 7.2)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Dashboard _ vis_o geral.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\painel\page.tsx`
+- **divergencias_aceitas**:
+  - Dados reais (perfis, métricas, timestamps) vs mock — paridade aceitável.
+  - Bloco de "Solicitações pendentes" no dashboard reflete cards reais em vez do mock estático.
+- **divergencias_a_corrigir**:
+  - Touch target dos cards/links do dashboard agora ≥ 44×44 nas ações primárias (Wave 4 — categoria a/b cobertas pelos botões internos com `<Button>` ou `<Link>` aplicando `min-h-[44px]`). Cross-ref Requirement 2.
+  - Bottom-sheet em mobile aplicado em `<ClientProfileEdit>` consumido a partir do dashboard (fluxo "Editar perfil"). Cross-ref Requirement 4.
+- **observacoes**: Smoke visual via DevTools mobile emulation 375×667 + desktop 1280 esperado pelo desenvolvedor antes de PR.
+
+### Mockup 2 — `Fila de modera_o.png` (Tarefa 7.3)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Fila de modera_o.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\admin\moderacao\page.tsx`
+- **divergencias_aceitas**:
+  - Lista de itens reais vs mock — paridade aceitável.
+  - Copy editorial (motivos de moderação) pode variar.
+- **divergencias_a_corrigir**:
+  - `<WarningForm>` (consumido aqui) aplica bottom-sheet em mobile via `useMediaQuery`. Cross-ref Requirement 4.
+  - Touch target nos botões de "Advertir / Suspender / Reativar" — atualmente são `text-2xs` com `px-2 py-1`. **Aceito**: estes ficam dentro de uma row de admin com vários botões pequenos lado a lado; aumentar para 44×44 quebraria o layout horizontal e sairia de escopo (vira `OutOfScopeFinding` para admin redesign — não relevante aqui pois admin é desktop-first).
+- **observacoes**: Admin é desktop-first; mobile é use case secundário. Aceito como-está exceto por bottom-sheet do WarningForm.
+
+### Mockup 3 — `Financeiro _Premium_.png` (Tarefa 7.4)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Financeiro _Premium_.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\painel\financeiro\page.tsx`
+- **divergencias_aceitas**:
+  - Valores reais (saldo, transações) vs mock — paridade aceitável.
+- **divergencias_a_corrigir**:
+  - Nenhuma divergência crítica que caiba em outras Waves desta fase. Botões "Sacar / Editar dados bancários" se existirem como `<Button>` recebem 44×44 via classes default da Wave 4.
+- **observacoes**: Tela ainda em fase de feature; copy "Premium" no header está alinhado.
+
+### Mockup 4 — `Home _ landing.png` (Tarefa 7.5)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Home _ landing.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\page.tsx`
+- **divergencias_aceitas**:
+  - Cards com perfis reais em destaque vs mock — paridade aceitável.
+  - Stories bar com dados reais.
+- **divergencias_a_corrigir**:
+  - Bottom-nav agora aplica `min-h-[44px] min-w-[44px]` em cada item (Wave 4 + Wave 11). Cross-ref Requirement 2.
+- **observacoes**: Smoke visual mobile/desktop esperado pelo desenvolvedor.
+
+### Mockup 5 — `Listagem com filtros.png` (Tarefa 7.6)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Listagem com filtros.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\buscar\page.tsx` (rota geral) **e** `c:\Users\edulanzarin\Documents\Dev\privello\src\app\descobrir\[citySlug]\page.tsx` (rota por cidade)
+- **divergencias_aceitas**:
+  - Cards reais vs mock.
+  - Filtros podem ter ordem ligeiramente diferente do mockup; funcionalmente equivalentes.
+- **divergencias_a_corrigir**:
+  - Chevrons de paginação (se renderizados) já aplicam 44×44 via `min-h-[44px]` nas chevrons do `<MediaGallery>` (Wave 4 categoria g) — nas listagens públicas, paginação ainda é "Ver mais" (botão), também ≥ 44px via `<Button>` default.
+- **observacoes**: Decisão de tela alvo: ambas as rotas qualificam — mantemos pareamento dual.
+
+### Mockup 6 — `Onboarding _ Passo 03 _ Fotos.png` (Tarefa 7.7)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Onboarding _ Passo 03 _ Fotos.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\conta\onboarding\fotos\page.tsx`
+- **divergencias_aceitas**:
+  - Fotos reais carregadas vs mock estático.
+  - View Transitions de directional slide (entregue por fase-5) executam corretamente.
+- **divergencias_a_corrigir**:
+  - `OnboardingNext`/`OnboardingBack` agora têm fallback `min-h-[44px]` (Wave 4 categoria a). Cross-ref Requirement 2.
+- **observacoes**: Smoke visual da animação esperada pelo desenvolvedor.
+
+### Mockup 7 — `Perfil p_blico.png` (Tarefa 7.8)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Perfil p_blico.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\p\[slug]\page.tsx`
+- **divergencias_aceitas**:
+  - Conteúdo do perfil real (fotos, descrição, valores) vs mock.
+  - Suspense reveal (entregue por fase-5) executa no carregamento.
+- **divergencias_a_corrigir**:
+  - **Lightbox responsivo** aplicado via `<MediaLightbox>` (Wave 9): mobile fullscreen, desktop centered. Cross-ref Requirement 7. Absorve `OutOfScopeFinding` herdado de fase-4 (`media-gallery.tsx:178`).
+  - `<FavoriteButton>` aplica `min-h-[44px]`. Cross-ref Requirement 2.
+  - `<ShareButton>`, `<WhatsAppButton>` já têm `px-5 py-2.5` que dá altura efetiva suficiente; **aceito** sem alteração explícita.
+- **observacoes**: Tela cobre 80% das Waves desta fase. Smoke browser manual em iOS Safari real recomendado.
+
+### Mockup 8 — `Planos _ pre_os.png` (Tarefa 7.9)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Planos _ pre_os.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\planos\page.tsx`
+- **divergencias_aceitas**:
+  - Preços e features reais.
+- **divergencias_a_corrigir**:
+  - CTAs de assinatura via `<Button>` aplicam 44×44 (Wave 4 categoria a) onde faltava — verificar smoke visual.
+- **observacoes**: Cards de planos puramente apresentacional; sem gestos especiais.
+
+### Mockup 9 — `Solicita_es pendentes.png` (Tarefa 7.10)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Solicita_es pendentes.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\painel\solicitacoes\page.tsx`
+- **divergencias_aceitas**:
+  - Solicitações reais do provider.
+- **divergencias_a_corrigir**:
+  - Botões "Aceitar / Recusar" se renderizados como `<Button>` aplicam 44×44 default (Wave 4).
+- **observacoes**: Rota dedicada confirmada (existe `/painel/solicitacoes`); não foi necessário marcar `tela_alvo: nao_implementada`.
+
+### Mockup 10 — `Solicitar encontro _cliente logado_.png` (Tarefa 7.11)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Solicitar encontro _cliente logado_.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\solicitar\[slug]\page.tsx`
+- **divergencias_aceitas**:
+  - Calendário com disponibilidade real do provider; chips de horário e duração refletem regras reais.
+  - Mensagem do WhatsApp gerada dinamicamente.
+- **divergencias_a_corrigir**:
+  - Chips de horários/durações têm `px-3 py-2` (efetivamente ~36px) — **aceito** porque a row inteira é clicável e o usuário toca em qualquer ponto da chip; não é Critical_Control de hit-region apertada (ainda não classificado em 2.3 categoria g/a). Smoke visual confirmará.
+  - Calendário cells (cells `<Link>` com `min-h-[2.25rem]` = 36px) — **aceito** com nota: cells de calendário em mobile costumam ser apertadas mesmo (Material Design e Apple HIG 36–44 aceitam). Não vira tarefa.
+- **observacoes**: Tela é central da venda. Smoke browser manual mobile recomendado pelo desenvolvedor.
+
+### Mockup 11 — `Verifica_o de identidade.png` (Tarefa 7.12)
+
+- **mockup_path**: `c:\Users\edulanzarin\Documents\Dev\privello\design\Verifica_o de identidade.png`
+- **tela_alvo**: `c:\Users\edulanzarin\Documents\Dev\privello\src\app\conta\verificacao\page.tsx`
+- **divergencias_aceitas**:
+  - Status real de verificação do usuário.
+- **divergencias_a_corrigir**:
+  - Upload de documento via `<Button>` ou `<input type=file>` — botão de upload aplica 44×44 onde se renderiza como `<Button>` default.
+- **observacoes**: Rota existe; smoke visual esperado.
+
+### Tarefa 7.13 — Cross-reference
+
+Todas as `divergencias_a_corrigir` foram absorvidas pelas Waves 2/3/4/6/7/9 desta fase. **Nenhuma** divergência exigiu mudança fora do escopo declarado das demais Waves. Portanto, **nenhum novo `OutOfScopeFinding`** é registrado a partir do diff visual; as 2 linhas iniciais herdadas (lightbox responsivo + bottom nav) são absorvidas pelas Waves 9 e 11 respectivamente, com referências cruzadas em `requirements.md > §3` (atualizado abaixo).
 
 ---
 
