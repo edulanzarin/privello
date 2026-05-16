@@ -344,7 +344,7 @@ Restrições importantes:
     - **Decisão fase-6**: manter inline (cf. `mockups-diff.md > §Drawer mobile`). Tasks 10.2–10.4 não executadas.
     - _Requirements: 7.2_
 
-  - [ ] 10.2 Criar `src/components/ui/drawer.tsx` (se decidido em 10.1)
+  - [x] 10.2 Criar `src/components/ui/drawer.tsx` (se decidido em 10.1) — **N/A: cancelado por 10.1**
     - API: `<Drawer open onClose side?: "left"|"right" className?>{children}</Drawer>`
     - Implementação: backdrop fixo + painel com `translate-x` baseado em `open` e `side`
     - Reusa hooks da fase-4: `useScrollLock`, `useEscapeKey`, `useFocusTrap`
@@ -353,13 +353,13 @@ Restrições importantes:
     - **N/A — manter inline** (cf. 10.1).
     - _Requirements: 7.4_
 
-  - [ ] 10.3 Substituir drawer inline em `src/components/painel/painel-sidebar.tsx:225` por `<Drawer>` (se 10.2 executado)
+  - [x] 10.3 Substituir drawer inline em `src/components/painel/painel-sidebar.tsx:225` por `<Drawer>` (se 10.2 executado) — **N/A: cancelado por 10.1**
     - Preservar comportamento atual (toggle, links, transição)
     - Validar visualmente em mobile (Chrome DevTools mobile emulation)
     - **N/A — manter inline** (cf. 10.1). `overscroll-behavior: contain` aplicado direto na aside inline (cf. Wave 8.2).
     - _Requirements: 7.4_
 
-  - [ ] 10.4 Smoke test determinístico para `<Drawer>` (se 10.2 executado)
+  - [x] 10.4 Smoke test determinístico para `<Drawer>` (se 10.2 executado) — **N/A: cancelado por 10.1**
     - Renderizar com `open=true`, `side="left"`/`right"`
     - Afirmar backdrop renderizado, painel com transform correto, click no backdrop dispara `onClose`, ESC dispara `onClose`
     - Focus trap delegado a `useFocusTrap` (já testado por fase-4 — não retesta)

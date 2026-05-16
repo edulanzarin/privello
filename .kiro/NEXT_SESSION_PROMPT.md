@@ -1,84 +1,72 @@
-# Prompt para próxima sessão autônoma
+# NEXT_SESSION_PROMPT — Auditoria Privello concluída
 
-> Cole o bloco abaixo no chat de uma nova sessão do Kiro Agent (Claude Opus 4.7).
->
-> O `.kiro/AUTO_APPROVE_SETUP.md` deste workspace já tem as regras de auto-approve que você colou no `settings.json` — sessão nova herda tudo.
+## Estado atual
 
----
+**Auditoria do master `auditoria-geral` 100% concluída em 2026-05-17.** As 7 fases estão `state: Done`.
 
-## Contexto rápido (não precisa colar, é referência)
+- Master: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\auditoria-geral\requirements.md`
+- Phase Cards:
+  - fase-1-seguranca → Done 2026-05-16T04:47:12Z
+  - fase-2-testes → Done 2026-05-16T04:46:53Z
+  - fase-3-backend → Done 2026-05-17T00:00:00Z
+  - fase-4-design-system → Done 2026-05-17T00:00:00Z
+  - fase-5-ux → Done 2026-05-17T00:00:00Z
+  - fase-6-mobile-cross-browser → Done 2026-05-17T00:00:00Z
+  - fase-7-dx-infra → Done 2026-05-17T00:00:00Z
 
-- Projeto: **Privello** (Next.js 16.2.6, App Router, Prisma 5 + Postgres, NextAuth v5, Tailwind v4)
-- Master spec: `.kiro/specs/auditoria-geral/requirements.md` — 7 fases
-- Estado atual:
-  - Fase 1 (`fase-1-seguranca`) = **Done** (2026-05-16T04:47:12Z, commit `cd6f36c`)
-  - Fase 2 (`fase-2-testes`) = **Done** (2026-05-16T04:46:53Z, commit `b5a8fe0`)
-  - Fases 3–7 = `SpawnReady` ou `Blocked` por dependência. Próximas elegíveis: **fase-3-backend** e **fase-4-design-system** (ambas independentes entre si).
-- Último commit: `e2bbc5a` — branch `master`, em sincronia com `origin/master` (push já foi feito).
-- 22 commits acumulados; 118 testes verdes; `tsc --noEmit` limpo; `npm run lint` tem 20 erros pré-existentes em código fora do escopo das fases 1/2 (pertencem a fase-5/fase-7 — registrados em `.kiro/handoff.md`).
+Para o estado completo, ler primeiro `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\handoff.md`.
 
-## ⬇️⬇️⬇️ COLE ESTE BLOCO NO CHAT DA NOVA SESSÃO ⬇️⬇️⬇️
+## O que NÃO precisa ser feito
 
-```
-Continuar a auditoria do Privello. As fases 1 (segurança) e 2 (testes) do master spec `auditoria-geral` estão Done; ler `.kiro/handoff.md` antes de qualquer ação para entender o estado completo.
+- **Não há mais fases pendentes na auditoria.** Não há próxima onda de promoção.
+- Não há decisão de produção bloqueada esperando o usuário.
+- Não há regressão pendente.
 
-Próxima onda do roadmap: fase-3-backend e fase-4-design-system. Ambas estão SpawnReady, são independentes entre si (sem dependência cruzada) e podem ser promovidas + executadas em paralelo, file-disjoint.
+## Followups operacionais não-bloqueantes
 
-Sequência esperada:
+Estes itens estão registrados mas **não bloqueiam novos ciclos** — podem ser executados quando convier:
 
-1. Promover ambas seguindo `.kiro/specs/auditoria-geral/PROMOCAO.md` (§3 inteiro, especialmente §3.3, §3.4, §3.5 e §3.6). Isso significa:
-   - criar `.kiro/specs/fase-3-backend/` e `.kiro/specs/fase-4-design-system/`
-   - copiar `_template-spec-filho.md` em cada como `requirements.md`
-   - preencher cabeçalho de proveniência + EARS herdadas dos Phase Cards correspondentes do master (Requirement 4 = fase-3, Requirement 5 = fase-4)
-   - virar `state: SpawnReady` → `state: InProgress` nos dois Phase Cards do master, com `child_spec_path` apontando
-   - registrar `agents_rule_areas` (fase-3 tem 3: cache-components, route-segment-config, server-actions; fase-4 não tem)
+1. **`git push origin master`** — push manual da branch `master`. Após push, capturar o link da run da CI no GitHub Actions e anexar em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\dx-conventions.md > §1 CI Pipeline > Primeira run` (fecha Tarefa 2.5 da fase-7).
+2. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar `docs/adr/0003-queries-ts-deprecated.md` conforme escolha.
+3. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
+4. **Smokes browser real da fase-6** (cabeçalhos preparados em `.kiro/specs/fase-6-mobile-cross-browser/mockups-diff.md`):
+   - Teclado virtual (login, cadastro, comentário, suporte) em iOS Safari + Android Chrome reais
+   - Gestos (pinch em lightbox/story viewer, overscroll em reels-feed, drawer mobile) em iOS Safari + Android Chrome reais
+   - Cross-browser desktop Safari + desktop Edge — 3 telas-âncora (`/`, `/p/[slug]`, `/painel`)
 
-2. Para cada fase promovida: gerar `design.md` e `tasks.md` próprios, depois executar as tarefas em ondas paralelas (subagentes file-disjoint).
+## Possíveis próximos ciclos (fora da auditoria atual)
 
-3. fase-3 inclui consultas obrigatórias a `node_modules/next/dist/docs/` antes de qualquer decisão técnica em cache-components, route-segment-config ou server-actions (regra dura E5). Registrar evidência em `requirements.md > §4` do spec-filho ANTES da primeira mudança.
+Quando o usuário decidir abrir um novo ciclo de trabalho:
 
-4. Smoke checks finais por fase: `npm run lint` (esperado: erros pré-existentes em código fora do escopo permanecem; novos erros nos arquivos tocados pela fase são bloqueantes), `npx tsc --noEmit`, `npm run test`, `npm run build`.
+- **Auditoria WCAG ampla** (acessibilidade) — explicitamente fora do escopo da fase-6.
+- **App nativo / PWA installable / push notifications** — fora do escopo da fase-6.
+- **Refactor de componentes pesados restantes**:
+  - `src/components/profile/perfil-editor.tsx` (~23KB)
+  - `src/components/reels/reels-feed.tsx` (~15KB)
+  - `src/components/stories/story-bar.tsx` (~14KB)
+  - `src/components/profile/media-manager.tsx` (~13KB)
+- **Cobertura E2E ampla com Playwright** (specs além dos 2 atuais) — Non-Goal de fase-2 e fase-6.
+- **Qualquer feature de produto nova** — abrir spec dedicado fora do master `auditoria-geral`.
 
-5. Quando uma fase terminar, atualizar Phase Card no master para `state: Done` com `doneAt` ISO-8601 e re-avaliar Spawn-Readiness Gate dos dependentes (PROMOCAO.md §7).
+## Restrições permanentes (válidas em qualquer próximo ciclo)
 
-Restrições (idênticas à sessão anterior):
 - Workspace só em `c:\Users\edulanzarin\Documents\Dev\privello\`.
-- NÃO rodar `git push`, `git reset --hard`, `git clean`, `Remove-Item -Recurse -Force`, `format`, `shutdown`. Push manual fica comigo.
+- NÃO rodar `git push`, `git reset --hard`, `git clean`, `Remove-Item -Recurse -Force`, `format`, `shutdown`. Push manual fica com o usuário.
 - NÃO mexer em `node_modules` direto (use `npm install`/`npm ci`).
-- NÃO mudar schema do Prisma sem me perguntar.
-- NÃO absorver achados fora de escopo silenciosamente — segue o protocolo OutOfScopeFinding (PROMOCAO.md §6).
-- Permissão total para edits, shell e subagentes em paralelo.
-- Pode rodar `npm install`, `npm run lint`, `npm run test`, `npm run build`, `npx tsc --noEmit` livremente.
+- NÃO mudar schema do Prisma sem perguntar.
+- Idioma pt-BR consistente em specs, código novo e mensagens de commit.
+- AGENTS.md rule: Next.js 16.x tem breaking changes — sempre consultar `node_modules/next/dist/docs/` antes de qualquer decisão técnica em APIs do Next; registrar evidência em `requirements.md > §4` do spec-filho ANTES da primeira mudança (regra dura E5).
 
-Pare e me pergunte só se encontrar:
-1. Decisão real de produção (hostname, domínio, valor de janela).
-2. Mudança de schema do Prisma.
-3. Conflito entre fase-3 e fase-4 que exija serializar (não esperado — são file-disjoint).
-4. Regressão de fase-1 ou fase-2 detectada durante execução (regra E6 do PROMOCAO.md §6.2).
+## Smoke checks finais (referência para o próximo ciclo)
 
-Para todo o resto, decide e segue.
+Baseline ao final desta auditoria:
 
-Ao terminar (ou se ficar bloqueado), atualizar `.kiro/handoff.md` com o estado final e me avisar no próximo retorno.
-```
+| Check | Resultado |
+|---|---|
+| `npx tsc --noEmit` | exit 0, zero erros |
+| `npm run test` | 36 files / 305 tests, exit 0 |
+| `npm run build` | falha pré-existente em `/api/cities` (DB local) — não é regressão; CI da fase-7 não roda build |
+| `npm run lint` | 71 problems (29 errors + 42 warnings) — tolerância em CI via Opção B (`continue-on-error: true`) |
+| `npm run test:e2e -- --list` | 4 projects (`ios-safari`, `desktop-chrome`, `desktop-firefox`, `android-chrome`) × 15 specs cada |
 
-## ⬆️⬆️⬆️ FIM DO BLOCO ⬆️⬆️⬆️
-
----
-
-## Notas operacionais
-
-- **Lock do tracker** (`C:\Users\edulanzarin\.kiro\tasks\8ce70501232af33b\*.meta.json`): se voltar a travar com `EPERM rename`, o agente já sabe o bypass — editar `tasks.md` direto via `str_replace`. Documentado no handoff.
-- **Race entre subagentes paralelos** durante git commit: alguns commits ficam compostos (mais arquivos do que o subagente staged). Conteúdo correto, só mensagem de commit pode ficar diferente do prescrito. Não bloqueia.
-- **Auto-approve** já está ativo via `.kiro/AUTO_APPROVE_SETUP.md`. Nada novo precisa ser configurado.
-
-## Se preferir promover só uma fase de cada vez
-
-Substitua o passo 1 do prompt por:
-
-> 1. Promover APENAS `fase-3-backend` (deixar fase-4 para depois). [...]
-
-ou
-
-> 1. Promover APENAS `fase-4-design-system` (deixar fase-3 para depois). [...]
-
-Recomendação: **fase-4 primeiro** se você quer ver tokens/primitivos sendo aplicados (entrega visível mais rápido). **fase-3 primeiro** se você prefere consolidar a camada de backend antes de mexer em UI.
+Qualquer próximo ciclo deve preservar ou superar essas marcas.
