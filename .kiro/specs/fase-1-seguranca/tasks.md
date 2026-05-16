@@ -213,7 +213,7 @@ Restrições importantes:
     - _Requirements: 5.1, 5.2_
     - _Validates: Property 1, Property 2, Property 3_
 
-  - [~] 9.2 * Implementar `src/lib/validation/<schemas>.pbt.ts` (idempotência)
+  - [x] 9.2 * Implementar `src/lib/validation/<schemas>.pbt.ts` (idempotência)
     - Property 4 (idempotência de `parse`): para cada schema listado em `endpoints-zod.md`, gerador derivado via `fc.record(...)`; assertiva `S.parse(S.parse(v))` estruturalmente igual a `S.parse(v)`
     - Pode ser um único arquivo `validation.pbt.ts` consumindo a lista por `describe.each`
     - _Requirements: 4.1, 4.5_
