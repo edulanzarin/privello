@@ -342,4 +342,51 @@ A regra ESLint configurada nesta fase (`no-restricted-syntax` em `eslint.config.
 
 ## Smoke checks finais
 
-> Preenchido após Wave 18 (Tarefas 14.x).
+> Wave 14 (Tarefas 14.1–14.4). Logs anexados aqui.
+
+### 14.1 — `npm run lint`
+
+```
+✖ 67 problems (20 errors, 47 warnings)
+```
+
+- **Erros novos da fase-4 (em arquivos do escopo da fase): 0**
+- **Erros de `no-restricted-syntax` (regra anti-regressão): 0**
+- Os 20 errors restantes são pré-existentes (regras `react-hooks/refs`, `react-hooks/cant-call-imperative-fn-during-render`, `react-hooks/cant-call-impure-fn-during-render`, `react-hooks/rules-of-hooks` ativadas pelo Next 16 / React 19 strict — herdados das Fases 1/2) em código que não foi tocado por esta fase: `cadastro/sucesso`, `age-gate.tsx`, `profile-story-cover`, `story-bar`, `media-gallery`, `painel/midias/midias-manager.tsx`, `painel/perfil/page.tsx`, `painel/plano/upgrade-button.tsx`, `admin/moderacao/page.tsx`, `admin/verificacoes/[id]/page.tsx`, `p/[slug]/page.tsx`. Estes são tratados em fase futura (Fase 5/6) ou OutOfScope.
+- 47 warnings remanescentes são `@typescript-eslint/no-unused-vars`, `react-hooks/exhaustive-deps` e similares — pré-existentes, não introduzidos pela fase-4.
+
+### 14.2 — `npx tsc --noEmit`
+
+```
+(exit 0, sem erros)
+```
+
+### 14.3 — `npm run test`
+
+```
+RUN  v4.1.6 C:/Users/edulanzarin/Documents/Dev/privello
+
+ Test Files  25 passed (25)
+      Tests  172 passed (172)
+   Duration  ~8.4s
+```
+
+- Baseline da fase-2 era ≥ 118 testes. Crescimento até 172 reflete:
+  - Testes novos da fase-4 (Dropdown determinístico, focus trap determinístico, Modal smoke focus trap).
+  - PBTs novas da fase-4 (Property 1, Property 2 em `use-focus-trap.pbt.ts`; Property 3, Property 4 em `dropdown.pbt.ts`).
+  - Testes determinísticos e PBTs adicionados pela fase-3 paralela (`*.service.test.ts` em `src/lib/services/`).
+
+### 14.4 — `npm run build` (com `AUTH_URL` no ambiente de build)
+
+```
+✓ Compiled successfully in 9.8s
+  Running TypeScript ...
+  Finished TypeScript in 11.3s ...
+  ƒ Proxy (Middleware)
+  Ν (Static) prerendered as static content
+  ƒ (Dynamic) server-rendered on demand
+(exit 0)
+```
+
+- 71 rotas compiladas (esperado conforme estado herdado).
+- `AUTH_URL` foi exportado no shell do build local (variável de ambiente esperada pelo `next-auth` em modo produção). Não é configuração nova da fase-4.

@@ -31,9 +31,9 @@ function render(node: React.ReactNode) {
 }
 
 const ce = createElement as unknown as (
-    type: any,
-    props?: any,
-    ...children: any[]
+    type: unknown,
+    props?: unknown,
+    ...children: unknown[]
 ) => React.ReactElement;
 
 function pressTab(shift = false) {

@@ -317,49 +317,49 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Testar: abrir Modal, simular Tab múltiplas vezes, foco não escapa do container
     - _Requirements: 4.8, 8.2_
 
-- [ ] 13. Property tests para Dropdown e focus trap
-  - [ ] 13.1 * Implementar `src/lib/hooks/use-focus-trap.pbt.ts` (Property 1, Property 2)
+- [x] 13. Property tests para Dropdown e focus trap
+  - [x] 13.1 * Implementar `src/lib/hooks/use-focus-trap.pbt.ts` (Property 1, Property 2)
     - Property 1 (completude do ciclo): para todo `n ∈ [2, 10]` e `i ∈ [0, n)`, aplicar n Tabs retorna ao mesmo elemento; aplicar n Shift+Tabs retorna ao mesmo elemento
     - Property 2 (libera foco anterior): para todo elemento externo `e` com foco antes da ativação, desativar leva `document.activeElement === e`
     - Geradores: `fc.integer({ min: 2, max: 10 })` para `n`; container montado com `n` `<button>`s
     - _Requirements: 8.3_
     - _Validates: Property 1, Property 2_
 
-  - [ ] 13.2 * Implementar `src/components/ui/dropdown.pbt.ts` (Property 3)
+  - [x] 13.2 * Implementar `src/components/ui/dropdown.pbt.ts` (Property 3)
     - Property 3 (estado controlado vs interno): para todo par `(controlled, defaultOpen, sequenceOfClicks)`, validar que se `controlled === true` o estado externo é fonte de verdade; senão o Dropdown alterna conforme cliques
     - Geradores: `fc.boolean()`, `fc.array(fc.constantFrom("trigger", "outside", "escape"), { maxLength: 5 })`
     - _Requirements: 8.3_
     - _Validates: Property 3_
 
-  - [ ] 13.3 * (Opcional) Property 4 — Dropdown roundtrip com `trapFocus={true}`
+  - [x] 13.3 * (Opcional) Property 4 — Dropdown roundtrip com `trapFocus={true}`
     - Para Dropdown aberto com `n ≥ 2` items, n Tabs retornam ao primeiro item
     - Consequência da Property 1 aplicada via integração focus trap
     - _Requirements: 8.3_
     - _Validates: Property 4_
 
-- [ ] 14. Smoke checks finais
-  - [ ] 14.1 Rodar `npm run lint`
+- [x] 14. Smoke checks finais
+  - [x] 14.1 Rodar `npm run lint`
     - Esperado: zero erros após Wave restante (10) terminada e regra ESLint instalada (11)
     - Anexar log em `tokens.md > Smoke checks finais`
     - _Requirements: 6.3, 7.2_
 
-  - [ ] 14.2 Rodar `npx tsc --noEmit`
+  - [x] 14.2 Rodar `npx tsc --noEmit`
     - Esperado: zero erros
     - Anexar log
     - _Requirements: 7.2_
 
-  - [ ] 14.3 Rodar `npm run test`
+  - [x] 14.3 Rodar `npm run test`
     - Esperado: zero falhas; todos os novos testes (Dropdown, focus trap, Modal smoke) e PBTs passam
     - Anexar log
     - _Requirements: 8.4_
 
-  - [ ] 14.4 Rodar `npm run build`
+  - [x] 14.4 Rodar `npm run build`
     - Esperado: sucesso, 71 rotas compiladas (estado herdado das Fases 1/2; pode variar se rotas foram adicionadas)
     - Anexar log
     - _Requirements: 7.2_
 
 - [ ] 15. Saída desta fase
-  - [ ] 15.1 Validar saída
+  - [x] 15.1 Validar saída
     - Todos os 8 Requirements de `requirements.md` têm evidência (path:linha de código, log de teste, ou link de PR) anexada
     - `tokens.md` cobre: Tokens semânticos, Variantes de opacidade (com `path:linha` por variante adotada), Escala tipográfica, Exceções declaradas, API conventions, Migration log, Lint anti-regressão, Contrato com CI Fase 7, Smoke checks finais
     - Contagem de `Hex_Literal` e `Font_Size_Arbitrary` em arquivos do escopo é **zero** OU exceções estão declaradas em `tokens.md`

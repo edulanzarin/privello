@@ -26,6 +26,7 @@ function Helper(props: HelperProps) {
     useFocusTrap(ref, active, { autoFocus: props.autoFocus ?? "first" });
     return createElement(
         "div",
+        // eslint-disable-next-line react-hooks/refs
         { ref, "data-testid": "trap-container" },
         ...props.items.map((it) =>
             createElement("button", {

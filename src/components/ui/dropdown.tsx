@@ -121,6 +121,8 @@ export function DropdownTrigger({
             "aria-haspopup"?: string;
             "aria-expanded"?: boolean;
         }>;
+        // Passar a ref como prop é uso legítimo; não estamos lendo `current` aqui.
+        // eslint-disable-next-line react-hooks/refs
         return cloneElement(child, {
             ref: triggerRef as React.Ref<HTMLElement>,
             onClick: (e: React.MouseEvent) => {
