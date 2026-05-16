@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { BottomNavWrapper } from "@/components/layout/bottom-nav-wrapper";
@@ -18,6 +18,16 @@ export const metadata: Metadata = {
   },
   description:
     "As melhores acompanhantes do Brasil. Perfis verificados, fotos reais, áudio e vídeo. Encontre acompanhantes por cidade com discrição e segurança.",
+};
+
+// fase-6: declara `interactive-widget=resizes-content` para que o viewport CSS
+// reduza quando o teclado virtual abre em iOS Safari 16+ / Android Chrome moderno,
+// permitindo que conteúdo `100dvh` se ajuste automaticamente em vez de ficar coberto.
+// Cf. `.kiro/specs/fase-6-mobile-cross-browser/design.md > Components and Interfaces > 3`.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
 };
 
 export default async function RootLayout({

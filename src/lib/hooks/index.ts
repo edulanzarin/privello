@@ -1,5 +1,6 @@
 export { useFileUpload } from "./use-file-upload";
 export { useMediaActions } from "./use-media-actions";
+export { useMediaQuery } from "./use-media-query";
 export { useScrollLock } from "./use-scroll-lock";
 export { useEscapeKey } from "./use-escape-key";
 export { useFocusTrap } from "./use-focus-trap";
