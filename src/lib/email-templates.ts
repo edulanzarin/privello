@@ -1,3 +1,38 @@
+/**
+ * Templates HTML de e-mails transacionais
+ *
+ * Caminho: src/lib/email-templates.ts
+ *
+ * Fábricas puras que retornam o `html` pronto para `sendEmail`. Cada função
+ * cobre um tipo de e-mail disparado pelo backend (recuperação de senha,
+ * advertência, suspensão, reativação) e usa a mesma moldura visual (`base`)
+ * mais o botão padrão (`btn`).
+ *
+ * Convenções:
+ * - Pure functions: recebem strings, devolvem string HTML. Sem I/O, sem
+ *   dependência de Prisma/Auth/Request.
+ * - HTML inline-styled (compatível com clientes de e-mail).
+ * - Cores e tipografia alinhadas ao design system (Georgia + #1a1a1a +
+ *   coral #e85d4a + alerta #c8102e).
+ * - O assunto (`subject`) NÃO mora aqui — é definido pelo chamador.
+ *
+ * Cross-refs:
+ * - src/lib/email.ts (`sendEmail`) — consumidor direto; o retorno destas
+ *   funções entra no campo `html` do envio.
+ * - src/app/_actions/password-reset.ts (`requestPasswordReset`) — usa
+ *   `passwordResetTemplate`.
+ * - src/app/_actions/admin-moderation.ts (`warnProfile`, `suspendProfile`,
+ *   `unsuspendProfile`) — usam `warningTemplate`, `suspensionTemplate`,
+ *   `unsuspensionTemplate`.
+ */
+
+/**
+ * Envoltório HTML compartilhado por todos os templates. Aplica `<head>`,
+ * `<body>` com cor de fundo, container centralizado, logotipo e rodapé.
+ *
+ * @param content - HTML interno do card central (já com headings e CTA).
+ * @returns Documento HTML completo (`<!DOCTYPE html>` ...) pronto para envio.
+ */
 function base(content: string) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -13,12 +48,33 @@ function base(content: string) {
 </html>`;
 }
 
+/**
+ * Botão CTA padrão (preto, sans-serif, uppercase). Compartilhado por todos
+ * os templates.
+ *
+ * @param href - URL absoluta de destino do botão.
+ * @param label - Texto visível do botão.
+ * @returns Trecho HTML inline pronto para concatenar no corpo do e-mail.
+ */
 function btn(href: string, label: string) {
   return `<div style="margin:28px 0;">
     <a href="${href}" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:14px 28px;font-family:sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;">${label}</a>
   </div>`;
 }
 
+/**
+ * Template do e-mail "Redefinir senha — Privello". Disparado pelo fluxo de
+ * recuperação de senha quando o usuário pede um novo token.
+ *
+ * Variáveis interpoladas:
+ * - `resetUrl` — URL absoluta `${BASE_URL}/recuperar-senha/<token>`. O token
+ *   expira em 1 h (cf. `src/app/_actions/password-reset.ts`).
+ *
+ * Consumido por: `src/app/_actions/password-reset.ts > requestPasswordReset`.
+ *
+ * @param resetUrl - URL de redefinição. Já deve incluir o token na rota.
+ * @returns HTML completo do e-mail pronto para `sendEmail({ html })`.
+ */
 export function passwordResetTemplate(resetUrl: string) {
   return base(`
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:normal;">Redefinir senha</h1>
@@ -31,6 +87,27 @@ export function passwordResetTemplate(resetUrl: string) {
   `);
 }
 
+/**
+ * Template do e-mail "Advertência recebida — Privello (N/SUSPENSION_THRESHOLD)".
+ * Disparado quando a moderação adiciona uma `Warning` ao perfil. Acima de
+ * 2 advertências, o template muda o tom para destacar o risco de suspensão
+ * automática (cf. `SUSPENSION_THRESHOLD` em `src/lib/constants.ts`).
+ *
+ * Variáveis interpoladas:
+ * - `name` — `Profile.displayName` do provider advertido.
+ * - `reason` — motivo informado pelo admin (já trimmed pelo chamador).
+ * - `warningCount` — total de advertências acumuladas (1, 2, 3...).
+ * - `panelUrl` — URL absoluta para o painel do provider
+ *   (`${APP_URL}/painel`).
+ *
+ * Consumido por: `src/app/_actions/admin-moderation.ts > warnProfile`.
+ *
+ * @param name - Nome de exibição do provider.
+ * @param reason - Motivo da advertência (texto livre validado pelo schema).
+ * @param warningCount - Número total de advertências após esta inclusão.
+ * @param panelUrl - URL para o painel do provider.
+ * @returns HTML completo do e-mail.
+ */
 export function warningTemplate(name: string, reason: string, warningCount: number, panelUrl: string) {
   const plural = warningCount === 1 ? "advertência" : "advertências";
   const danger = warningCount >= 2;
@@ -54,6 +131,25 @@ export function warningTemplate(name: string, reason: string, warningCount: numb
   `);
 }
 
+/**
+ * Template do e-mail "Sua conta no Privello foi suspensa". Disparado quando
+ * a moderação suspende manualmente o perfil ou quando a 3ª advertência aciona
+ * a suspensão automática.
+ *
+ * Variáveis interpoladas:
+ * - `name` — `Profile.displayName` do provider suspenso.
+ * - `note` — motivo opcional (admin pode suspender sem nota; quando `null`
+ *   o bloco "Motivo" é omitido).
+ * - `panelUrl` — URL absoluta para o painel do provider.
+ *
+ * Consumido por: `src/app/_actions/admin-moderation.ts > suspendProfile` e
+ * por `warnProfile` quando o threshold de suspensão é atingido.
+ *
+ * @param name - Nome de exibição do provider.
+ * @param note - Motivo opcional informado pelo admin; `null` omite o bloco.
+ * @param panelUrl - URL para o painel do provider.
+ * @returns HTML completo do e-mail.
+ */
 export function suspensionTemplate(name: string, note: string | null, panelUrl: string) {
   return base(`
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:normal;">Conta suspensa</h1>
@@ -73,6 +169,20 @@ export function suspensionTemplate(name: string, note: string | null, panelUrl: 
   `);
 }
 
+/**
+ * Template do e-mail "Sua conta no Privello foi reativada". Disparado quando
+ * a moderação reativa um perfil previamente suspenso.
+ *
+ * Variáveis interpoladas:
+ * - `name` — `Profile.displayName` do provider reativado.
+ * - `panelUrl` — URL absoluta para o painel do provider.
+ *
+ * Consumido por: `src/app/_actions/admin-moderation.ts > unsuspendProfile`.
+ *
+ * @param name - Nome de exibição do provider.
+ * @param panelUrl - URL para o painel do provider.
+ * @returns HTML completo do e-mail.
+ */
 export function unsuspensionTemplate(name: string, panelUrl: string) {
   return base(`
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:normal;">Conta reativada</h1>

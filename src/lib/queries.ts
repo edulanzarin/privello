@@ -1,4 +1,39 @@
 /**
+ * God-module legado de queries Prisma — em estado híbrido (deprecated)
+ *
+ * Caminho: src/lib/queries.ts
+ *
+ * Estado híbrido transitório até **2026-06-13**: as 27 funções de query
+ * foram migradas para `src/lib/services/*` na Wave 7 da fase-3-backend, mas
+ * este arquivo ainda existe por dois motivos justificados:
+ *   1. Re-exports de compatibilidade (`@/lib/services > @/lib/queries`)
+ *      enquanto qualquer consumidor remanescente é migrado.
+ *   2. Helpers `sortProfileCards` / `finalizeDiscoverOrder` (e seus suportes
+ *      `profileCardInclude` / `ProfileCardPayload`) servem como **oráculo**
+ *      da Property 1 do PBT (`discover.service.pbt.ts`), validando paridade
+ *      entre o agrupamento SQL e o agrupamento JS por `planTier`.
+ *
+ * Convenções:
+ * - NÃO adicionar novos exports aqui. Toda função nova deve nascer em
+ *   `src/lib/services/*`.
+ * - NÃO importar de `@/lib/queries` em código de produto novo — usar
+ *   `@/lib/services` diretamente.
+ * - Após 2026-06-13, este arquivo deve ser removido (Wave 5 da
+ *   fase-7-dx-infra). A Property 1 migra para snapshot estático e os
+ *   re-exports somem.
+ *
+ * Cross-refs:
+ * - docs/adr/0003-queries-ts-deprecated.md — decisão arquitetural completa
+ *   (status, alternativas, janela de revisão).
+ * - .kiro/specs/fase-7-dx-infra/dx-conventions.md > §4 — convenção
+ *   anti-regressão para imports legados.
+ * - src/lib/services/discover.service.pbt.ts — Property 1 (consumidor dos
+ *   helpers JUSTIFICADO).
+ * - src/lib/services/discover.service.ts > __test_internal__ — equivalentes
+ *   privados já portados; o teste compara um contra o outro.
+ */
+
+/**
  * @deprecated 2026-05-30 — funções migradas para `@/lib/services/*` na
  * Wave 7 da fase-3-backend (cf. `metricas-baseline.md > §5 Decisões >
  * queries.ts final`). Remoção planejada após 2026-06-13 (janela ≥ 14 dias
