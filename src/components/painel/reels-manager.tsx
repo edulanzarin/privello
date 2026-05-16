@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Clapperboard, Eye, EyeOff, Lock, Loader2, Play, Trash2, Upload, X } from "lucide-react";
 import { createReel, deleteReel, toggleReelPrivacy } from "@/app/_actions/reels";
 import { useToast } from "@/components/ui/toast";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 type Reel = { id: string; url: string; caption: string | null; isPublic: boolean };
@@ -242,19 +243,11 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsPrivate((p) => !p)}
-            className={cn(
-              "flex h-[24px] w-[42px] items-center rounded-full transition-colors duration-200",
-              isPrivate ? "bg-[#30d158]" : "bg-black/[0.09]",
-            )}
-          >
-            <span className={cn(
-              "ml-[2px] h-[20px] w-[20px] rounded-full bg-white shadow-sm transition-transform duration-200",
-              isPrivate && "translate-x-[18px]",
-            )} />
-          </button>
+          <Switch
+            checked={isPrivate}
+            onChange={setIsPrivate}
+            size="md"
+          />
         </div>
 
         {uploading && (

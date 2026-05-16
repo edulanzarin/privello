@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, X, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Modal } from "@/components/ui/modal";
 import type { StoryGroup } from "@/lib/queries";
 
 const STORY_DURATION = 5000; // ms for image stories
@@ -234,134 +235,141 @@ export function StoryBar({
       </div>
 
       {/* ── Story Viewer Overlay ── */}
-      {activeGroupIdx !== null && activeGroup && activeStory && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm">
-          {/* Card container */}
-          <div className="relative mx-auto flex h-full w-full max-w-sm flex-col sm:h-[90vh] sm:rounded-xl overflow-hidden">
+      <Modal
+        open={activeGroupIdx !== null && !!activeGroup && !!activeStory}
+        onClose={closeViewer}
+        position="fullscreen"
+        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full"
+      >
+        {activeGroupIdx !== null && activeGroup && activeStory ? (
+          <>
+            {/* Card container */}
+            <div className="relative mx-auto flex h-full w-full max-w-sm flex-col sm:h-[90vh] sm:rounded-xl overflow-hidden">
 
-            {/* Progress bars */}
-            <div className="absolute inset-x-0 top-0 z-10 flex gap-1 p-2 pt-3">
-              {activeGroup.stories.map((s, si) => (
-                <div key={s.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/30">
-                  <div
-                    className="h-full rounded-full bg-white"
-                    style={{
-                      width:
-                        si < activeStoryIdx
-                          ? "100%"
-                          : si === activeStoryIdx
-                            ? `${progress}%`
-                            : "0%",
-                      transition: si === activeStoryIdx ? "none" : undefined,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Top bar */}
-            <div className="absolute inset-x-0 top-5 z-20 flex items-center justify-between px-3 pt-4">
-              <Link
-                href={`/p/${activeGroup.slug}`}
-                onClick={closeViewer}
-                className="flex items-center gap-2"
-              >
-                <div className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-white/60">
-                  <Image src={activeGroup.coverUrl} alt="" fill className="object-cover" sizes="36px" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white leading-none">{activeGroup.displayName}</p>
-                  <p className="mt-0.5 text-[10px] text-white/60">{timeAgo(activeStory.createdAt)}</p>
-                </div>
-              </Link>
-              <button
-                onClick={closeViewer}
-                className="rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60"
-              >
-                <X className="h-5 w-5" strokeWidth={2} />
-              </button>
-            </div>
-
-            {/* Story image */}
-            <div className="relative flex-1 bg-black">
-              <Image
-                src={activeStory.mediaUrl}
-                alt=""
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
-
-              {/* Caption */}
-              {activeStory.caption && (
-                <div className="absolute inset-x-0 bottom-20 px-4">
-                  <p className="mx-auto max-w-[90%] rounded-lg bg-black/60 px-4 py-2.5 text-center text-sm text-white backdrop-blur-sm">
-                    {activeStory.caption}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Tap zones: left = prev, right = next */}
-            <div className="absolute inset-x-0 z-10" style={{ top: "15%", bottom: "15%" }}>
-              <div className="flex h-full">
-                <button className="flex-1" onClick={goPrevStory} aria-label="Anterior" />
-                <button className="flex-1" onClick={goNextStory} aria-label="Próximo" />
+              {/* Progress bars */}
+              <div className="absolute inset-x-0 top-0 z-10 flex gap-1 p-2 pt-3">
+                {activeGroup.stories.map((s, si) => (
+                  <div key={s.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/30">
+                    <div
+                      className="h-full rounded-full bg-white"
+                      style={{
+                        width:
+                          si < activeStoryIdx
+                            ? "100%"
+                            : si === activeStoryIdx
+                              ? `${progress}%`
+                              : "0%",
+                        transition: si === activeStoryIdx ? "none" : undefined,
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
 
-            {/* Bottom bar: views + like */}
-            <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-6 pt-12">
-              <div className="flex items-center gap-1.5 text-sm text-white/70">
-                <Eye className="h-4 w-4" strokeWidth={1.5} />
-                <span>{activeStory.viewCount}</span>
-              </div>
-              {isClient ? (
-                <button
-                  onClick={toggleLike}
-                  className="flex items-center gap-1.5 text-sm text-white"
-                >
-                  <Heart
-                    className={cn(
-                      "h-6 w-6 transition",
-                      activeStory.likedByMe ? "fill-coral text-coral scale-110" : "text-white/80",
-                    )}
-                    strokeWidth={1.5}
-                  />
-                  <span className="text-xs text-white/70">{activeStory.likeCount}</span>
-                </button>
-              ) : (
+              {/* Top bar */}
+              <div className="absolute inset-x-0 top-5 z-20 flex items-center justify-between px-3 pt-4">
                 <Link
-                  href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
-                  className="text-[10px] text-white/50 hover:text-white/80 transition"
-                  onClick={(e) => e.stopPropagation()}
+                  href={`/p/${activeGroup.slug}`}
+                  onClick={closeViewer}
+                  className="flex items-center gap-2"
                 >
-                  Entre para curtir
+                  <div className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-white/60">
+                    <Image src={activeGroup.coverUrl} alt="" fill className="object-cover" sizes="36px" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white leading-none">{activeGroup.displayName}</p>
+                    <p className="mt-0.5 text-[10px] text-white/60">{timeAgo(activeStory.createdAt)}</p>
+                  </div>
                 </Link>
-              )}
-            </div>
-          </div>
+                <button
+                  onClick={closeViewer}
+                  className="rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60"
+                >
+                  <X className="h-5 w-5" strokeWidth={2} />
+                </button>
+              </div>
 
-          {/* Profile prev/next arrows */}
-          {activeGroupIdx > 0 && (
-            <button
-              onClick={() => { setActiveGroupIdx((i) => i! - 1); setActiveStoryIdx(0); setProgress(0); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20 sm:left-4"
-            >
-              <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
-            </button>
-          )}
-          {activeGroupIdx < localGroups.length - 1 && (
-            <button
-              onClick={() => { setActiveGroupIdx((i) => i! + 1); setActiveStoryIdx(0); setProgress(0); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20 sm:right-4"
-            >
-              <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
-            </button>
-          )}
-        </div>
-      )}
+              {/* Story image */}
+              <div className="relative flex-1 bg-black">
+                <Image
+                  src={activeStory.mediaUrl}
+                  alt=""
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+
+                {/* Caption */}
+                {activeStory.caption && (
+                  <div className="absolute inset-x-0 bottom-20 px-4">
+                    <p className="mx-auto max-w-[90%] rounded-lg bg-black/60 px-4 py-2.5 text-center text-sm text-white backdrop-blur-sm">
+                      {activeStory.caption}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Tap zones: left = prev, right = next */}
+              <div className="absolute inset-x-0 z-10" style={{ top: "15%", bottom: "15%" }}>
+                <div className="flex h-full">
+                  <button className="flex-1" onClick={goPrevStory} aria-label="Anterior" />
+                  <button className="flex-1" onClick={goNextStory} aria-label="Próximo" />
+                </div>
+              </div>
+
+              {/* Bottom bar: views + like */}
+              <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-6 pt-12">
+                <div className="flex items-center gap-1.5 text-sm text-white/70">
+                  <Eye className="h-4 w-4" strokeWidth={1.5} />
+                  <span>{activeStory.viewCount}</span>
+                </div>
+                {isClient ? (
+                  <button
+                    onClick={toggleLike}
+                    className="flex items-center gap-1.5 text-sm text-white"
+                  >
+                    <Heart
+                      className={cn(
+                        "h-6 w-6 transition",
+                        activeStory.likedByMe ? "fill-coral text-coral scale-110" : "text-white/80",
+                      )}
+                      strokeWidth={1.5}
+                    />
+                    <span className="text-xs text-white/70">{activeStory.likeCount}</span>
+                  </button>
+                ) : (
+                  <Link
+                    href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
+                    className="text-[10px] text-white/50 hover:text-white/80 transition"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Entre para curtir
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Profile prev/next arrows */}
+            {activeGroupIdx > 0 && (
+              <button
+                onClick={() => { setActiveGroupIdx((i) => i! - 1); setActiveStoryIdx(0); setProgress(0); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20 sm:left-4"
+              >
+                <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
+              </button>
+            )}
+            {activeGroupIdx < localGroups.length - 1 && (
+              <button
+                onClick={() => { setActiveGroupIdx((i) => i! + 1); setActiveStoryIdx(0); setProgress(0); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20 sm:right-4"
+              >
+                <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
+              </button>
+            )}
+          </>
+        ) : null}
+      </Modal>
     </>
   );
 }

@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
 import { useToast } from "@/components/ui/toast";
+import { Switch } from "@/components/ui/switch";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
 type Media = {
@@ -362,19 +364,11 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setUploadPublic((p) => !p)}
-            className={cn(
-              "flex h-[24px] w-[42px] items-center rounded-full transition-colors duration-200",
-              !uploadPublic ? "bg-[#30d158]" : "bg-black/[0.09]",
-            )}
-          >
-            <span className={cn(
-              "ml-[2px] h-[20px] w-[20px] rounded-full bg-white shadow-sm transition-transform duration-200",
-              !uploadPublic && "translate-x-[18px]",
-            )} />
-          </button>
+          <Switch
+            checked={!uploadPublic}
+            onChange={(c) => setUploadPublic(!c)}
+            size="md"
+          />
         </div>
 
         {/* Publish button */}
@@ -393,91 +387,93 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       </div>
 
       {/* ── Full-screen lightbox ── */}
-      {curItem && (
-        <div className="fixed inset-0 z-[200] flex flex-col bg-black">
-          {/* Top bar */}
-          <div className="flex h-14 shrink-0 items-center justify-between px-4">
-            <button
-              onClick={closeLb}
-              className="flex items-center gap-2 text-white/70 transition hover:text-white"
-            >
-              <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
-              <span className="text-sm">Voltar</span>
-            </button>
-            <p className="text-xs text-white/40">{lightbox! + 1} / {filtered.length}</p>
-            <div className="w-20" />
-          </div>
+      <Modal open={!!curItem} onClose={closeLb} position="fullscreen" className="bg-black flex w-full flex-col">
+        {curItem && (
+          <>
+            {/* Top bar */}
+            <div className="flex h-14 shrink-0 items-center justify-between px-4">
+              <button
+                onClick={closeLb}
+                className="flex items-center gap-2 text-white/70 transition hover:text-white"
+              >
+                <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
+                <span className="text-sm">Voltar</span>
+              </button>
+              <p className="text-xs text-white/40">{lightbox! + 1} / {filtered.length}</p>
+              <div className="w-20" />
+            </div>
 
-          {/* Media area */}
-          <div className="relative flex flex-1 items-center justify-center overflow-hidden">
-            {isVideo(curItem) ? (
-              <video src={curItem.url} controls autoPlay
-                className="max-h-full max-w-full" />
-            ) : (
-              <Image src={curItem.url} alt="" width={900} height={1200}
-                className="max-h-full max-w-full object-contain" priority />
-            )}
+            {/* Media area */}
+            <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+              {isVideo(curItem) ? (
+                <video src={curItem.url} controls autoPlay
+                  className="max-h-full max-w-full" />
+              ) : (
+                <Image src={curItem.url} alt="" width={900} height={1200}
+                  className="max-h-full max-w-full object-contain" priority />
+              )}
 
-            {/* Nav arrows */}
-            {filtered.length > 1 && (
-              <>
-                <button
-                  onClick={prevLb}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition hover:bg-white/20"
-                >
-                  <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-                <button
-                  onClick={nextLb}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition hover:bg-white/20"
-                >
-                  <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-              </>
-            )}
-          </div>
+              {/* Nav arrows */}
+              {filtered.length > 1 && (
+                <>
+                  <button
+                    onClick={prevLb}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={nextLb}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
+                  </button>
+                </>
+              )}
+            </div>
 
-          {/* Bottom info + actions */}
-          <div className="shrink-0 border-t border-white/10 px-5 py-4">
-            <div className="mx-auto max-w-lg">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white">@{profileSlug ?? "–"}</p>
-                  <p className="text-xs text-white/40">{fmtDate(curItem.createdAt)}</p>
-                  {curItem.caption && (
-                    <p className="mt-2 text-sm leading-relaxed text-white/80">{curItem.caption}</p>
-                  )}
-                </div>
-                {/* Actions */}
-                <div className="flex shrink-0 flex-col gap-2">
-                  {visTab === "publica" && !curItem.isCover && (
-                    <button
-                      type="button"
-                      onClick={() => handleSetCover(curItem.id)}
-                      className="flex items-center gap-1.5 rounded border border-white/20 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/60 hover:text-white"
-                    >
-                      <Star className="h-3 w-3" strokeWidth={1.5} /> Definir perfil
-                    </button>
-                  )}
-                  {curItem.isCover ? (
-                    <p className="text-[10px] text-white/30 text-center max-w-[100px]">
-                      Defina outra foto de perfil antes de remover
-                    </p>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(curItem.id)}
-                      className="flex items-center gap-1.5 rounded border border-white/20 px-3 py-1.5 text-xs text-white/70 transition hover:border-coral hover:text-coral"
-                    >
-                      <Trash2 className="h-3 w-3" strokeWidth={1.5} /> Remover
-                    </button>
-                  )}
+            {/* Bottom info + actions */}
+            <div className="shrink-0 border-t border-white/10 px-5 py-4">
+              <div className="mx-auto max-w-lg">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white">@{profileSlug ?? "–"}</p>
+                    <p className="text-xs text-white/40">{fmtDate(curItem.createdAt)}</p>
+                    {curItem.caption && (
+                      <p className="mt-2 text-sm leading-relaxed text-white/80">{curItem.caption}</p>
+                    )}
+                  </div>
+                  {/* Actions */}
+                  <div className="flex shrink-0 flex-col gap-2">
+                    {visTab === "publica" && !curItem.isCover && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetCover(curItem.id)}
+                        className="flex items-center gap-1.5 rounded border border-white/20 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/60 hover:text-white"
+                      >
+                        <Star className="h-3 w-3" strokeWidth={1.5} /> Definir perfil
+                      </button>
+                    )}
+                    {curItem.isCover ? (
+                      <p className="text-[10px] text-white/30 text-center max-w-[100px]">
+                        Defina outra foto de perfil antes de remover
+                      </p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(curItem.id)}
+                        className="flex items-center gap-1.5 rounded border border-white/20 px-3 py-1.5 text-xs text-white/70 transition hover:border-coral hover:text-coral"
+                      >
+                        <Trash2 className="h-3 w-3" strokeWidth={1.5} /> Remover
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
     </div>
   );
 }

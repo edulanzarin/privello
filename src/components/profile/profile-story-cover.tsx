@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { Heart, X, Eye, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Modal } from "@/components/ui/modal";
 import type { StoryGroup } from "@/lib/queries";
 
 const DURATION = 5000;
@@ -200,11 +201,13 @@ export function ProfileStoryCover({
       </button>
 
       {/* ── Story viewer overlay ── */}
-      {open && localGroup && activeStory && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm cursor-pointer"
-          onClick={close}
-        >
+      <Modal
+        open={open && !!localGroup && !!activeStory}
+        onClose={close}
+        position="fullscreen"
+        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full"
+      >
+        {open && localGroup && activeStory ? (
           <div
             className="relative mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden sm:h-[90vh] sm:rounded-xl cursor-default"
             onClick={(e) => e.stopPropagation()}
@@ -275,9 +278,9 @@ export function ProfileStoryCover({
                 </Link>
               )}
             </div>
-          </div>
-        </div>
-      )}
+            </div>
+        ) : null}
+      </Modal>
     </>
   );
 }

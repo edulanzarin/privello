@@ -6,6 +6,7 @@ import { saveAvailabilityWindows } from "@/app/painel/_actions/provider-settings
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
 
 const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
@@ -72,22 +73,15 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
       <Card variant="solid" padding="none" className="overflow-hidden divide-y divide-black/[0.06]">
         {[0, 1, 2, 3, 4, 5, 6].map((wd) => (
           <div key={wd} className="flex items-center gap-4 px-5 py-[14px]">
-            <span className="w-[76px] text-[14px] font-semibold">{DAYS[wd]}</span>
+            <span className="w-[76px] text-md font-semibold">{DAYS[wd]}</span>
 
-            {/* Same toggle as valores-form */}
-            <button
-              type="button"
-              onClick={() => setOpenDays((prev) => prev.map((p, i) => (i === wd ? !p : p)))}
-              className={cn(
-                "flex h-[22px] w-[40px] shrink-0 items-center rounded-full transition-colors duration-200",
-                openDays[wd] ? "bg-[#30d158]" : "bg-black/[0.09]",
-              )}
-            >
-              <span className={cn(
-                "ml-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform duration-200",
-                openDays[wd] && "translate-x-[18px]",
-              )} />
-            </button>
+            <Switch
+              checked={openDays[wd]}
+              onChange={(c) =>
+                setOpenDays((prev) => prev.map((p, i) => (i === wd ? c : p)))
+              }
+              size="md"
+            />
 
             {openDays[wd] ? (
               <div className="ml-auto flex items-center gap-2">

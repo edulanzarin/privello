@@ -160,51 +160,51 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - `bg-[#ff9500]/10 text-[#b36200]` → `bg-warning/10 text-warning` (validar contraste)
     - _Requirements: 5.2_
 
-- [ ] 7. Consolidação de Switch duplicado
-  - [ ] 7.1 Substituir Switch inline em `src/app/painel/valores/valores-form.tsx:96-99`
+- [x] 7. Consolidação de Switch duplicado
+  - [x] 7.1 Substituir Switch inline em `src/app/painel/valores/valores-form.tsx:96-99`
     - `<button onClick={...} className="...flex h-[22px] w-[40px]...rounded-full transition-colors duration-200...">` → `<Switch checked={enabled[d.minutes]} onChange={(c) => setEnabled((p) => ({ ...p, [d.minutes]: c }))} disabled={d.required} size="md" />`
     - Validar comportamento idêntico (estado, callback, disabled)
     - _Requirements: 5.2_
 
-  - [ ] 7.2 Substituir Switch inline em `src/app/painel/midias/midias-manager.tsx:368-371`
+  - [x] 7.2 Substituir Switch inline em `src/app/painel/midias/midias-manager.tsx:368-371`
     - Caso especial: estado invertido (`!uploadPublic`). Solução: `<Switch checked={!uploadPublic} onChange={(c) => setUploadPublic(!c)} ... />` OU renomear estado para `isPrivate` (decisão pequena no commit)
     - _Requirements: 5.2_
 
-  - [ ] 7.3 Substituir Switch inline em `src/app/painel/disponibilidade/availability-form.tsx:81-85`
+  - [x] 7.3 Substituir Switch inline em `src/app/painel/disponibilidade/availability-form.tsx:81-85`
     - `<Switch checked={openDays[wd]} onChange={(c) => setOpenDays((prev) => prev.map((p, i) => (i === wd ? c : p)))} size="md" />`
     - _Requirements: 5.2_
 
-  - [ ] 7.4 Substituir Switch inline em `src/components/painel/reels-manager.tsx:248-252`
+  - [x] 7.4 Substituir Switch inline em `src/components/painel/reels-manager.tsx:248-252`
     - Caso especial: estado invertido (`isPrivate`). Manter semântica como em 7.2.
     - _Requirements: 5.2_
 
-  - [ ] 7.5 Substituir Switch inline em `src/app/cadastro/acompanhante/provider-register-form.tsx:455-459`
+  - [x] 7.5 Substituir Switch inline em `src/app/cadastro/acompanhante/provider-register-form.tsx:455-459`
     - Já usa tokens (`bg-success`/`bg-line`); substituir mesmo assim para consolidar API
     - _Requirements: 5.2_
 
-  - [ ] 7.6 Decidir caso `src/app/conta/onboarding/valores/valores-form.tsx:119-123`
+  - [x] 7.6 Decidir caso `src/app/conta/onboarding/valores/valores-form.tsx:119-123`
     - Switch inline usa cor `bg-coral` (não verde do primitivo). Decisão:
       - (a) Substituir aceitando unificação visual no verde do `Switch` primitivo
       - (b) Registrar como `OutOfScopeFinding` ("Switch primitivo não parametriza cor; refactor de API é fora desta fase")
     - Documentar a decisão escolhida em `tokens.md`
     - _Requirements: 5.2, 5.5_
 
-- [ ] 8. Consolidação de modais/overlays duplicados
-  - [ ] 8.1 Substituir modal admin em `src/components/admin/warning-form.tsx:93`
+- [x] 8. Consolidação de modais/overlays duplicados
+  - [x] 8.1 Substituir modal admin em `src/components/admin/warning-form.tsx:93`
     - Trocar `<div className="fixed inset-0 z-50 ...">` por `<Modal open={open} onClose={() => setOpen(false)} className="w-full max-w-sm bg-white p-6 shadow-xl">`
     - Preservar `role="dialog"`/`aria-modal="true"` (Modal já fornece)
     - _Requirements: 5.2_
 
-  - [ ] 8.2 Substituir modal de edição em `src/app/conta/perfil/client-profile-edit.tsx:60`
+  - [x] 8.2 Substituir modal de edição em `src/app/conta/perfil/client-profile-edit.tsx:60`
     - Trocar `<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 ...">` por `<Modal open={open} onClose={() => setOpen(false)} position="center" className="w-full max-w-md ...">`
     - _Requirements: 5.2_
 
-  - [ ] 8.3 Substituir lightbox full-screen em `src/app/painel/midias/midias-manager.tsx:397`
+  - [x] 8.3 Substituir lightbox full-screen em `src/app/painel/midias/midias-manager.tsx:397`
     - Trocar `<div className="fixed inset-0 z-[200] flex flex-col bg-black">` por `<Modal open={!!curItem} onClose={...} position="fullscreen" className="bg-black">`
     - Preservar gestos de teclado/touch existentes
     - _Requirements: 5.2_
 
-  - [ ] 8.4 Decidir caso de `src/components/stories/story-bar.tsx:238` (story viewer)
+  - [x] 8.4 Decidir caso de `src/components/stories/story-bar.tsx:238` (story viewer)
     - O viewer tem comportamentos próprios (autoplay, swipe, progresso). Decisão:
       - (a) Abstrair em `<StoryViewer>` interno que envolve `Modal position="fullscreen"`
       - (b) Substituir o overlay por `Modal position="fullscreen"` direto e manter os comportamentos no JSX atual
@@ -212,16 +212,16 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Documentar a decisão em `tokens.md` e implementar
     - _Requirements: 5.2, 5.5_
 
-  - [ ] 8.5 Substituir story viewer espelhado em `src/components/profile/profile-story-cover.tsx:205`
+  - [x] 8.5 Substituir story viewer espelhado em `src/components/profile/profile-story-cover.tsx:205`
     - Aplicar a mesma decisão da 8.4
     - _Requirements: 5.2_
 
-  - [ ] 8.6 Decidir caso de `src/components/profile/media-gallery.tsx:178` (galeria responsiva)
+  - [x] 8.6 Decidir caso de `src/components/profile/media-gallery.tsx:178` (galeria responsiva)
     - Behavior responsivo (mobile fullscreen, desktop centered). Decisão preliminar do design: **registrar como `OutOfScopeFinding` para `fase-6-mobile-cross-browser`** (responsividade é tema central da Fase 6)
     - Confirmar e registrar OutOfScopeFinding em `requirements.md > §3` com commit no master
     - _Requirements: 5.2, 5.5, 7.2_
 
-  - [ ] 8.7 Avaliar `src/components/painel/painel-sidebar.tsx:225` (drawer mobile)
+  - [x] 8.7 Avaliar `src/components/painel/painel-sidebar.tsx:225` (drawer mobile)
     - Não é modal — é drawer com transição lateral. Decisão preliminar do design: **manter como caso à parte; refactor para `<Drawer>` é tarefa potencial fora da Fase 4**. Registrar como nota em `tokens.md > Out of scope desta fase`
     - _Requirements: 5.5_
 

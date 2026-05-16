@@ -6,6 +6,7 @@ import { saveDurationOptions } from "@/app/painel/_actions/provider-settings";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { ToggleChip } from "@/components/ui/toggle-chip";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 const DURATIONS = [
@@ -83,36 +84,30 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       {/* Durações */}
       <div className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
         <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-[14px] font-semibold">Durações e valores</p>
-          <p className="mt-1 text-[12px] text-muted">Ative as durações que você oferece e defina o valor.</p>
+          <p className="text-md font-semibold">Durações e valores</p>
+          <p className="mt-1 text-sm text-muted">Ative as durações que você oferece e defina o valor.</p>
         </div>
         <div className="divide-y divide-black/[0.04]">
           {DURATIONS.map((d) => (
             <div key={d.minutes} className="flex items-center gap-4 px-6 py-4">
-              <button
-                type="button"
+              <Switch
+                checked={!!enabled[d.minutes]}
+                onChange={(c) =>
+                  !d.required &&
+                  setEnabled((p) => ({ ...p, [d.minutes]: c }))
+                }
                 disabled={d.required}
-                onClick={() => !d.required && setEnabled((p) => ({ ...p, [d.minutes]: !p[d.minutes] }))}
-                className={cn(
-                  "flex h-[22px] w-[40px] shrink-0 items-center rounded-full transition-colors duration-200",
-                  enabled[d.minutes] ? "bg-[#30d158]" : "bg-black/[0.09]",
-                  d.required && "opacity-60 cursor-not-allowed",
-                )}
-              >
-                <span className={cn(
-                  "ml-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform duration-200",
-                  enabled[d.minutes] && "translate-x-[18px]",
-                )} />
-              </button>
+                size="md"
+              />
               <span className={cn(
-                "w-20 shrink-0 text-[14px] font-medium",
+                "w-20 shrink-0 text-md font-medium",
                 !enabled[d.minutes] && "text-muted",
               )}>
                 {d.label}
                 {d.required && <span className="ml-1 text-coral">*</span>}
               </span>
               <div className="relative max-w-[160px]">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[13px] text-muted">R$</span>
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-muted">R$</span>
                 <input
                   type="number"
                   min={50}
@@ -121,7 +116,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   value={prices[d.minutes] || ""}
                   onChange={(e) => setPrices((p) => ({ ...p, [d.minutes]: Number(e.target.value) }))}
                   placeholder="0"
-                  className="w-full rounded-lg border border-black/10 bg-white py-[7px] pl-9 pr-3 text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-black/[0.03] disabled:text-muted"
+                  className="w-full rounded-lg border border-black/10 bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-black/[0.03] disabled:text-muted"
                 />
               </div>
             </div>
@@ -132,7 +127,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       {/* Pagamentos */}
       <div className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
         <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-[14px] font-semibold">Formas de pagamento</p>
+          <p className="text-md font-semibold">Formas de pagamento</p>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-5">
           {PAYMENT_OPTIONS.map((p) => (

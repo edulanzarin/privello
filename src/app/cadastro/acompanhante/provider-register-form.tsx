@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ToggleChip } from "@/components/ui/toggle-chip";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 const HAIR_OPTIONS = [
@@ -448,18 +449,15 @@ export function ProviderRegisterForm() {
             <div className="divide-y divide-line/50">
               {DURATIONS.map((d) => (
                 <div key={d.key} className="flex items-center gap-4 px-6 py-4">
-                  <button
-                    type="button"
+                  <Switch
+                    checked={!!durEnabled[d.key]}
+                    onChange={(c) =>
+                      !d.required &&
+                      setDurEnabled((p) => ({ ...p, [d.key]: c }))
+                    }
                     disabled={d.required}
-                    onClick={() => !d.required && setDurEnabled((p) => ({ ...p, [d.key]: !p[d.key] }))}
-                    className={cn(
-                      "flex h-6 w-10 shrink-0 items-center rounded-full transition-colors duration-200",
-                      durEnabled[d.key] ? "bg-success" : "bg-line",
-                      d.required && "opacity-60 cursor-not-allowed",
-                    )}
-                  >
-                    <span className={cn("ml-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200", durEnabled[d.key] && "translate-x-4")} />
-                  </button>
+                    size="md"
+                  />
                   <span className={cn("w-20 shrink-0 text-sm font-medium", !durEnabled[d.key] && "text-muted")}>
                     {d.label}{d.required && <span className="ml-1 text-coral">*</span>}
                   </span>

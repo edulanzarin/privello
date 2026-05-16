@@ -182,13 +182,11 @@ Classificação dos Requirements herdados:
 
 ## 3. Achados fora de escopo
 
-> Nenhum achado fora de escopo registrado nesta fase.
-
-Cada novo achado relevante que extrapolar o escopo desta fase será registrado como uma linha desta tabela (schema `OutOfScopeFinding` de `design.md > Data Models` do master) e disparará commit no master spec, **nunca** absorção silenciosa pelo spec-filho (regra dura E4 de `design.md > Error Handling` do master).
+> Os achados abaixo extrapolam o escopo desta fase e foram registrados conforme regra E4 do master spec (`design.md > Error Handling`).
 
 | discoveredIn | description | proposedTarget | evidence |
 |---|---|---|---|
-| _(vazio até a primeira descoberta)_ | | | |
+| `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-4-design-system\tasks.md > 8.6` | Modal lightbox responsivo (mobile fullscreen, desktop centered) com behavior próprio. Substituir por `Modal position="fullscreen"` direto descaracterizaria o desktop centered; abstrair em `<MediaLightbox>` exigiria `useMediaQuery` + lógica de breakpoint que é tema central da Fase 6 (mobile/cross-browser). | `fase-6-mobile-cross-browser` | `src/components/profile/media-gallery.tsx:178` (overlay `fixed inset-0 z-50` com behavior responsivo). |
 
 ---
 

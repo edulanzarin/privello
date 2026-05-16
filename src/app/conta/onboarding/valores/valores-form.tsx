@@ -3,17 +3,18 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { saveOnboardingValores } from "@/app/_actions/onboarding";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 
 const DURATIONS = [
-  { key: "30min",    label: "30 min",  required: false },
-  { key: "1h",       label: "1 hora",  required: true  },
-  { key: "2h",       label: "2 horas", required: false },
-  { key: "3h",       label: "3 horas", required: false },
-  { key: "4h",       label: "4 horas", required: false },
-  { key: "overnight",label: "Pernoite",required: false },
-  { key: "travel",   label: "Diária",  required: false },
+  { key: "30min", label: "30 min", required: false },
+  { key: "1h", label: "1 hora", required: true },
+  { key: "2h", label: "2 horas", required: false },
+  { key: "3h", label: "3 horas", required: false },
+  { key: "4h", label: "4 horas", required: false },
+  { key: "overnight", label: "Pernoite", required: false },
+  { key: "travel", label: "Diária", required: false },
 ] as const;
 
 const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferência", "Cripto"];
@@ -37,35 +38,35 @@ type Profile = {
 function initEnabled(profile: Profile): Record<DurationKey, boolean> {
   const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
   return {
-    "30min":    byMin.has(30)   || false,
-    "1h":       true,
-    "2h":       byMin.has(120)  || !!profile.priceTwoHours,
-    "3h":       byMin.has(180)  || false,
-    "4h":       byMin.has(240)  || false,
-    "overnight":byMin.has(720)  || !!profile.priceOvernight,
-    "travel":   byMin.has(1440) || !!profile.priceTravelDay,
+    "30min": byMin.has(30) || false,
+    "1h": true,
+    "2h": byMin.has(120) || !!profile.priceTwoHours,
+    "3h": byMin.has(180) || false,
+    "4h": byMin.has(240) || false,
+    "overnight": byMin.has(720) || !!profile.priceOvernight,
+    "travel": byMin.has(1440) || !!profile.priceTravelDay,
   };
 }
 
 function initPrices(profile: Profile): Record<DurationKey, number> {
   const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
   return {
-    "30min":    byMin.get(30)?.priceBrl   || 0,
-    "1h":       byMin.get(60)?.priceBrl   || profile.priceHour || 0,
-    "2h":       byMin.get(120)?.priceBrl  || profile.priceTwoHours  || 0,
-    "3h":       byMin.get(180)?.priceBrl  || 0,
-    "4h":       byMin.get(240)?.priceBrl  || 0,
-    "overnight":byMin.get(720)?.priceBrl  || profile.priceOvernight || 0,
-    "travel":   byMin.get(1440)?.priceBrl || profile.priceTravelDay || 0,
+    "30min": byMin.get(30)?.priceBrl || 0,
+    "1h": byMin.get(60)?.priceBrl || profile.priceHour || 0,
+    "2h": byMin.get(120)?.priceBrl || profile.priceTwoHours || 0,
+    "3h": byMin.get(180)?.priceBrl || 0,
+    "4h": byMin.get(240)?.priceBrl || 0,
+    "overnight": byMin.get(720)?.priceBrl || profile.priceOvernight || 0,
+    "travel": byMin.get(1440)?.priceBrl || profile.priceTravelDay || 0,
   };
 }
 
 export function ValoresForm({ profile }: { profile: Profile }) {
   const [pending, startTransition] = useTransition();
-  const [err, setErr]              = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   const [enabled, setEnabled] = useState<Record<DurationKey, boolean>>(() => initEnabled(profile));
-  const [prices,  setPrices]  = useState<Record<DurationKey, number>>(() => initPrices(profile));
+  const [prices, setPrices] = useState<Record<DurationKey, number>>(() => initPrices(profile));
   const [payments, setPayments] = useState<string[]>(() =>
     profile.paymentMethods ? profile.paymentMethods.split(" · ").map((s) => s.trim()) : []
   );
@@ -84,7 +85,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
     const fd = new FormData();
     DURATIONS.forEach((d) => {
       fd.set(`enabled_${d.key}`, enabled[d.key] ? "1" : "0");
-      fd.set(`price_${d.key}`,   String(prices[d.key] ?? 0));
+      fd.set(`price_${d.key}`, String(prices[d.key] ?? 0));
     });
     fd.set("paymentMethods", payments.join(" · "));
     startTransition(async () => {
@@ -111,22 +112,16 @@ export function ValoresForm({ profile }: { profile: Profile }) {
         <div className="divide-y divide-black/[0.06]">
           {DURATIONS.map((d) => (
             <div key={d.key} className="flex items-center gap-4 px-6 py-4">
-              {/* Toggle */}
-              <button
-                type="button"
+              {/* Toggle (unificado: visual verde do primitivo Switch) */}
+              <Switch
+                checked={!!enabled[d.key]}
+                onChange={(c) =>
+                  !d.required &&
+                  setEnabled((p) => ({ ...p, [d.key]: c }))
+                }
                 disabled={d.required}
-                onClick={() => !d.required && setEnabled((p) => ({ ...p, [d.key]: !p[d.key] }))}
-                className={cn(
-                  "flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-                  enabled[d.key] ? "bg-coral" : "bg-line",
-                  d.required && "opacity-60 cursor-not-allowed",
-                )}
-              >
-                <span className={cn(
-                  "ml-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
-                  enabled[d.key] && "translate-x-4",
-                )} />
-              </button>
+                size="md"
+              />
 
               {/* Label */}
               <span className={cn(
