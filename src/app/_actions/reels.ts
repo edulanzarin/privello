@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import {
+  CreateReelSchema,
+  DeleteReelSchema,
+  ToggleReelPrivacySchema,
+  formDataToObject,
+} from "@/lib/validation";
 
 async function getProviderProfile() {
   const session = await auth();
@@ -15,10 +21,9 @@ async function getProviderProfile() {
 
 export async function createReel(formData: FormData) {
   const profile = await getProviderProfile();
-  const url       = (formData.get("url") as string).trim();
-  const caption   = (formData.get("caption") as string | null)?.trim() || null;
-  const isPrivate = formData.get("isPrivate") === "true";
-  if (!url) return { error: "URL inválida." };
+  const parsed = CreateReelSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { url, caption, isPrivate } = parsed.data;
 
   const count = await prisma.media.count({ where: { profileId: profile.id, mediaType: "REEL" } });
 
@@ -26,7 +31,7 @@ export async function createReel(formData: FormData) {
     data: {
       profileId: profile.id,
       url,
-      caption,
+      caption: caption ?? null,
       isPublic: !isPrivate,
       sortOrder: count,
       isCover: false,
@@ -40,14 +45,18 @@ export async function createReel(formData: FormData) {
 
 export async function deleteReel(mediaId: string) {
   const profile = await getProviderProfile();
-  await prisma.media.deleteMany({ where: { id: mediaId, profileId: profile.id, mediaType: "REEL" } });
+  const parsed = DeleteReelSchema.safeParse({ mediaId });
+  if (!parsed.success) return;
+  await prisma.media.deleteMany({ where: { id: parsed.data.mediaId, profileId: profile.id, mediaType: "REEL" } });
   revalidatePath("/painel/reels");
 }
 
 export async function toggleReelPrivacy(mediaId: string) {
   const profile = await getProviderProfile();
+  const parsed = ToggleReelPrivacySchema.safeParse({ mediaId });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
   const reel = await prisma.media.findFirst({
-    where: { id: mediaId, profileId: profile.id, mediaType: "REEL" },
+    where: { id: parsed.data.mediaId, profileId: profile.id, mediaType: "REEL" },
     select: { id: true, isPublic: true },
   });
   if (!reel) return { error: "Reel não encontrado." };

@@ -7,6 +7,13 @@ import { redirect } from "next/navigation";
 import { sendEmail } from "@/lib/email";
 import { warningTemplate, suspensionTemplate, unsuspensionTemplate } from "@/lib/email-templates";
 import { SUSPENSION_THRESHOLD, SITE_URL } from "@/lib/constants";
+import {
+  GiveWarningSchema,
+  SuspendProfileSchema,
+  UnsuspendProfileSchema,
+  DeleteAdminMediaSchema,
+  ToggleMediaVisibilitySchema,
+} from "@/lib/validation";
 
 const APP_URL = process.env.NEXTAUTH_URL ?? SITE_URL;
 
@@ -21,20 +28,22 @@ async function requireAdmin() {
   return session.user.id;
 }
 
-export async function giveWarning(profileId: string, reason: string): Promise<{ error?: string; suspended?: boolean }> {
+export async function giveWarning(profileId: string, reason: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; suspended?: boolean }> {
   const adminId = await requireAdmin();
 
-  if (!reason.trim()) return { error: "Informe o motivo da advertência." };
+  const parsed = GiveWarningSchema.safeParse({ profileId, reason });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { profileId: pid, reason: trimmedReason } = parsed.data;
 
   const profile = await prisma.profile.findUnique({
-    where: { id: profileId },
+    where: { id: pid },
     include: { user: { select: { email: true, name: true } }, warnings: { select: { id: true } } },
   });
   if (!profile) return { error: "Perfil não encontrado." };
   if (profile.isSuspended) return { error: "Perfil já está suspenso." };
 
   await prisma.warning.create({
-    data: { profileId, adminId, reason: reason.trim() },
+    data: { profileId: pid, adminId, reason: trimmedReason },
   });
 
   const warningCount = profile.warnings.length + 1;
@@ -42,7 +51,7 @@ export async function giveWarning(profileId: string, reason: string): Promise<{ 
 
   if (warningCount >= SUSPENSION_THRESHOLD) {
     await prisma.profile.update({
-      where: { id: profileId },
+      where: { id: pid },
       data: { isSuspended: true, suspendedAt: new Date(), suspensionNote: `Suspenso automaticamente após ${warningCount} advertências.` },
     });
     suspended = true;
@@ -62,7 +71,7 @@ export async function giveWarning(profileId: string, reason: string): Promise<{ 
     await sendEmail({
       to: profile.user.email,
       subject: `Advertência recebida — Privello (${warningCount}/${SUSPENSION_THRESHOLD})`,
-      html: warningTemplate(profile.displayName, reason.trim(), warningCount, `${APP_URL}/painel`),
+      html: warningTemplate(profile.displayName, trimmedReason, warningCount, `${APP_URL}/painel`),
     });
   }
 
@@ -71,25 +80,29 @@ export async function giveWarning(profileId: string, reason: string): Promise<{ 
   return { suspended };
 }
 
-export async function suspendProfile(profileId: string, note: string): Promise<{ error?: string }> {
+export async function suspendProfile(profileId: string, note: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
+  const parsed = SuspendProfileSchema.safeParse({ profileId, note });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { profileId: pid, note: trimmedNote } = parsed.data;
+
   const profile = await prisma.profile.findUnique({
-    where: { id: profileId },
+    where: { id: pid },
     include: { user: { select: { email: true, name: true } } },
   });
   if (!profile) return { error: "Perfil não encontrado." };
 
   await prisma.profile.update({
-    where: { id: profileId },
-    data: { isSuspended: true, suspendedAt: new Date(), suspensionNote: note.trim() || null },
+    where: { id: pid },
+    data: { isSuspended: true, suspendedAt: new Date(), suspensionNote: trimmedNote || null },
   });
 
   if (profile.user.email) {
     await sendEmail({
       to: profile.user.email,
       subject: "Sua conta no Privello foi suspensa",
-      html: suspensionTemplate(profile.displayName, note.trim() || null, `${APP_URL}/painel`),
+      html: suspensionTemplate(profile.displayName, trimmedNote || null, `${APP_URL}/painel`),
     });
   }
 
@@ -98,17 +111,21 @@ export async function suspendProfile(profileId: string, note: string): Promise<{
   return {};
 }
 
-export async function unsuspendProfile(profileId: string): Promise<{ error?: string }> {
+export async function unsuspendProfile(profileId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
+  const parsed = UnsuspendProfileSchema.safeParse({ profileId });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { profileId: pid } = parsed.data;
+
   const profile = await prisma.profile.findUnique({
-    where: { id: profileId },
+    where: { id: pid },
     include: { user: { select: { email: true } } },
   });
   if (!profile) return { error: "Perfil não encontrado." };
 
   await prisma.profile.update({
-    where: { id: profileId },
+    where: { id: pid },
     data: { isSuspended: false, suspendedAt: null, suspensionNote: null },
   });
 
@@ -125,33 +142,41 @@ export async function unsuspendProfile(profileId: string): Promise<{ error?: str
   return {};
 }
 
-export async function deleteAdminMedia(mediaId: string): Promise<{ error?: string }> {
+export async function deleteAdminMedia(mediaId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
+  const parsed = DeleteAdminMediaSchema.safeParse({ mediaId });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { mediaId: mid } = parsed.data;
+
   const media = await prisma.media.findUnique({
-    where: { id: mediaId },
+    where: { id: mid },
     include: { profile: { select: { slug: true } } },
   });
   if (!media) return { error: "Mídia não encontrada." };
 
-  await prisma.media.delete({ where: { id: mediaId } });
+  await prisma.media.delete({ where: { id: mid } });
 
   revalidatePath("/admin/midias");
   revalidatePath(`/p/${media.profile.slug}`);
   return {};
 }
 
-export async function toggleMediaVisibility(mediaId: string): Promise<{ error?: string }> {
+export async function toggleMediaVisibility(mediaId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
+  const parsed = ToggleMediaVisibilitySchema.safeParse({ mediaId });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { mediaId: mid } = parsed.data;
+
   const media = await prisma.media.findUnique({
-    where: { id: mediaId },
+    where: { id: mid },
     include: { profile: { select: { slug: true } } },
   });
   if (!media) return { error: "Mídia não encontrada." };
 
   await prisma.media.update({
-    where: { id: mediaId },
+    where: { id: mid },
     data: { isPublic: !media.isPublic },
   });
 

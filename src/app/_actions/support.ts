@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import {
+  OpenTicketSchema,
+  ReplyTicketSchema,
+  CloseTicketSchema,
+  ReopenTicketSchema,
+  formDataToObject,
+} from "@/lib/validation";
 
 async function getSession() {
   const session = await auth();
@@ -13,12 +20,11 @@ async function getSession() {
 
 // ── Provider actions ──────────────────────────────────────────────────────────
 
-export async function openTicket(formData: FormData): Promise<{ error?: string; ticketId?: string }> {
+export async function openTicket(formData: FormData): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; ticketId?: string }> {
   const session = await getSession();
-  const subject = (formData.get("subject") as string | null)?.trim();
-  const text = (formData.get("text") as string | null)?.trim();
-
-  if (!subject || !text) return { error: "Preencha o assunto e a mensagem." };
+  const parsed = OpenTicketSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { subject, text } = parsed.data;
 
   const ticket = await prisma.supportTicket.create({
     data: {
@@ -34,12 +40,14 @@ export async function openTicket(formData: FormData): Promise<{ error?: string; 
   return { ticketId: ticket.id };
 }
 
-export async function replyTicket(ticketId: string, text: string): Promise<{ error?: string }> {
+export async function replyTicket(ticketId: string, text: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   const session = await getSession();
-  if (!text.trim()) return { error: "Mensagem vazia." };
+  const parsed = ReplyTicketSchema.safeParse({ ticketId, text });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { ticketId: tid, text: trimmedText } = parsed.data;
 
   const ticket = await prisma.supportTicket.findUnique({
-    where: { id: ticketId },
+    where: { id: tid },
     select: { userId: true, status: true },
   });
 
@@ -55,23 +63,23 @@ export async function replyTicket(ticketId: string, text: string): Promise<{ err
   if (ticket?.status === "CLOSED") return { error: "Ticket fechado." };
 
   await prisma.supportMessage.create({
-    data: { ticketId, userId: session.user.id, text: text.trim(), isAdmin },
+    data: { ticketId: tid, userId: session.user.id, text: trimmedText, isAdmin },
   });
 
   if (isAdmin && ticket?.status === "OPEN") {
     await prisma.supportTicket.update({
-      where: { id: ticketId },
+      where: { id: tid },
       data: { status: "IN_PROGRESS" },
     });
   }
 
   await prisma.supportTicket.update({
-    where: { id: ticketId },
+    where: { id: tid },
     data: { updatedAt: new Date() },
   });
 
-  revalidatePath(`/painel/suporte/${ticketId}`);
-  revalidatePath(`/admin/suporte/${ticketId}`);
+  revalidatePath(`/painel/suporte/${tid}`);
+  revalidatePath(`/admin/suporte/${tid}`);
   return {};
 }
 
@@ -89,20 +97,24 @@ async function requireAdmin() {
 
 export async function closeTicket(ticketId: string): Promise<void> {
   await requireAdmin();
+  const parsed = CloseTicketSchema.safeParse({ ticketId });
+  if (!parsed.success) return;
   await prisma.supportTicket.update({
-    where: { id: ticketId },
+    where: { id: parsed.data.ticketId },
     data: { status: "CLOSED" },
   });
-  revalidatePath(`/admin/suporte/${ticketId}`);
+  revalidatePath(`/admin/suporte/${parsed.data.ticketId}`);
   revalidatePath("/admin/suporte");
 }
 
 export async function reopenTicket(ticketId: string): Promise<void> {
   await requireAdmin();
+  const parsed = ReopenTicketSchema.safeParse({ ticketId });
+  if (!parsed.success) return;
   await prisma.supportTicket.update({
-    where: { id: ticketId },
+    where: { id: parsed.data.ticketId },
     data: { status: "OPEN" },
   });
-  revalidatePath(`/admin/suporte/${ticketId}`);
+  revalidatePath(`/admin/suporte/${parsed.data.ticketId}`);
   revalidatePath("/admin/suporte");
 }

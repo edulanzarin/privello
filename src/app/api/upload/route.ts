@@ -3,7 +3,9 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { MAX_UPLOAD_BYTES } from "@/lib/constants";
+import { UploadBodySchema, formDataToObject } from "@/lib/validation";
+import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitConfigFor } from "@/lib/rate-limit-config";
 
 const IMAGE_MAX = 8 * 1024 * 1024;  // 8 MB
 const VIDEO_MAX = 200 * 1024 * 1024; // 200 MB
@@ -22,19 +24,39 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   }
 
+  // Rate limit: 20 uploads per hour per userId. Excess returns 429 with
+  // Retry-After plus a structured audit log line.
+  const rl = await rateLimit(rateLimitConfigFor("upload", session.user.id));
+  if (!rl.allowed) {
+    console.warn({
+      ts: Date.now(),
+      endpoint: "upload",
+      key: session.user.id,
+      retryAfter: rl.retryAfter,
+    });
+    return NextResponse.json(
+      { error: "Limite de uploads atingido. Tente novamente mais tarde." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rl.retryAfter ?? 3600) },
+      },
+    );
+  }
+
   const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
   if (!profile) {
     return NextResponse.json({ error: "Perfil não encontrado." }, { status: 404 });
   }
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  const isPublic = formData.get("isPublic") !== "false";
-  const caption = (formData.get("caption") as string | null)?.trim() || null;
-  const mediaType = (formData.get("mediaType") as string | null) ?? "IMAGE";
+  const parsed = UploadBodySchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    return NextResponse.json(parsed.error.flatten(), { status: 400 });
+  }
+  const { file, isPublic, caption, mediaType, purpose } = parsed.data;
 
-  if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
-
+  // KEEP existing MIME/size validation (per spec: file uploads keep
+  // handler-side checks; the schema only verifies File presence).
   const isVideoFile = ALLOWED_VIDEOS.includes(file.type);
   const isImageFile = ALLOWED_IMAGES.includes(file.type);
   if (!isImageFile && !isVideoFile) {
@@ -67,7 +89,6 @@ export async function POST(req: NextRequest) {
 
   // REEL and story uploads: the caller (createReel action / createStory action) handles
   // the DB record — don't create a Media row here or we get duplicates.
-  const purpose = (formData.get("purpose") as string | null) ?? "";
   if (mediaType === "REEL" || purpose === "story") {
     return NextResponse.json({ ok: true, url });
   }
@@ -77,7 +98,7 @@ export async function POST(req: NextRequest) {
   const isCover = isPublic && count === 0;
 
   const media = await prisma.media.create({
-    data: { profileId: profile.id, url, isPublic, sortOrder: count, isCover, caption, mediaType },
+    data: { profileId: profile.id, url, isPublic, sortOrder: count, isCover, caption: caption ?? null, mediaType },
   });
 
   return NextResponse.json({ ok: true, media });

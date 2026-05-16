@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMPClient, Preference } from "@/lib/mercadopago";
+import { CheckoutBodySchema } from "@/lib/validation";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ??
@@ -41,8 +42,11 @@ export async function POST(req: NextRequest) {
   });
   if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
 
-  const body = await req.json() as { type: string; tier?: string };
-  const { type, tier } = body;
+  const result = CheckoutBodySchema.safeParse(await req.json());
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
+  const { type, tier } = result.data;
 
   const key = type === "plan" ? (tier ?? "") : type;
   const unitPrice = PRICES[key];
@@ -57,7 +61,7 @@ export async function POST(req: NextRequest) {
     : `${BASE_URL}/painel/plano?upgraded=1`;
 
   const preference = new Preference(client);
-  const result = await preference.create({
+  const preferenceResult = await preference.create({
     body: {
       items: [{ id: key, title, quantity: 1, unit_price: unitPrice, currency_id: "BRL" }],
       payer: { email: user.email, name: user.name ?? undefined },
@@ -73,5 +77,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ url: result.init_point });
+  return NextResponse.json({ url: preferenceResult.init_point });
 }

@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isSubscriber } from "@/lib/queries";
+import {
+  CommentListQuerySchema,
+  CommentBodySchema,
+  CommentDeleteBodySchema,
+} from "@/lib/validation";
+import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitConfigFor } from "@/lib/rate-limit-config";
 
 export async function GET(req: NextRequest) {
-  const mediaId = req.nextUrl.searchParams.get("mediaId");
-  if (!mediaId) return NextResponse.json({ error: "mediaId obrigatório." }, { status: 400 });
+  const result = CommentListQuerySchema.safeParse({
+    mediaId: req.nextUrl.searchParams.get("mediaId"),
+  });
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
 
   const comments = await prisma.mediaComment.findMany({
-    where: { mediaId },
+    where: { mediaId: result.data.mediaId },
     orderBy: { createdAt: "asc" },
     take: 50,
     include: { user: { select: { id: true, name: true, slug: true } } },
@@ -25,12 +36,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Apenas assinantes podem comentar." }, { status: 403 });
   }
 
-  const { mediaId, text } = await req.json() as { mediaId: string; text: string };
-  if (!mediaId || !text?.trim()) return NextResponse.json({ error: "Campos obrigatórios." }, { status: 400 });
-  if (text.length > 500) return NextResponse.json({ error: "Comentário muito longo." }, { status: 400 });
+  // Rate limit: 5 comments per minute per userId. Excess returns 429 with
+  // a Retry-After header and a structured audit log line.
+  const rl = await rateLimit(rateLimitConfigFor("comment", session.user.id));
+  if (!rl.allowed) {
+    console.warn({
+      ts: Date.now(),
+      endpoint: "comment",
+      key: session.user.id,
+      retryAfter: rl.retryAfter,
+    });
+    return NextResponse.json(
+      { error: "Muitos comentários em pouco tempo. Tente novamente em alguns instantes." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rl.retryAfter ?? 60) },
+      },
+    );
+  }
+
+  const result = CommentBodySchema.safeParse(await req.json());
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
+  const { mediaId, text } = result.data;
 
   const comment = await prisma.mediaComment.create({
-    data: { mediaId, userId: session.user.id, text: text.trim() },
+    data: { mediaId, userId: session.user.id, text },
     include: { user: { select: { id: true, name: true, slug: true } } },
   });
   return NextResponse.json({ comment });
@@ -40,8 +72,11 @@ export async function DELETE(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
 
-  const { commentId } = await req.json() as { commentId: string };
-  if (!commentId) return NextResponse.json({ error: "commentId obrigatório." }, { status: 400 });
+  const result = CommentDeleteBodySchema.safeParse(await req.json());
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
+  const { commentId } = result.data;
 
   const comment = await prisma.mediaComment.findUnique({
     where: { id: commentId },

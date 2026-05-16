@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSectionProfiles } from "@/lib/queries";
+import { ProfilesSectionQuerySchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const type = searchParams.get("type") as "hot" | "boosted" | null;
-  const offset = Math.max(0, parseInt(searchParams.get("offset") ?? "0", 10));
-
-  if (type !== "hot" && type !== "boosted") {
-    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+  const result = ProfilesSectionQuerySchema.safeParse({
+    type: req.nextUrl.searchParams.get("type"),
+    offset: req.nextUrl.searchParams.get("offset") ?? undefined,
+  });
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
   }
 
-  const { profiles, hasMore } = await getSectionProfiles(type, offset);
+  const { profiles, hasMore } = await getSectionProfiles(result.data.type, result.data.offset);
   return NextResponse.json({ profiles, hasMore });
 }

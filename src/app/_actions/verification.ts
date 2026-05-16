@@ -4,6 +4,14 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import {
+  SubmitVerificationCaseSchema,
+  ApproveVerificationSchema,
+  RejectVerificationSchema,
+  AdminToggleVerificationSchema,
+  AdminSetPlanSchema,
+  formDataToObject,
+} from "@/lib/validation";
 
 async function getProviderProfile() {
   const session = await auth();
@@ -13,18 +21,11 @@ async function getProviderProfile() {
   return profile;
 }
 
-export async function submitVerificationCase(formData: FormData): Promise<{ error?: string; success?: boolean }> {
+export async function submitVerificationCase(formData: FormData): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; success?: boolean }> {
   const profile = await getProviderProfile();
-
-  const documentFrontUrl = (formData.get("documentFrontUrl") as string | null)?.trim() || null;
-  const documentBackUrl  = (formData.get("documentBackUrl")  as string | null)?.trim() || null;
-  const selfieUrl        = (formData.get("selfieUrl")        as string | null)?.trim() || null;
-  const videoUrl         = (formData.get("videoUrl")         as string | null)?.trim() || null;
-  const documentType     = (formData.get("documentType")     as string | null)?.trim() || "RG";
-
-  if (!documentFrontUrl || !documentBackUrl || !selfieUrl) {
-    return { error: "Envie o documento (frente e verso) e a selfie antes de submeter." };
-  }
+  const parsed = SubmitVerificationCaseSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { documentFrontUrl, documentBackUrl, selfieUrl, videoUrl, documentType } = parsed.data;
 
   // Upsert — replace previous pending case if any
   const existing = await prisma.verificationCase.findFirst({
@@ -34,11 +35,25 @@ export async function submitVerificationCase(formData: FormData): Promise<{ erro
   if (existing) {
     await prisma.verificationCase.update({
       where: { id: existing.id },
-      data: { documentFrontUrl, documentBackUrl, selfieUrl, videoUrl, documentType, waitingSince: new Date() },
+      data: {
+        documentFrontUrl,
+        documentBackUrl,
+        selfieUrl,
+        videoUrl: videoUrl ?? null,
+        documentType,
+        waitingSince: new Date(),
+      },
     });
   } else {
     await prisma.verificationCase.create({
-      data: { profileId: profile.id, documentFrontUrl, documentBackUrl, selfieUrl, videoUrl, documentType },
+      data: {
+        profileId: profile.id,
+        documentFrontUrl,
+        documentBackUrl,
+        selfieUrl,
+        videoUrl: videoUrl ?? null,
+        documentType,
+      },
     });
   }
 
@@ -66,18 +81,20 @@ async function requireAdmin() {
   if (user?.role !== "ADMIN" && user?.role !== "MODERATOR") redirect("/");
 }
 
-export async function approveVerification(caseId: string): Promise<{ error?: string; success?: boolean }> {
+export async function approveVerification(caseId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; success?: boolean }> {
   await requireAdmin();
+  const parsed = ApproveVerificationSchema.safeParse({ caseId });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
 
   const vc = await prisma.verificationCase.findUnique({
-    where: { id: caseId },
+    where: { id: parsed.data.caseId },
     select: { id: true, profileId: true },
   });
   if (!vc) return { error: "Caso não encontrado." };
 
   await prisma.$transaction([
     prisma.verificationCase.update({
-      where: { id: caseId },
+      where: { id: parsed.data.caseId },
       data: { status: "APROVADO" },
     }),
     prisma.profile.update({
@@ -91,19 +108,21 @@ export async function approveVerification(caseId: string): Promise<{ error?: str
   return { success: true };
 }
 
-export async function rejectVerification(caseId: string, note?: string): Promise<{ error?: string; success?: boolean }> {
+export async function rejectVerification(caseId: string, note?: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; success?: boolean }> {
   await requireAdmin();
+  const parsed = RejectVerificationSchema.safeParse({ caseId, note: note ?? null });
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
 
   const vc = await prisma.verificationCase.findUnique({
-    where: { id: caseId },
+    where: { id: parsed.data.caseId },
     select: { id: true, profileId: true },
   });
   if (!vc) return { error: "Caso não encontrado." };
 
   await prisma.$transaction([
     prisma.verificationCase.update({
-      where: { id: caseId },
-      data: { status: "REJEITADO", documentNote: note ?? null },
+      where: { id: parsed.data.caseId },
+      data: { status: "REJEITADO", documentNote: parsed.data.note ?? null },
     }),
     prisma.profile.update({
       where: { id: vc.profileId },
@@ -118,19 +137,21 @@ export async function rejectVerification(caseId: string, note?: string): Promise
 
 export async function adminToggleVerification(profileId: string): Promise<void> {
   await requireAdmin();
-  const profile = await prisma.profile.findUnique({ where: { id: profileId }, select: { isVerified: true } });
+  const parsed = AdminToggleVerificationSchema.safeParse({ profileId });
+  if (!parsed.success) return;
+  const profile = await prisma.profile.findUnique({ where: { id: parsed.data.profileId }, select: { isVerified: true } });
   if (!profile) return;
-  await prisma.profile.update({ where: { id: profileId }, data: { isVerified: !profile.isVerified } });
+  await prisma.profile.update({ where: { id: parsed.data.profileId }, data: { isVerified: !profile.isVerified } });
   revalidatePath("/admin/perfis");
 }
 
 export async function adminSetPlan(profileId: string, plan: string): Promise<void> {
   await requireAdmin();
-  const valid = ["ESSENCIAL", "DESTAQUE", "PREMIUM"];
-  if (!valid.includes(plan)) return;
+  const parsed = AdminSetPlanSchema.safeParse({ profileId, plan });
+  if (!parsed.success) return;
   await prisma.profile.update({
-    where: { id: profileId },
-    data: { planTier: plan as "ESSENCIAL" | "DESTAQUE" | "PREMIUM" },
+    where: { id: parsed.data.profileId },
+    data: { planTier: parsed.data.plan },
   });
   revalidatePath("/admin/perfis");
 }

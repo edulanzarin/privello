@@ -1,20 +1,66 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
 import { getOrCreateCityBySlug } from "@/lib/queries";
+import {
+  LoginActionSchema,
+  SignupClientSchema,
+  SignupProviderSchema,
+  formDataToObject,
+} from "@/lib/validation";
+import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitConfigFor } from "@/lib/rate-limit-config";
+
+/**
+ * Resolve the caller IP from the standard proxy headers. We pick the
+ * left-most entry of `x-forwarded-for` (closest to the actual client)
+ * with a sane fallback chain so the rate-limit key never degrades to a
+ * shared bucket silently.
+ */
+async function resolveClientIp(): Promise<string> {
+  const h = await headers();
+  const fwd = h.get("x-forwarded-for");
+  if (fwd) {
+    const first = fwd.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return h.get("x-real-ip")?.trim() || "unknown";
+}
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 export async function loginAction(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const callbackUrl = formData.get("callbackUrl") as string | null;
+  const parsed = LoginActionSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    return { error: "Validation failed", issues: parsed.error.issues };
+  }
+  const { email, password, callbackUrl } = parsed.data;
+
+  // Rate-limit BEFORE invoking signIn so brute-force attempts don't even
+  // touch the auth backend. Key: client IP. Limits/window come from the
+  // canonical rate-limit table (see `rate-limits.md`).
+  const ip = await resolveClientIp();
+  const rl = await rateLimit(rateLimitConfigFor("login", ip));
+  if (!rl.allowed) {
+    console.warn({
+      ts: Date.now(),
+      endpoint: "login",
+      key: ip,
+      retryAfter: rl.retryAfter,
+    });
+    return {
+      error: "Too many login attempts",
+      issues: [],
+      retryAfter: rl.retryAfter,
+    };
+  }
 
   // Determine redirect based on user role
   const user = await prisma.user.findUnique({
-    where: { email: email?.toLowerCase() },
+    where: { email },
     select: { role: true },
   });
 
@@ -39,15 +85,9 @@ export async function loginAction(formData: FormData) {
 
 // ── Cadastro cliente ──────────────────────────────────────────────────────────
 export async function registerClientAction(formData: FormData) {
-  const name = (formData.get("name") as string).trim();
-  const slug = (formData.get("slug") as string)?.trim().toLowerCase();
-  const email = (formData.get("email") as string).trim().toLowerCase();
-  const password = formData.get("password") as string;
-
-  if (!name || !email || !password) return { error: "Preencha todos os campos." };
-  if (!slug || slug.length < 3) return { error: "O @ deve ter ao menos 3 caracteres." };
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) return { error: "O @ deve conter apenas letras minúsculas, números e hífens." };
-  if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
+  const parsed = SignupClientSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { name, slug, email, password } = parsed.data;
 
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) return { error: "Este e-mail já está cadastrado." };
@@ -61,7 +101,7 @@ export async function registerClientAction(formData: FormData) {
 
   const hash = await bcrypt.hash(password, 12);
 
-  const newClient = await prisma.user.create({
+  await prisma.user.create({
     data: { name, email, password: hash, role: "CLIENT", slug },
   });
 
@@ -75,62 +115,38 @@ export async function registerClientAction(formData: FormData) {
 
 // ── Cadastro acompanhante ─────────────────────────────────────────────────────
 export async function registerProviderAction(formData: FormData) {
-  const email = (formData.get("email") as string).trim().toLowerCase();
-  const password = formData.get("password") as string;
-  const displayName = (formData.get("displayName") as string).trim();
-  const slug = (formData.get("slug") as string).trim().toLowerCase();
-  const ageStr = formData.get("age") as string;
-  const citySlug = (formData.get("citySlug") as string | null)?.trim() ?? "";
-  const cityQuery = (formData.get("cityQuery") as string | null)?.trim() ?? "";
-  const bio = (formData.get("bio") as string | null)?.trim() ?? "";
-  const tagline = (formData.get("tagline") as string | null)?.trim() || null;
-  const whatsapp = (formData.get("whatsapp") as string | null)?.trim() || null;
-  const heightCm = formData.get("heightCm") ? Number(formData.get("heightCm")) : null;
-  const dressSize = (formData.get("dressSize") as string | null)?.trim() || null;
-  const hair = (formData.get("hair") as string | null)?.trim() || null;
-  const eyes = (formData.get("eyes") as string | null)?.trim() || null;
-  const languages = (formData.get("languages") as string | null)?.trim() || null;
-  const servesMen = formData.get("servesMen") === "1";
-  const servesWomen = formData.get("servesWomen") === "1";
-  const servesCouples = formData.get("servesCouples") === "1";
-  const hasOwnPlace = formData.get("hasOwnPlace") === "1";
-  const homeVisit = formData.get("homeVisit") === "1";
-  const travelsNational = formData.get("travelsNational") === "1";
-  const travelsInternational = formData.get("travelsInternational") === "1";
-  const paymentMethods = (formData.get("paymentMethods") as string | null)?.trim() || null;
-  const durationsJson = (formData.get("durationsJson") as string | null) ?? "[]";
-  const photoFile = formData.get("photo") as File | null;
-
-  if (!email || !password || !displayName || !slug || !ageStr) {
-    return { error: "Preencha todos os campos obrigatórios." };
+  // The provider form ships its `durations` payload as a JSON string in
+  // `durationsJson`. Normalize it before handing the FormData to the schema
+  // so the schema's `durations` field can parse cleanly.
+  const raw = formDataToObject(formData);
+  let durations: unknown = [];
+  try {
+    durations = JSON.parse((raw.durationsJson as string | undefined) ?? "[]");
+  } catch {
+    durations = [];
   }
-  if (!citySlug) return { error: "Selecione a cidade onde você atende." };
-  if (!bio) return { error: "Escreva uma bio." };
-  if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
-  if (!photoFile || photoFile.size === 0) return { error: "Selecione uma foto de perfil." };
+  delete (raw as Record<string, unknown>).durationsJson;
+  (raw as Record<string, unknown>).durations = durations;
 
-  const age = parseInt(ageStr, 10);
-  if (isNaN(age) || age < 18) return { error: "Você deve ter ao menos 18 anos." };
+  const parsed = SignupProviderSchema.safeParse(raw);
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const d = parsed.data;
+  const photoFile = d.photo;
 
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    return { error: "O @ deve conter apenas letras minúsculas, números e hífens." };
-  }
+  if (photoFile.size === 0) return { error: "Selecione uma foto de perfil." };
 
-  const exists = await prisma.user.findUnique({ where: { email } });
-  if (exists) return { error: "Este e-mail já está cadastrado." };
-
-  const slugTaken = await prisma.profile.findUnique({ where: { slug } });
-  if (slugTaken) return { error: `O @ "@${slug}" já está em uso. Escolha outro.` };
-
-  let durations: Array<{ minutes: number; label: string; priceBrl: number; sortOrder: number }> = [];
-  try { durations = JSON.parse(durationsJson); } catch { /* ignore */ }
-
-  const oneHour = durations.find((d) => d.minutes === 60);
+  const oneHour = d.durations.find((dur) => dur.minutes === 60);
   if (!oneHour) return { error: "Informe o valor para 1 hora (obrigatório)." };
 
-  const hash = await bcrypt.hash(password, 12);
+  const exists = await prisma.user.findUnique({ where: { email: d.email } });
+  if (exists) return { error: "Este e-mail já está cadastrado." };
 
-  const city = await getOrCreateCityBySlug(citySlug);
+  const slugTaken = await prisma.profile.findUnique({ where: { slug: d.slug } });
+  if (slugTaken) return { error: `O @ "@${d.slug}" já está em uso. Escolha outro.` };
+
+  const hash = await bcrypt.hash(d.password, 12);
+
+  const city = await getOrCreateCityBySlug(d.citySlug);
   if (!city) return { error: "Cidade não encontrada. Tente novamente." };
 
   const count = await prisma.profile.count();
@@ -138,45 +154,45 @@ export async function registerProviderAction(formData: FormData) {
 
   const newUser = await prisma.user.create({
     data: {
-      name: displayName,
-      email,
+      name: d.displayName,
+      email: d.email,
       password: hash,
       role: "PROVIDER",
       profile: {
         create: {
-          slug,
+          slug: d.slug,
           publicCode,
-          displayName,
-          age,
-          bio,
-          tagline,
-          whatsappPhone: whatsapp,
+          displayName: d.displayName,
+          age: d.age,
+          bio: d.bio,
+          tagline: d.tagline ?? null,
+          whatsappPhone: d.whatsapp ?? null,
           cityId: city.id,
           priceHour: oneHour.priceBrl,
-          priceTwoHours: durations.find((d) => d.minutes === 120)?.priceBrl ?? null,
-          priceOvernight: durations.find((d) => d.minutes === 720)?.priceBrl ?? null,
-          priceTravelDay: durations.find((d) => d.minutes === 1440)?.priceBrl ?? null,
-          paymentMethods,
-          heightCm: heightCm && !isNaN(heightCm) ? heightCm : null,
-          dressSize,
-          hair,
-          eyes,
-          languages,
-          servesMen,
-          servesWomen,
-          servesCouples,
-          hasOwnPlace,
-          homeVisit,
-          travelsNational,
-          travelsInternational,
+          priceTwoHours: d.durations.find((dur) => dur.minutes === 120)?.priceBrl ?? null,
+          priceOvernight: d.durations.find((dur) => dur.minutes === 720)?.priceBrl ?? null,
+          priceTravelDay: d.durations.find((dur) => dur.minutes === 1440)?.priceBrl ?? null,
+          paymentMethods: d.paymentMethods ?? null,
+          heightCm: d.heightCm ?? null,
+          dressSize: d.dressSize ?? null,
+          hair: d.hair ?? null,
+          eyes: d.eyes ?? null,
+          languages: d.languages ?? null,
+          servesMen: d.servesMen,
+          servesWomen: d.servesWomen,
+          servesCouples: d.servesCouples,
+          hasOwnPlace: d.hasOwnPlace,
+          homeVisit: d.homeVisit,
+          travelsNational: d.travelsNational,
+          travelsInternational: d.travelsInternational,
           planTier: "ESSENCIAL",
           isOnline: false,
           durationOptions: {
             createMany: {
-              data: durations.map((d, i) => ({
-                minutes: d.minutes,
-                label: d.label,
-                priceBrl: d.priceBrl,
+              data: d.durations.map((dur, i) => ({
+                minutes: dur.minutes,
+                label: dur.label ?? `${dur.minutes} min`,
+                priceBrl: dur.priceBrl,
                 sortOrder: i,
                 active: true,
               })),
@@ -188,7 +204,8 @@ export async function registerProviderAction(formData: FormData) {
     include: { profile: { select: { id: true } } },
   });
 
-  // Save profile photo
+  // Save profile photo. Validation of MIME/size is intentionally kept here —
+  // the Zod schema only validates that `photo` is a File (`z.instanceof(File)`).
   const profile = newUser.profile;
   if (profile) {
     try {
@@ -214,5 +231,5 @@ export async function registerProviderAction(formData: FormData) {
     }
   }
 
-  await signIn("credentials", { email, password, redirectTo: "/painel" });
+  await signIn("credentials", { email: d.email, password: d.password, redirectTo: "/painel" });
 }

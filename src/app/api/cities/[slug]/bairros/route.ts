@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { BairrosParamsSchema } from "@/lib/validation";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const result = BairrosParamsSchema.safeParse(await params);
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
 
-  const city = await prisma.city.findUnique({ where: { slug } });
+  const city = await prisma.city.findUnique({ where: { slug: result.data.slug } });
   if (!city) return NextResponse.json({ bairros: [] });
 
   const districts = await prisma.district.findMany({

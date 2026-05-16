@@ -3,10 +3,11 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { UploadVerificationBodySchema, formDataToObject } from "@/lib/validation";
 
-const MAX_SIZE_IMG   = 10 * 1024 * 1024;  // 10 MB for images
+const MAX_SIZE_IMG = 10 * 1024 * 1024;  // 10 MB for images
 const MAX_SIZE_VIDEO = 150 * 1024 * 1024; // 150 MB for video
-const ALLOWED_IMG   = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const ALLOWED_IMG = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 const ALLOWED_VIDEO = ["video/mp4", "video/quicktime", "video/webm", "video/x-msvideo"];
 
 export async function POST(req: NextRequest) {
@@ -21,10 +22,13 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
+  const parsed = UploadVerificationBodySchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    return NextResponse.json(parsed.error.flatten(), { status: 400 });
+  }
+  const { file } = parsed.data;
 
-  if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
-
+  // KEEP existing MIME/size validation (per spec).
   const isVideo = ALLOWED_VIDEO.includes(file.type);
   const isImage = ALLOWED_IMG.includes(file.type);
 

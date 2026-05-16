@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { CreateStorySchema, DeleteStorySchema, formDataToObject } from "@/lib/validation";
 
 async function getProviderProfile() {
   const session = await auth();
@@ -15,14 +16,13 @@ async function getProviderProfile() {
 
 export async function createStory(formData: FormData) {
   const profile = await getProviderProfile();
-  const mediaUrl  = (formData.get("mediaUrl") as string).trim();
-  const caption   = (formData.get("caption") as string | null)?.trim() || null;
-  const mediaType = (formData.get("mediaType") as string | null) || "IMAGE";
-  if (!mediaUrl) return;
+  const parsed = CreateStorySchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return;
+  const { mediaUrl, caption, mediaType } = parsed.data;
 
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   await prisma.story.create({
-    data: { profileId: profile.id, mediaUrl, mediaType, caption, expiresAt },
+    data: { profileId: profile.id, mediaUrl, mediaType, caption: caption ?? null, expiresAt },
   });
 
   revalidatePath("/painel/perfil");
@@ -31,10 +31,10 @@ export async function createStory(formData: FormData) {
 
 export async function deleteStory(formData: FormData) {
   const profile = await getProviderProfile();
-  const storyId = formData.get("storyId") as string;
-  if (!storyId) return;
+  const parsed = DeleteStorySchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return;
 
-  await prisma.story.deleteMany({ where: { id: storyId, profileId: profile.id } });
+  await prisma.story.deleteMany({ where: { id: parsed.data.storyId, profileId: profile.id } });
 
   revalidatePath("/painel/perfil");
   revalidatePath("/painel/stories");

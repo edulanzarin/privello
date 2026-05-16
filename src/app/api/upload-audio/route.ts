@@ -4,6 +4,7 @@ import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MAX_AUDIO_BYTES } from "@/lib/constants";
+import { UploadAudioBodySchema, formDataToObject } from "@/lib/validation";
 
 const ALLOWED = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4", "audio/webm", "audio/x-m4a"];
 
@@ -25,11 +26,14 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
+  const parsed = UploadAudioBodySchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    return NextResponse.json(parsed.error.flatten(), { status: 400 });
+  }
+  const { file } = parsed.data;
 
-  if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
-
-  // Some browsers send audio/mpeg for .mp3, check both type and name
+  // KEEP existing MIME/size validation (per spec).
+  // Some browsers send audio/mpeg for .mp3, check both type and name.
   const isAudio = ALLOWED.includes(file.type) || file.name.match(/\.(mp3|wav|ogg|m4a|webm)$/i);
   if (!isAudio) {
     return NextResponse.json({ error: "Formato inválido. Use MP3, WAV, OGG ou M4A." }, { status: 400 });
@@ -58,7 +62,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true, url });
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(_req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });

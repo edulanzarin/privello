@@ -5,6 +5,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { passwordResetTemplate } from "@/lib/email-templates";
+import {
+  RequestPasswordResetSchema,
+  ResetPasswordSchema,
+  formDataToObject,
+} from "@/lib/validation";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ??
@@ -13,9 +18,10 @@ const BASE_URL =
 
 export async function requestPasswordReset(
   formData: FormData,
-): Promise<{ error?: string; success?: boolean }> {
-  const email = (formData.get("email") as string ?? "").trim().toLowerCase();
-  if (!email) return { error: "Email obrigatório." };
+): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; success?: boolean }> {
+  const parsed = RequestPasswordResetSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { email } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { email } });
 
@@ -44,14 +50,10 @@ export async function requestPasswordReset(
 
 export async function resetPassword(
   formData: FormData,
-): Promise<{ error?: string; success?: boolean }> {
-  const token = (formData.get("token") as string ?? "").trim();
-  const password = (formData.get("password") as string ?? "");
-  const confirm = (formData.get("confirm") as string ?? "");
-
-  if (!token) return { error: "Token inválido." };
-  if (password.length < 8) return { error: "Senha deve ter ao menos 8 caracteres." };
-  if (password !== confirm) return { error: "Senhas não conferem." };
+): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; success?: boolean }> {
+  const parsed = ResetPasswordSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+  const { token, password } = parsed.data;
 
   const record = await prisma.verificationToken.findFirst({
     where: { token, identifier: { startsWith: "reset:" } },

@@ -2,8 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isSubscriber, listReels } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
+import { ReelsQuerySchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
+  const result = ReelsQuerySchema.safeParse({
+    cityId: req.nextUrl.searchParams.get("cityId") ?? undefined,
+    profileId: req.nextUrl.searchParams.get("profileId") ?? undefined,
+    cursor: req.nextUrl.searchParams.get("cursor") ?? undefined,
+    limit: req.nextUrl.searchParams.get("limit") ?? undefined,
+  });
+  if (!result.success) {
+    return NextResponse.json(result.error.flatten(), { status: 400 });
+  }
+
   const session = await auth();
   const userId = session?.user?.id ?? undefined;
 
@@ -16,17 +27,14 @@ export async function GET(req: NextRequest) {
       prisma.profile.findUnique({ where: { userId }, select: { id: true } }),
     ]);
     viewerIsSubscriber = subStatus;
-    // Providers always see their own private reels; pass their profile id as ownerId
-    // so the query can unlock them
     if (profile) ownerId = profile.id;
   }
 
-  const p = req.nextUrl.searchParams;
   const data = await listReels({
-    cityId:    p.get("cityId")    ?? undefined,
-    profileId: p.get("profileId") ?? undefined,
-    cursor:    p.get("cursor")    ?? undefined,
-    limit:     p.get("limit")     ? Number(p.get("limit")) : 10,
+    cityId: result.data.cityId,
+    profileId: result.data.profileId,
+    cursor: result.data.cursor,
+    limit: result.data.limit,
     userId,
     viewerIsSubscriber,
     ownerId,

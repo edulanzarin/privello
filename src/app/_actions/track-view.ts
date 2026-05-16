@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { TrackProfileViewSchema } from "@/lib/validation";
 
 const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 
@@ -13,6 +14,11 @@ const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
  */
 export async function trackProfileView(profileId: string) {
   try {
+    // Validate input shape silently (action contract is silent on parse errors).
+    const parsed = TrackProfileViewSchema.safeParse({ profileId });
+    if (!parsed.success) return;
+    const { profileId: pid } = parsed.data;
+
     const session = await auth();
 
     // Don't count if the viewer is the profile owner
@@ -21,12 +27,12 @@ export async function trackProfileView(profileId: string) {
         where: { userId: session.user.id },
         select: { id: true },
       });
-      if (ownProfile?.id === profileId) return;
+      if (ownProfile?.id === pid) return;
     }
 
     // Cookie-based cooldown: "pv_<profileId>" = timestamp of last view
     const jar = await cookies();
-    const cookieKey = `pv_${profileId}`;
+    const cookieKey = `pv_${pid}`;
     const lastView = jar.get(cookieKey)?.value;
 
     if (lastView) {
@@ -43,7 +49,7 @@ export async function trackProfileView(profileId: string) {
     });
 
     await prisma.profile.update({
-      where: { id: profileId },
+      where: { id: pid },
       data: {
         viewsThisMonth: { increment: 1 },
         viewsCurrentPeriod: { increment: 1 },

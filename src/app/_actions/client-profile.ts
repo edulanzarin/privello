@@ -5,15 +5,25 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_DURATION_MS } from "@/lib/constants";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import {
+    UploadClientAvatarSchema,
+    UpdateClientNameSchema,
+    UpdateClientSlugSchema,
+    formDataToObject,
+} from "@/lib/validation";
 
 // ── Upload foto de perfil do cliente ──────────────────────────────────────────
 export async function uploadClientAvatarAction(formData: FormData) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Não autorizado." };
 
-    const file = formData.get("avatar") as File | null;
-    if (!file || file.size === 0) return { error: "Selecione uma foto." };
+    const parsed = UploadClientAvatarSchema.safeParse(formDataToObject(formData));
+    if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+    const file = parsed.data.avatar;
 
+    if (file.size === 0) return { error: "Selecione uma foto." };
+
+    // KEEP existing MIME/size validation (per spec: file uploads keep handler-side checks).
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) return { error: "A foto deve ter no máximo 5MB." };
 
@@ -44,13 +54,12 @@ export async function updateClientNameAction(formData: FormData) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Não autorizado." };
 
-    const name = (formData.get("name") as string)?.trim();
-    if (!name || name.length < 2) return { error: "Nome deve ter ao menos 2 caracteres." };
-    if (name.length > 60) return { error: "Nome deve ter no máximo 60 caracteres." };
+    const parsed = UpdateClientNameSchema.safeParse(formDataToObject(formData));
+    if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
 
     await prisma.user.update({
         where: { id: session.user.id },
-        data: { name },
+        data: { name: parsed.data.name },
     });
 
     return { ok: true };
@@ -61,12 +70,9 @@ export async function updateClientSlugAction(formData: FormData) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Não autorizado." };
 
-    const newSlug = (formData.get("slug") as string)?.trim().toLowerCase();
-    if (!newSlug || newSlug.length < 3) return { error: "O @ deve ter ao menos 3 caracteres." };
-    if (newSlug.length > 30) return { error: "O @ deve ter no máximo 30 caracteres." };
-    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(newSlug) && newSlug.length > 2) {
-        return { error: "O @ deve conter apenas letras minúsculas, números e hífens." };
-    }
+    const parsed = UpdateClientSlugSchema.safeParse(formDataToObject(formData));
+    if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
+    const newSlug = parsed.data.slug;
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },

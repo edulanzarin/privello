@@ -95,7 +95,7 @@ Restrições importantes:
     - Documento vive em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-1-seguranca\endpoints-zod.md`
     - _Requirements: 4.2_
 
-  - [~] 4.4 Aplicar Zod em cada endpoint listado
+  - [x] 4.4 Aplicar Zod em cada endpoint listado
     - Substituir validações manuais (`if (!body.x)` etc.) por `Schema.safeParse(rawBody)`
     - Em falha de Route Handler: 400 com `result.error.flatten()` formatado
     - Em falha de Server Action: objeto tipado `{ error, issues }`
@@ -119,29 +119,29 @@ Restrições importantes:
     - Tabela: Endpoint | Chave | Janela | Limite | Resposta ao exceder
     - _Requirements: 5.1, 5.2_
 
-  - [~] 5.4 Aplicar rate limit em login (NextAuth)
+  - [x] 5.4 Aplicar rate limit em login (NextAuth)
     - Decidir mecanismo: callback NextAuth dedicado OU rota auxiliar em `src/app/api/auth/...`
     - Em excesso: 429 com `Retry-After`; log de auditoria com `{ ts, ip, attempt }`
     - _Requirements: 5.1, 5.4_
 
-  - [~] 5.5 Aplicar rate limit em `/api/upload/route.ts`
+  - [x] 5.5 Aplicar rate limit em `/api/upload/route.ts`
     - Chave: `userId` da sessão; janela conforme tabela
     - Em excesso: 429 com mensagem; log de auditoria
     - Manter validação atual de Content-Length/MIME/tamanho intacta (item ✅ resolvido — não vira tarefa)
     - _Requirements: 5.1, 5.4_
 
-  - [~] 5.6 Aplicar rate limit em `/api/wa-click/route.ts`
+  - [x] 5.6 Aplicar rate limit em `/api/wa-click/route.ts`
     - Chave: `profileId+IP`; janela conforme tabela
     - Em excesso: **200 silencioso** (sem registrar o clique, sem revelar limite)
     - _Requirements: 5.1_
 
-  - [~] 5.7 Aplicar rate limit em endpoints de comentários
+  - [x] 5.7 Aplicar rate limit em endpoints de comentários
     - Localizar Route Handlers e Server Actions de comentários (mídia comentários, story comentários)
     - Chave: `userId`; janela conforme tabela
     - Em excesso: 429 com mensagem; log de auditoria
     - _Requirements: 5.1, 5.4_
 
-  - [~] 5.8 Aplicar rate limit em endpoints de visualização de stories
+  - [x] 5.8 Aplicar rate limit em endpoints de visualização de stories
     - Localizar endpoint de "view" de stories
     - Chave: `userId+storyId`; janela conforme tabela; comportamento idempotente (200 silencioso após primeira visualização na janela)
     - _Requirements: 5.1_
