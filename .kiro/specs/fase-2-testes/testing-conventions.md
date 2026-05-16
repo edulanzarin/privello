@@ -73,6 +73,41 @@ import { test, fc } from "@fast-check/vitest";
 
 Justificativa registrada em `notes.md > tsconfig validation` (produzido pela Tarefa 1.5): omitir `vitest/globals` mantém `compilerOptions.types` enxuto e evita colisão com tipos do Next 16.
 
+### Isolamento Vitest ↔ Playwright
+
+Os dois runners não devem coletar os mesmos arquivos. A separação é declarada em ambas as configs e validada pela Tarefa 1.6.
+
+**Vitest** (`vitest.config.ts`):
+
+- `test.include = ["src/**/*.{test,pbt}.ts"]` — só pega arquivos co-localizados em `src/`.
+- `test.exclude = ["tests/e2e/**", "node_modules/**", ".next/**"]` — exclui explicitamente a árvore do Playwright.
+
+**Playwright** (`playwright.config.ts`):
+
+- `testDir: "./tests/e2e"` — restringe a coleção ao subdiretório de E2E. Como o Vitest não emite testes lá e o Playwright nunca olha para fora desse `testDir`, sufixos `*.test.ts` ou `*.pbt.ts` em `src/**` ficam fora do alcance do Playwright por construção.
+- Não foi necessário um `testMatch` adicional nesta fase. Caso futuras tarefas adicionem arquivos `*.test.ts` dentro de `tests/e2e/` (ex.: helpers de E2E nomeados acidentalmente assim), revisitar aqui e introduzir `testMatch: "**/*.spec.ts"`.
+
+**Validação executada (Tarefa 1.6):**
+
+Comando: `npx playwright test --list` na raiz do repo (`c:\Users\edulanzarin\Documents\Dev\privello\`).
+
+Saída (excerto, apenas primeiros itens — total `30 tests in 2 files`):
+
+```text
+Listing tests:
+  [ios-safari] › ios-bug-condition.spec.ts:114:9 › Property 1: iOS Safari touch interactions on non-secure origin › citySuggest mounts a dropdown with options after typing >= 2 chars
+  [ios-safari] › ios-bug-condition.spec.ts:200:9 › Property 1: iOS Safari touch interactions on non-secure origin › storyTap mounts the story viewer overlay within 1s of tapping a circle
+  [ios-safari] › preservation.spec.ts:145:13 › Preservation 3.1 — desktop city autocomplete still shows suggestions › renders dropdown options for query "São P"
+  ...
+  [desktop-chrome] › preservation.spec.ts:539:9 › Preservation 3.5 — iOS Safari unrelated features unchanged › login page renders the email + password form
+
+Total: 30 tests in 2 files
+```
+
+Os "2 files" são exatamente `tests/e2e/ios-bug-condition.spec.ts` e `tests/e2e/preservation.spec.ts`. Nenhum `src/**/*.test.ts` ou `src/**/*.pbt.ts` aparece — tanto porque o `testDir` do Playwright aponta para `tests/e2e` quanto porque, no momento desta validação, ainda não havia `*.test.ts`/`*.pbt.ts` em `src/**` (são produzidos pelas Tarefas 3.x e 4.x). A regra fica documentada para que a separação se mantenha quando esses arquivos forem criados.
+
+Não foi feita alteração em `playwright.config.ts` na Tarefa 1.6 — a config já estava restritiva o suficiente.
+
 ---
 
 ## 2. Exemplos canônicos

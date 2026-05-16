@@ -40,18 +40,18 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Smoke: `npm run test` termina com código 0 em projeto sem testes (zero arquivos casados ainda)
     - _Requirements: 1.3, 1.6_
 
-  - [-] 1.5 Validar interação com `tsconfig.json`
+  - [x] 1.5 Validar interação com `tsconfig.json`
     - Confirmar que arquivos `*.test.ts` e `*.pbt.ts` co-localizados são reconhecidos pelo TypeScript
     - Adicionar `vitest/globals` em `compilerOptions.types` se necessário; caso contrário usar imports explícitos (`import { describe, it, expect } from "vitest"`) e documentar a escolha em `testing-conventions.md`
     - _Requirements: 1.4_
 
-  - [~] 1.6 Validar isolamento contra Playwright
+  - [x] 1.6 Validar isolamento contra Playwright
     - Rodar `npm run test:e2e -- --list` em ambiente local: nenhum dos `*.test.ts` ou `*.pbt.ts` deve ser coletado pelo Playwright
     - Se houver colisão, ajustar `playwright.config.ts > testMatch` para excluir `*.test.ts`/`*.pbt.ts`
     - _Requirements: 1.6_
 
 - [ ] 2. Convenções e documento canônico
-  - [-] 2.1 Criar `testing-conventions.md` em `.kiro/specs/fase-2-testes/`
+  - [x] 2.1 Criar `testing-conventions.md` em `.kiro/specs/fase-2-testes/`
     - Seção "Localização e nomenclatura": co-localização, sufixos `*.test.ts`/`*.pbt.ts`, regra de imports, regra de tamanho de arquivo
     - Seção "Exemplos canônicos": um snippet de `*.test.ts` e um de `*.pbt.ts` (este último usando `@fast-check/vitest`)
     - Seção "Persistência de contraexemplos": dois caminhos (inline `it("regression: ...")` ou `<modulo>.regressions.ts` consumido por `describe.each`)
