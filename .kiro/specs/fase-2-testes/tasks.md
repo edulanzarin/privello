@@ -123,13 +123,13 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Requirements: 4.1, 4.3_
     - _Validates: Property 3_
 
-  - [~] 4.5 * Implementar `src/lib/whatsapp-booking.pbt.ts` (Property 4) condicional
+  - [x] 4.5 * Implementar `src/lib/whatsapp-booking.pbt.ts` (Property 4) condicional
     - WHERE `parseBookingUrl` existir no módulo, implementar round-trip
     - WHERE não existir, **NÃO** criar arquivo `.pbt.ts`; registrar como **não declarável** em `testing-conventions.md`
     - _Requirements: 4.1, 4.4_
     - _Validates: Property 4_
 
-  - [~] 4.6 * Implementar `src/lib/booking-slots.pbt.ts` (Properties 5 e 6)
+  - [x] 4.6 * Implementar `src/lib/booking-slots.pbt.ts` (Properties 5 e 6)
     - Property 5 (monotonicidade): toda sequência gerada é estritamente crescente em `start`, com `end > start` por slot
     - Property 6 (completude): com `intervalo=0`, união cobre exatamente `[início, fim − duração]` sem lacunas; com `intervalo>0`, ajustar para `⊆` + invariante de espaçamento
     - Documentar a forma final no comentário do teste

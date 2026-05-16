@@ -206,7 +206,7 @@ Restrições importantes:
 - [ ] 9. Property tests pós-Fase 2 (condicional)
   - Pré-condição: `fase-2-testes` em `state: Done`. Enquanto não estiver, esta seção fica `Blocked` no Phase Card desta fase, e a Fase 1 pode ser entregue como `Done` parcial cobrindo só os blocos 1–8 (verificação manual). As Properties enunciadas em `design.md > Correctness Properties` viram `*.pbt.ts` aqui.
 
-  - [~] 9.1 * Implementar `src/lib/rate-limit.pbt.ts`
+  - [x] 9.1 * Implementar `src/lib/rate-limit.pbt.ts`
     - Property 1 (limit dentro da janela): `fc.string()` para chave, `fc.integer({ min: 1, max: 60 })` para `windowSec`, `fc.integer({ min: 1, max: 100 })` para `limit`; tempo via `vi.useFakeTimers()`
     - Property 2 (independência entre chaves): mesmo gerador com par `(k1, k2)` distinto
     - Property 3 (reset após janela): mesma config, avançar tempo via `vi.advanceTimersByTime((windowSec + 1) * 1000)`

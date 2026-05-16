@@ -335,6 +335,8 @@ Nenhuma função inversa (`parseBookingUrl`, `parseWhatsAppBookingMessage` etc.)
 
 **Consequência:** Property 4 é **não declarável** — confirmado em código. A Tarefa 4.5 NÃO produz `src/lib/whatsapp-booking.pbt.ts`; o resultado fica documentado nesta seção, conforme o próprio enunciado da tarefa.
 
+**Confirmação na execução da Tarefa 4.5 (condicional):** nenhum arquivo `src/lib/whatsapp-booking.pbt.ts` foi criado. `whatsapp-booking.ts` exporta apenas funções de construção (`buildWhatsAppBookingMessage`, `whatsappDigits`, `buildWhatsAppUrl`); a string final é mensagem freeform sem inversa parseável. Conforme `tasks.md > 4.5` (condicional), Property 4 fica registrada como **NÃO DECLARÁVEL** e a cobertura do módulo é exercida por `src/lib/whatsapp-booking.test.ts` (entrega da Tarefa 3.6) com casos determinísticos sobre as regras de construção da mensagem e da URL.
+
 ### 5.5 `src/lib/booking-slots.ts` — Properties 5 e 6 (sem par parse/serialize)
 
 **Status: sem par; cobertura via Properties 5/6 (monotonicidade e completude).**
