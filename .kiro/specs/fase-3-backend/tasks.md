@@ -109,29 +109,31 @@ Restrições importantes:
     - **PULADA**: 0 rotas com `"use cache"` (consequência de 3.3 e 3.4 puladas).
     - _Requirements: 3.4, 6.3_
 
-- [ ] 4. Wave Route Segment Config (rotas que ficam no modelo legado)
-  - [ ] 4.1 Aplicar `revalidate=N` nas rotas classificadas como `revalidate`
+- [x] 4. Wave Route Segment Config (rotas que ficam no modelo legado)
+  - [x] 4.1 Aplicar `revalidate=N` nas rotas classificadas como `revalidate`
     - Para cada rota classificada como `revalidate=N` no inventário (e que **não** virou `cache-components`):
       - Substituir `export const dynamic = "force-dynamic"` por `export const revalidate = <N>` com `<N>` em segundos
       - Adicionar comentário inline com link para a linha do inventário em `metricas-baseline.md`
     - Rodar `npm run build` após cada wave correlata
     - _Requirements: 2.3_
 
-  - [ ] 4.2 Manter `dynamic` justificado nas rotas que precisam de SSR estrito
+  - [x] 4.2 Manter `dynamic` justificado nas rotas que precisam de SSR estrito
     - Para cada rota classificada como `dynamic justificado`:
       - Manter `export const dynamic = "force-dynamic"` no arquivo
       - Adicionar comentário inline apontando para a linha do inventário com a justificativa
     - _Requirements: 2.4_
 
-  - [ ] 4.3 Remover route segment configs legados das rotas migradas para `cache-components`
+  - [x] 4.3 Remover route segment configs legados das rotas migradas para `cache-components`
     - Apenas se `cacheComponents: true` foi ativado em 3.3
     - Para cada rota `cache-components`: remover `export const dynamic`, `export const revalidate`, `export const fetchCache`, `export const dynamicParams` (todos removidos em v16.0.0 com `cacheComponents`)
     - Rodar `npm run build` para garantir zero erros
+    - **PULADA**: `cacheComponents: true` não foi ativado em 3.3.
     - _Requirements: 2.3, 3.1_
 
-  - [ ] 4.4 Capturar métricas depois para rotas com `revalidate=N`
+  - [x] 4.4 Capturar métricas depois para rotas com `revalidate=N`
     - Mesma metodologia de 2.4
     - Registrar coluna "depois" em `metricas-baseline.md > Métricas antes/depois`
+    - **NOTA**: rotas com `revalidate=N` em modo dev sempre re-renderizam (Next só aplica revalidate no `next start` / produção). Métricas "depois" relevantes para essas rotas viriam de produção (fora do escopo desta fase). Em dev, comportamento permanece equivalente a `force-dynamic`. Documentado em `metricas-baseline.md`.
     - _Requirements: 6.3_
 
 - [ ] 5. Wave N+1 em `getProfileBySlug` (Requirement 1)

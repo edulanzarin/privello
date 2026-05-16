@@ -102,16 +102,16 @@ export default async function PainelOverviewPage() {
       {/* ── Header ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[11px] font-medium text-muted">
+          <p className="text-xs font-medium text-muted">
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
-          <h1 className="mt-1 text-[24px] font-semibold tracking-tight sm:text-[28px]">
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
             {greeting}, {profile.displayName}<span className="text-coral">.</span>
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href={`/p/${profile.slug}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[12px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
+            className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
             <Eye className="h-3.5 w-3.5" strokeWidth={1.5} />
             Ver perfil
           </Link>
@@ -124,15 +124,15 @@ export default async function PainelOverviewPage() {
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" strokeWidth={1.5} />
             <div>
-              <p className="text-[13px] font-semibold text-amber-800">Perfil desabilitado</p>
-              <p className="mt-0.5 text-[12px] text-amber-700">
+              <p className="text-base font-semibold text-amber-800">Perfil desabilitado</p>
+              <p className="mt-0.5 text-sm text-amber-700">
                 Você não aparece nas buscas enquanto não tiver um plano ativo.
               </p>
             </div>
           </div>
           <a
             href="/painel/plano"
-            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-[12px] font-semibold text-white transition hover:bg-amber-600 active:scale-[0.97]"
+            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 active:scale-[0.97]"
           >
             Ativar plano
           </a>
@@ -188,11 +188,11 @@ export default async function PainelOverviewPage() {
         {/* Views */}
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted">Visualizações</p>
+            <p className="text-xs font-medium text-muted">Visualizações</p>
             <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />
           </div>
-          <p className="mt-3 text-[22px] font-semibold tabular-nums tracking-tight">{profile.viewsThisMonth.toLocaleString("pt-BR")}</p>
-          <p className="mt-0.5 text-[11px] text-muted">acumulado</p>
+          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{profile.viewsThisMonth.toLocaleString("pt-BR")}</p>
+          <p className="mt-0.5 text-xs text-muted">acumulado</p>
           <div className="mt-3 h-8">
             <Sparkline data={[...Array(7)].map((_, i) => Math.max(0, viewsPeriod - (6 - i) * 2))} color="#86868b" />
           </div>
@@ -201,11 +201,11 @@ export default async function PainelOverviewPage() {
         {/* Curtidas */}
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted">Curtidas</p>
+            <p className="text-xs font-medium text-muted">Curtidas</p>
             <Heart className="h-4 w-4 text-muted" strokeWidth={1.5} />
           </div>
-          <p className="mt-3 text-[22px] font-semibold tabular-nums tracking-tight">{favoritesCount}</p>
-          <p className="mt-0.5 text-[11px] text-muted">perfis salvos</p>
+          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{favoritesCount}</p>
+          <p className="mt-0.5 text-xs text-muted">perfis salvos</p>
           <div className="mt-3 h-8">
             <BarChart data={[1, 1, 2, 2, 3, 4, Math.max(favoritesCount, 4)]} color="#ff375f" />
           </div>
@@ -214,11 +214,11 @@ export default async function PainelOverviewPage() {
         {/* Faturamento */}
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted">Faturamento</p>
+            <p className="text-xs font-medium text-muted">Faturamento</p>
             <TrendingUp className="h-4 w-4 text-muted" strokeWidth={1.5} />
           </div>
-          <p className="mt-3 text-[22px] font-semibold tabular-nums tracking-tight">{formatBrl(totalMonth)}</p>
-          <p className="mt-0.5 text-[11px] text-muted capitalize">{monthName}</p>
+          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{formatBrl(totalMonth)}</p>
+          <p className="mt-0.5 text-xs text-muted capitalize">{monthName}</p>
           <div className="mt-3 h-8">
             <BarChart data={revenueByDay} color="#ff375f" />
           </div>
@@ -232,34 +232,34 @@ export default async function PainelOverviewPage() {
         <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-[11px] font-medium text-muted">Faturamento · últimos 14 dias</p>
-              <p className="mt-1 text-[18px] font-semibold tracking-tight">{formatBrl(totalMonth)}</p>
+              <p className="text-xs font-medium text-muted">Faturamento · últimos 14 dias</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight">{formatBrl(totalMonth)}</p>
             </div>
             <Link href="/painel/financeiro"
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-[12px] font-medium text-[#0a84ff] hover:bg-black/[0.04] transition-colors">
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-blue hover:bg-black/[0.04] transition-colors">
               Ver tudo <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
             </Link>
           </div>
           <div className="h-32">
             <BarChart data={revenueByDay} color="#ff375f" />
           </div>
-          <div className="mt-2 flex justify-between text-[10px] text-muted">
+          <div className="mt-2 flex justify-between text-2xs text-muted">
             <span>-13 dias</span>
             <span>hoje</span>
           </div>
           {/* Summary row */}
           <div className="mt-4 grid grid-cols-3 gap-3 border-t border-black/[0.05] pt-4">
             <div>
-              <p className="text-[10px] text-muted">Encontros</p>
-              <p className="mt-0.5 text-[14px] font-semibold">{paidRows.length}</p>
+              <p className="text-2xs text-muted">Encontros</p>
+              <p className="mt-0.5 text-md font-semibold">{paidRows.length}</p>
             </div>
             <div>
-              <p className="text-[10px] text-muted">Ticket médio</p>
-              <p className="mt-0.5 text-[14px] font-semibold">{avgTicket > 0 ? formatBrl(avgTicket) : "—"}</p>
+              <p className="text-2xs text-muted">Ticket médio</p>
+              <p className="mt-0.5 text-md font-semibold">{avgTicket > 0 ? formatBrl(avgTicket) : "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] text-muted">No-shows</p>
-              <p className="mt-0.5 text-[14px] font-semibold">{financialRows.filter((r) => r.isNoShow).length}</p>
+              <p className="text-2xs text-muted">No-shows</p>
+              <p className="mt-0.5 text-md font-semibold">{financialRows.filter((r) => r.isNoShow).length}</p>
             </div>
           </div>
         </div>
@@ -267,24 +267,24 @@ export default async function PainelOverviewPage() {
         {/* Right column */}
         <div className="space-y-5">
           {/* Boost */}
-          <div className="rounded-2xl bg-[#1d1d1f] p-5 text-white shadow-lg">
+          <div className="rounded-2xl bg-foreground p-5 text-white shadow-lg">
             <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-[#ff9500]" strokeWidth={1.5} />
-              <p className="text-[14px] font-semibold">Boost · topo da lista</p>
+              <Zap className="h-4 w-4 text-warning" strokeWidth={1.5} />
+              <p className="text-md font-semibold">Boost · topo da lista</p>
             </div>
             {isBoosted ? (
-              <div className="mt-3 rounded-xl border border-[#ff9500]/30 bg-[#ff9500]/10 px-3 py-2">
-                <p className="text-[12px] font-semibold text-[#ff9500]">Boost ativo</p>
-                <p className="mt-0.5 text-[11px] text-white/60">
+              <div className="mt-3 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2">
+                <p className="text-sm font-semibold text-warning">Boost ativo</p>
+                <p className="mt-0.5 text-xs text-white/60">
                   Expira {new Date(profile.featuredUntil!).toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
             ) : (
               <>
-                <p className="mt-2 text-[12px] text-white/60">Até 3× mais views nas próximas 24h.</p>
-                <p className="mt-3 text-[20px] font-semibold">R$ 89</p>
+                <p className="mt-2 text-sm text-white/60">Até 3× mais views nas próximas 24h.</p>
+                <p className="mt-3 text-2xl font-semibold">R$ 89</p>
                 <Link href="/planos"
-                  className="mt-3 block w-full rounded-full bg-white py-2.5 text-center text-[13px] font-semibold text-foreground shadow-sm transition hover:bg-white/90 active:scale-[0.98]">
+                  className="mt-3 block w-full rounded-full bg-white py-2.5 text-center text-base font-semibold text-foreground shadow-sm transition hover:bg-white/90 active:scale-[0.98]">
                   Disparar boost
                 </Link>
               </>
@@ -293,9 +293,9 @@ export default async function PainelOverviewPage() {
 
           {/* Views do período */}
           <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
-            <p className="text-[11px] font-medium text-muted mb-1">Visualizações · período atual</p>
-            <p className="text-[28px] font-semibold tabular-nums tracking-tight">{viewsPeriod.toLocaleString("pt-BR")}</p>
-            <p className="mt-0.5 text-[11px] text-muted">desde o início do período de ranking</p>
+            <p className="text-xs font-medium text-muted mb-1">Visualizações · período atual</p>
+            <p className="text-4xl font-semibold tabular-nums tracking-tight">{viewsPeriod.toLocaleString("pt-BR")}</p>
+            <p className="mt-0.5 text-xs text-muted">desde o início do período de ranking</p>
           </div>
         </div>
       </div>

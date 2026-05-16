@@ -7,6 +7,7 @@ import { WarningForm } from "@/components/admin/warning-form";
 import { BadgeCheck, Ban } from "lucide-react";
 import { adminToggleVerification, adminSetPlan } from "@/app/_actions/verification";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 37 (admin perfis).
 export const dynamic = "force-dynamic";
 
 type PageProps = {
@@ -143,11 +144,10 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                       <form action={adminToggleVerification.bind(null, p.id)}>
                         <button
                           type="submit"
-                          className={`text-[10px] font-bold px-2 py-1 border transition ${
-                            p.isVerified
+                          className={`text-[10px] font-bold px-2 py-1 border transition ${p.isVerified
                               ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
                               : "border-line text-muted hover:border-foreground/30"
-                          }`}
+                            }`}
                         >
                           {p.isVerified ? "✓ Verificada" : "Verificar"}
                         </button>

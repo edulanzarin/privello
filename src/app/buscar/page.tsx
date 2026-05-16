@@ -30,11 +30,11 @@ export default async function BuscarPage({ searchParams }: PageProps) {
           <>
             {/* Global search results */}
             <div className="mb-6 flex items-baseline justify-between">
-              <h1 className="text-[20px] font-semibold tracking-tight">
+              <h1 className="text-2xl font-semibold tracking-tight">
                 Resultados para{" "}
                 <span className="text-coral">&ldquo;{q}&rdquo;</span>
               </h1>
-              <Link href="/buscar" className="text-[12px] text-[#0a84ff] hover:underline">
+              <Link href="/buscar" className="text-sm text-blue hover:underline">
                 Limpar
               </Link>
             </div>
@@ -45,24 +45,24 @@ export default async function BuscarPage({ searchParams }: PageProps) {
                 name="q"
                 defaultValue={q}
                 placeholder="Nome ou @handle…"
-                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
               />
-              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
+              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                 Buscar
               </button>
             </form>
 
             {results.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-[14px] text-muted">Nenhum perfil encontrado para &ldquo;{q}&rdquo;.</p>
-                <p className="mt-2 text-[13px] text-muted">
+                <p className="text-md text-muted">Nenhum perfil encontrado para &ldquo;{q}&rdquo;.</p>
+                <p className="mt-2 text-base text-muted">
                   Tente um nome diferente ou{" "}
-                  <Link href="/buscar" className="text-[#0a84ff] hover:underline">busque por cidade</Link>.
+                  <Link href="/buscar" className="text-blue hover:underline">busque por cidade</Link>.
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-[12px] text-muted">{results.length} perfil{results.length !== 1 ? "s" : ""} encontrado{results.length !== 1 ? "s" : ""}</p>
+                <p className="text-sm text-muted">{results.length} perfil{results.length !== 1 ? "s" : ""} encontrado{results.length !== 1 ? "s" : ""}</p>
                 {results.map((p) => {
                   const cover = p.media[0]?.url;
                   return (
@@ -76,12 +76,12 @@ export default async function BuscarPage({ searchParams }: PageProps) {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <p className="truncate text-[14px] font-semibold">{p.displayName}, {p.age}</p>
+                          <p className="truncate text-md font-semibold">{p.displayName}, {p.age}</p>
                           {p.isVerified && (
-                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={2} />
+                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2} />
                           )}
                         </div>
-                        <div className="flex items-center gap-1 text-[12px] text-muted">
+                        <div className="flex items-center gap-1 text-sm text-muted">
                           <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.5} />
                           <span className="truncate">{p.city.name}</span>
                           <span className="text-black/20">·</span>
@@ -89,7 +89,7 @@ export default async function BuscarPage({ searchParams }: PageProps) {
                         </div>
                       </div>
                       {p.priceHour > 0 && (
-                        <p className="shrink-0 text-[13px] font-semibold text-coral">
+                        <p className="shrink-0 text-base font-semibold text-coral">
                           R${p.priceHour}/h
                         </p>
                       )}
@@ -101,8 +101,8 @@ export default async function BuscarPage({ searchParams }: PageProps) {
           </>
         ) : (
           <>
-            <h1 className="text-[28px] font-semibold tracking-tight">Buscar</h1>
-            <p className="mt-2 text-[14px] text-muted">
+            <h1 className="text-4xl font-semibold tracking-tight">Buscar</h1>
+            <p className="mt-2 text-md text-muted">
               Encontre por cidade, nome ou @handle.
             </p>
 
@@ -111,16 +111,16 @@ export default async function BuscarPage({ searchParams }: PageProps) {
               <input
                 name="q"
                 placeholder="Nome ou @handle em qualquer cidade…"
-                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
               />
-              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
+              <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                 Buscar
               </button>
             </form>
 
             <div className="relative my-8 flex items-center gap-3">
               <div className="h-px flex-1 bg-black/[0.06]" />
-              <span className="text-[11px] font-medium text-muted">ou busque por cidade</span>
+              <span className="text-xs font-medium text-muted">ou busque por cidade</span>
               <div className="h-px flex-1 bg-black/[0.06]" />
             </div>
 

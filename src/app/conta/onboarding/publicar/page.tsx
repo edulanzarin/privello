@@ -8,6 +8,7 @@ import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
 import { publishProfile } from "@/app/_actions/onboarding";
 import { formatBrl } from "@/lib/money";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 20 (onboarding/publicar autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPublicarPage() {

@@ -30,6 +30,12 @@ function render(node: React.ReactNode) {
     });
 }
 
+const ce = createElement as unknown as (
+    type: any,
+    props?: any,
+    ...children: any[]
+) => React.ReactElement;
+
 function pressTab(shift = false) {
     act(() => {
         document.dispatchEvent(
@@ -47,8 +53,7 @@ describe("Modal — focus trap integrado (smoke)", () => {
     it("ao abrir Modal, foco vai para o primeiro elemento focável do container", () => {
         const onClose = vi.fn();
         render(
-            createElement(
-                Modal,
+            ce(Modal,
                 { open: true, onClose },
                 createElement(
                     "div",
@@ -65,8 +70,7 @@ describe("Modal — focus trap integrado (smoke)", () => {
     it("Tab cíclico: foco não escapa do container", () => {
         const onClose = vi.fn();
         render(
-            createElement(
-                Modal,
+            ce(Modal,
                 { open: true, onClose },
                 createElement(
                     "div",
@@ -91,8 +95,7 @@ describe("Modal — focus trap integrado (smoke)", () => {
     it("Escape dispara onClose", () => {
         const onClose = vi.fn();
         render(
-            createElement(
-                Modal,
+            ce(Modal,
                 { open: true, onClose },
                 createElement("button", null, "ok"),
             ),
@@ -112,8 +115,7 @@ describe("Modal — focus trap integrado (smoke)", () => {
     it("não renderiza quando open=false", () => {
         const onClose = vi.fn();
         render(
-            createElement(
-                Modal,
+            ce(Modal,
                 { open: false, onClose },
                 createElement("button", null, "ok"),
             ),
@@ -124,8 +126,7 @@ describe("Modal — focus trap integrado (smoke)", () => {
     it("API pública preservada: persistent não fecha por backdrop click", () => {
         const onClose = vi.fn();
         render(
-            createElement(
-                Modal,
+            ce(Modal,
                 { open: true, onClose, persistent: true },
                 createElement("div", { "data-testid": "content" }, "x"),
             ),

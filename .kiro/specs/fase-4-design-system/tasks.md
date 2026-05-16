@@ -101,61 +101,61 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Quando `trapFocus === true`, ativar `useFocusTrap(contentRef, open)`
     - _Requirements: 4.9_
 
-- [ ] 5. Eliminação de hex literais e font-size arbitrários — Wave 1 (Font_Size_Arbitrary top-N)
-  - [ ] 5.1 Migrar `src/app/p/[slug]/page.tsx` (38 ocorrências de `text-[Npx]` + 11 hex literais)
+- [x] 5. Eliminação de hex literais e font-size arbitrários — Wave 1 (Font_Size_Arbitrary top-N)
+  - [x] 5.1 Migrar `src/app/p/[slug]/page.tsx` (38 ocorrências de `text-[Npx]` + 11 hex literais)
     - Mapear cada `text-[Npx]` para classe da escala (`text-xs`, `text-sm`, `text-base`, `text-md`, `text-lg`, `text-xl`, `text-2xl`, `text-3xl`, `text-4xl`)
     - Substituir hex literais por tokens semânticos (`#0a84ff` → `text-blue` etc.)
     - Validar visualmente (smoke local) que o layout não regrediu
     - Registrar antes/depois em `tokens.md > Migration log`
     - _Requirements: 5.2, 5.3, 5.6_
 
-  - [ ] 5.2 Migrar `src/app/painel/page.tsx` (34 + 11)
+  - [x] 5.2 Migrar `src/app/painel/page.tsx` (34 + 11)
     - Mesmo mapeamento canônico
     - _Requirements: 5.2, 5.3, 5.6_
 
-  - [ ] 5.3 Migrar `src/app/descobrir/[citySlug]/page.tsx` (34 + 3)
+  - [x] 5.3 Migrar `src/app/descobrir/[citySlug]/page.tsx` (34 + 3)
     - Mesmo mapeamento canônico
     - _Requirements: 5.2, 5.3, 5.6_
 
-  - [ ] 5.4 Migrar `src/app/conta/verificacao/page.tsx` (30 ocorrências de `text-[Npx]`)
+  - [x] 5.4 Migrar `src/app/conta/verificacao/page.tsx` (30 ocorrências de `text-[Npx]`)
     - Mesmo mapeamento canônico
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 5.5 Migrar `src/app/solicitar/[slug]/page.tsx` (29 ocorrências)
+  - [x] 5.5 Migrar `src/app/solicitar/[slug]/page.tsx` (29 ocorrências)
     - Mesmo mapeamento canônico
     - _Requirements: 5.2, 5.3_
 
-- [ ] 6. Eliminação de hex literais — Wave 2 (Hex_Literal top-N)
-  - [ ] 6.1 Migrar `src/app/cadastro/sucesso/page.tsx` (15 hex literais)
+- [x] 6. Eliminação de hex literais — Wave 2 (Hex_Literal top-N)
+  - [x] 6.1 Migrar `src/app/cadastro/sucesso/page.tsx` (15 hex literais)
     - Mapeamento canônico (`#0a84ff` → blue, `#ff3b30` → danger, etc.)
     - _Requirements: 5.2, 5.6_
 
-  - [ ] 6.2 Migrar `src/components/admin/admin-charts.tsx` (9 hex literais)
+  - [x] 6.2 Migrar `src/components/admin/admin-charts.tsx` (9 hex literais)
     - Cores de chart podem precisar permanecer literais — tomar decisão caso a caso
     - WHERE permanecerem, registrar em `tokens.md > Exceções declaradas` com justificativa "cor específica de visualização de dados, não pertence à paleta semântica"
     - _Requirements: 5.2, 5.7_
 
-  - [ ] 6.3 Migrar `src/app/buscar/page.tsx` (5 hex + 15 font-size)
+  - [x] 6.3 Migrar `src/app/buscar/page.tsx` (5 hex + 15 font-size)
     - Mapeamento canônico
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.4 Migrar `src/components/profile/profile-card.tsx` (5 hex + 13 font-size)
+  - [x] 6.4 Migrar `src/components/profile/profile-card.tsx` (5 hex + 13 font-size)
     - Mapeamento canônico
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.5 Migrar `src/app/entrar/page.tsx` (4 hex)
+  - [x] 6.5 Migrar `src/app/entrar/page.tsx` (4 hex)
     - `#0a84ff` → `text-blue`/`bg-blue`; `#ff3b30` → `text-danger`; `#f5f5f7` → `bg-background`
     - _Requirements: 5.2_
 
-  - [ ] 6.6 Migrar `src/app/painel/plano/upgrade-button.tsx` (4 hex)
+  - [x] 6.6 Migrar `src/app/painel/plano/upgrade-button.tsx` (4 hex)
     - `#0a84ff` em todas as 4 ocorrências → variantes `bg-blue/[0.04]`, `bg-blue/[0.08]`, `text-blue`, `border-blue/40`
     - _Requirements: 5.2_
 
-  - [ ] 6.7 Migrar `src/app/painel/plano/page.tsx` (4 hex + 13 font-size)
+  - [x] 6.7 Migrar `src/app/painel/plano/page.tsx` (4 hex + 13 font-size)
     - `#ff9500` → `text-warning`/`bg-warning`; `#30d158` → `text-success`; `#b36200` (texto escuro sobre warning) → registrar como exceção em `tokens.md` OU usar `text-warning` se contraste suficiente
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.8 Migrar `src/app/painel/suporte/page.tsx` e `src/app/painel/suporte/[id]/page.tsx` (4 hex cada, padrão idêntico de status badges)
+  - [x] 6.8 Migrar `src/app/painel/suporte/page.tsx` e `src/app/painel/suporte/[id]/page.tsx` (4 hex cada, padrão idêntico de status badges)
     - `bg-[#0a84ff]/10 text-[#0a84ff]` → `bg-blue/10 text-blue`
     - `bg-[#ff9500]/10 text-[#b36200]` → `bg-warning/10 text-warning` (validar contraste)
     - _Requirements: 5.2_

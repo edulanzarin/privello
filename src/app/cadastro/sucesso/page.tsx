@@ -45,16 +45,16 @@ function SucessoContent() {
   if (status === "waiting") {
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0a84ff]/10">
-          <Loader2 className="h-8 w-8 animate-spin text-[#0a84ff]" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue/10">
+          <Loader2 className="h-8 w-8 animate-spin text-blue" />
         </div>
-        <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
           Confirmando pagamento
         </h1>
-        <p className="max-w-xs text-sm text-[#86868b]">
+        <p className="max-w-xs text-sm text-muted">
           Aguarde enquanto confirmamos seu pagamento e criamos sua conta…
         </p>
-        <div className="mt-2 flex items-center gap-2 text-xs text-[#86868b]">
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
           <Clock className="h-3.5 w-3.5" />
           <span>Isso costuma levar menos de 30 segundos</span>
         </div>
@@ -68,17 +68,17 @@ function SucessoContent() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-50">
           <Clock className="h-8 w-8 text-amber-500" />
         </div>
-        <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
           Pagamento em processamento
         </h1>
-        <p className="max-w-xs text-sm text-[#86868b]">
+        <p className="max-w-xs text-sm text-muted">
           Seu pagamento foi recebido, mas a confirmação está demorando mais que o normal.
           <br />
           Sua conta será criada em breve — você receberá acesso automaticamente.
         </p>
-        <p className="mt-2 text-sm text-[#86868b]">
+        <p className="mt-2 text-sm text-muted">
           Já tem acesso?{" "}
-          <Link href="/entrar" className="font-semibold text-[#0a84ff] hover:underline">
+          <Link href="/entrar" className="font-semibold text-blue hover:underline">
             Fazer login →
           </Link>
         </p>
@@ -88,19 +88,19 @@ function SucessoContent() {
 
   return (
     <div className="flex flex-col items-center gap-4 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#30d158]/10">
-        <CheckCircle className="h-8 w-8 text-[#30d158]" strokeWidth={1.5} />
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+        <CheckCircle className="h-8 w-8 text-success" strokeWidth={1.5} />
       </div>
-      <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground">
         Cadastro concluído!
       </h1>
-      <p className="max-w-xs text-sm text-[#86868b]">
+      <p className="max-w-xs text-sm text-muted">
         Sua conta foi criada. Faça login para adicionar suas fotos e ativar seu perfil.
       </p>
       <div className="mt-4 flex flex-col gap-3 w-full max-w-[200px]">
         <Link
           href="/entrar"
-          className="rounded-xl bg-[#ff375f] px-6 py-3 text-center text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+          className="rounded-xl bg-coral px-6 py-3 text-center text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Fazer login
         </Link>
@@ -111,7 +111,7 @@ function SucessoContent() {
 
 export default function CadastroSucessoPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f5f5f7] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-2xl border border-black/[0.06] bg-white p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <Suspense fallback={null}>
           <SucessoContent />

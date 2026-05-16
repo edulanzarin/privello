@@ -126,13 +126,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
   // Verification seals
   const seals: { icon: typeof ShieldCheck; label: string; sub: string; color: string }[] = [];
   if (profile.isVerified) {
-    seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie", color: "text-[#30d158]" });
+    seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie", color: "text-success" });
   }
   if (profile.videoVerified) {
-    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada", color: "text-[#5856d6]" });
+    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada", color: "text-accent-purple" });
   }
   seals.push({ icon: Clock3, label: `Membro há ${monthsVerified} meses`, sub: `Desde ${memberLabel}`, color: "text-muted" });
-  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`, sub: "este mês", color: "text-[#0a84ff]" });
+  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`, sub: "este mês", color: "text-blue" });
 
   return (
     <>
@@ -145,7 +145,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
         {/* ── Breadcrumb ── */}
         <div className="border-b border-black/[0.06]">
-          <div className="mx-auto max-w-4xl px-4 py-3 text-[11px] font-medium text-muted sm:px-6">
+          <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-muted sm:px-6">
             <Link href="/buscar" className="transition-colors hover:text-foreground">Descobrir</Link>
             {" / "}
             <Link href={`/descobrir/${profile.city.slug}`} className="transition-colors hover:text-foreground">{profile.city.name}</Link>
@@ -175,26 +175,26 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* Status badges */}
                 <div className="flex flex-wrap gap-2 mb-3">
                   {profile.isOnline && (
-                    <span className="flex items-center gap-1.5 rounded-full bg-[#30d158]/10 px-2.5 py-[3px] text-[11px] font-semibold text-[#248a3d]">
-                      <span className="h-[6px] w-[6px] rounded-full bg-[#30d158] animate-pulse" /> Online
+                    <span className="flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-[3px] text-xs font-semibold text-success-dark">
+                      <span className="h-[6px] w-[6px] rounded-full bg-success animate-pulse" /> Online
                     </span>
                   )}
                   {profile.isVerified && (
-                    <span className="flex items-center gap-1.5 rounded-full bg-[#0a84ff]/10 px-2.5 py-[3px] text-[11px] font-semibold text-[#0a84ff]">
+                    <span className="flex items-center gap-1.5 rounded-full bg-blue/10 px-2.5 py-[3px] text-xs font-semibold text-blue">
                       <ShieldCheck className="h-3 w-3" strokeWidth={2} /> Verificada
                     </span>
                   )}
                   {profile.videoVerified && (
-                    <span className="flex items-center gap-1.5 rounded-full bg-[#5856d6]/10 px-2.5 py-[3px] text-[11px] font-semibold text-[#5856d6]">
+                    <span className="flex items-center gap-1.5 rounded-full bg-accent-purple/10 px-2.5 py-[3px] text-xs font-semibold text-accent-purple">
                       <Video className="h-3 w-3" strokeWidth={2} /> Vídeo
                     </span>
                   )}
                 </div>
 
-                <h1 className="text-[32px] font-bold tracking-tight text-foreground sm:text-[38px] leading-none">
+                <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-4xl leading-none">
                   {profile.displayName}
                 </h1>
-                <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-[14px] text-muted">
+                <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-md text-muted">
                   <span className="font-medium text-foreground">{profile.age} anos</span>
                   <span className="text-black/20">·</span>
                   <span className="inline-flex items-center gap-1">
@@ -205,7 +205,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     <>
                       <span className="text-black/20">·</span>
                       <span className="inline-flex items-center gap-1">
-                        <Star className="h-3.5 w-3.5 fill-[#ff9500] text-[#ff9500]" strokeWidth={0} />
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" strokeWidth={0} />
                         <span className="font-medium text-foreground">{profile.ratingAvg.toFixed(1)}</span>
                         <span className="text-muted">({profile.ratingCount})</span>
                       </span>
@@ -214,7 +214,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 </div>
 
                 {profile.tagline && (
-                  <p className="mt-3 text-[15px] italic text-muted leading-snug max-w-md">
+                  <p className="mt-3 text-lg italic text-muted leading-snug max-w-md">
                     &ldquo;{profile.tagline}&rdquo;
                   </p>
                 )}
@@ -228,10 +228,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
                 {/* Price */}
                 <div className="mt-5 inline-flex items-baseline gap-2">
-                  <span className="text-[28px] font-bold text-foreground">{formatBrl(profile.priceHour)}</span>
-                  <span className="text-muted text-[14px]">/hora</span>
+                  <span className="text-4xl font-bold text-foreground">{formatBrl(profile.priceHour)}</span>
+                  <span className="text-muted text-md">/hora</span>
                   {profile.priceTwoHours && (
-                    <span className="text-muted text-[13px] ml-3">{formatBrl(profile.priceTwoHours)}<span className="text-[11px]">/2h</span></span>
+                    <span className="text-muted text-base ml-3">{formatBrl(profile.priceTwoHours)}<span className="text-xs">/2h</span></span>
                   )}
                 </div>
 
@@ -242,8 +242,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       <div key={s.label} className="flex items-center gap-3 px-3.5 py-2.5">
                         <s.icon className={`h-4 w-4 shrink-0 ${s.color}`} strokeWidth={1.5} />
                         <div className="min-w-0">
-                          <span className="text-[12px] font-semibold text-foreground">{s.label}</span>
-                          <span className="ml-1.5 text-[11px] text-muted">{s.sub}</span>
+                          <span className="text-sm font-semibold text-foreground">{s.label}</span>
+                          <span className="ml-1.5 text-xs text-muted">{s.sub}</span>
                         </div>
                       </div>
                     ))}
@@ -256,7 +256,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     <div className="mt-5 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:max-w-none">
                       <Link
                         href={`/solicitar/${profile.slug}`}
-                        className="flex items-center justify-center gap-2 rounded-full bg-coral py-3 text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+                        className="flex items-center justify-center gap-2 rounded-full bg-coral py-3 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
                       >
                         Marcar horário
                       </Link>
@@ -269,7 +269,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   </>
                 ) : (
                   <div className="mt-5 flex gap-2.5">
-                    <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
+                    <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
                       Editar perfil
                     </Link>
                     <ShareButton displayName={profile.displayName} slug={profile.slug} />
@@ -298,20 +298,20 @@ export default async function PublicProfilePage({ params }: PageProps) {
         </section>
 
         {/* ── Bio + Characteristics + Availability ── */}
-        <section className="border-t border-black/[0.06] bg-[#f5f5f7] py-14">
+        <section className="border-t border-black/[0.06] bg-background py-14">
           <div className="mx-auto grid max-w-4xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr]">
 
             <div className="space-y-8">
               <div>
-                <h2 className="text-[20px] font-semibold tracking-tight">Quem sou</h2>
-                <div className="mt-3 space-y-3 text-[14px] leading-relaxed text-muted">
+                <h2 className="text-2xl font-semibold tracking-tight">Quem sou</h2>
+                <div className="mt-3 space-y-3 text-md leading-relaxed text-muted">
                   {profile.bio.split("\n").map((p, i) => <p key={i}>{p}</p>)}
                 </div>
               </div>
 
               <div className="grid gap-8 sm:grid-cols-2">
                 <div>
-                  <h3 className="text-[11px] font-medium text-muted">Características</h3>
+                  <h3 className="text-xs font-medium text-muted">Características</h3>
                   <ul className="mt-3 space-y-0">
                     {[
                       ["Altura", profile.heightCm ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m` : "—"],
@@ -320,7 +320,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       ["Olhos", profile.eyes ?? "—"],
                       ["Idiomas", profile.languages ?? "—"],
                     ].map(([k, v]) => (
-                      <li key={String(k)} className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                      <li key={String(k)} className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                         <span className="text-muted">{k}</span>
                         <span className="font-medium">{v}</span>
                       </li>
@@ -328,31 +328,31 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-[11px] font-medium text-muted">Valores</h3>
+                  <h3 className="text-xs font-medium text-muted">Valores</h3>
                   <ul className="mt-3 space-y-0">
-                    <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                    <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                       <span className="text-muted">1 hora</span>
                       <span className="font-semibold">{formatBrl(profile.priceHour)}</span>
                     </li>
                     {profile.priceTwoHours ? (
-                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                         <span className="text-muted">2 horas</span>
                         <span className="font-semibold">{formatBrl(profile.priceTwoHours)}</span>
                       </li>
                     ) : null}
                     {profile.priceOvernight ? (
-                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                         <span className="text-muted">Pernoite</span>
                         <span className="font-semibold">{formatBrl(profile.priceOvernight)}</span>
                       </li>
                     ) : null}
                     {profile.priceTravelDay ? (
-                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                         <span className="text-muted">Viagem (diária)</span>
                         <span className="font-semibold">{formatBrl(profile.priceTravelDay)}</span>
                       </li>
                     ) : null}
-                    <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                    <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                       <span className="text-muted">Pagamento</span>
                       <span className="font-medium">{profile.paymentMethods ?? "—"}</span>
                     </li>
@@ -361,7 +361,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
 
               <div>
-                <h3 className="text-[11px] font-medium text-muted">Atende a</h3>
+                <h3 className="text-xs font-medium text-muted">Atende a</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {[
                     ["Homens", profile.servesMen],
@@ -375,7 +375,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     <span
                       key={String(label)}
                       className={cn(
-                        "rounded-full px-3 py-1 text-[12px] font-medium",
+                        "rounded-full px-3 py-1 text-sm font-medium",
                         on ? "bg-foreground text-white" : "bg-black/[0.04] text-muted line-through",
                       )}
                     >
@@ -387,19 +387,19 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
 
             <div>
-              <h2 className="text-[20px] font-semibold tracking-tight">Esta semana</h2>
+              <h2 className="text-2xl font-semibold tracking-tight">Esta semana</h2>
               <ul className="mt-4 space-y-0">
                 {profile.availabilityRules.map((r) => (
-                  <li key={r.id} className="flex items-center justify-between border-b border-black/[0.05] py-2.5 text-[13px]">
+                  <li key={r.id} className="flex items-center justify-between border-b border-black/[0.05] py-2.5 text-base">
                     <span>{DAYS_PT[r.weekday]} · {r.startTime} – {r.endTime}</span>
-                    <span className="text-[11px] font-medium uppercase">
+                    <span className="text-xs font-medium uppercase">
                       {r.status === "CLOSED" ? (
                         <span className="text-muted">Fechado</span>
                       ) : r.status === "BUSY" ? (
                         <span className="text-coral">Ocupada</span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[#248a3d]">
-                          <span className="h-[5px] w-[5px] rounded-full bg-[#30d158]" />Disponível
+                        <span className="inline-flex items-center gap-1 text-success-dark">
+                          <span className="h-[5px] w-[5px] rounded-full bg-success" />Disponível
                         </span>
                       )}
                     </span>
@@ -410,11 +410,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 <>
                   <Link
                     href={`/solicitar/${profile.slug}`}
-                    className="mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                    className="mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-md font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
                   >
                     Montar horário → WhatsApp
                   </Link>
-                  <p className="mt-3 text-[12px] leading-relaxed text-muted text-center">
+                  <p className="mt-3 text-sm leading-relaxed text-muted text-center">
                     Escolha dia, horário e duração. Abrimos o WhatsApp com texto pronto — sem intermediários.
                   </p>
                 </>
@@ -427,9 +427,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
         <section className="border-t border-black/[0.06] py-14">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-[22px] font-semibold tracking-tight">
+              <h2 className="text-3xl font-semibold tracking-tight">
                 {profile.ratingAvg > 0 ? (
-                  <>{profile.ratingAvg.toFixed(1)} <span className="text-[16px] text-muted font-normal">· {profile.ratingCount} avaliações</span></>
+                  <>{profile.ratingAvg.toFixed(1)} <span className="text-xl text-muted font-normal">· {profile.ratingCount} avaliações</span></>
                 ) : (
                   <span className="text-2xl text-muted">Sem avaliações ainda</span>
                 )}
@@ -439,7 +439,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 isSubscriberViewer ? (
                   <Link
                     href={`/avaliar/${profile.slug}`}
-                    className="shrink-0 rounded-lg border border-foreground px-4 py-2 text-[13px] font-semibold text-foreground transition hover:bg-foreground hover:text-white active:scale-[0.97]"
+                    className="shrink-0 rounded-lg border border-foreground px-4 py-2 text-base font-semibold text-foreground transition hover:bg-foreground hover:text-white active:scale-[0.97]"
                   >
                     {userReview ? "Editar avaliação" : "Avaliar"}
                   </Link>
@@ -465,10 +465,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         {(r.user.name ?? "?")[0].toUpperCase()}
                       </span>
                       <div>
-                        <p className="text-[14px] font-semibold">
+                        <p className="text-md font-semibold">
                           {r.user.slug ? `@${r.user.slug}` : r.user.name}
                         </p>
-                        <p className="mt-0.5 flex items-center gap-1 text-[13px] text-muted">
+                        <p className="mt-0.5 flex items-center gap-1 text-base text-muted">
                           {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
                           <span className="ml-1">{r.createdAt.toLocaleDateString("pt-BR")}</span>
                         </p>
@@ -476,12 +476,12 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                     {isSubscriberViewer ? (
                       r.comment && (
-                        <p className="mt-4 text-[14px] italic leading-relaxed text-muted">{r.comment}</p>
+                        <p className="mt-4 text-md italic leading-relaxed text-muted">{r.comment}</p>
                       )
                     ) : (
                       <div className="mt-4 flex items-center gap-2 rounded-lg bg-black/[0.03] px-3 py-2">
                         <Lock className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
-                        <Link href={`/assinar?from=/p/${profile.slug}`} className="text-[13px] text-coral hover:underline">
+                        <Link href={`/assinar?from=/p/${profile.slug}`} className="text-base text-coral hover:underline">
                           Assine para ver o comentário
                         </Link>
                       </div>

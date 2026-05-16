@@ -11,7 +11,7 @@ type WeekPoint = { week: string; count: number };
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded border border-line bg-white p-4 shadow-sm">
-      <p className="mb-3 text-[11px] font-medium text-muted">{title}</p>
+      <p className="mb-3 text-xs font-medium text-muted">{title}</p>
       {children}
     </div>
   );

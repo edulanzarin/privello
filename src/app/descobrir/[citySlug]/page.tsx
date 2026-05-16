@@ -112,23 +112,23 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
         {/* ── Header ── */}
         <div className="border-b border-black/[0.06] bg-white/50 backdrop-blur-sm">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted">
               Descobrir / {city.name}
             </p>
             <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <h1 className="text-[28px] font-semibold tracking-tight sm:text-[34px]">
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-4xl">
                 {city.name} <span className="text-muted font-normal">·</span>{" "}
-                <span className="text-[22px] font-normal text-muted sm:text-[26px]">
+                <span className="text-3xl font-normal text-muted sm:text-4xl">
                   {count.toLocaleString("pt-BR")} perfis
                 </span>
               </h1>
               {count > 0 && (
                 <div className="flex flex-wrap items-center gap-3">
                   <details className="relative">
-                    <summary className="cursor-pointer list-none rounded-lg border border-black/10 bg-white px-3.5 py-[6px] text-[13px] font-medium shadow-sm">
+                    <summary className="cursor-pointer list-none rounded-lg border border-black/10 bg-white px-3.5 py-[6px] text-base font-medium shadow-sm">
                       {sortLabel}
                     </summary>
-                    <ul className="absolute left-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-[13px] shadow-xl overflow-hidden animate-scale-in">
+                    <ul className="absolute left-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-base shadow-xl overflow-hidden animate-scale-in">
                       {(
                         [
                           ["relevance", "Relevância"],
@@ -161,10 +161,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   <Link
                     key={pill.label}
                     href={pill.href}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-3 py-[4px] text-[12px] font-medium text-foreground transition-colors hover:bg-black/[0.08]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-3 py-[4px] text-sm font-medium text-foreground transition-colors hover:bg-black/[0.08]"
                   >
                     {pill.label}
-                    <span className="text-coral font-bold text-[11px]">×</span>
+                    <span className="text-coral font-bold text-xs">×</span>
                   </Link>
                 ))}
               </div>
@@ -182,8 +182,8 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           /* ── Empty state ── */
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="mx-auto max-w-md text-center">
-              <p className="text-[28px] font-semibold tracking-tight">Ainda não há perfis em {city.name}.</p>
-              <p className="mt-3 text-[14px] leading-relaxed text-muted">
+              <p className="text-4xl font-semibold tracking-tight">Ainda não há perfis em {city.name}.</p>
+              <p className="mt-3 text-md leading-relaxed text-muted">
                 {activePills.length > 0
                   ? "Nenhum perfil corresponde aos filtros selecionados. Tente remover alguns filtros."
                   : "Seja o primeiro a se cadastrar nessa cidade ou explore outras regiões."}
@@ -192,14 +192,14 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                 {activePills.length > 0 && (
                   <Link
                     href={`/descobrir/${citySlug}`}
-                    className="rounded-lg bg-foreground px-5 py-[7px] text-[13px] font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
+                    className="rounded-lg bg-foreground px-5 py-[7px] text-base font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
                   >
                     Limpar filtros
                   </Link>
                 )}
                 <Link
                   href="/buscar"
-                  className="rounded-lg border border-black/10 bg-white px-5 py-[7px] text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
+                  className="rounded-lg border border-black/10 bg-white px-5 py-[7px] text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
                 >
                   Buscar outra cidade
                 </Link>
@@ -217,30 +217,30 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   name="q"
                   defaultValue={filters.search ?? ""}
                   placeholder="Nome ou @handle…"
-                  className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+                  className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
                 />
-                <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
+                <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                   Ir
                 </button>
               </form>
               {filters.search && (
                 <Link
                   href={`/buscar?q=${encodeURIComponent(filters.search)}`}
-                  className="block text-center text-[12px] text-[#0a84ff] transition-colors hover:underline"
+                  className="block text-center text-sm text-blue transition-colors hover:underline"
                 >
                   Buscar em todas as cidades
                 </Link>
               )}
 
               <details className="group lg:open" open>
-                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-[12px] font-semibold shadow-sm lg:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm lg:hidden">
                   <span>Filtros</span>
                   <span className="text-muted group-open:rotate-180 transition-transform">▾</span>
                 </summary>
 
                 <div className="flex items-center justify-between pt-2 lg:pt-0">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted">Filtros</p>
-                  <Link href={`/descobrir/${citySlug}`} className="text-[12px] text-[#0a84ff] transition-colors hover:underline">
+                  <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted">Filtros</p>
+                  <Link href={`/descobrir/${citySlug}`} className="text-sm text-blue transition-colors hover:underline">
                     limpar
                   </Link>
                 </div>
@@ -251,10 +251,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   {/* Gênero */}
                   <div>
-                    <p className="text-[11px] font-medium text-muted">Procuro</p>
+                    <p className="text-xs font-medium text-muted">Procuro</p>
                     <div className="mt-2.5 flex flex-col gap-2">
                       {GENDER_OPTIONS.map((o) => (
-                        <label key={o.value} className="flex cursor-pointer items-center gap-2 text-[13px]">
+                        <label key={o.value} className="flex cursor-pointer items-center gap-2 text-base">
                           <input
                             type="radio"
                             name="genero"
@@ -270,8 +270,8 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   {/* Sinais de confiança */}
                   <div className="space-y-2">
-                    <p className="text-[11px] font-medium text-muted">Confiança</p>
-                    <label className="flex cursor-pointer items-center gap-2 text-[13px]">
+                    <p className="text-xs font-medium text-muted">Confiança</p>
+                    <label className="flex cursor-pointer items-center gap-2 text-base">
                       <input type="checkbox" name="verified" value="1" defaultChecked={filters.verifiedOnly} className="accent-coral rounded" />
                       Apenas verificadas
                     </label>
@@ -279,65 +279,65 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-foreground py-[8px] text-[13px] font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
+                    className="w-full rounded-lg bg-foreground py-[8px] text-base font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
                   >
                     Aplicar ({count.toLocaleString("pt-BR")})
                   </button>
 
                   {/* Filtros avançados */}
                   <details className="group">
-                    <summary className="cursor-pointer list-none text-[11px] font-medium text-muted group-open:mb-4">
+                    <summary className="cursor-pointer list-none text-xs font-medium text-muted group-open:mb-4">
                       Avançados ▾
                     </summary>
                     <div className="space-y-4">
                       <div>
-                        <p className="text-[11px] font-medium text-muted">Preço /h</p>
+                        <p className="text-xs font-medium text-muted">Preço /h</p>
                         <div className="mt-2 flex gap-2">
                           <input
                             name="pmin"
                             defaultValue={filters.priceMin ?? ""}
                             placeholder="mín"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-[13px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
+                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                           <input
                             name="pmax"
                             defaultValue={filters.priceMax ?? ""}
                             placeholder="máx"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-[13px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
+                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                         </div>
                       </div>
                       <div>
-                        <p className="text-[11px] font-medium text-muted">Idade</p>
+                        <p className="text-xs font-medium text-muted">Idade</p>
                         <div className="mt-2 flex gap-2">
                           <input
                             name="amin"
                             defaultValue={filters.ageMin ?? ""}
                             placeholder="mín"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-[13px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
+                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                           <input
                             name="amax"
                             defaultValue={filters.ageMax ?? ""}
                             placeholder="máx"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-[13px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
+                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-[11px] font-medium text-muted">Atendimento</p>
-                        <label className="flex cursor-pointer items-center gap-2 text-[13px]">
+                        <p className="text-xs font-medium text-muted">Atendimento</p>
+                        <label className="flex cursor-pointer items-center gap-2 text-base">
                           <input type="checkbox" name="local" value="1" defaultChecked={filters.hasOwnPlace} className="accent-coral rounded" />
                           Local próprio
                         </label>
-                        <label className="flex cursor-pointer items-center gap-2 text-[13px]">
+                        <label className="flex cursor-pointer items-center gap-2 text-base">
                           <input type="checkbox" name="domicilio" value="1" defaultChecked={filters.homeVisit} className="accent-coral rounded" />
                           A domicílio
                         </label>
                       </div>
                       <button
                         type="submit"
-                        className="w-full rounded-lg border border-black/10 bg-white py-[7px] text-[12px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
+                        className="w-full rounded-lg border border-black/10 bg-white py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
                       >
                         Aplicar avançados
                       </button>
@@ -349,7 +349,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
             {/* ── Results ── */}
             <div>
-              <div className="rounded-lg bg-foreground/90 px-4 py-2 text-center text-[12px] font-medium text-white/90">
+              <div className="rounded-lg bg-foreground/90 px-4 py-2 text-center text-sm font-medium text-white/90">
                 Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
               </div>
               {view === "list" ? (

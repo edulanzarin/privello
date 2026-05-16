@@ -11,6 +11,9 @@
   --privello-blue: #0a84ff;
   --privello-warning: #ff9500;
   --privello-danger: #ff3b30;
+  --privello-success-dark: #248a3d;
+  --privello-warning-dark: #b36200;
+  --privello-accent-purple: #5856d6;
 }
 
 @theme inline {
@@ -20,10 +23,13 @@
   --color-line: var(--privello-line);
   --color-coral: var(--privello-coral);
   --color-success: var(--privello-green);
+  --color-success-dark: var(--privello-success-dark);
+  --color-warning-dark: var(--privello-warning-dark);
   --color-sidebar: var(--privello-sidebar);
   --color-warning: var(--privello-warning);
   --color-danger: var(--privello-danger);
   --color-blue: var(--privello-blue);
+  --color-accent-purple: var(--privello-accent-purple);
   --text-2xs: 10px;
   --text-xs: 11px;
   --text-sm: 12px;

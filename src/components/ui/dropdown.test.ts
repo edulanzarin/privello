@@ -35,6 +35,12 @@ function render(node: React.ReactNode) {
     });
 }
 
+const ce = createElement as unknown as (
+    type: any,
+    props?: any,
+    ...children: any[]
+) => React.ReactElement;
+
 function clickTrigger() {
     const trigger = document.querySelector<HTMLButtonElement>(
         "[aria-haspopup=\"menu\"]",
@@ -67,21 +73,19 @@ function makeBasicDropdown(props: {
     open?: boolean;
     defaultOpen?: boolean;
 } = {}) {
-    return createElement(
-        Dropdown,
+    return ce(Dropdown,
         {
             open: props.open,
             defaultOpen: props.defaultOpen,
             onOpenChange: props.onOpenChange,
         },
-        createElement(DropdownTrigger, null, "Open"),
-        createElement(
-            DropdownContent,
+        ce(DropdownTrigger, null, "Open"),
+        ce(DropdownContent,
             null,
-            createElement(DropdownItem, { onClick: props.onItemClick }, "Item A"),
-            createElement(DropdownItem, null, "Item B"),
-            createElement(DropdownItem, { variant: "danger" as const }, "Delete"),
-            createElement(DropdownItem, { disabled: true }, "Disabled"),
+            ce(DropdownItem, { onClick: props.onItemClick }, "Item A"),
+            ce(DropdownItem, null, "Item B"),
+            ce(DropdownItem, { variant: "danger" as const }, "Delete"),
+            ce(DropdownItem, { disabled: true }, "Disabled"),
         ),
     );
 }
@@ -177,14 +181,12 @@ describe("Dropdown — variantes de item", () => {
     it("disabled não dispara onClick", () => {
         const onClick = vi.fn();
         render(
-            createElement(
-                Dropdown,
+            ce(Dropdown,
                 { defaultOpen: true },
-                createElement(DropdownTrigger, null, "Open"),
-                createElement(
-                    DropdownContent,
+                ce(DropdownTrigger, null, "Open"),
+                ce(DropdownContent,
                     null,
-                    createElement(DropdownItem, { disabled: true, onClick }, "X"),
+                    ce(DropdownItem, { disabled: true, onClick }, "X"),
                 ),
             ),
         );
@@ -241,14 +243,12 @@ describe("Dropdown — estado controlado vs interno", () => {
 describe("Dropdown — alinhamento", () => {
     it("align=\"start\" aplica left-0", () => {
         render(
-            createElement(
-                Dropdown,
+            ce(Dropdown,
                 { defaultOpen: true },
-                createElement(DropdownTrigger, null, "Open"),
-                createElement(
-                    DropdownContent,
+                ce(DropdownTrigger, null, "Open"),
+                ce(DropdownContent,
                     { align: "start" as const },
-                    createElement(DropdownItem, null, "X"),
+                    ce(DropdownItem, null, "X"),
                 ),
             ),
         );
@@ -258,14 +258,12 @@ describe("Dropdown — alinhamento", () => {
 
     it("align=\"end\" aplica right-0", () => {
         render(
-            createElement(
-                Dropdown,
+            ce(Dropdown,
                 { defaultOpen: true },
-                createElement(DropdownTrigger, null, "Open"),
-                createElement(
-                    DropdownContent,
+                ce(DropdownTrigger, null, "Open"),
+                ce(DropdownContent,
                     { align: "end" as const },
-                    createElement(DropdownItem, null, "X"),
+                    ce(DropdownItem, null, "X"),
                 ),
             ),
         );

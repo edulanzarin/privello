@@ -6,6 +6,7 @@ import { TicketChat } from "@/components/support/ticket-chat";
 import { closeTicket, reopenTicket } from "@/app/_actions/support";
 import { AdminShell } from "@/components/admin/admin-shell";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 42 (admin chat ticket).
 export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ id: string }> };

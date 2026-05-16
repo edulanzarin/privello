@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSectionProfiles } from "@/lib/queries";
 import { ProfilesSectionQuerySchema } from "@/lib/validation";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 43 (Route Handler com cursor pagination).
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {

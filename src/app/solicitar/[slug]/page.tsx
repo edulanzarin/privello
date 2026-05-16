@@ -152,27 +152,27 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
     <>
       <header className="border-b border-black/[0.06] bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href={`/p/${profile.slug}`} className="text-[13px] text-muted hover:text-foreground transition-colors">
+          <Link href={`/p/${profile.slug}`} className="text-base text-muted hover:text-foreground transition-colors">
             ← Voltar ao perfil
           </Link>
-          <Link href="/" className="text-[17px] font-semibold tracking-tight">
+          <Link href="/" className="text-xl font-semibold tracking-tight">
             privello<span className="text-coral">.</span>
           </Link>
-          <p className="flex items-center gap-2 text-[13px]">
+          <p className="flex items-center gap-2 text-base">
             <span className="hidden sm:inline text-muted">Cliente</span>
             <Check className="h-3.5 w-3.5 text-success" strokeWidth={2} />
-            <span className="text-[10px] text-muted">fluxo Privello</span>
+            <span className="text-2xs text-muted">fluxo Privello</span>
           </p>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <p className="text-[11px] font-medium text-muted">Marcar horário</p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-tight sm:text-[34px]">
+        <p className="text-xs font-medium text-muted">Marcar horário</p>
+        <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-4xl">
           Combinar com {profile.displayName}
           <span className="text-coral">.</span>
         </h1>
-        <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-md leading-relaxed text-muted">
           Escolha dia e horário em intervalos de 30 minutos conforme a disponibilidade cadastrada por ela. Ao clicar em{" "}
           <strong className="text-foreground">Marcar no WhatsApp</strong>, abrimos o WhatsApp com uma mensagem já
           montada — sem exibir ocupação de outros clientes no site.
@@ -181,9 +181,9 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px]">
           <div className="space-y-12">
             <section>
-              <p className="text-[11px] font-medium text-muted">01 · Escolha um dia</p>
+              <p className="text-xs font-medium text-muted">01 · Escolha um dia</p>
               <div className="mt-4 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
-                <div className="flex items-center justify-between text-[14px] font-medium">
+                <div className="flex items-center justify-between text-md font-medium">
                   <Link
                     href={buildSolicitarHref(slug, { mes: prevMes }, sp)}
                     scroll={false}
@@ -192,7 +192,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   >
                     ←
                   </Link>
-                  <span className="text-[15px] font-semibold capitalize tracking-tight">
+                  <span className="text-lg font-semibold capitalize tracking-tight">
                     {selectedDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
                   </span>
                   <Link
@@ -204,12 +204,12 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     →
                   </Link>
                 </div>
-                <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[12px] font-medium text-muted">
+                <div className="mt-4 grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted">
                   {DAYS_PT.map((d) => (
                     <span key={d}>{d}</span>
                   ))}
                 </div>
-                <div className="mt-2 grid grid-cols-7 gap-1 text-center text-[14px]">
+                <div className="mt-2 grid grid-cols-7 gap-1 text-center text-md">
                   {cells.map((c, idx) => {
                     if (!c.date) return <span key={idx} />;
                     const ymd = `${c.date.getFullYear()}-${String(c.date.getMonth() + 1).padStart(2, "0")}-${String(c.date.getDate()).padStart(2, "0")}`;
@@ -237,7 +237,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     );
                   })}
                 </div>
-                <p className="mt-4 text-[11px] leading-relaxed text-muted">
+                <p className="mt-4 text-xs leading-relaxed text-muted">
                   Dias riscados: fora do período cadastrado ou indisponíveis. Horários são gerados de 30 em 30 minutos
                   dentro da janela (ex.: 12:00–17:00 → 12:00, 12:30, …).
                 </p>
@@ -245,10 +245,10 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
             </section>
 
             <section>
-              <p className="text-[11px] font-medium text-muted">02 · Horário e duração</p>
+              <p className="text-xs font-medium text-muted">02 · Horário e duração</p>
               {!isOvernight && (
                 <>
-                  <p className="mt-3 text-[11px] font-medium text-muted">Horários disponíveis</p>
+                  <p className="mt-3 text-xs font-medium text-muted">Horários disponíveis</p>
                   {starts.length ? (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {starts.map((h) => (
@@ -257,7 +257,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                           href={buildSolicitarHref(slug, { hora: h }, sp)}
                           scroll={false}
                           className={cn(
-                            "rounded-lg border px-3 py-2 text-[13px] font-medium transition-all active:scale-[0.97]",
+                            "rounded-lg border px-3 py-2 text-base font-medium transition-all active:scale-[0.97]",
                             hora === h
                               ? "border-foreground bg-foreground text-white shadow-sm"
                               : "border-black/10 bg-white hover:border-black/20 shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]",
@@ -268,17 +268,17 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-2 text-[14px] text-muted">Não há horários para este dia — escolha outra data.</p>
+                    <p className="mt-2 text-md text-muted">Não há horários para este dia — escolha outra data.</p>
                   )}
                 </>
               )}
               {isOvernight && (
-                <p className="mt-3 text-[14px] text-muted">
+                <p className="mt-3 text-md text-muted">
                   Pernoite não tem horário fixo — o início será combinado diretamente pelo WhatsApp.
                 </p>
               )}
 
-              <p className="mt-6 text-[11px] font-medium text-muted">Duração</p>
+              <p className="mt-6 text-xs font-medium text-muted">Duração</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {durations.map((d) => (
                   <Link
@@ -286,7 +286,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     href={buildSolicitarHref(slug, { durMin: String(d.minutes) }, sp)}
                     scroll={false}
                     className={cn(
-                      "rounded-2xl border bg-white p-4 text-center text-[14px] transition-all active:scale-[0.97]",
+                      "rounded-2xl border bg-white p-4 text-center text-md transition-all active:scale-[0.97]",
                       "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
                       durationMinutes === d.minutes
                         ? "border-foreground bg-foreground text-white shadow-sm"
@@ -294,20 +294,20 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     )}
                   >
                     <p className="font-semibold">{d.label}</p>
-                    <p className="mt-1 text-[12px] opacity-80">{formatBrl(d.priceBrl)}</p>
+                    <p className="mt-1 text-sm opacity-80">{formatBrl(d.priceBrl)}</p>
                   </Link>
                 ))}
               </div>
             </section>
 
             <section>
-              <p className="text-[11px] font-medium text-muted">03 · Onde será?</p>
+              <p className="text-xs font-medium text-muted">03 · Onde será?</p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <Link
                   href={buildSolicitarHref(slug, { local: "proprio" }, sp)}
                   scroll={false}
                   className={cn(
-                    "rounded-2xl border p-5 text-[14px] transition-all active:scale-[0.97]",
+                    "rounded-2xl border p-5 text-md transition-all active:scale-[0.97]",
                     "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
                     local === "proprio"
                       ? "border-foreground bg-foreground text-white"
@@ -315,7 +315,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   )}
                 >
                   <p className="font-semibold">Local próprio</p>
-                  <p className={cn("mt-2 text-[12px]", local === "proprio" ? "opacity-80" : "text-muted")}>
+                  <p className={cn("mt-2 text-sm", local === "proprio" ? "opacity-80" : "text-muted")}>
                     Atendimento no espaço dela. Valor conforme duração acima.
                   </p>
                 </Link>
@@ -323,7 +323,7 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   href={buildSolicitarHref(slug, { local: "domicilio" }, sp)}
                   scroll={false}
                   className={cn(
-                    "rounded-2xl border p-5 text-[14px] transition-all active:scale-[0.97]",
+                    "rounded-2xl border p-5 text-md transition-all active:scale-[0.97]",
                     "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
                     local === "domicilio"
                       ? "border-foreground bg-foreground text-white"
@@ -331,17 +331,17 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   )}
                 >
                   <p className="font-semibold">A domicílio</p>
-                  <p className={cn("mt-2 text-[12px]", local === "domicilio" ? "opacity-80" : "text-muted")}>
+                  <p className={cn("mt-2 text-sm", local === "domicilio" ? "opacity-80" : "text-muted")}>
                     Endereço e taxa de deslocamento combinados no WhatsApp.
                   </p>
-                  <p className="mt-2 text-[12px] font-medium text-coral">+ estimativa R$ 100 no resumo (ajustável)</p>
+                  <p className="mt-2 text-sm font-medium text-coral">+ estimativa R$ 100 no resumo (ajustável)</p>
                 </Link>
               </div>
             </section>
 
             <section>
-              <p className="text-[11px] font-medium text-muted">04 · Observações (opcional)</p>
-              <p className="mt-2 text-[13px] text-muted">
+              <p className="text-xs font-medium text-muted">04 · Observações (opcional)</p>
+              <p className="mt-2 text-base text-muted">
                 Serão incluídas na mensagem do WhatsApp ao clicar em Marcar — não ficam salvas no servidor.
               </p>
             </section>

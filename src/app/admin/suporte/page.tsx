@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 41 (admin lista tickets).
 export const dynamic = "force-dynamic";
 
 const statusLabel: Record<string, string> = {

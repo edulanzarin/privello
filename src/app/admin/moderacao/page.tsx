@@ -8,6 +8,7 @@ import { QuickActions } from "@/components/admin/quick-actions";
 import { AdminCityFilter } from "@/components/admin/admin-city-filter";
 import { BadgeCheck, Clock, Users, ShieldCheck, Play, TrendingUp, AlertCircle } from "lucide-react";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 36 (admin moderação tempo real).
 export const dynamic = "force-dynamic";
 
 type PageProps = {
@@ -173,20 +174,20 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
   }
 
   const kpis = [
-    { label: "Perfis ativos",     value: totalProfiles.toLocaleString("pt-BR"),   icon: Users,       sub: `${verifiedProfiles} verificadas` },
-    { label: "Verificadas",       value: verifiedProfiles.toLocaleString("pt-BR"), icon: BadgeCheck,  sub: `${totalProfiles > 0 ? Math.round(verifiedProfiles / totalProfiles * 100) : 0}% do total` },
-    { label: "Pendentes review",  value: pendingCount.toLocaleString("pt-BR"),     icon: ShieldCheck, sub: "aguardando revisão", alert: pendingCount > 5 },
+    { label: "Perfis ativos", value: totalProfiles.toLocaleString("pt-BR"), icon: Users, sub: `${verifiedProfiles} verificadas` },
+    { label: "Verificadas", value: verifiedProfiles.toLocaleString("pt-BR"), icon: BadgeCheck, sub: `${totalProfiles > 0 ? Math.round(verifiedProfiles / totalProfiles * 100) : 0}% do total` },
+    { label: "Pendentes review", value: pendingCount.toLocaleString("pt-BR"), icon: ShieldCheck, sub: "aguardando revisão", alert: pendingCount > 5 },
     { label: "Assinantes ativos", value: activeSubscriptions.toLocaleString("pt-BR"), icon: TrendingUp, sub: "clientes com acesso" },
-    { label: "Suporte aberto",    value: openTickets.toLocaleString("pt-BR"),      icon: AlertCircle, sub: "tickets pendentes", alert: openTickets > 0 },
-    { label: "MRR estimado",      value: `R$ ${totalMRR.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, icon: Play, sub: "receita recorrente/mês" },
+    { label: "Suporte aberto", value: openTickets.toLocaleString("pt-BR"), icon: AlertCircle, sub: "tickets pendentes", alert: openTickets > 0 },
+    { label: "MRR estimado", value: `R$ ${totalMRR.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, icon: Play, sub: "receita recorrente/mês" },
   ];
 
   const TABS = [
-    { key: "pending",   label: "Pendentes" },
-    { key: "all",       label: "Todos" },
-    { key: "NOVO",      label: "Novos" },
-    { key: "REVISAO",   label: "Em revisão" },
-    { key: "APROVADO",  label: "Aprovados" },
+    { key: "pending", label: "Pendentes" },
+    { key: "all", label: "Todos" },
+    { key: "NOVO", label: "Novos" },
+    { key: "REVISAO", label: "Em revisão" },
+    { key: "APROVADO", label: "Aprovados" },
     { key: "REJEITADO", label: "Rejeitados" },
   ];
 
@@ -263,11 +264,10 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
               <Link
                 key={key}
                 href={buildQueueHref({ status: key, p: "1" })}
-                className={`rounded px-2.5 py-1 text-[11px] font-semibold transition ${
-                  statusFilter === key
+                className={`rounded px-2.5 py-1 text-[11px] font-semibold transition ${statusFilter === key
                     ? "bg-foreground text-white"
                     : "bg-line text-muted hover:bg-line/70 hover:text-foreground"
-                }`}
+                  }`}
               >
                 {label}
               </Link>

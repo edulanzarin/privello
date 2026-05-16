@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { isSubscriber } from "@/lib/queries";
 import { SubscribeButton } from "./subscribe-button";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 22 (assinar verifica subscription via auth()).
 export const dynamic = "force-dynamic";
 
 const PERKS = [

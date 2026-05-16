@@ -14,8 +14,8 @@ const statusLabel: Record<string, string> = {
   CLOSED: "Fechado",
 };
 const statusClass: Record<string, string> = {
-  OPEN: "bg-[#0a84ff]/10 text-[#0a84ff]",
-  IN_PROGRESS: "bg-[#ff9500]/10 text-[#b36200]",
+  OPEN: "bg-blue/10 text-blue",
+  IN_PROGRESS: "bg-warning/10 text-warning-dark",
   CLOSED: "bg-black/[0.06] text-muted",
 };
 
@@ -50,7 +50,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
     <div className="space-y-4 max-w-xl mx-auto">
       <Link
         href="/painel/suporte"
-        className="inline-flex items-center gap-1.5 text-[13px] text-muted transition hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-base text-muted transition hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
         Todos os chamados
@@ -59,12 +59,12 @@ export default async function TicketDetailPage({ params }: PageProps) {
       <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between border-b border-black/[0.06] px-5 py-4">
           <div>
-            <p className="text-[14px] font-semibold">{ticket.subject}</p>
-            <p className="mt-0.5 text-[12px] text-muted">
+            <p className="text-md font-semibold">{ticket.subject}</p>
+            <p className="mt-0.5 text-sm text-muted">
               Aberto em {new Date(ticket.createdAt).toLocaleDateString("pt-BR")}
             </p>
           </div>
-          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusClass[ticket.status]}`}>
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass[ticket.status]}`}>
             {statusLabel[ticket.status]}
           </span>
         </div>

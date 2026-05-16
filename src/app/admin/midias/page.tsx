@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { MediaDeleteBtn, MediaVisibilityBtn } from "@/components/admin/media-actions";
 import { Heart, MessageCircle, Lock, Star, Play, LayoutGrid, List, Eye } from "lucide-react";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 38 (admin moderação de mídias).
 export const dynamic = "force-dynamic";
 
 type PageProps = {
@@ -16,32 +17,32 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
   const raw = await searchParams;
   const get = (k: string) => { const v = raw[k]; return Array.isArray(v) ? v[0] : v; };
 
-  const q        = get("q")?.trim() ?? "";
-  const typeF    = get("type") ?? "";
-  const visibF   = get("visib") ?? "";
-  const sortF    = get("sort") ?? "newest";
+  const q = get("q")?.trim() ?? "";
+  const typeF = get("type") ?? "";
+  const visibF = get("visib") ?? "";
+  const sortF = get("sort") ?? "newest";
   const viewMode = get("view") ?? "grid";
-  const pageNum  = Math.max(1, parseInt(get("p") ?? "1", 10));
+  const pageNum = Math.max(1, parseInt(get("p") ?? "1", 10));
   const PAGE_SIZE = viewMode === "list" ? 30 : 60;
 
   const where: Prisma.MediaWhereInput = {};
-  if (typeF)  where.mediaType = typeF;
-  if (visibF === "public")  where.isPublic = true;
+  if (typeF) where.mediaType = typeF;
+  if (visibF === "public") where.isPublic = true;
   if (visibF === "private") where.isPublic = false;
   if (q) {
     where.profile = {
       OR: [
         { displayName: { contains: q, mode: "insensitive" } },
-        { slug:        { contains: q, mode: "insensitive" } },
+        { slug: { contains: q, mode: "insensitive" } },
       ],
     };
   }
 
   const orderBy: Prisma.MediaOrderByWithRelationInput =
-    sortF === "oldest"   ? { createdAt: "asc" }  :
-    sortF === "likes"    ? { likes: { _count: "desc" } } :
-    sortF === "comments" ? { comments: { _count: "desc" } } :
-    { createdAt: "desc" };
+    sortF === "oldest" ? { createdAt: "asc" } :
+      sortF === "likes" ? { likes: { _count: "desc" } } :
+        sortF === "comments" ? { comments: { _count: "desc" } } :
+          { createdAt: "desc" };
 
   const [media, total] = await Promise.all([
     prisma.media.findMany({
@@ -110,10 +111,10 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
         {/* Stats bar */}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4">
           {[
-            { label: "Total",    value: total,        active: !typeF && !visibF },
-            { label: "Públicas", value: totalPublic,  active: visibF === "public" },
+            { label: "Total", value: total, active: !typeF && !visibF },
+            { label: "Públicas", value: totalPublic, active: visibF === "public" },
             { label: "Privadas", value: totalPrivate, active: visibF === "private" },
-            { label: "Reels",    value: totalReels,   active: typeF === "REEL" },
+            { label: "Reels", value: totalReels, active: typeF === "REEL" },
           ].map(({ label, value, active }) => (
             <div key={label} className={`border px-3 py-2 ${active ? "border-foreground bg-foreground text-white" : "border-line bg-white"}`}>
               <p className={`text-[10px] font-bold uppercase tracking-wider ${active ? "text-white/60" : "text-muted"}`}>{label}</p>

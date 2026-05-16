@@ -74,20 +74,20 @@ function Sidebar({ step }: { step: number }) {
         <h1 className="mt-10 text-2xl font-semibold tracking-tight leading-snug">
           Verificação de<br />identidade
         </h1>
-        <p className="mt-4 text-[13px] leading-relaxed text-white/60">
+        <p className="mt-4 text-base leading-relaxed text-white/60">
           Complete as etapas para receber seus selos de confiança e aparecer com destaque no Privello.
         </p>
       </div>
 
       <div className="mt-10 space-y-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Selos que você recebe</p>
+        <p className="text-2xs font-semibold uppercase tracking-widest text-white/30">Selos que você recebe</p>
         <div className={cn("flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5 transition-all", step >= 1 ? "opacity-100" : "opacity-40")}>
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20">
             <BadgeCheck className="h-4 w-4 text-emerald-400" strokeWidth={2} />
           </div>
           <div>
-            <p className="text-[12px] font-semibold">Identidade verificada</p>
-            <p className="text-[10px] text-white/40">Documento + selfie — etapas 1 e 2</p>
+            <p className="text-sm font-semibold">Identidade verificada</p>
+            <p className="text-2xs text-white/40">Documento + selfie — etapas 1 e 2</p>
           </div>
         </div>
         <div className={cn("flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5 transition-all", step >= 3 ? "opacity-100" : "opacity-40")}>
@@ -95,14 +95,14 @@ function Sidebar({ step }: { step: number }) {
             <Video className="h-4 w-4 text-blue-400" strokeWidth={2} />
           </div>
           <div>
-            <p className="text-[12px] font-semibold">Vídeo verificado</p>
-            <p className="text-[10px] text-white/40">Vídeo curto de presença — etapa 3</p>
+            <p className="text-sm font-semibold">Vídeo verificado</p>
+            <p className="text-2xs text-white/40">Vídeo curto de presença — etapa 3</p>
           </div>
         </div>
       </div>
 
       <div className="mt-8">
-        <div className="flex items-center justify-between text-[10px] text-white/40 mb-2">
+        <div className="flex items-center justify-between text-2xs text-white/40 mb-2">
           <span>Progresso</span>
           <span>{Math.round((step / STEPS.length) * 100)}%</span>
         </div>
@@ -111,7 +111,7 @@ function Sidebar({ step }: { step: number }) {
         </div>
       </div>
 
-      <div className="mt-auto pt-10 text-[10px] leading-relaxed text-white/30">
+      <div className="mt-auto pt-10 text-2xs leading-relaxed text-white/30">
         Imagens enviadas com AES-256 ponta a ponta.<br />
         Apagamos automaticamente após 30 dias da aprovação.
       </div>
@@ -185,7 +185,7 @@ export default function ContaVerificacaoPage() {
             <CheckCircle className="h-10 w-10" strokeWidth={1.5} />
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">Enviado para revisão</h2>
-          <p className="max-w-sm text-[13px] text-muted leading-relaxed">
+          <p className="max-w-sm text-base text-muted leading-relaxed">
             Nossa equipe vai analisar seus documentos em até 24 horas. Você receberá uma notificação quando o processo for concluído.
           </p>
           <div className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs text-muted shadow-sm">
@@ -194,17 +194,17 @@ export default function ContaVerificacaoPage() {
           </div>
           <div className="mt-2 flex flex-wrap justify-center gap-3">
             {slots.videoUrl?.url && (
-              <div className="flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-[11px] font-semibold text-blue-700">
+              <div className="flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-700">
                 <Video className="h-3.5 w-3.5" strokeWidth={2} />
                 Vídeo enviado — selo em análise
               </div>
             )}
-            <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[11px] font-semibold text-emerald-700">
+            <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700">
               <BadgeCheck className="h-3.5 w-3.5" strokeWidth={2} />
               Identidade em análise
             </div>
           </div>
-          <Link href="/painel" className="mt-4 rounded-xl bg-foreground px-10 py-3 text-[13px] font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all">
+          <Link href="/painel" className="mt-4 rounded-xl bg-foreground px-10 py-3 text-base font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all">
             Voltar ao painel
           </Link>
         </main>
@@ -227,13 +227,13 @@ export default function ContaVerificacaoPage() {
                 <button
                   onClick={() => setStep(s.id)}
                   className={cn(
-                    "flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-medium transition-all",
+                    "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
                     active ? "bg-foreground text-white shadow-sm" : done ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" : "bg-white text-muted border border-black/[0.06] hover:border-black/[0.12] shadow-sm",
                   )}
                 >
                   {done && !active ? <CheckCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} /> : <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />}
                   <span className="hidden sm:block">{s.title}</span>
-                  {s.optional && <span className="hidden sm:block text-[9px] opacity-60">(opcional)</span>}
+                  {s.optional && <span className="hidden sm:block text-2xs opacity-60">(opcional)</span>}
                 </button>
                 {i < STEPS.length - 1 && <ChevronRight className="h-3 w-3 text-muted/30 shrink-0" strokeWidth={1.5} />}
               </div>
@@ -249,15 +249,15 @@ export default function ContaVerificacaoPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold tracking-tight">{currentStep.title}<span className="text-coral">.</span></h2>
-              <p className="text-[12px] text-muted mt-0.5">{currentStep.subtitle}</p>
+              <p className="text-sm text-muted mt-0.5">{currentStep.subtitle}</p>
             </div>
-            <div className={cn("hidden sm:flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold", currentStep.id === 3 ? "border-blue-200 bg-blue-50 text-blue-700" : "border-emerald-200 bg-emerald-50 text-emerald-700")}>
+            <div className={cn("hidden sm:flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-2xs font-semibold", currentStep.id === 3 ? "border-blue-200 bg-blue-50 text-blue-700" : "border-emerald-200 bg-emerald-50 text-emerald-700")}>
               <currentStep.sealIcon className="h-3 w-3" strokeWidth={2} />
               {currentStep.seal}
               {currentStep.optional && <span className="opacity-60 ml-0.5 font-normal">· opcional</span>}
             </div>
           </div>
-          <p className="text-[13px] text-muted leading-relaxed max-w-xl">{currentStep.description}</p>
+          <p className="text-base text-muted leading-relaxed max-w-xl">{currentStep.description}</p>
         </div>
 
         {/* Upload slots */}
@@ -274,7 +274,7 @@ export default function ContaVerificacaoPage() {
                   <div className="relative h-44 w-full bg-zinc-100">
                     <Image src={preview} alt="" fill className="object-cover" sizes="400px" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-emerald-500 px-2.5 py-1 text-[10px] font-bold text-white">
+                    <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-emerald-500 px-2.5 py-1 text-2xs font-bold text-white">
                       <CheckCircle className="h-3 w-3" strokeWidth={2.5} /> Recebido
                     </span>
                   </div>
@@ -285,22 +285,22 @@ export default function ContaVerificacaoPage() {
                   </div>
                 )}
                 <div className="p-5">
-                  <p className="text-[13px] font-semibold text-foreground">{field.label}</p>
-                  <p className="mt-1 text-[11px] text-muted">{field.hint}</p>
+                  <p className="text-base font-semibold text-foreground">{field.label}</p>
+                  <p className="mt-1 text-xs text-muted">{field.hint}</p>
                   {done ? (
                     <div className="mt-4 flex items-center justify-between">
-                      <p className="flex items-center gap-1.5 text-[12px] text-emerald-600 font-medium"><CheckCircle className="h-3.5 w-3.5" strokeWidth={2} /> Arquivo enviado</p>
+                      <p className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium"><CheckCircle className="h-3.5 w-3.5" strokeWidth={2} /> Arquivo enviado</p>
                       <button type="button" onClick={() => clearSlot(field.key)} className="rounded-full p-1.5 text-muted hover:bg-black/[0.04] hover:text-coral transition-all"><X className="h-4 w-4" strokeWidth={1.5} /></button>
                     </div>
                   ) : uploading ? (
                     <div className="mt-4">
                       <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.04]"><div className="h-full w-2/3 animate-pulse rounded-full bg-foreground/60" /></div>
-                      <p className="mt-2 text-[11px] text-muted">Enviando…</p>
+                      <p className="mt-2 text-xs text-muted">Enviando…</p>
                     </div>
                   ) : (
                     <>
-                      {error && <div className="mt-3 flex items-center gap-2 rounded-lg bg-coral/[0.06] px-3 py-2 text-[11px] text-coral"><AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />{error}</div>}
-                      <button type="button" onClick={() => inputRefs.current[field.key]?.click()} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-black/[0.12] bg-black/[0.02] py-4 text-[12px] font-medium text-foreground/70 hover:border-foreground/30 hover:bg-black/[0.04] active:scale-[0.98] transition-all">
+                      {error && <div className="mt-3 flex items-center gap-2 rounded-lg bg-coral/[0.06] px-3 py-2 text-xs text-coral"><AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />{error}</div>}
+                      <button type="button" onClick={() => inputRefs.current[field.key]?.click()} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-black/[0.12] bg-black/[0.02] py-4 text-sm font-medium text-foreground/70 hover:border-foreground/30 hover:bg-black/[0.04] active:scale-[0.98] transition-all">
                         <Upload className="h-4 w-4" strokeWidth={1.5} />
                         {field.accept.startsWith("video") ? "Enviar vídeo" : "Enviar foto"}
                       </button>
@@ -314,7 +314,7 @@ export default function ContaVerificacaoPage() {
         </div>
 
         {/* Security note */}
-        <div className="mt-10 grid gap-4 rounded-2xl border border-black/[0.04] bg-black/[0.015] p-5 text-[11px] text-muted sm:grid-cols-3">
+        <div className="mt-10 grid gap-4 rounded-2xl border border-black/[0.04] bg-black/[0.015] p-5 text-xs text-muted sm:grid-cols-3">
           <div className="flex gap-2.5"><Lock className="h-3.5 w-3.5 shrink-0 mt-0.5 text-foreground/40" strokeWidth={1.5} /><span>Criptografia AES-256 — imagens cifradas no envio e no servidor.</span></div>
           <div className="flex gap-2.5"><Shield className="h-3.5 w-3.5 shrink-0 mt-0.5 text-foreground/40" strokeWidth={1.5} /><span>Acesso restrito — apenas moderação interna, auditável.</span></div>
           <div className="flex gap-2.5"><Clock className="h-3.5 w-3.5 shrink-0 mt-0.5 text-foreground/40" strokeWidth={1.5} /><span>Exclusão automática — removidos 30 dias após aprovação.</span></div>
@@ -322,7 +322,7 @@ export default function ContaVerificacaoPage() {
 
         {/* Error */}
         {submitError && (
-          <div className="mt-5 flex items-center gap-2 rounded-xl bg-coral/[0.06] px-4 py-3 text-[12px] text-coral">
+          <div className="mt-5 flex items-center gap-2 rounded-xl bg-coral/[0.06] px-4 py-3 text-sm text-coral">
             <AlertCircle className="h-4 w-4 shrink-0" strokeWidth={1.5} />{submitError}
           </div>
         )}
@@ -331,19 +331,19 @@ export default function ContaVerificacaoPage() {
         <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-2">
             {step > 1 && (
-              <button onClick={() => setStep(step - 1)} className="rounded-xl border border-black/[0.08] bg-white px-5 py-2.5 text-[13px] font-medium shadow-sm hover:bg-black/[0.02] active:scale-[0.97] transition-all">← Voltar</button>
+              <button onClick={() => setStep(step - 1)} className="rounded-xl border border-black/[0.08] bg-white px-5 py-2.5 text-base font-medium shadow-sm hover:bg-black/[0.02] active:scale-[0.97] transition-all">← Voltar</button>
             )}
             {step === 1 && (
-              <Link href="/painel" className="rounded-xl border border-black/[0.08] bg-white px-5 py-2.5 text-[13px] font-medium text-center shadow-sm hover:bg-black/[0.02] active:scale-[0.97] transition-all">Cancelar</Link>
+              <Link href="/painel" className="rounded-xl border border-black/[0.08] bg-white px-5 py-2.5 text-base font-medium text-center shadow-sm hover:bg-black/[0.02] active:scale-[0.97] transition-all">Cancelar</Link>
             )}
           </div>
           <div className="flex gap-2">
             {step < STEPS.length ? (
-              <button onClick={() => setStep(step + 1)} disabled={!stepDone(currentStep)} className="flex items-center gap-2 rounded-xl bg-foreground px-8 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none">
+              <button onClick={() => setStep(step + 1)} disabled={!stepDone(currentStep)} className="flex items-center gap-2 rounded-xl bg-foreground px-8 py-2.5 text-base font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none">
                 Próximo <ChevronRight className="h-4 w-4" strokeWidth={2} />
               </button>
             ) : (
-              <button onClick={handleSubmit} disabled={!requiredDone || pending} className="flex items-center gap-2 rounded-xl bg-foreground px-8 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none">
+              <button onClick={handleSubmit} disabled={!requiredDone || pending} className="flex items-center gap-2 rounded-xl bg-foreground px-8 py-2.5 text-base font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none">
                 {pending ? "Enviando…" : "Enviar para revisão"}
                 {!pending && <CheckCircle className="h-4 w-4" strokeWidth={2} />}
               </button>

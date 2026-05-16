@@ -14,8 +14,8 @@ type ProfileCardProps = {
 
 const PLAN_CONFIG = {
   BOOST: {
-    wrapClass: "ring-2 ring-[#ff9500]/60",
-    badgeBg: "bg-[#ff9500]",
+    wrapClass: "ring-2 ring-warning/60",
+    badgeBg: "bg-warning",
     badgeText: "text-white",
     badgeLabel: "BOOST",
   },
@@ -85,8 +85,8 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
         {/* Top: verified badge */}
         {profile.isVerified && (
           <div className="absolute right-2.5 top-2.5">
-            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold text-foreground shadow-sm backdrop-blur-sm">
-              <ShieldCheck className="h-2.5 w-2.5 text-[#007aff]" strokeWidth={2} />
+            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-2xs font-semibold text-foreground shadow-sm backdrop-blur-sm">
+              <ShieldCheck className="h-2.5 w-2.5 text-blue" strokeWidth={2} />
               Verificada
             </span>
           </div>
@@ -96,16 +96,16 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-3 pb-2.5">
           {plan.badgeLabel ? (
             <span className={cn(
-              "rounded-full px-2.5 py-[3px] text-[9px] font-bold tracking-[0.12em] uppercase",
+              "rounded-full px-2.5 py-[3px] text-2xs font-bold tracking-[0.12em] uppercase",
               plan.badgeBg, plan.badgeText,
             )}>
               {plan.badgeLabel}
             </span>
           ) : <span />}
 
-          <span className="text-[16px] font-semibold leading-none tabular-nums text-white drop-shadow-sm">
+          <span className="text-xl font-semibold leading-none tabular-nums text-white drop-shadow-sm">
             {formatBrl(profile.priceHour)}
-            <span className="text-[11px] font-normal opacity-70">/h</span>
+            <span className="text-xs font-normal opacity-70">/h</span>
           </span>
         </div>
       </div>
@@ -126,12 +126,12 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
       <div className="flex flex-col gap-1.5 p-3.5 pb-3">
         {/* Name + rating */}
         <div className="flex items-start justify-between gap-2">
-          <p className="text-[15px] font-semibold leading-tight tracking-tight">
+          <p className="text-lg font-semibold leading-tight tracking-tight">
             {profile.displayName}, {profile.age}
           </p>
           {profile.ratingCount > 0 && (
-            <span className="flex shrink-0 items-center gap-0.5 text-[11px]">
-              <Star className="h-2.5 w-2.5 fill-[#ff9500] text-[#ff9500]" strokeWidth={0} />
+            <span className="flex shrink-0 items-center gap-0.5 text-xs">
+              <Star className="h-2.5 w-2.5 fill-warning text-warning" strokeWidth={0} />
               <span className="font-semibold">{profile.ratingAvg.toFixed(1)}</span>
               <span className="text-muted">({profile.ratingCount})</span>
             </span>
@@ -140,13 +140,13 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
 
         {/* Tagline */}
         {profile.tagline && (
-          <p className="line-clamp-1 text-[12px] italic leading-snug text-muted">
+          <p className="line-clamp-1 text-sm italic leading-snug text-muted">
             &ldquo;{profile.tagline}&rdquo;
           </p>
         )}
 
         {/* Location */}
-        <div className="flex items-center gap-1 text-[11px] text-muted">
+        <div className="flex items-center gap-1 text-xs text-muted">
           <MapPin className="h-2.5 w-2.5 shrink-0" strokeWidth={1.5} />
           <span className="truncate">{profile.district?.name ? `${profile.district.name} · ` : ""}{profile.city.name}</span>
         </div>
@@ -155,31 +155,31 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
         {hasAttributes && (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {photos.length > 0 && (
-              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-[10px] text-muted">
+              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-2xs text-muted">
                 <Images className="h-2.5 w-2.5" strokeWidth={1.5} />
                 {photos.length}
               </span>
             )}
             {hasReels && (
-              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-[10px] text-muted">
+              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-2xs text-muted">
                 <Clapperboard className="h-2.5 w-2.5" strokeWidth={1.5} />
                 Reels
               </span>
             )}
             {profile.videoVerified && (
-              <span className="flex items-center gap-1 rounded-full border border-[#007aff]/20 bg-[#007aff]/[0.06] px-2 py-[3px] text-[10px] text-[#007aff]">
+              <span className="flex items-center gap-1 rounded-full border border-blue/20 bg-blue/[0.06] px-2 py-[3px] text-2xs text-blue">
                 <ShieldCheck className="h-2.5 w-2.5" strokeWidth={1.5} />
                 Vídeo verificado
               </span>
             )}
             {profile.hasOwnPlace && (
-              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-[10px] text-muted">
+              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-2xs text-muted">
                 <Home className="h-2.5 w-2.5" strokeWidth={1.5} />
                 Local
               </span>
             )}
             {profile.homeVisit && (
-              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-[10px] text-muted">
+              <span className="flex items-center gap-1 rounded-full border border-black/[0.07] px-2 py-[3px] text-2xs text-muted">
                 <Car className="h-2.5 w-2.5" strokeWidth={1.5} />
                 Atende
               </span>
