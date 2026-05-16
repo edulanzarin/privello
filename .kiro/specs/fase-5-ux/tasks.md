@@ -436,13 +436,14 @@ Restrições importantes:
     - Properties 1, 2, 3 rodam verde
     - _Requirements: 1.3, 2.5, 3.3, 4.4, 5.7, 6.2, 7.4, 8.1_
 
-  - [ ] 11.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
+  - [x] 11.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
     - **Esta tarefa é executada pelo orquestrador, não pelo executor da fase**
     - `state: SpawnReady` ou `InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601 no formato `YYYY-MM-DDTHH:MM:SSZ`
     - Manter `child_spec_path` apontando para esta pasta
     - Re-rodar Spawn-Readiness Gate em `fase-6-mobile-cross-browser` (dependente direta — depende de fase-4 + fase-5)
     - Documentar no `handoff.md` que `fase-5-ux` está `Done` e listar fases destravadas a seguir
+    - **DONE em 2026-05-17T00:00:00Z** — Phase Card no master atualizado para `state: Done`. Spawn-Readiness Gate de fase-6-mobile-cross-browser re-avaliado: dependências fase-4+fase-5 satisfeitas, gate plenamente atendido. `handoff.md` atualizado.
     - _Requirements: 8.3_
 
 ## Notes

@@ -341,7 +341,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Arquivos protegidos não alterados (cf. Tarefa 9.5)
     - _Requirements: Saída desta fase_
 
-  - [ ] 10.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
+  - [x] 10.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
     - **Esta tarefa é executada pelo orquestrador, não pelo executor da fase**
     - `state: InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601 no formato `YYYY-MM-DDTHH:MM:SSZ`
@@ -349,6 +349,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Se Wave 5 ficou como `pendente até 2026-06-13`, adicionar nota explícita no Phase Card (`<!-- EAR 8.4 cleanup pendente até 2026-06-13. Ver dx-conventions.md > §4. -->`)
     - Nenhuma fase desta árvore depende de fase-7-dx-infra (folha do grafo, cf. `PROMOCAO.md > §5` e `handoff.md > Próximos passos`); não é necessário re-rodar Spawn-Readiness Gate
     - Atualizar `handoff.md` com a entrega desta fase (links para `.github/workflows/ci.yml`, `docs/env.md`, `docs/docker.md`, `docs/adr/`, `CHANGELOG.md`, `dx-conventions.md`)
+    - **DONE em 2026-05-17T00:00:00Z** — Phase Card no master atualizado para `state: Done` com nota sobre Wave 5 pendente até 2026-06-13. Folha do grafo: nenhuma fase posterior destravada. `handoff.md` atualizado.
     - _Requirements: Saída desta fase_
 
 ## Notes

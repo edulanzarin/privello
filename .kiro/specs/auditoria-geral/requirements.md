@@ -271,9 +271,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\ux-premium-polish`
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\final-polish-phase`
 - **agents_rule_areas**: `view-transitions` (avaliação e adoção da API de View Transitions do Next 16 nas rotas onde for aplicável).
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-5-ux\`
 - **promoted_at**: 2026-05-17
+- **doneAt**: 2026-05-17T00:00:00Z
+- **spawn_readiness_note**: Spawn-Readiness Gate re-avaliado para fase-6-mobile-cross-browser (dependente direta — depende de fase-4 + fase-5); ambas dependências satisfeitas, gate plenamente atendido — orquestrador pode iniciar fase-6 a seguir.
 
 #### Acceptance Criteria
 
@@ -334,9 +336,12 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **out_of_scope**: monitoramento em produção (APM/log shipping), feature flags e blue/green deploy.
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\final-polish-phase`
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\`
 - **promoted_at**: 2026-05-17
+- **doneAt**: 2026-05-17T00:00:00Z
+- **spawn_readiness_note**: Fase folha do grafo (cf. PROMOCAO.md §5). Não destrava nenhuma fase posterior.
+- **followup_pendente**: EAR 8.4 (cleanup `src/lib/queries.ts`) marcado pendente até 2026-06-13 (janela `@deprecated 2026-05-30`). Ver `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\dx-conventions.md > §4 Queries cleanup`.
 
 #### Acceptance Criteria
 
