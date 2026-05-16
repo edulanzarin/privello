@@ -21,12 +21,12 @@ Restrições importantes:
     - Log estruturado de invocações bem-sucedidas com `{ ts, ip, mode, subject }`
     - _Requirements: 1.2, 1.3, 1.4_
 
-  - [-] 1.2 Refactor `src/app/api/dev/reset/route.ts`
+  - [x] 1.2 Refactor `src/app/api/dev/reset/route.ts`
     - Substituir `if (NODE_ENV === "production") return 403` por `requireAdminOrToken(req)`
     - Manter exatamente as mesmas operações de `prisma.$transaction` em sucesso
     - _Requirements: 1.1_
 
-  - [-] 1.3 Refactor `src/app/api/dev/activate-plans/route.ts`
+  - [x] 1.3 Refactor `src/app/api/dev/activate-plans/route.ts`
     - Mesma substituição da 1.2
     - _Requirements: 1.1_
 
@@ -41,13 +41,13 @@ Restrições importantes:
     - Sem corpo no 401
     - _Requirements: 2.2, 2.3, 2.4, 2.5_
 
-  - [-] 2.2 Refactor `src/app/api/cron/expire-plans/route.ts`
+  - [x] 2.2 Refactor `src/app/api/cron/expire-plans/route.ts`
     - Substituir leitura de `?secret=` por `verifyCronSecret(req, { transitionEndsAt })`
     - `transitionEndsAt` declarado como constante no commit, com comentário citando a data e o checklist de schedulers a atualizar antes
     - Manter exatamente as mesmas mutações em sucesso
     - _Requirements: 2.1_
 
-  - [-] 2.3 Refactor `src/app/api/cron/reset-hot/route.ts`
+  - [x] 2.3 Refactor `src/app/api/cron/reset-hot/route.ts`
     - Mesma substituição da 2.2
     - _Requirements: 2.1_
 
@@ -77,7 +77,7 @@ Restrições importantes:
     - _Requirements: 3.2_
 
 - [ ] 4. Validação Zod nos Public_Input_Endpoints
-  - [~] 4.1 Adicionar `zod` em `package.json > dependencies`
+  - [x] 4.1 Adicionar `zod` em `package.json > dependencies`
     - Pinar versão atual estável (sem `^` ou `~`)
     - Validar `npm install` em ambiente limpo
     - _Requirements: 4.1_
@@ -109,12 +109,12 @@ Restrições importantes:
     - Comentário deixando claro que store em memória **funciona apenas em single-instance**; multi-instance é `OutOfScopeFinding` para Fase 7
     - _Requirements: 5.3_
 
-  - [-] 5.2 Criar `src/lib/rate-limit-config.ts` com tabela canônica
+  - [x] 5.2 Criar `src/lib/rate-limit-config.ts` com tabela canônica
     - Constante `RATE_LIMIT_TABLE` com entradas para `login`, `upload`, `waClick`, `comment`, `storyView` (valores conforme `design.md > Data Models`)
     - Tipo derivado para uso em chamadas
     - _Requirements: 5.1, 5.2_
 
-  - [~] 5.3 Replicar a tabela em `rate-limits.md`
+  - [x] 5.3 Replicar a tabela em `rate-limits.md`
     - Documento em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-1-seguranca\rate-limits.md`
     - Tabela: Endpoint | Chave | Janela | Limite | Resposta ao exceder
     - _Requirements: 5.1, 5.2_
