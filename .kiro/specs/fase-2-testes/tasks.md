@@ -72,28 +72,28 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Para cada arquivo `non-pure` ou `parcial`, registrar nota explicando por que não vira tarefa nesta fase
     - _Requirements: 3.2_
 
-  - [~] 3.2 Criar `src/lib/money.test.ts`
+  - [x] 3.2 Criar `src/lib/money.test.ts`
     - Cobrir caso de sucesso típico (formatação BRL, parse de string formatada)
     - Cobrir bordas: zero, valor mínimo, valor máximo declarado pelo módulo, input mal-formatado (deve lançar ou retornar erro tipado conforme API real)
     - _Requirements: 3.4_
 
-  - [~] 3.3 Criar `src/lib/discover-params.test.ts`
+  - [x] 3.3 Criar `src/lib/discover-params.test.ts`
     - Cobrir caso de sucesso (URLSearchParams típica) e bordas: vazio, chaves repetidas, valores malformados
     - _Requirements: 3.4_
 
-  - [~] 3.4 Criar `src/lib/time-utils.test.ts`
+  - [x] 3.4 Criar `src/lib/time-utils.test.ts`
     - Cobrir formatação e parsing nos formatos usados pelo app, com bordas (meia-noite, fim de mês, fuso)
     - _Requirements: 3.4_
 
-  - [~] 3.5 Criar `src/lib/booking-slots.test.ts`
+  - [x] 3.5 Criar `src/lib/booking-slots.test.ts`
     - Cobrir geração de slots em janela típica e bordas (janela vazia, duração maior que janela, intervalo zero)
     - _Requirements: 3.4_
 
-  - [~] 3.6 Criar `src/lib/whatsapp-booking.test.ts`
+  - [x] 3.6 Criar `src/lib/whatsapp-booking.test.ts`
     - Cobrir construção de URL com payload típico e bordas (caracteres a escapar, payload mínimo)
     - _Requirements: 3.4_
 
-  - [~] 3.7 Decidir cobertura de `src/lib/utils.ts` e `src/lib/constants.ts`
+  - [x] 3.7 Decidir cobertura de `src/lib/utils.ts` e `src/lib/constants.ts`
     - `utils.ts`: se houver lógica não-trivial, criar `utils.test.ts`; caso contrário registrar nota em `testing-conventions.md`
     - `constants.ts`: tipicamente sem teste; registrar a decisão (sem teste, ou teste de integridade se houver derivação computada)
     - _Requirements: 3.4_

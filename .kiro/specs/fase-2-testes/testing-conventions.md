@@ -39,7 +39,7 @@ Preferir o alias do projeto:
 import { brlToCents, centsToBRL } from "@/lib/money";
 ```
 
-O alias `@/*` aponta para `./src/*` (`tsconfig.json > compilerOptions.paths`) e é resolvido em runtime pelo plugin `vite-tsconfig-paths` registrado em `vitest.config.ts`. Quando o alias não estiver disponível, usar caminho relativo curto:
+O alias `@/*` aponta para `./src/*` (`tsconfig.json > compilerOptions.paths`) e é resolvido em runtime via `resolve.tsconfigPaths: true` do Vite (config nativa, registrada em `vitest.config.ts`). Quando o alias não estiver disponível, usar caminho relativo curto:
 
 ```ts
 import { brlToCents, centsToBRL } from "./money";
@@ -271,6 +271,13 @@ Tabela confirmada pela Tarefa 3.1 lendo cada arquivo no top-level de `src/lib/`.
 - `utils.ts`: "provável puro" → `pure` confirmado.
 
 > Os subdiretórios `src/lib/hooks/`, `src/lib/security/`, `src/lib/services/`, `src/lib/validation/` não estão no escopo desta tarefa (top-level apenas). Avaliação caso a caso fica para fases consumidoras.
+
+### 4.1 Decisão sobre `utils.ts` e `constants.ts` (Tarefa 3.7)
+
+| Arquivo | Decisão | Justificativa |
+|---|---|---|
+| `src/lib/utils.ts` | **Sem `*.test.ts` nesta fase.** | Único export é `cn(...inputs: ClassValue[])` em `src/lib/utils.ts:4-6`, wrapper determinístico de `twMerge(clsx(inputs))`. Testar reproduziria os testes de `clsx` + `tailwind-merge` (ambas libs com cobertura própria upstream). Decisão registrada conforme Tarefa 3.7 do `tasks.md`. Re-avaliar se `utils.ts` ganhar lógica não-trivial em fases futuras. |
+| `src/lib/constants.ts` | **Sem `*.test.ts` nesta fase.** | Apenas literais e tuplas `as const` (ver §4 acima e o arquivo em `src/lib/constants.ts`): `PLAN_PRICES`, `*_DURATION_MS`, `MAX_*_BYTES`, `DAYS_PT`, `SITE_URL`, `*_PAGE_SIZE`. Expressões aritméticas (`30 * 24 * 60 * 60 * 1000`) são avaliadas em compile-time pelo TypeScript — não há lógica condicional ou derivação computada que justifique teste de integridade. Decisão registrada conforme Tarefa 3.7 do `tasks.md`. |
 
 ---
 
