@@ -136,7 +136,7 @@ Restrições importantes:
     - **NOTA**: rotas com `revalidate=N` em modo dev sempre re-renderizam (Next só aplica revalidate no `next start` / produção). Métricas "depois" relevantes para essas rotas viriam de produção (fora do escopo desta fase). Em dev, comportamento permanece equivalente a `force-dynamic`. Documentado em `metricas-baseline.md`.
     - _Requirements: 6.3_
 
-- [ ] 5. Wave N+1 em `getProfileBySlug` (Requirement 1)
+- [x] 5. Wave N+1 em `getProfileBySlug` (Requirement 1)
   - [x] 5.1 Refactor de `profile.service.ts > getProfileBySlug` com paginação cursor-based
     - Adicionar parâmetros `mediaCursor?: string`, `mediaPageSize?: number` (default 12, max 24), `userId?: string` ao tipo `GetProfileBySlugOptions`
     - Reescrever o corpo: profile → media (cursor) → reviews → availabilityRules → durationOptions, executados em `Promise.all` quando independentes
@@ -160,16 +160,17 @@ Restrições importantes:
     - Componente `MediaGallery` com fetch incremental fica para `fase-5-ux`; aqui apenas garantir que a estrutura aceita cursor
     - _Requirements: 1.2, 5.3_
 
-  - [ ] 5.5 Capturar métricas depois para `getProfileBySlug`
+  - [x] 5.5 Capturar métricas depois para `getProfileBySlug`
     - Mesma metodologia de 2.4
     - Registrar coluna "depois" em `metricas-baseline.md > Métricas antes/depois`
     - Confirmar: count de queries pode aumentar (1 → 4-5) MAS tempo p50 deve diminuir; se ambos pioraram, reverter
     - _Requirements: 1.5, 6.3_
 
-  - [ ] 5.6 * Implementar `src/lib/services/profile.service.pbt.ts` (Properties 2 e 3)
+  - [x] 5.6 * Implementar `src/lib/services/profile.service.pbt.ts` (Properties 2 e 3)
     - Property 2 (paginação completa+disjunta): gerador `fc.integer({ min: 0, max: 100 })` para `n`; mock do Prisma `media.findMany`
     - Property 3 (cursor monotônico): `fc.uniqueArray(fc.record({ sortOrder: fc.option(fc.integer()), id: fc.uuid() }))` com `pageSize` aleatório em [1, 12]
     - Documentar persistência de contraexemplo conforme `fase-2-testes/testing-conventions.md > §3`
+    - **VERDE**: 6/6 tests passed (1.10s, vitest 4.1.6).
     - _Requirements: 7.1, 7.3_
     - _Validates: Property 2, Property 3_
 
