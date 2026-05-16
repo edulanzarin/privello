@@ -137,24 +137,24 @@ Restrições importantes:
     - _Requirements: 6.3_
 
 - [ ] 5. Wave N+1 em `getProfileBySlug` (Requirement 1)
-  - [ ] 5.1 Refactor de `profile.service.ts > getProfileBySlug` com paginação cursor-based
+  - [x] 5.1 Refactor de `profile.service.ts > getProfileBySlug` com paginação cursor-based
     - Adicionar parâmetros `mediaCursor?: string`, `mediaPageSize?: number` (default 12, max 24), `userId?: string` ao tipo `GetProfileBySlugOptions`
     - Reescrever o corpo: profile → media (cursor) → reviews → availabilityRules → durationOptions, executados em `Promise.all` quando independentes
     - Aplicar `select` explícito em `reviews` limitando a ≤ 10 campos por relação (atende Property 4 do spec arquivado)
     - Se cursor inválido, fallback para primeira página (sem crash)
     - _Requirements: 1.2, 1.4, 1.3_
 
-  - [ ] 5.2 Adicionar export `getProfileMediaPage(slug, options)`
+  - [x] 5.2 Adicionar export `getProfileMediaPage(slug, options)`
     - Função separada que retorna `{ items, nextCursor, hasMore }` para paginação incremental do componente `MediaGallery`
     - Mesma cursor decodificação/codificação descrita em `design.md > Components and Interfaces > 6. Paginação cursor-based`
     - Usar `take: pageSize + 1` para detectar `hasMore`
     - _Requirements: 1.2, 1.4_
 
-  - [ ] 5.3 Atualizar `src/lib/services/index.ts` com novo export
+  - [x] 5.3 Atualizar `src/lib/services/index.ts` com novo export
     - Adicionar `getProfileMediaPage` na linha de `profile.service`
     - _Requirements: 5.3_
 
-  - [ ] 5.4 Atualizar consumidor `src/app/p/[slug]/page.tsx`
+  - [x] 5.4 Atualizar consumidor `src/app/p/[slug]/page.tsx`
     - Trocar import de `@/lib/queries` por `@/lib/services` para `getProfileBySlug`
     - Confirmar que o componente consome a primeira página de mídia e expõe API para `getProfileMediaPage` em chamadas subsequentes (via fetch incremental no client)
     - Componente `MediaGallery` com fetch incremental fica para `fase-5-ux`; aqui apenas garantir que a estrutura aceita cursor

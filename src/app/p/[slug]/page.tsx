@@ -16,7 +16,8 @@ import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { ShareButton } from "@/components/profile/share-button";
 import { WhatsAppButton } from "@/components/profile/whatsapp-button";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlug, getStoriesForProfile, isSubscriber, getUserReviewForProfile } from "@/lib/queries";
+import { getStoriesForProfile, isSubscriber } from "@/lib/queries";
+import { getProfileBySlug, getUserReviewForProfile } from "@/lib/services";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
@@ -67,27 +68,39 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params;
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
-  const profile = await getProfileBySlug(slug, session?.user?.id);
-  if (!profile) notFound();
-  const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
-  if (profile.isSuspended && !isAdmin) notFound();
 
+  // Resolver ownership ANTES de buscar o perfil completo, para que possamos
+  // passar `includePrivate: ownerView` ao service (Wave 5 — Req 1). Donos
+  // veem suas mídias privadas; demais usuários só veem públicas (com overlay
+  // locked para não-assinantes em fase-5).
   let isProvider = false;
-  let ownerView = false;
+  let viewerProfileId: string | null = null;
   if (session?.user?.id) {
     try {
       const viewerProfile = await prisma.profile.findUnique({
         where: { userId: session.user.id },
-        select: { id: true },
+        select: { id: true, slug: true },
       });
       if (viewerProfile) {
         isProvider = true;
-        ownerView = viewerProfile.id === profile.id;
+        if (viewerProfile.slug === slug) viewerProfileId = viewerProfile.id;
       }
     } catch {
       isProvider = session.user.role === "PROVIDER";
     }
   }
+
+  const profile = await getProfileBySlug(slug, {
+    userId: session?.user?.id,
+    // Quando o viewer é dono do perfil sendo exibido, mostramos privadas;
+    // do contrário, AC 1.2 limita a ≤ 12 itens públicos por sortOrder.
+    includePrivate: viewerProfileId != null,
+  });
+  if (!profile) notFound();
+  const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
+  if (profile.isSuspended && !isAdmin) notFound();
+
+  const ownerView = viewerProfileId != null && viewerProfileId === profile.id;
 
   // Only non-provider users can interact — providers are read-only on all profiles
   const canInteract = isLoggedIn && !ownerView && !isProvider;
