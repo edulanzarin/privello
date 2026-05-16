@@ -61,13 +61,13 @@ Restrições importantes:
     - Listar hosts encontrados em `endpoints-zod.md` (seção dedicada "Imagens externas") com ocorrência (path:linha)
     - _Requirements: 3.2_
 
-  - [~] 3.2 Editar `next.config.ts > images.remotePatterns`
+  - [x] 3.2 Editar `next.config.ts > images.remotePatterns`
     - Substituir o array atual por whitelist explícita: domínio próprio em produção (lido de `process.env.PRODUCTION_HOSTNAME`), `picsum.photos` (dev/seed), `commondatastorage.googleapis.com`, `storage.googleapis.com`, `*.googleusercontent.com`, e quaisquer outros confirmados em 3.1
     - **REMOVER** `{ protocol: "https", hostname: "**" }`
     - Comentário no arquivo cita: `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/images.md` + `node_modules/next/dist/shared/lib/image-config.d.ts:type RemotePattern`, com a data da consulta
     - _Requirements: 3.1, 3.3_
 
-  - [~] 3.3 Validar build com a whitelist final
+  - [x] 3.3 Validar build com a whitelist final
     - Rodar `npm run build` e confirmar zero falhas relacionadas a `next/image`
     - WHERE algum `<Image src>` usar host fora da whitelist, ou (a) adicionar à whitelist com justificativa, ou (b) trocar por host coberto, ou (c) registrar como `OutOfScopeFinding`
     - _Requirements: 3.4_
