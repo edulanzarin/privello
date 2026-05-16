@@ -82,7 +82,7 @@ Restrições importantes:
     - Validar `npm install` em ambiente limpo
     - _Requirements: 4.1_
 
-  - [~] 4.2 Criar `src/lib/validation/index.ts` e schemas por endpoint
+  - [x] 4.2 Criar `src/lib/validation/index.ts` e schemas por endpoint
     - Para cada Public_Input_Endpoint identificado em 4.3, criar `src/lib/validation/<endpoint>.schema.ts` com `Schema` e `type X = z.infer<typeof Schema>`
     - Schemas mínimos previstos: `UploadBodySchema`, `WaClickBodySchema`, `ReviewBodySchema`, `SignupBodySchema`, schemas para Server Actions de perfil, financeiro, suporte
     - Re-export nomeado em `index.ts`
