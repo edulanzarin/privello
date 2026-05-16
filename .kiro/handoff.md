@@ -137,7 +137,7 @@ Total: 11 commits desta sessão. Branch `master`, sem push (constraint do usuár
 
 **Followups operacionais (não-bloqueantes — herdados de fases anteriores):**
 
-1. **Documentação completa de código** — esta sessão zerou lint e documentou 4 services. **Pendente:** server actions (`src/app/_actions/*`), route handlers (`src/app/api/**`), pages RSC, componentes de produto. Ver `.kiro/NEXT_SESSION_PROMPT.md` para prompt detalhado da próxima sessão.
+1. **Documentação P1-P5 concluída** — esta sessão (P5) fechou o ciclo iniciado nas sessões anteriores. JSDoc adicionado em todos os arquivos de produto (server actions, route handlers, helpers, páginas RSC e componentes). 5 commits de documentação: `7e7f0d7` (P1 server actions), `0d11c24` (P2 route handlers), `994ff8c` (P3 helpers), `e29efc2` (P4 páginas RSC), `55cca34` (P5 componentes — 43 arquivos em `src/components/{profile,painel,discover,stories,reels,admin,marketing,onboarding,support,layout,home,solicitar}`).
 2. **`git push origin master`** dos commits desta sessão (range pós-`aedafe3`). Working tree limpo localmente.
 3. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar ADR 0003 conforme escolha.
 4. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
