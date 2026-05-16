@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2, Expand, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SUBSCRIPTION_PRICE_LABEL } from "@/lib/constants";
+import { MediaLightbox } from "@/components/profile/media-lightbox";
 
 const PAGE_SIZE = 6;
 
@@ -185,23 +186,24 @@ function PostModal({
   const curCommentCount = commentCounts[item.id] ?? item.commentCount;
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className="fixed inset-0 z-[200] overflow-y-auto bg-white sm:overflow-hidden sm:bg-black/60 sm:backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:p-4 cursor-pointer"
-      onClick={(e) => { if ((e.target as HTMLElement) === e.currentTarget) onClose(); }}
+    <MediaLightbox
+      open={true}
+      onClose={onClose}
+      className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[85vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-2xl sm:shadow-2xl cursor-default"
     >
-      <button
-        onClick={onClose}
-        className="absolute right-4 top-4 z-20 hidden min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 sm:flex"
-        aria-label="Fechar"
-      >
-        <X className="h-5 w-5" strokeWidth={1.5} />
-      </button>
-
       <div
-        className="flex min-h-full w-full flex-col bg-white sm:min-h-0 sm:h-[85vh] sm:max-w-5xl sm:flex-row sm:overflow-hidden sm:rounded-2xl sm:shadow-2xl cursor-default"
+        ref={scrollContainerRef}
+        className="flex min-h-full w-full flex-col overflow-y-auto sm:min-h-0 sm:h-full sm:flex-row sm:overflow-hidden cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 z-20 hidden min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 sm:flex"
+          aria-label="Fechar"
+        >
+          <X className="h-5 w-5" strokeWidth={1.5} />
+        </button>
+
         {/* ── Photo ── */}
         <div className="relative aspect-[3/4] w-full shrink-0 bg-black sm:aspect-auto sm:flex-1">
           <button
@@ -403,7 +405,7 @@ function PostModal({
           )}
         </div>
       </div>
-    </div>
+    </MediaLightbox>
   );
 }
 
