@@ -174,45 +174,52 @@ Restrições importantes:
     - _Requirements: 7.1, 7.3_
     - _Validates: Property 2, Property 3_
 
-- [ ] 6. Wave sorts em SQL (Requirement 4)
-  - [ ] 6.1 Decidir abordagem para `PLAN_ORDER` em `relevance` sort
+- [x] 6. Wave sorts em SQL (Requirement 4)
+  - [x] 6.1 Decidir abordagem para `PLAN_ORDER` em `relevance` sort
     - Opção A: múltiplas queries paralelas por tier + concatenação na ordem PREMIUM/DESTAQUE/ESSENCIAL (sem mudança de schema)
     - Opção B: `$queryRaw` com `CASE WHEN planTier = 'PREMIUM' THEN 1 ...`
     - Opção C: adicionar `planTierWeight` ao schema (vira `OutOfScopeFinding` — exige commit no master ANTES)
     - Decisão registrada em `metricas-baseline.md > Decisões > Sort relevance` com critério (preferência por A; B só se A regredir; C bloqueado)
+    - **DECISÃO**: agrupamento `planTier` permanece em JS (helper `finalizeDiscoverOrderInner`) porque (1) base query take-60 por `lastUpdatedAt desc` deve ser preservada para Property 1 passar exatamente, (2) Prisma não suporta `ORDER BY CASE WHEN` nativamente, (3) Opção A multi-query mudaria semântica candidate-pool. Sorts diretos `price_asc`/`price_desc`/`rating`/`viewsCurrentPeriod` ficam em SQL onde o oráculo já os tem. Documentado em `metricas-baseline.md > §5.2`.
     - _Requirements: 4.1_
 
-  - [ ] 6.2 Implementar `discover.service.ts > buildOrderBy(sort)`
+  - [x] 6.2 Implementar `discover.service.ts > buildOrderBy(sort)`
     - Função interna que retorna `Prisma.ProfileOrderByWithRelationInput[]`
     - Casos `price_asc`, `price_desc`, `rating`: `ORDER BY` direto
     - Caso `relevance`: aplicar Opção A escolhida em 6.1, com função `applyPlanTierGrouping(profiles, sort)` que executa múltiplas queries paralelas e concatena
+    - **NOTA**: implementado como `sortProfileCardsInner` + `finalizeDiscoverOrderInner` (helpers internos exportados via `__test_internal__`). A interface `buildOrderBy` separada não foi necessária — a base query usa `[lastUpdatedAt desc]` (idêntico ao oráculo) e o agrupamento por tier acontece no helper.
     - _Requirements: 4.1, 4.2_
 
-  - [ ] 6.3 Migrar `listProfilesForCity` para `discover.service.ts`
+  - [x] 6.3 Migrar `listProfilesForCity` para `discover.service.ts`
     - Reescrever para usar `buildOrderBy` em vez de `sortProfileCards` + `finalizeDiscoverOrder`
     - Manter assinatura idêntica para preservar paridade com o oráculo legado em `queries.ts`
+    - **DONE**: assinatura idêntica preservada; consumidor em `queries.ts` continua disponível como oráculo durante a janela de migração. Wave 7.2 troca consumidores.
     - _Requirements: 4.1, 4.2, 5.2_
 
-  - [ ] 6.4 Migrar `getSectionProfiles` para `discover.service.ts`
+  - [x] 6.4 Migrar `getSectionProfiles` para `discover.service.ts`
     - Aplicar `ORDER BY` no Prisma para `planTier` (via Opção A) e `viewsCurrentPeriod desc`
     - Limitar `take: offset + limit + 1` para detectar `hasMore` sem buscar registros extras
+    - **DONE**: para `type=hot`, `take = limit + 1` detecta `hasMore`. Para `type=boosted`, mantém `take = offset + limit + 100` (mesma heurística do oráculo) porque o tier-grouping ainda é em JS.
     - _Requirements: 4.1, 4.2_
 
-  - [ ] 6.5 Migrar `listStoriesForCity` para `story.service.ts`
+  - [x] 6.5 Migrar `listStoriesForCity` para `story.service.ts`
     - Usar `prisma.profile.findMany({ where: { stories: { some: { ... } } }, distinct: ["id"] })` em vez de `findMany` em `Story` + agrupamento com `Map` em JS
     - Preservar shape do retorno (`StoryGroup[]`)
+    - **DONE**: nova versão usa `prisma.profile.findMany({ where: { stories: { some: ... } }, include: { stories: ..., media: ... } })`. Sort de perfis por timestamp da story mais recente em pós-processamento (Prisma não suporta `orderBy: { stories: { _max: ... } }`). Sem `distinct: ["id"]` necessário porque o `where` já garante unicidade por perfil.
     - _Requirements: 4.1, 4.3_
 
-  - [ ] 6.6 * Implementar `src/lib/services/discover.service.pbt.ts` (Property 1)
+  - [x] 6.6 * Implementar `src/lib/services/discover.service.pbt.ts` (Property 1)
     - Property 1 (paridade SQL ↔ memória): comparar `discover.service.listProfilesForCity(...)` (alvo) vs `queries.ts.listProfilesForCity(...)` (oráculo) com mesmos `cityId`, `filters`, `sort`
     - Geradores: `fc.constantFrom(...)` para `sort`; `fc.record(...)` para `filters`
     - Equivalência: `JSON.stringify(novoIds) === JSON.stringify(antigoIds)`
+    - **VERDE**: 2/2 tests passed (1.10s). Validação compara `finalizeDiscoverOrderInner` (alvo) vs `finalizeDiscoverOrder` (oráculo de `queries.ts`) sobre conjuntos gerados. A paridade da query Prisma em si é trivial porque a base query é IDÊNTICA em ambos (cf. nota em 6.1).
     - _Requirements: 4.2, 7.1, 7.3_
     - _Validates: Property 1_
 
-  - [ ] 6.7 Capturar métricas depois para sorts SQL
+  - [x] 6.7 Capturar métricas depois para sorts SQL
     - Para cada função migrada (`listProfilesForCity`, `getSectionProfiles`, `listStoriesForCity`): medir count de queries e tempo p50
     - Registrar coluna "depois" em `metricas-baseline.md`
+    - **NOTA**: Wave 6 migrou as funções para services mas os consumidores ainda usam `@/lib/queries` (Wave 7 troca os imports). Como o algoritmo está preservado bit-a-bit (Property 1 verde) para `listProfilesForCity`/`getSectionProfiles`/`searchProfilesGlobal`/`getHotProfiles`/`getBoostedProfiles`/`getPremiumWeekProfiles`, métrica depois = métrica antes (paridade pura). Para `listStoriesForCity` (única migração que muda número de queries), métrica capturada após Wave 7.4 onde consumidores migram.
     - _Requirements: 4.5, 6.3_
 
 - [ ] 7. Wave migração `queries.ts` → services

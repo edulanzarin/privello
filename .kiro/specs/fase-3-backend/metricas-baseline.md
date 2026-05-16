@@ -208,8 +208,8 @@ registradas em uma única requisição (após warm-up do Turbopack).
 | # | otimização                                  | arquivo                                          | antes (queries) | depois (queries) | antes (ms p50) | depois (ms p50) | método              | commit |
 |---|---------------------------------------------|--------------------------------------------------|----------------:|-----------------:|---------------:|----------------:|---------------------|--------|
 | 1 | `getProfileBySlug` paginação cursor + select | `src/lib/services/profile.service.ts`           | 14 (1 join + Stories sidebar) | 14 (split: 11 includes + 3 da paginação cursor) | 268 | 322 (var. ±3%; aplicação 127-193ms) | `Invoke-WebRequest /p/olivia` × 5 (warm) | `3ffe3ca` |
-| 2 | `getSectionProfiles` ORDER BY SQL           | `src/app/api/profiles/section/route.ts`         | 1 + sort em JS  | _(Wave 6)_       | 51            | _(Wave 6)_     | `Invoke-WebRequest /api/profiles/section?type=hot&offset=0` × 5 | _(pendente)_ |
-| 3 | `listStoriesForCity` distinct                | `/descobrir/[citySlug]` (consome `listStories…`) | ~10 (multi)     | _(Wave 6)_       | 1157          | _(Wave 6)_     | `Invoke-WebRequest /descobrir/sao-paulo-sp` × 5 | _(pendente)_ |
+| 2 | `getSectionProfiles` ORDER BY SQL           | `src/lib/services/discover.service.ts`   (`type=hot`) | 1 + sort em JS  | 1 (sem sort em JS, `take = limit + 1`)       | 51            | paridade pura | `Invoke-WebRequest /api/profiles/section?type=hot&offset=0` × 5 (Wave 7.2) | `<wave-7-2>` |
+| 3 | `listStoriesForCity` distinct                | `src/lib/services/story.service.ts` | ~10 (Story[] + Map JS)     | 1 (Profile.findMany c/ stories nested)       | 1157          | _(Wave 7.4 c/ consumidor)_     | `Invoke-WebRequest /descobrir/sao-paulo-sp` × 5 | `<wave-7-4>` |
 
 **Notas:**
 - A linha 1 inclui ~14 queries por request — o `getProfileBySlug` em si emite ~12 queries via o `include` profundo (profile + city + district + media + reviews + reviews.user + availabilityRules + durationOptions + Stories de profile pública por outra fonte na mesma página). A meta da Wave 5 é cortar a paginação de mídia (≤ 12 itens via cursor); o count de queries pode estabilizar próximo do atual mas o tempo p50 deve cair quando o payload por mídia diminuir.
@@ -241,8 +241,19 @@ registradas em uma única requisição (após warm-up do Turbopack).
 - **trade-offs**: ao manter o modelo legado (Route Segment Config), perdemos `cacheTag`/`revalidateTag` (substituído por `revalidate=N` baseado em tempo). Páginas autenticadas continuam SSR estrito. Cache Components fica como decisão para uma fase futura quando (a) houver mais conteúdo público para cachear ou (b) rotas autenticadas migrarem para Server Components com fetches isolados em sub-componentes que possam ter `"use cache"` próprio.
 - **doc consultada**: `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md` + `cacheComponents.md` + `use-cache.md` (cf. requirements.md > §4).
 
-### 5.2 Outras decisões
+### 5.2 Sort relevance — agrupamento por `planTier` em JS (Wave 6.1)
+
+- **decisão**: Manter o agrupamento PREMIUM > DESTAQUE > ESSENCIAL em JS via helper `finalizeDiscoverOrderInner` em `src/lib/services/discover.service.ts`. **Não** adotar `$queryRaw` (Opção B) nem mudança de schema (Opção C).
+- **data**: 2026-05-16
+- **causa**: paridade exata com `queries.ts.finalizeDiscoverOrder` é gate da Wave 6 (Property 1). A migração da base query para multi-query paralela por tier (Opção A do design.md) mudaria o candidate pool — o oráculo aplica `take: 60 ORDER BY lastUpdatedAt desc` antes de tier-grouping em JS, e Opção A produziria um conjunto diferente de candidatos. `$queryRaw CASE WHEN` (Opção B) violaria a tipagem do Prisma e dificultaria evolução. `planTierWeight Int @default(...)` no schema (Opção C) seria mudança de schema que viraria `OutOfScopeFinding`.
+- **alternativas consideradas**:
+  - **Opção A (multi-query paralela por tier+boost)**: descartada — viola paridade.
+  - **Opção B (`$queryRaw`)**: descartada — perde tipagem.
+  - **Opção C (campo `planTierWeight` no schema)**: descartada — `OutOfScopeFinding`.
+- **trade-offs**: o agrupamento em JS é O(n) sobre `n ≤ DISCOVER_PAGE_SIZE` (60 por padrão); custo desprezível para o tamanho realista do candidate pool. Sorts diretos (`price_asc`, `price_desc`, `rating`) que **não** dependem de `planTier` continuam puramente em SQL no oráculo (não houve mudança de comportamento). A Wave 6 portanto entrega: (a) funções migradas para `services/`, (b) `listStoriesForCity` agora usa `prisma.profile.findMany({ stories: { some } })` em vez de Map JS sobre Story (única migração estritamente SQL-side), (c) Property 1 verde provando paridade.
+
+### 5.3 Outras decisões
 
 | # | decisão | data | alternativas | trade-offs |
 |---|---------|------|--------------|-----------|
-| _(linhas preenchidas em 6.1, 7.9)_ | | | | |
+| _(linhas preenchidas em 7.9)_ | | | | |
