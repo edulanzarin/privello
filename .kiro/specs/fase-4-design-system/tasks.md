@@ -225,40 +225,40 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Não é modal — é drawer com transição lateral. Decisão preliminar do design: **manter como caso à parte; refactor para `<Drawer>` é tarefa potencial fora da Fase 4**. Registrar como nota em `tokens.md > Out of scope desta fase`
     - _Requirements: 5.5_
 
-- [ ] 9. Consolidação de fluxo de upload duplicado
-  - [ ] 9.1 Decidir expansão de `useFileUpload` para suportar XHR com progresso
+- [x] 9. Consolidação de fluxo de upload duplicado
+  - [x] 9.1 Decidir expansão de `useFileUpload` para suportar XHR com progresso
     - Atualmente o hook usa `fetch` (sem progresso real). Para cobrir `src/components/painel/reels-manager.tsx:52` (XHR com `xhr.upload.onprogress`), expandir API
     - Adicionar `strategy?: "fetch" | "xhr"` (default `"fetch"`) e `onProgress?: (percent: number) => void`
     - Implementar branch XHR no hook quando `strategy === "xhr"`
     - _Requirements: 5.4_
 
-  - [ ] 9.2 Migrar `src/components/painel/media-manager.tsx:126`
+  - [x] 9.2 Migrar `src/components/painel/media-manager.tsx:126`
     - `fetch("/api/upload", ...)` → `useFileUpload({ endpoint: "/api/upload", onError: (e) => toast(e, "error") })`
     - _Requirements: 5.4_
 
-  - [ ] 9.3 Migrar `src/app/painel/perfil/perfil-editor.tsx:128` e `:144`
+  - [x] 9.3 Migrar `src/app/painel/perfil/perfil-editor.tsx:128` e `:144`
     - Caso `:144` é `/api/upload-audio` — endpoint distinto, mesma estrutura
     - `useFileUpload({ endpoint: "/api/upload" })` para `:128`; `useFileUpload({ endpoint: "/api/upload-audio" })` para `:144`
     - _Requirements: 5.4_
 
-  - [ ] 9.4 Migrar `src/app/painel/midias/midias-manager.tsx:128`
+  - [x] 9.4 Migrar `src/app/painel/midias/midias-manager.tsx:128`
     - `useFileUpload({ endpoint: "/api/upload" })`
     - _Requirements: 5.4_
 
-  - [ ] 9.5 Migrar `src/app/painel/stories/stories-manager.tsx:63`
+  - [x] 9.5 Migrar `src/app/painel/stories/stories-manager.tsx:63`
     - `useFileUpload({ endpoint: "/api/upload" })`
     - _Requirements: 5.4_
 
-  - [ ] 9.6 Migrar `src/app/conta/onboarding/fotos/photo-uploader.tsx:33`
+  - [x] 9.6 Migrar `src/app/conta/onboarding/fotos/photo-uploader.tsx:33`
     - `useFileUpload({ endpoint: "/api/upload" })`
     - _Requirements: 5.4_
 
-  - [ ] 9.7 Migrar `src/components/painel/reels-manager.tsx:52` (XHR com progresso)
+  - [x] 9.7 Migrar `src/components/painel/reels-manager.tsx:52` (XHR com progresso)
     - `useFileUpload({ endpoint: "/api/upload", strategy: "xhr", onProgress: setUploadProgress })`
     - Validar que o progresso continua sendo emitido em tempo real
     - _Requirements: 5.4_
 
-  - [ ] 9.8 Migrar `src/app/conta/verificacao/page.tsx:138` (`/api/upload/verification`)
+  - [x] 9.8 Migrar `src/app/conta/verificacao/page.tsx:138` (`/api/upload/verification`)
     - `useFileUpload({ endpoint: "/api/upload/verification" })`
     - _Requirements: 5.4_
 

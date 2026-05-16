@@ -7,6 +7,7 @@ import { ImagePlus, Video, Clapperboard, BookImage, Lock, Loader2, Trash2, Star 
 import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
 import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 type Media = { id: string; url: string; isPublic: boolean; isCover: boolean; mediaType?: string };
@@ -20,10 +21,10 @@ type Props = {
 };
 
 const TABS = [
-  { key: "fotos",    label: "Fotos",    icon: ImagePlus   },
-  { key: "videos",   label: "Vídeos",   icon: Video       },
-  { key: "reels",    label: "Reels",    icon: Clapperboard },
-  { key: "stories",  label: "Stories",  icon: BookImage   },
+  { key: "fotos", label: "Fotos", icon: ImagePlus },
+  { key: "videos", label: "Vídeos", icon: Video },
+  { key: "reels", label: "Reels", icon: Clapperboard },
+  { key: "stories", label: "Stories", icon: BookImage },
 ] as const;
 
 type TabKey = typeof TABS[number]["key"];
@@ -109,22 +110,27 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
   const [activeTab, setActiveTab] = useState<TabKey>("fotos");
   const [uploading, setUploading] = useState(false);
   const [storyPending, startStoryTransition] = useTransition();
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload",
+    onError: (msg) => toast(msg, "error"),
+  });
 
   // Filter by type
-  const pubImages  = publicPhotos.filter((m) => !isVideo(m.url, m.mediaType));
-  const pubVideos  = publicPhotos.filter((m) => isVideo(m.url, m.mediaType) && m.mediaType !== "REEL");
-  const pubReels   = publicPhotos.filter((m) => m.mediaType === "REEL");
+  const pubImages = publicPhotos.filter((m) => !isVideo(m.url, m.mediaType));
+  const pubVideos = publicPhotos.filter((m) => isVideo(m.url, m.mediaType) && m.mediaType !== "REEL");
+  const pubReels = publicPhotos.filter((m) => m.mediaType === "REEL");
 
   async function uploadFiles(files: FileList | null, isPublic: boolean, mediaType = "IMAGE") {
     if (!files?.length) return;
     setUploading(true);
     for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.set("file", file);
-      fd.set("isPublic", String(isPublic));
-      fd.set("mediaType", mediaType);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!res.ok) { const d = await res.json(); toast(d.error ?? "Erro ao enviar.", "error"); break; }
+      const data = await upload(file, {
+        isPublic: String(isPublic),
+        mediaType,
+      });
+      if (!data) {
+        break;
+      }
     }
     setUploading(false);
     toast("Arquivo adicionado.");

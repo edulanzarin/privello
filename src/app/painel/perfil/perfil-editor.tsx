@@ -13,6 +13,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 
 const LANGUAGE_OPTIONS = [
   { value: "PT", label: "Português" },
@@ -118,17 +119,21 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const publicPhotos = profile.media.filter((m) => m.isPublic);
   const privatePhotos = profile.media.filter((m) => !m.isPublic);
 
+  const { upload: uploadPhoto } = useFileUpload({
+    endpoint: "/api/upload",
+    onError: (msg) => toast(msg, "error"),
+  });
+  const { upload: uploadAudioFile } = useFileUpload({
+    endpoint: "/api/upload-audio",
+    onError: (msg) => toast(msg, "error"),
+  });
+
   async function uploadFiles(files: FileList | null, isPublic: boolean) {
     if (!files?.length) return;
     setUploading(true);
     for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.set("file", file);
-      fd.set("isPublic", String(isPublic));
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!res.ok) {
-        const d = await res.json();
-        toast(d.error ?? "Erro ao enviar foto.", "error");
+      const data = await uploadPhoto(file, { isPublic: String(isPublic) });
+      if (!data) {
         break;
       }
     }
@@ -139,12 +144,11 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
   async function uploadAudio(file: File) {
     setAudioUploading(true);
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await fetch("/api/upload-audio", { method: "POST", body: fd });
-    const data = await res.json();
-    if (!res.ok) { toast(data.error ?? "Erro ao enviar áudio.", "error"); }
-    else { setAudioUrl(data.url); toast("Áudio salvo com sucesso."); }
+    const data = await uploadAudioFile(file);
+    if (data?.url) {
+      setAudioUrl(data.url as string);
+      toast("Áudio salvo com sucesso.");
+    }
     setAudioUploading(false);
   }
 
@@ -394,11 +398,10 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   key={lang.value}
                   type="button"
                   onClick={() => toggleLang(lang.value)}
-                  className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
-                    selectedLangs.includes(lang.value)
-                      ? "border-foreground bg-foreground text-white"
-                      : "border-line bg-white text-muted hover:border-foreground/30"
-                  }`}
+                  className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${selectedLangs.includes(lang.value)
+                    ? "border-foreground bg-foreground text-white"
+                    : "border-line bg-white text-muted hover:border-foreground/30"
+                    }`}
                 >
                   {lang.label}
                 </button>

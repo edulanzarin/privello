@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Camera, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 type Props = { coverUrl: string | null };
@@ -14,6 +15,10 @@ export function ProfilePhotoUploader({ coverUrl }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const router = useRouter();
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload",
+    onError: setError,
+  });
 
   const displayUrl = previewUrl ?? coverUrl;
 
@@ -25,19 +30,8 @@ export function ProfilePhotoUploader({ coverUrl }: Props) {
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
 
-    const fd = new FormData();
-    fd.set("file", file);
-    fd.set("isPublic", "true");
-
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao enviar foto.");
-        setPreviewUrl(null);
-      }
-    } catch {
-      setError("Erro de conexão.");
+    const data = await upload(file, { isPublic: "true" });
+    if (!data) {
       setPreviewUrl(null);
     }
 

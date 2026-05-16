@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Trash2, Eye, Heart, Clock, Plus } from "lucide-react";
 import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 type Story = {
@@ -34,6 +35,10 @@ function timeLeft(exp: Date) {
 export function StoriesManager({ activeStories, expiredStories }: Props) {
   const router = useRouter();
   const { toast } = useToast();
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload",
+    onError: (msg) => toast(msg, "error"),
+  });
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
@@ -54,21 +59,16 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
     setUploading(true);
 
     const isVideo = selectedFile.type.startsWith("video");
-    const fd = new FormData();
-    fd.set("file", selectedFile);
-    fd.set("isPublic", "true");
-    fd.set("purpose", "story");
-    fd.set("mediaType", isVideo ? "VIDEO" : "IMAGE");
-
-    const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
-    if (!uploadRes.ok) {
-      const d = await uploadRes.json();
-      toast(d.error ?? "Erro ao enviar.", "error");
+    const data = await upload(selectedFile, {
+      isPublic: "true",
+      purpose: "story",
+      mediaType: isVideo ? "VIDEO" : "IMAGE",
+    });
+    if (!data) {
       setUploading(false);
       return;
     }
-    const data = await uploadRes.json();
-    const mediaUrl = data.url ?? data.media?.url;
+    const mediaUrl = (data.url as string | undefined) ?? (data.media as { url?: string } | undefined)?.url;
     if (!mediaUrl) {
       toast("Erro ao obter URL do arquivo.", "error");
       setUploading(false);

@@ -11,6 +11,7 @@ import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
 import { useToast } from "@/components/ui/toast";
 import { Switch } from "@/components/ui/switch";
 import { Modal } from "@/components/ui/modal";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 type Media = {
@@ -48,6 +49,10 @@ function sortMedia(arr: Media[]): Media[] {
 export function MidiasManager({ publicMedia, privateMedia, privateCount, profileSlug }: Props) {
   const router = useRouter();
   const { toast } = useToast();
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload",
+    onError: (msg) => toast(msg, "error"),
+  });
 
   const [visTab, setVisTab] = useState<VisTab>("publica");
   const [typeTab, setTypeTab] = useState<TypeTab>("todos");
@@ -120,15 +125,15 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
     setUploading(true);
     let ok = 0;
     for (const file of pendingFiles) {
-      const fd = new FormData();
-      fd.set("file", file);
-      fd.set("isPublic", String(uploadPublic));
-      // Auto-detect media type from file
       const detectedType = file.type.startsWith("video") ? "VIDEO" : "IMAGE";
-      fd.set("mediaType", detectedType);
-      fd.set("caption", caption);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (!res.ok) { const d = await res.json(); toast(d.error ?? "Erro ao enviar.", "error"); break; }
+      const data = await upload(file, {
+        isPublic: String(uploadPublic),
+        mediaType: detectedType,
+        caption,
+      });
+      if (!data) {
+        break;
+      }
       ok++;
     }
     setUploading(false);

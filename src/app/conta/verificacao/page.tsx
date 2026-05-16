@@ -8,6 +8,7 @@ import {
   FileText, Video, BadgeCheck, ChevronRight, AlertCircle,
 } from "lucide-react";
 import { submitVerificationCase } from "@/app/_actions/verification";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -129,22 +130,31 @@ export default function ContaVerificacaoPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const inputRefs = useRef<Partial<Record<FieldKey, HTMLInputElement | null>>>({});
 
+  // Captura por slot do erro reportado pelo hook (estado de uploading muda dentro do hook)
+  const pendingKeyRef = useRef<FieldKey | null>(null);
+  const pendingPreviewRef = useRef<string | undefined>(undefined);
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload/verification",
+    onError: (msg) => {
+      const key = pendingKeyRef.current;
+      const previewObjectUrl = pendingPreviewRef.current;
+      if (key) {
+        setSlots((s) => ({ ...s, [key]: { url: "", uploading: false, error: msg, previewObjectUrl } }));
+      }
+    },
+  });
+
   async function uploadFile(key: FieldKey, file: File) {
     const previewObjectUrl = file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined;
     setSlots((s) => ({ ...s, [key]: { url: "", uploading: true, previewObjectUrl } }));
-    const fd = new FormData();
-    fd.append("file", file);
-    try {
-      const res = await fetch("/api/upload/verification", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        setSlots((s) => ({ ...s, [key]: { url: "", uploading: false, error: data.error ?? "Erro no upload.", previewObjectUrl } }));
-      } else {
-        setSlots((s) => ({ ...s, [key]: { url: data.url, uploading: false, previewObjectUrl } }));
-      }
-    } catch {
-      setSlots((s) => ({ ...s, [key]: { url: "", uploading: false, error: "Erro de conexão.", previewObjectUrl } }));
+    pendingKeyRef.current = key;
+    pendingPreviewRef.current = previewObjectUrl;
+    const data = await upload(file);
+    if (data?.url) {
+      setSlots((s) => ({ ...s, [key]: { url: data.url as string, uploading: false, previewObjectUrl } }));
     }
+    pendingKeyRef.current = null;
+    pendingPreviewRef.current = undefined;
   }
 
   function clearSlot(key: FieldKey) {

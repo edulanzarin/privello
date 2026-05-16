@@ -6,6 +6,7 @@ import { Clapperboard, Eye, EyeOff, Lock, Loader2, Play, Trash2, Upload, X } fro
 import { createReel, deleteReel, toggleReelPrivacy } from "@/app/_actions/reels";
 import { useToast } from "@/components/ui/toast";
 import { Switch } from "@/components/ui/switch";
+import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
 type Reel = { id: string; url: string; caption: string | null; isPublic: boolean };
@@ -22,6 +23,12 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const { upload } = useFileUpload({
+    endpoint: "/api/upload",
+    strategy: "xhr",
+    onProgress: setUploadProgress,
+    onError: (msg) => toast(msg, "error"),
+  });
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -43,34 +50,20 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
     setUploading(true);
     setUploadProgress(0);
 
-    const fd = new FormData();
-    fd.append("file", selectedFile);
-    fd.append("mediaType", "REEL");
-    fd.append("isPublic", "true");
-
-    const url = await new Promise<string | null>((resolve) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/api/upload");
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) setUploadProgress(Math.round((e.loaded / e.total) * 100));
-      };
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          resolve(data.url ?? data.media?.url ?? null);
-        } else {
-          const data = JSON.parse(xhr.responseText);
-          toast(data.error ?? "Erro no upload.", "error");
-          resolve(null);
-        }
-      };
-      xhr.onerror = () => { toast("Erro de conexão.", "error"); resolve(null); };
-      xhr.send(fd);
+    const data = await upload(selectedFile, {
+      mediaType: "REEL",
+      isPublic: "true",
     });
 
     setUploading(false);
     setUploadProgress(0);
-    if (!url) return;
+    if (!data) return;
+
+    const url = (data.url as string | undefined) ?? (data.media as { url?: string } | undefined)?.url ?? null;
+    if (!url) {
+      toast("Erro ao obter URL do reel.", "error");
+      return;
+    }
 
     clearPreview();
 
