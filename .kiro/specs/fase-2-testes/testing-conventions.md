@@ -293,6 +293,8 @@ Lista confirmada pela Tarefa 4.1 lendo cada módulo classificado como `pure` ou 
 
 **Consequência:** Property 1 do `design.md > Correctness Properties` é **não declarável** com a API atual. A Tarefa 4.2, que prevê `src/lib/money.pbt.ts`, vai precisar ser revista (sem par, sem `.pbt.ts` artificial). A introdução de `brlToCents`/`centsToBRL` é um `OutOfScopeFinding` candidato para `fase-3-backend` (camada financeira) — registrar em `requirements.md > §3` quando a Tarefa 4.2 chegar.
 
+> **Nota (Tarefa 4.2 executada):** `money.ts` exporta apenas `formatBrl(number) → string`; nenhum parser inverso existe. Round-trip como originalmente especificado em `design.md > Property 1` é **não declarável**. Em vez de pular o módulo, `src/lib/money.pbt.ts` declara um invariante mais fraco que preserva o espírito da Property 1: `formatBrl(value)` começa com `"R$"` e preserva os dígitos de `value` na saída (ignorando NBSP e separador de milhar). Out-of-scope desta fase: introduzir `parseBrl` (ou um par `brlToCents`/`centsToBRL`) destravaria a Property 1 canônica — registrado como **candidato a refactor** para `fase-3-backend` se a camada financeira precisar.
+
 ### 5.2 `src/lib/discover-params.ts` — Property 2 (round-trip filtros ↔ URLSearchParams)
 
 **Status: não declarável como round-trip estrito.**

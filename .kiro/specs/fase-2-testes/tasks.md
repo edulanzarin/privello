@@ -104,7 +104,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - WHERE um módulo da lista alvo (Property 1–6 do `design.md > Correctness Properties`) não tiver par aplicável, anotar como **não declarável** com justificativa
     - _Requirements: 4.2, 4.4_
 
-  - [~] 4.2 * Implementar `src/lib/money.pbt.ts` (Property 1)
+  - [x] 4.2 * Implementar `src/lib/money.pbt.ts` (Property 1)
     - `test.prop([fc.integer({ min: 0, max: 99_999_900 })])` validando `brlToCents(centsToBRL(c)) === c`
     - Comentar a seed se a fixar; caso contrário, default `numRuns: 100`
     - _Requirements: 4.1, 4.3, 4.5_
