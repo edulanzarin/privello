@@ -1,3 +1,22 @@
+/**
+ * Página RSC — Perfil do cliente logado (favoritos, assinatura, dados).
+ *
+ * Rota: `/conta/perfil`.
+ * Tipo: Server Component.
+ * Auth: cliente logado (não-logado redirecionado para `/entrar`; provider
+ *  redirecionado para `/painel`).
+ * Cache: `force-dynamic` (lê `auth()` + favoritos + assinatura).
+ *
+ * Header com avatar e dados, banner de assinatura, stats e lista de
+ * `Favorite`s ativos do cliente.
+ *
+ * Cross-refs:
+ * - src/app/_actions/favorites.ts (getClientFavorites)
+ * - src/lib/services/subscription.service.ts (isSubscriber)
+ * - src/app/conta/perfil/favorites-list.tsx
+ * - src/app/conta/perfil/client-avatar-upload.tsx
+ * - src/app/conta/perfil/client-profile-edit.tsx
+ */
 import { redirect } from "next/navigation";
 import { Heart, LogOut, Crown, Lock, Eye, Calendar } from "lucide-react";
 import Link from "next/link";

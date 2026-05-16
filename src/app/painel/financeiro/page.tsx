@@ -1,3 +1,21 @@
+/**
+ * Página RSC — Painel do provider: gestão financeira (Premium-only).
+ *
+ * Rota: `/painel/financeiro`.
+ * Tipo: Server Component (form de adicionar é server action).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`;
+ *  feature-gate adicional: apenas plano `PREMIUM` (mostra paywall caso contrário).
+ * Cache: `force-dynamic` (totais por mês corrente).
+ *
+ * Lista os `FinancialRecord` do mês corrente e oferece formulário de
+ * registro de novo encontro (incl. no-show).
+ *
+ * Cross-refs:
+ * - src/app/painel/layout.tsx
+ * - src/lib/services/financial.service.ts (listFinancialRecordsForMonth)
+ * - src/app/painel/_actions/provider-settings.ts (addFinancialRecord)
+ * - src/app/painel/financeiro/financial-table.tsx
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Diamond } from "lucide-react";

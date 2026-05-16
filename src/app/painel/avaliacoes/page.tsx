@@ -1,3 +1,17 @@
+/**
+ * Página RSC — Painel do provider: avaliações recebidas.
+ *
+ * Rota: `/painel/avaliacoes`.
+ * Tipo: Server Component.
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lista pode mudar a qualquer momento).
+ *
+ * Sumário (média, total, distribuição) + lista cronológica de `Review`s.
+ *
+ * Cross-refs:
+ * - src/app/painel/layout.tsx
+ * - src/app/api/review/route.ts
+ */
 import { redirect } from "next/navigation";
 import { Star, MessageSquare, TrendingUp } from "lucide-react";
 import { auth } from "@/lib/auth";

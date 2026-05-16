@@ -1,3 +1,20 @@
+/**
+ * Página RSC — Pricing de assinatura para clientes (R$19,90/mês).
+ *
+ * Rota: `/assinar`.
+ * Tipo: Server Component.
+ * Auth: cliente logado (não-cliente é redirecionado para `/entrar`; já
+ *  assinante é redirecionado para `from` ou `/`).
+ * Cache: `force-dynamic` (lê `auth()` + `isSubscriber`).
+ *
+ * Página comercial de assinatura com perks e CTA para o checkout do
+ * Mercado Pago via componente `SubscribeButton`.
+ *
+ * Cross-refs:
+ * - src/lib/services/subscription.service.ts (isSubscriber)
+ * - src/app/assinar/subscribe-button.tsx
+ * - src/app/api/mp/checkout/route.ts
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Check, Lock, ImageIcon, Film, Star } from "lucide-react";

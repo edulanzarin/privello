@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: gerenciamento de mídias (fotos/vídeos).
+ *
+ * Rota: `/painel/midias`.
+ * Tipo: Server Component (manager é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lista de `Media` muda a cada upload/edição).
+ *
+ * Carrega todas as `Media` (públicas e privadas) e delega manipulação
+ * (upload, reorder, toggle público) ao `MidiasManager`.
+ *
+ * Cross-refs:
+ * - src/app/painel/midias/midias-manager.tsx
+ * - src/app/api/upload/route.ts
+ */
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

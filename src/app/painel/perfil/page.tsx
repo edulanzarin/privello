@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: editor de perfil.
+ *
+ * Rota: `/painel/perfil`.
+ * Tipo: Server Component (editor é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lê estado atual do `Profile` + stories ativos).
+ *
+ * Carrega `Profile` completo + mídias + stories das últimas 24h e delega
+ * a edição ao `PerfilEditor`.
+ *
+ * Cross-refs:
+ * - src/app/painel/perfil/perfil-editor.tsx
+ * - src/app/painel/_actions/provider-settings.ts
+ */
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

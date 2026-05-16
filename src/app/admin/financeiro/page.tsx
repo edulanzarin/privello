@@ -1,3 +1,19 @@
+/**
+ * Página RSC — Admin financeiro (MRR, planos, assinaturas).
+ *
+ * Rota: `/admin/financeiro`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
+ * Cache: `force-dynamic` (snapshot por request).
+ *
+ * Renderiza KPIs de MRR estimado, breakdown por plano de acompanhante e lista
+ * de assinaturas de clientes ativas/expiradas/canceladas.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx (gate ADMIN/MODERATOR)
+ * - src/components/admin/admin-shell.tsx
+ * - src/lib/prisma.ts
+ */
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 

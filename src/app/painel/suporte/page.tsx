@@ -1,3 +1,17 @@
+/**
+ * Página RSC — Painel do provider: lista de tickets de suporte + abrir novo.
+ *
+ * Rota: `/painel/suporte`.
+ * Tipo: Server Component (form de criação dispara server action).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lista filtra por `userId` da sessão).
+ *
+ * Form de novo ticket + histórico próprio.
+ *
+ * Cross-refs:
+ * - src/app/_actions/support.ts (openTicket)
+ * - src/app/painel/suporte/[id]/page.tsx
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { MessageCircle, Plus } from "lucide-react";

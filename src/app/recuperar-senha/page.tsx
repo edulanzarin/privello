@@ -1,5 +1,20 @@
 "use client";
 
+/**
+ * Página RSC — Solicitar recuperação de senha por e-mail.
+ *
+ * Rota: `/recuperar-senha`.
+ * Tipo: Client Component (`"use client"`).
+ * Auth: público.
+ * Cache: default (Client Component).
+ *
+ * Formulário de e-mail; chama o server action `requestPasswordReset` e
+ * mostra confirmação genérica (não vaza se o e-mail existe).
+ *
+ * Cross-refs:
+ * - src/app/_actions/password-reset.ts (requestPasswordReset)
+ * - src/app/recuperar-senha/[token]/page.tsx
+ */
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { requestPasswordReset } from "@/app/_actions/password-reset";

@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Feed de Reels filtrado por perfil.
+ *
+ * Rota: `/reels/[slug]`.
+ * Tipo: Server Component (feed é Client).
+ * Auth: público (lê `auth()` para personalizar UI quando cliente).
+ * Cache: `force-dynamic` (lista personalizada por sessão).
+ *
+ * Top-bar com identidade do perfil + `ReelsFeed` filtrado pelo `profileId`.
+ *
+ * Cross-refs:
+ * - src/lib/services/reels.service.ts (listReels)
+ * - src/lib/services/subscription.service.ts (isSubscriber)
+ * - src/components/reels/reels-feed.tsx
+ */
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";

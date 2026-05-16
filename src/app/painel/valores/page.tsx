@@ -1,3 +1,17 @@
+/**
+ * Página RSC — Painel do provider: editor de valores e durações.
+ *
+ * Rota: `/painel/valores`.
+ * Tipo: Server Component (form é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lê preços e durações atuais).
+ *
+ * Editor das `DurationOption` ativas + preços base do `Profile`.
+ *
+ * Cross-refs:
+ * - src/app/painel/valores/valores-form.tsx
+ * - src/app/painel/_actions/provider-settings.ts
+ */
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

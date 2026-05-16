@@ -1,3 +1,19 @@
+/**
+ * Página RSC — Painel do provider: gestão de plano e boost.
+ *
+ * Rota: `/painel/plano`.
+ * Tipo: Server Component (botões são Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lê `planTier`, `planExpiresAt`, `featuredUntil`).
+ *
+ * Mostra plano atual, opção de boost (grátis 1×/mês para Premium ou pago)
+ * e cards das 3 ofertas (Basic, Plus, Premium).
+ *
+ * Cross-refs:
+ * - src/app/painel/plano/upgrade-button.tsx
+ * - src/app/_actions/subscription.ts (boost / upgrade)
+ * - src/app/api/mp/checkout/route.ts
+ */
 import { redirect } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -64,8 +80,8 @@ export default async function PainelPlanoPage() {
 
       {/* Boost card */}
       <div className={`rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${isBoosted
-          ? "border-warning/25 bg-warning/[0.05]"
-          : "border-black/[0.06] bg-white"
+        ? "border-warning/25 bg-warning/[0.05]"
+        : "border-black/[0.06] bg-white"
         }`}>
         <div className="flex items-center gap-2">
           <Zap className={`h-4 w-4 ${isBoosted ? "text-warning" : "text-muted"}`} strokeWidth={1.5} />
@@ -102,8 +118,8 @@ export default async function PainelPlanoPage() {
             <div
               key={plan.tier}
               className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${isActive
-                  ? "border-coral/25 bg-coral/[0.04]"
-                  : "border-black/[0.06] bg-white"
+                ? "border-coral/25 bg-coral/[0.04]"
+                : "border-black/[0.06] bg-white"
                 }`}
             >
               {isActive && (

@@ -1,3 +1,14 @@
+/**
+ * Página RSC — Cadastro: escolher tipo de conta (cliente vs acompanhante).
+ *
+ * Rota: `/cadastro`.
+ * Tipo: Server Component.
+ * Auth: público (já-logado é redirecionado para `/painel`).
+ * Cache: `force-dynamic` (lê `auth()` para redirect).
+ *
+ * Splash de cadastro com 2 cards de escolha; encaminha para
+ * `/cadastro/cliente` ou `/cadastro/acompanhante`.
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";

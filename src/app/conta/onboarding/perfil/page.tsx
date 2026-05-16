@@ -1,4 +1,20 @@
-﻿import { redirect } from "next/navigation";
+﻿/**
+ * Página RSC — Onboarding passo 01: perfil (bio, características, contato).
+ *
+ * Rota: `/conta/onboarding/perfil`.
+ * Tipo: Server Component (form é Client).
+ * Auth: acompanhante (PROVIDER) — exige sessão e `Profile` próprio.
+ * Cache: `force-dynamic` (lê `auth()` + `Profile`).
+ *
+ * Primeiro passo do onboarding. Renderiza `OnboardingSidebar` + `PerfilForm`
+ * com dados atuais do `Profile` para edição.
+ *
+ * Cross-refs:
+ * - src/components/onboarding/onboarding-sidebar.tsx
+ * - src/app/conta/onboarding/perfil/perfil-form.tsx
+ * - src/app/_actions/onboarding.ts
+ */
+import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

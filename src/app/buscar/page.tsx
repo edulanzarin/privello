@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Busca global por nome ou @handle.
+ *
+ * Rota: `/buscar`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 120` (Route Segment Config — janela de 2min).
+ *
+ * Aceita `?q=` para busca; sem query, mostra formulário de busca por nome
+ * e formulário `BuscarForm` para escolha de cidade.
+ *
+ * Cross-refs:
+ * - src/lib/services/profile.service.ts (searchProfilesGlobal)
+ * - src/app/buscar/buscar-form.tsx
+ */
 import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "@/components/layout/site-header";

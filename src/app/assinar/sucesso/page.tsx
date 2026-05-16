@@ -1,3 +1,14 @@
+/**
+ * Página RSC — Confirmação de assinatura ativada (retorno do pagamento).
+ *
+ * Rota: `/assinar/sucesso`.
+ * Tipo: Server Component.
+ * Auth: público (renderiza confirmação estática).
+ * Cache: default (RSC SSR; sem segredo dinâmico).
+ *
+ * Tela de sucesso pós-checkout do Mercado Pago com CTAs para explorar a
+ * plataforma e ver Reels.
+ */
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 

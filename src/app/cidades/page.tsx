@@ -1,3 +1,16 @@
+/**
+ * Página RSC — Lista de todas as cidades atendidas.
+ *
+ * Rota: `/cidades`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 900` (Route Segment Config — janela de 15min).
+ *
+ * Grid de cidades com links para `/descobrir/[citySlug]`.
+ *
+ * Cross-refs:
+ * - src/lib/services/city.service.ts (getAllCities)
+ */
 import Link from "next/link";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";

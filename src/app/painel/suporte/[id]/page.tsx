@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: chat de ticket de suporte.
+ *
+ * Rota: `/painel/suporte/[id]`.
+ * Tipo: Server Component (chat é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`;
+ *  retorna 404 se o ticket não pertencer ao usuário (`ticket.userId === session.user.id`).
+ * Cache: `force-dynamic` (mensagens em tempo real).
+ *
+ * Detalhe e chat de um `SupportTicket` do próprio provider.
+ *
+ * Cross-refs:
+ * - src/components/support/ticket-chat.tsx
+ * - src/app/_actions/support.ts
+ */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";

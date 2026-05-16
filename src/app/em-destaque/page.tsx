@@ -1,3 +1,17 @@
+/**
+ * Página RSC — Lista de perfis com boost ativo no momento.
+ *
+ * Rota: `/em-destaque`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 120` (Route Segment Config — janela de 2min).
+ *
+ * Mostra os perfis com `featuredUntil` no futuro, ordenados por plano e
+ * views.
+ *
+ * Cross-refs:
+ * - src/lib/services/profile.service.ts (getBoostedProfiles)
+ */
 import { Zap } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";

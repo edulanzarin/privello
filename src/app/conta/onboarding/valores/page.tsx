@@ -1,4 +1,18 @@
-﻿import { redirect } from "next/navigation";
+﻿/**
+ * Página RSC — Onboarding passo 03: valores e durações.
+ *
+ * Rota: `/conta/onboarding/valores`.
+ * Tipo: Server Component (form é Client).
+ * Auth: acompanhante (PROVIDER) — exige sessão e `Profile` próprio.
+ * Cache: `force-dynamic` (lê `auth()` + `Profile`).
+ *
+ * Editor de preços por duração (1h, 2h, pernoite, etc.) via `ValoresForm`.
+ *
+ * Cross-refs:
+ * - src/components/onboarding/onboarding-sidebar.tsx
+ * - src/app/conta/onboarding/valores/valores-form.tsx
+ */
+import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

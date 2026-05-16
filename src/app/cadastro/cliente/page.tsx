@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Cadastro de cliente (CLIENT).
+ *
+ * Rota: `/cadastro/cliente`.
+ * Tipo: Server Component (form é Client Component).
+ * Auth: público (já-logado é redirecionado para `/`).
+ * Cache: `force-dynamic` (lê `auth()` para redirect).
+ *
+ * Layout marketing + `ClientRegisterForm` para criação gratuita de conta de
+ * cliente.
+ *
+ * Cross-refs:
+ * - src/app/cadastro/cliente/client-register-form.tsx
+ * - src/app/_actions/auth.ts
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";

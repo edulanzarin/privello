@@ -1,3 +1,19 @@
+/**
+ * Página RSC — Painel do provider: visão geral.
+ *
+ * Rota: `/painel`.
+ * Tipo: Server Component.
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx` +
+ *  re-checa `auth()` para acessar `session.user.id`.
+ * Cache: `force-dynamic` (KPIs e charts em tempo real).
+ *
+ * Dashboard de boas-vindas com KPIs (views, curtidas, faturamento),
+ * banners de plano/suspensão/advertências e charts de receita por dia.
+ *
+ * Cross-refs:
+ * - src/app/painel/layout.tsx
+ * - src/lib/services/financial.service.ts (listFinancialRecordsForMonth)
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Eye, Heart, TrendingUp, Zap, ArrowUpRight, AlertCircle, Ban } from "lucide-react";

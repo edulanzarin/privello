@@ -1,4 +1,24 @@
-﻿import type { Metadata } from "next";
+﻿/**
+ * Página RSC — Perfil público de acompanhante.
+ *
+ * Rota: `/p/[slug]`.
+ * Tipo: Server Component.
+ * Auth: público (lê `auth()` para personalizar UI: dono vê privadas,
+ *  cliente assinante vê comentários, provider tem CTA de edição se for o
+ *  dono e read-only no resto).
+ * Cache: `force-dynamic` (visualizações, favorito e dados personalizados).
+ *
+ * Hero com galeria + áudio, dados, valores, disponibilidade semanal e
+ * reviews. CTAs principais: marcar horário, WhatsApp, favoritar, compartilhar.
+ *
+ * Cross-refs:
+ * - src/lib/services/profile.service.ts (getProfileBySlug, getUserReviewForProfile)
+ * - src/lib/services/discover.service.ts (getStoriesForProfile)
+ * - src/lib/services/subscription.service.ts (isSubscriber)
+ * - src/app/_actions/favorites.ts (getFavoriteStatus)
+ * - src/components/profile/* (gallery, view-tracker, favorite-button, etc.)
+ */
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";

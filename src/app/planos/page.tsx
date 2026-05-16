@@ -1,3 +1,14 @@
+/**
+ * Página RSC — Pricing público dos planos para acompanhantes.
+ *
+ * Rota: `/planos`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 900` (Route Segment Config — janela de 15min).
+ *
+ * Cards de Basic/Plus/Premium + bloco À la carte (boost 24h) + FAQ.
+ * `SiteHeader` chama `auth()` então a rota não é fully static.
+ */
 import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";

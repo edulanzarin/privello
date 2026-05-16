@@ -1,4 +1,19 @@
-﻿import Link from "next/link";
+﻿/**
+ * Página RSC — Onboarding passo 04: revisão e publicação do perfil.
+ *
+ * Rota: `/conta/onboarding/publicar`.
+ * Tipo: Server Component (form de publicação é server action).
+ * Auth: acompanhante (PROVIDER) — exige sessão e `Profile` próprio.
+ * Cache: `force-dynamic` (lê `auth()` + `Profile`).
+ *
+ * Checklist de itens obrigatórios + preview do card; o botão de publicar
+ * só é habilitado quando todos os itens estão `ok`.
+ *
+ * Cross-refs:
+ * - src/app/_actions/onboarding.ts (publishProfile)
+ * - src/components/onboarding/onboarding-sidebar.tsx
+ */
+import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { ViewTransition } from "react";

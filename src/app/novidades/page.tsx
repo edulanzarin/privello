@@ -1,3 +1,14 @@
+/**
+ * Página RSC — Novidades / blog (placeholder).
+ *
+ * Rota: `/novidades`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 900` (Route Segment Config — janela de 15min).
+ *
+ * Página estática de placeholder. `SiteHeader` chama `auth()`, por isso a
+ * rota não é fully static — manter `revalidate` é o trade-off atual.
+ */
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 

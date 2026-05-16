@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Ranking semanal de perfis em alta (top 20 por views).
+ *
+ * Rota: `/em-alta`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 120` (Route Segment Config — janela de 2min).
+ *
+ * Lista os perfis com mais views na janela atual de ranking (resetada
+ * semanalmente pelo cron `/api/cron/reset-hot`).
+ *
+ * Cross-refs:
+ * - src/lib/services/profile.service.ts (getHotProfiles, getHotPeriodStart)
+ * - src/app/api/cron/reset-hot/route.ts
+ */
 import { TrendingUp } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";

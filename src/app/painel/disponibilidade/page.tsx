@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: regras de disponibilidade semanal.
+ *
+ * Rota: `/painel/disponibilidade`.
+ * Tipo: Server Component (form é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lê regras atuais do `Profile`).
+ *
+ * Editor das regras `AvailabilityRule` (status + janela horária por dia da
+ * semana) consumidas pelas páginas pública e de solicitar.
+ *
+ * Cross-refs:
+ * - src/app/painel/disponibilidade/availability-form.tsx
+ * - src/app/painel/_actions/provider-settings.ts
+ */
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

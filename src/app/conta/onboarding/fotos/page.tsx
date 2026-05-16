@@ -1,4 +1,19 @@
-﻿import Link from "next/link";
+﻿/**
+ * Página RSC — Onboarding passo 02: foto de perfil.
+ *
+ * Rota: `/conta/onboarding/fotos`.
+ * Tipo: Server Component (uploader é Client).
+ * Auth: acompanhante (PROVIDER) — exige sessão e `Profile` próprio.
+ * Cache: `force-dynamic` (lê `auth()` + `Profile`).
+ *
+ * Permite escolher a foto de capa (cover) que aparece no anúncio.
+ * Bloqueia avanço para `/painel/plano` enquanto não houver capa.
+ *
+ * Cross-refs:
+ * - src/app/conta/onboarding/fotos/photo-uploader.tsx
+ * - src/app/api/upload/route.ts
+ */
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
 import { auth } from "@/lib/auth";

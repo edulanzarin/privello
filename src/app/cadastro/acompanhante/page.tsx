@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Cadastro de acompanhante (PROVIDER).
+ *
+ * Rota: `/cadastro/acompanhante`.
+ * Tipo: Server Component (form é Client Component).
+ * Auth: público (já-logado é redirecionado para `/painel`).
+ * Cache: `force-dynamic` (lê `auth()` para redirect).
+ *
+ * Layout marketing + formulário `ProviderRegisterForm` que dispara o fluxo
+ * de checkout de cadastro pago.
+ *
+ * Cross-refs:
+ * - src/app/cadastro/acompanhante/provider-register-form.tsx
+ * - src/app/api/cadastro/iniciar/route.ts
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";

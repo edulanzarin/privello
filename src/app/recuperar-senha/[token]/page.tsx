@@ -1,5 +1,20 @@
 "use client";
 
+/**
+ * Página RSC — Redefinir senha com token enviado por e-mail.
+ *
+ * Rota: `/recuperar-senha/[token]`.
+ * Tipo: Client Component (`"use client"`).
+ * Auth: público (token é a credencial efêmera; expira em 1h).
+ * Cache: default (Client Component).
+ *
+ * Recebe o `token` via params, pede nova senha e confirmação, e chama o
+ * server action `resetPassword`. Em sucesso, redireciona para
+ * `/entrar?reset=1`.
+ *
+ * Cross-refs:
+ * - src/app/_actions/password-reset.ts (resetPassword)
+ */
 import Link from "next/link";
 import { use, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";

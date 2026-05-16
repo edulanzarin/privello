@@ -1,3 +1,22 @@
+/**
+ * Página RSC — Solicitar encontro: monta horário, duração, local.
+ *
+ * Rota: `/solicitar/[slug]`.
+ * Tipo: Server Component.
+ * Auth: público — clientes não-logados podem montar; provider logado é
+ *  redirecionado para `/p/[slug]` (read-only).
+ * Cache: `force-dynamic` (estado vive em searchParams + lê `auth()`).
+ *
+ * Calendário do mês, slots de 30min dentro da janela do dia, durações,
+ * local (próprio ou domicílio) e painel lateral com resumo + CTA que
+ * abre o WhatsApp com mensagem pronta.
+ *
+ * Cross-refs:
+ * - src/lib/booking-slots.ts
+ * - src/lib/time-utils.ts
+ * - src/lib/services/profile.service.ts (getProfileBySlug)
+ * - src/components/solicitar/solicitar-whatsapp-panel.tsx
+ */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {

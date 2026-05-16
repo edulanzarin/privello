@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: stories (24h).
+ *
+ * Rota: `/painel/stories`.
+ * Tipo: Server Component (manager é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`;
+ *  feature-gate adicional: planos `DESTAQUE` ou `PREMIUM` (paywall caso contrário).
+ * Cache: `force-dynamic` (stories ativos vs expirados por request).
+ *
+ * Carrega últimos 50 stories e separa em ativos (não-expirados) e expirados.
+ *
+ * Cross-refs:
+ * - src/app/painel/stories/stories-manager.tsx
+ * - src/app/_actions/stories.ts
+ */
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

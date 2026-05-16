@@ -1,5 +1,21 @@
 "use client";
 
+/**
+ * Página RSC — Confirmação de cadastro: poll do webhook do MP.
+ *
+ * Rota: `/cadastro/sucesso`.
+ * Tipo: Client Component (`"use client"`).
+ * Auth: público.
+ * Cache: default (Client Component).
+ *
+ * Recebe `?s=<slug>` da URL e faz polling em `/api/cadastro/verificar` a
+ * cada 3s (até 20 tentativas) para detectar quando o webhook do Mercado
+ * Pago concluiu a criação da conta. Sem `s`, mostra confirmação imediata.
+ *
+ * Cross-refs:
+ * - src/app/api/cadastro/verificar/route.ts
+ * - src/app/api/mp/webhook/route.ts
+ */
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";

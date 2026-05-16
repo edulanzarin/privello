@@ -1,3 +1,22 @@
+/**
+ * Página RSC — Dashboard de moderação (KPIs, charts, fila de verificação).
+ *
+ * Rota: `/admin/moderacao`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
+ * Cache: `force-dynamic` (KPIs em tempo real e fila por searchParams).
+ *
+ * Página inicial do admin: KPIs (perfis, verificadas, pendentes, suporte, MRR),
+ * charts de séries temporais e fila paginada de `VerificationCase` com filtros
+ * por status, cidade, busca e ordenação.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/components/admin/admin-charts.tsx
+ * - src/components/admin/quick-actions.tsx
+ * - src/components/admin/admin-city-filter.tsx
+ */
 import Image from "next/image";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";

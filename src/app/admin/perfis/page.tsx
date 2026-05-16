@@ -1,3 +1,21 @@
+/**
+ * Página RSC — Admin lista de perfis (busca, filtros, ações administrativas).
+ *
+ * Rota: `/admin/perfis`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
+ * Cache: `force-dynamic` (filtros e paginação por searchParams).
+ *
+ * Listagem paginada de perfis com filtros (plano, verificação, cidade) e
+ * ações inline: toggle de verificação, mudança de plano e advertência/
+ * suspensão.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/components/admin/warning-form.tsx
+ * - src/app/_actions/verification.ts (adminToggleVerification, adminSetPlan)
+ */
 import Link from "next/link";
 import Image from "next/image";
 import type { Prisma } from "@prisma/client";
@@ -145,8 +163,8 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                         <button
                           type="submit"
                           className={`text-2xs font-bold px-2 py-1 border transition ${p.isVerified
-                              ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
-                              : "border-line text-muted hover:border-foreground/30"
+                            ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
+                            : "border-line text-muted hover:border-foreground/30"
                             }`}
                         >
                           {p.isVerified ? "✓ Verificada" : "Verificar"}

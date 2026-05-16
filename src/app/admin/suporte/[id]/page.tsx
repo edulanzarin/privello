@@ -1,3 +1,21 @@
+/**
+ * Página RSC — Admin chat de ticket de suporte.
+ *
+ * Rota: `/admin/suporte/[id]`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`; também
+ *  re-checa `auth()` para acessar `session.user.id` do operador).
+ * Cache: `force-dynamic` (mensagens em tempo real).
+ *
+ * Detalhe e chat de um `SupportTicket`. Permite fechar/reabrir o ticket e
+ * delega o input de mensagens ao componente `TicketChat`.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/components/support/ticket-chat.tsx
+ * - src/app/_actions/support.ts (closeTicket, reopenTicket)
+ */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";

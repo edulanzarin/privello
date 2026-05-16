@@ -1,4 +1,24 @@
-﻿import type { Metadata } from "next";
+﻿/**
+ * Página RSC — Listagem de perfis por cidade (descobrir).
+ *
+ * Rota: `/descobrir/[citySlug]`.
+ * Tipo: Server Component.
+ * Auth: público (lê `auth()` apenas para diferenciar UI quando logado, ex:
+ *  permitir likes em stories).
+ * Cache: `force-dynamic` (filtros, sort, view e stories personalizadas).
+ *
+ * Página principal de descoberta: stories no topo, sidebar de filtros
+ * (gênero, preço, idade, verificação, atendimento) e grid/lista de perfis
+ * com ordenação.
+ *
+ * Cross-refs:
+ * - src/lib/services/city.service.ts (getOrCreateCityBySlug)
+ * - src/lib/services/discover.service.ts (listProfilesForCity, listStoriesForCity)
+ * - src/lib/discover-params.ts
+ * - src/components/discover/* + src/components/profile/*
+ * - src/components/stories/story-bar.tsx
+ */
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, ViewTransition } from "react";
 import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";

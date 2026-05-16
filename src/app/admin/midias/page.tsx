@@ -1,3 +1,19 @@
+/**
+ * Página RSC — Admin moderação de mídias.
+ *
+ * Rota: `/admin/midias`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
+ * Cache: `force-dynamic` (filtros, busca e paginação por searchParams).
+ *
+ * Listagem em grid/list de todas as mídias da plataforma com filtros por
+ * tipo, visibilidade, ordenação e ações rápidas (toggle visibilidade, deletar).
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/components/admin/media-actions.tsx
+ */
 import Image from "next/image";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";

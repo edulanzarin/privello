@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Painel do provider: reels (vídeos curtos).
+ *
+ * Rota: `/painel/reels`.
+ * Tipo: Server Component (manager é Client).
+ * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
+ * Cache: `force-dynamic` (lista de reels muda a cada upload).
+ *
+ * Lista mídias `mediaType: REEL` e delega gestão ao `ReelsManager`.
+ *
+ * Cross-refs:
+ * - src/components/painel/reels-manager.tsx
+ * - src/app/_actions/reels.ts
+ * - src/app/api/upload/route.ts
+ */
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";

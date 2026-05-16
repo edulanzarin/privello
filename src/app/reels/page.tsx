@@ -1,3 +1,22 @@
+/**
+ * Página RSC — Feed global de Reels (TikTok-style).
+ *
+ * Rota: `/reels`.
+ * Tipo: Server Component (feed é Client).
+ * Auth: público (lê `auth()` para personalizar likes/comentários quando
+ *  cliente assinante; provider tem visão own-content).
+ * Cache: `force-dynamic` (lista personalizada por sessão e filtro de cidade).
+ *
+ * Aceita `?cidade=<slug>` para filtrar. Carrega 10 reels iniciais e delega
+ * scroll infinito ao componente `ReelsFeed`.
+ *
+ * Cross-refs:
+ * - src/lib/services/reels.service.ts (listReels)
+ * - src/lib/services/city.service.ts (getCityBySlug, getCitiesWithReels)
+ * - src/lib/services/subscription.service.ts (isSubscriber)
+ * - src/components/reels/reels-feed.tsx
+ * - src/components/reels/city-filter.tsx + city-restorer.tsx
+ */
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { listReels, getCitiesWithReels, getCityBySlug, isSubscriber } from "@/lib/services";

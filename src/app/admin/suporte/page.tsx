@@ -1,3 +1,19 @@
+/**
+ * Página RSC — Admin lista de tickets de suporte (abertos + fechados recentes).
+ *
+ * Rota: `/admin/suporte`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
+ * Cache: `force-dynamic` (estado de tickets muda a cada interação).
+ *
+ * Lista os tickets `OPEN`/`IN_PROGRESS` ordenados pelo mais antigo (FIFO) e
+ * mostra os 20 últimos `CLOSED` em uma seção secundária.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/app/admin/suporte/[id]/page.tsx
+ */
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";

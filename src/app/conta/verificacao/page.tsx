@@ -1,5 +1,22 @@
 "use client";
 
+/**
+ * Página RSC — Verificação de identidade (3 passos: documento, selfie, vídeo).
+ *
+ * Rota: `/conta/verificacao`.
+ * Tipo: Client Component (`"use client"`).
+ * Auth: acompanhante (PROVIDER) — gate efetivo no server action
+ *  `submitVerificationCase` e nos uploads de `/api/upload/verification`.
+ * Cache: default (Client Component).
+ *
+ * Wizard visual de 3 etapas que faz upload dos arquivos para o endpoint
+ * dedicado e submete o `VerificationCase` ao final.
+ *
+ * Cross-refs:
+ * - src/app/_actions/verification.ts (submitVerificationCase)
+ * - src/app/api/upload/verification/route.ts
+ * - src/lib/hooks/use-file-upload.ts
+ */
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";

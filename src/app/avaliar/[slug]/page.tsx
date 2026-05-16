@@ -1,5 +1,21 @@
 "use client";
 
+/**
+ * Página RSC — Formulário de avaliação de perfil pelo cliente assinante.
+ *
+ * Rota: `/avaliar/[slug]`.
+ * Tipo: Client Component (`"use client"`).
+ * Auth: cliente logado (gate efetivo em `POST /api/review` — o handler
+ *  exige sessão de cliente assinante; UI é acessível mas o submit falha
+ *  sem credenciais).
+ * Cache: default (Client Component).
+ *
+ * Estrelas 1–5 + comentário opcional. Submete via `fetch POST /api/review`
+ * e redireciona ao perfil em sucesso.
+ *
+ * Cross-refs:
+ * - src/app/api/review/route.ts
+ */
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";

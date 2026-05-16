@@ -1,3 +1,20 @@
+/**
+ * Página RSC — Home pública (landing).
+ *
+ * Rota: `/`.
+ * Tipo: Server Component.
+ * Auth: público.
+ * Cache: `revalidate = 60` (Route Segment Config — janela de 60s).
+ *
+ * Renderiza hero com busca, estatísticas da plataforma, seções "Em destaque"
+ * (boost ativo) e "Em alta da semana", além de pílulas de top cidades.
+ *
+ * Cross-refs:
+ * - src/lib/services/stats.service.ts
+ * - src/lib/services/profile.service.ts (getSectionProfiles)
+ * - src/components/home/profile-section.tsx
+ * - src/components/marketing/hero-search-form.tsx
+ */
 import Link from "next/link";
 import { Suspense } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";

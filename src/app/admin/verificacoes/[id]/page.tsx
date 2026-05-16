@@ -1,3 +1,20 @@
+/**
+ * Página RSC — Admin detalhe de caso de verificação (aprovar/rejeitar).
+ *
+ * Rota: `/admin/verificacoes/[id]`.
+ * Tipo: Server Component.
+ * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`; também
+ *  re-checa `auth()` para garantir sessão).
+ * Cache: `force-dynamic` (estado do caso e tempo de espera por request).
+ *
+ * Tela de revisão humana de um `VerificationCase`: mostra documentos,
+ * selfie/vídeo e formulários para aprovar ou rejeitar com nota.
+ *
+ * Cross-refs:
+ * - src/app/admin/layout.tsx
+ * - src/components/admin/admin-shell.tsx
+ * - src/app/_actions/verification.ts (approveVerification, rejectVerification)
+ */
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";

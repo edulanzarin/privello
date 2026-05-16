@@ -1,3 +1,18 @@
+/**
+ * Página RSC — Login.
+ *
+ * Rota: `/entrar`.
+ * Tipo: Server Component (form é Client).
+ * Auth: público (já-logado é redirecionado para `/`).
+ * Cache: `force-dynamic` (lê `auth()` para redirect e `searchParams.error`).
+ *
+ * Aceita `?callbackUrl=` para redirect pós-login e `?error=` para mostrar
+ * mensagem de credenciais inválidas.
+ *
+ * Cross-refs:
+ * - src/app/entrar/login-form.tsx
+ * - src/app/api/auth/[...nextauth]/route.ts
+ */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
