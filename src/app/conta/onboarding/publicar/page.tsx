@@ -1,8 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
-import { } from "react/canary";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,7 +10,7 @@ import { OnboardingBack } from "../onboarding-nav";
 import { publishProfile } from "@/app/_actions/onboarding";
 import { formatBrl } from "@/lib/money";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 20 (onboarding/publicar autenticado).
+// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 20 (onboarding/publicar autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPublicarPage() {
@@ -54,7 +53,7 @@ export default async function OnboardingPublicarPage() {
             Publicar perfil<span className="text-coral">.</span>
           </h1>
           <p className="mt-3 max-w-xl text-sm text-muted">
-            Revise as informações antes de publicar. Você pode editar tudo depois no painel.
+            Revise as informaÃ§Ãµes antes de publicar. VocÃª pode editar tudo depois no painel.
           </p>
 
           <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -100,7 +99,7 @@ export default async function OnboardingPublicarPage() {
               href="/conta/onboarding/valores"
               className="rounded-lg border border-line bg-white px-6 py-3 text-base font-medium hover:bg-line active:scale-[0.97] transition"
             >
-              ← Voltar
+              â† Voltar
             </OnboardingBack>
             <form action={publishProfile}>
               <button

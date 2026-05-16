@@ -1,13 +1,11 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
-import { } from "react/canary";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
 import { ValoresForm } from "./valores-form";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 18 (onboarding/valores autenticado).
+// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 18 (onboarding/valores autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingValoresPage() {
@@ -34,7 +32,7 @@ export default async function OnboardingValoresPage() {
             Seus valores<span className="text-coral">.</span>
           </h1>
           <p className="mt-3 max-w-xl text-sm text-muted">
-            Defina seus preços por duração. Você pode alterar a qualquer momento no painel.
+            Defina seus preÃ§os por duraÃ§Ã£o. VocÃª pode alterar a qualquer momento no painel.
           </p>
           <ValoresForm profile={profile} />
         </main>

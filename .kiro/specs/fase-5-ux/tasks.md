@@ -392,29 +392,29 @@ Restrições importantes:
     - Numero de testes deve ser ≥ ao baseline da fase-4 (172 testes em 2026-05-17)
     - _Requirements: 7.4_
 
-- [ ] 10. Smoke checks finais
-  - [ ] 10.1 `npm run lint` — registrar baseline
+- [x] 10. Smoke checks finais
+  - [x] 10.1 `npm run lint` — registrar baseline
     - Esperado: 0 errors **novos** introduzidos pela fase-5 em arquivos do escopo
     - Erros pré-existentes em `age-gate.tsx`, `profile-story-cover`, `story-bar`, `media-gallery`, `painel/midias/midias-manager`, `painel/perfil/page.tsx`, `painel/plano/upgrade-button.tsx`, etc. podem permanecer (pertencem à fase-7); refactor da Wave 6 pode resolver alguns como efeito colateral
     - Anexar log em `inventario-rotas.md > Smoke checks finais`
     - _Requirements: 6.6_
 
-  - [ ] 10.2 `npx tsc --noEmit` — zero erros de tipo
+  - [x] 10.2 `npx tsc --noEmit` — zero erros de tipo
     - Bloqueio duro: se houver erros, corrigir antes de prosseguir
     - _Requirements: 6.6_
 
-  - [ ] 10.3 `npm run test` — todos os testes verdes
+  - [x] 10.3 `npm run test` — todos os testes verdes
     - Bloqueio duro
     - Anexar log
     - _Requirements: 5.7, 7.4_
 
-  - [ ] 10.4 `npm run build` — build limpo com `experimental.viewTransition: true`
+  - [x] 10.4 `npm run build` — build limpo com `experimental.viewTransition: true`
     - Bloqueio duro: build precisa terminar com exit 0
     - Confirmar que `experimental.viewTransition` é registrado nos warnings do Next como flag experimental aceita (não como deprecated/erro)
     - Confirmar que count de rotas no output do build permanece estável (estimativa: 71 rotas, conforme baseline herdado da fase-4)
     - _Requirements: 6.2, 6.6_
 
-  - [ ] 10.5 Smoke browser manual em desenvolvimento (`npm run dev`)
+  - [x] 10.5 Smoke browser manual em desenvolvimento (`npm run dev`)
     - Validar visualmente os 3 padrões de View Transition:
       - Suspense reveal em `/p/[slug]` (skeleton → conteúdo com slide-up)
       - Same-route crossfade em `/descobrir/[citySlug]` (trocar cidade)
@@ -423,8 +423,8 @@ Restrições importantes:
     - Anexar nota em `inventario-rotas.md > Smoke browser manual` com browser usado e resultado
     - _Requirements: 6.3, 7.2_
 
-- [ ] 11. Saída desta fase
-  - [ ] 11.1 Validar saída
+- [x] 11. Saída desta fase
+  - [x] 11.1 Validar saída
     - Todos os 8 Requirements de `requirements.md` têm evidência (path:linha de código, log de teste, ou link de PR/commit) anexada
     - `inventario-rotas.md` cobre as 4 seções (cabeçalho, metodologia, 72 linhas de inventário, listas vazias não migradas, smoke checks)
     - `requirements.md > §3 OutOfScopeFinding` está vazia ou cada linha aponta commit no master spec

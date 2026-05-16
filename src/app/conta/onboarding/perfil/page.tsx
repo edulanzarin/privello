@@ -1,12 +1,11 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
-import { } from "react/canary";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
 import { PerfilForm } from "./perfil-form";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 17 (onboarding/perfil autenticado).
+// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 17 (onboarding/perfil autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPerfilPage() {
@@ -33,7 +32,7 @@ export default async function OnboardingPerfilPage() {
             Seu perfil<span className="text-coral">.</span>
           </h1>
           <p className="mt-3 max-w-xl text-sm text-muted">
-            Essas informações aparecem no seu anúncio. Seja autêntica — perfis completos convertem mais.
+            Essas informaÃ§Ãµes aparecem no seu anÃºncio. Seja autÃªntica â€” perfis completos convertem mais.
           </p>
           <PerfilForm
             profile={profile}
