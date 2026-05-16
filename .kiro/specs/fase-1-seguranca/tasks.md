@@ -189,14 +189,14 @@ Restrições importantes:
     - _Requirements: 7.3_
 
 - [ ] 8. Saída da fase
-  - [~] 8.1 Validar saída
+  - [x] 8.1 Validar saída
     - Todos os 8 Requirements de `requirements.md` têm evidência (path:linha de código, log de teste manual, ou link de PR) anexada
     - Seção §4 (AGENTS_Rule) de `requirements.md` tem linha preenchida para `images-config` e `headers` (já preenchidas; confirmar que continuam coerentes com o que foi efetivamente entregue)
     - Seção §3 (`OutOfScopeFinding`) está vazia ou cada linha aponta commit no master spec
     - Documentos `endpoints-zod.md`, `rate-limits.md`, `nextauth-prod.md` e (se aplicável) `csp-rollout.md` existem e estão preenchidos
     - _Requirements: 8.2_
 
-  - [~] 8.2 Atualizar Phase Card no master `requirements.md`
+  - [x] 8.2 Atualizar Phase Card no master `requirements.md`
     - `state: InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601
     - Manter `child_spec_path` apontando para esta pasta

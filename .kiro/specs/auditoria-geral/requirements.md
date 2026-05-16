@@ -117,9 +117,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **out_of_scope**: rotação de chaves, auditoria de dependências (SCA) e WAF — vão para DX/Infra ou spec próprio futuro.
 - **historical_refs**: nenhum (a Fase 1 não herda de specs arquivados em `.kiro/specs/_archive/`; segurança não foi tema de spec arquivado).
 - **agents_rule_areas**: `images-config` (whitelist em `images.remotePatterns`), `headers` (avaliação de CSP/HSTS e demais headers de segurança em `next.config.ts`).
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-1-seguranca\`
 - **promoted_at**: 2026-03-14
+- **doneAt**: 2026-05-16T04:47:12Z
+- **spawn_readiness_note**: Spawn-Readiness Gate re-avaliado para fase-3 e fase-7 (dependentes diretas); ambas agora têm fase-1 + fase-2 satisfeitas, gate plenamente atendido — orquestrador/usuário pode iniciar fase-3 ou fase-7 a seguir.
 
 <!-- Já resolvido (cf. `design.md > Estado de partida`) — entram como `Resolvido` na Revalidação do spec-filho e NÃO viram tarefa de entrega:
   - Webhook MercadoPago com HMAC-SHA256 (`src/app/api/mp/webhook/route.ts`); só o teste/cobertura desse fluxo pode ser herdado pela Fase 2.

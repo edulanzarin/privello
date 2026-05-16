@@ -238,3 +238,80 @@ A Fase 1 é considerada `Done` quando:
 - A seção 4 deste documento (AGENTS_Rule) tem linha preenchida para cada `NextApiArea` declarada (`images-config`, `headers`) ANTES da primeira decisão técnica que toque essa área.
 - A seção 3 deste documento (`OutOfScopeFinding`) tem cada linha referenciando um commit no master spec, ou está marcada como vazia.
 - O Phase Card desta fase no master `requirements.md` foi atualizado para `state: Done` com `doneAt` ISO-8601 e link para esta pasta.
+
+---
+
+## Saída desta fase — evidências
+
+> Cada Requirement tem evidência verificável (path:linha de código + commits + documentos canônicos do spec-filho). Status: ✅ entregue.
+
+### Requirement 1 — Endurecimento dos Dev_Endpoints  ✅
+
+- **EAR 1.1** (autenticação além de `NODE_ENV`) → `src/lib/security/dev-auth.ts:101+` (helper `requireAdminOrToken`).
+- **EAR 1.2** (sessão NextAuth admin/moderator OU `Authorization: Bearer <DEV_ENDPOINT_TOKEN>`) → ambas as rotas consomem o helper: `src/app/api/dev/reset/route.ts:7-15` e `src/app/api/dev/activate-plans/route.ts:8-15`.
+- **EAR 1.3** (404 em produção sem credencial) → `src/lib/security/dev-auth.ts:120-122`.
+- **EAR 1.4** (log estruturado com `{ ts, ip, mode, subject }`) → `src/lib/security/dev-auth.ts:80-89` (`logSuccess`).
+- **PBT** Property 7 + Property 8 → `src/lib/security/dev-auth.pbt.ts` (commit `8504c1f`).
+
+### Requirement 2 — Cron_Endpoints com segredo via header  ✅
+
+- **EAR 2.1** (substituir query string por header, com transição) → `src/lib/security/cron-auth.ts:101+` (`verifyCronSecret`).
+- **EAR 2.2** (aceitar `Authorization: Bearer` e `X-Cron-Secret`, prioridade ao primeiro) → ambas as rotas consomem o helper: `src/app/api/cron/expire-plans/route.ts` e `src/app/api/cron/reset-hot/route.ts`.
+- **EAR 2.3** (warning estruturado quando segredo vier por query) → `src/lib/security/cron-auth.ts:130-145`.
+- **EAR 2.4** (rejeição de query após `transitionEndsAt`) → constante `transitionEndsAt = new Date("2026-06-15T00:00:00Z")` declarada nas duas rotas e propagada ao helper.
+- **EAR 2.5** (401 sem corpo na falha) → `verifyCronSecret` em `src/lib/security/cron-auth.ts`.
+- **PBT** Property 5 + Property 6 → `src/lib/security/cron-auth.pbt.ts` (commit `8504c1f`).
+
+### Requirement 3 — Whitelist de `images.remotePatterns`  ✅
+
+- **EAR 3.1** (whitelist explícita, sem `hostname: "**"`) → `next.config.ts:65-70+`.
+- **EAR 3.2** (lista finita por host: domínio próprio em produção via `PRODUCTION_HOSTNAME` + `picsum.photos`, `commondatastorage.googleapis.com`, `storage.googleapis.com`, `*.googleusercontent.com`) → 5 hosts + `PRODUCTION_HOSTNAME` condicional em `next.config.ts`.
+- **EAR 3.3** (comentário cita doc consultado + data) → comentário cita `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/images.md` + `node_modules/next/dist/shared/lib/image-config.d.ts:24` em 2026-03-14.
+- **EAR 3.4** (build falha sem entrada correspondente) → não há fallback `**`; build PASS confirmado em commit `c321510`.
+
+### Requirement 4 — Validação Zod em Public_Input_Endpoints  ✅
+
+- **EAR 4.1** (Zod em todas as Server Actions e Route Handlers de input externo) → diretório `src/lib/validation/` com 21 arquivos de schema + `_form-utils.ts` + `index.ts` (commit `9d9844c`).
+- **EAR 4.2** (documento `endpoints-zod.md` com todos os endpoints alvo) → `endpoints-zod.md` lista 51 Server Actions + 19 Route Handlers cobertos.
+- **EAR 4.3** (HTTP 400 com `flatten()` em Route Handlers; objeto `{ error, issues }` em Server Actions) → aplicado em 29 arquivos (commit `a0ef4b5`).
+- **EAR 4.4** (`z.infer<typeof Schema>` exportado por schema) → tipos exportados de cada schema em `src/lib/validation/`.
+- **EAR 4.5** (substituição de validações manuais por `Schema.safeParse(rawBody)`) → manual replaced across 29 files (commit `a0ef4b5`).
+- **PBT** Property 4 (idempotência de `parse`) → `src/lib/validation/validation.pbt.ts` (commit `cd923fe`).
+
+### Requirement 5 — Rate limiting em Rate_Limited_Endpoints  ✅
+
+- **EAR 5.1** (rate limit em login, upload, `wa-click`, comentários, story-view com limites positivos por janela) → `src/lib/rate-limit.ts` + `src/lib/rate-limit-config.ts` (constante `RATE_LIMIT_TABLE`).
+- **EAR 5.2** (tabela canônica replicada em `rate-limits.md`) → `rate-limits.md` espelha a `RATE_LIMIT_TABLE` por endpoint (chave, janela, limite, resposta).
+- **EAR 5.3** (escolha entre módulo único OU middleware-proxy, declarada em ADR) → decisão documentada em `rate-limits.md`: "módulo único em `src/lib/rate-limit.ts` com store em memória + interface plugável; middleware-proxy fora de escopo (multi-instance é `OutOfScopeFinding` para Fase 7)".
+- **EAR 5.4** (auditoria de excedências em login/upload/comentários sem expor ao cliente) → logs de auditoria emitidos pelos handlers consumidores (commit `a0ef4b5`).
+- **PBT** Properties 1, 2, 3 → `src/lib/rate-limit.pbt.ts` (commit `54a4858`).
+
+### Requirement 6 — Configuração de produção do NextAuth  ✅
+
+- **EAR 6.1** (substituir `trustHost: true` aberto, documentado) → `src/lib/auth.ts:9-16` com guard de `AUTH_URL` em produção.
+- **EAR 6.2** (`trustHost` condicional em produção; falha se `AUTH_URL` ausente) → `src/lib/auth.ts:18-32` com JSDoc.
+- **EAR 6.3** (`AUTH_URL` em `.env.example` com comentário) → adicionada em `.env.example` (commit `1f0a931`).
+- **EAR 6.4** (`nextauth-prod.md` com passo a passo Vercel/Docker) → `nextauth-prod.md` (commit `48d9696`).
+
+### Requirement 7 — CSP e HSTS via headers estáticos  ✅
+
+- **EAR 7.1** (CSP/HSTS avaliados, com consulta prévia a `node_modules/next/dist/docs/`) → consulta registrada em §4 deste documento (linha `headers`); origens por diretiva listadas em `csp-origins.md`.
+- **EAR 7.2** (`Content-Security-Policy-Report-Only` listando origens por diretiva) → `next.config.ts:18-50` com helper `buildCSP` aplicando o header em `securityHeaders`.
+- **EAR 7.3** (transição Report-Only → enforcement só após janela ≥ 7 dias com zero violações) → procedimento documentado em `nextauth-prod.md > §5` (janela mínima + critério de transição + procedimento de reversão + escopo de entrega Report-Only nesta fase).
+- **EAR 7.4** (HSTS `max-age=15552000; includeSubDomains` sem `preload`) → `next.config.ts:51-55`.
+- **EAR 7.5** (preservar X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control) → 4 headers preservados em `securityHeaders` no `next.config.ts`.
+- Commit consolidado de CSP+HSTS: `5fee0d8`.
+
+### Requirement 8 — Itens fora de escopo declarados  ✅
+
+- **EAR 8.1** (declarar fora de escopo: rotação de chaves, SCA, WAF) → §6 deste documento ("Non-Goals / Out of Scope") lista os 8 itens fora de escopo.
+- **EAR 8.2** (qualquer item fora de escopo absorvido vira `OutOfScopeFinding` com commit no master) → §3 deste documento (`OutOfScopeFinding`) está vazia: nenhum item fora de escopo foi absorvido durante a execução.
+
+### Checklist final de saída
+
+- [x] 8 Requirements têm evidência (path:linha + commit/documento).
+- [x] §4 (AGENTS_Rule) tem linha preenchida para `images-config` e `headers`, coerentes com a entrega.
+- [x] §3 (`OutOfScopeFinding`) está vazia — nada absorvido fora de escopo.
+- [x] Documentos `endpoints-zod.md`, `rate-limits.md`, `nextauth-prod.md`, `csp-origins.md` existem e estão preenchidos.
+- [x] `csp-rollout.md` não é arquivo separado — o procedimento de rollout CSP Report-Only → enforcement vive em `nextauth-prod.md > §5` (decisão registrada inline; satisfaz EAR 7.3 / task 7.5).
+- [x] Section 9 (PBT) tasks 9.1–9.4 marcadas `[x]` — pré-condição pós-Fase-2 satisfeita (fase-2-testes em `state: Done` no master, commit `b5a8fe0`).
