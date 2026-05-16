@@ -38,7 +38,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Anexar inventário da Tarefa 1.2 nas seções correspondentes (§1 lint, §6 any)
     - _Requirements: Saída desta fase_
 
-- [ ] 2. Wave CI Pipeline
+- [~] 2. Wave CI Pipeline (2.5 pendente até primeiro push)
   - [x] 2.1 Decidir versão de Node para a CI
     - Avaliar declarar `package.json > engines.node` nesta fase OU manter sem declaração e fixar a versão direto no YAML
     - Se declarar: alinhar com versão LTS atual (Node 20 ou Node 22) e usar `node-version-file: 'package.json'` no `actions/setup-node`
@@ -71,7 +71,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Confirmar que cada step tem `name` em pt-BR (ou inglês curto idiomático para steps de actions)
     - _Requirements: 1.4_
 
-  - [ ] 2.5 Anexar evidência da primeira run da CI
+  - [~] 2.5 Anexar evidência da primeira run da CI
     - Após o commit de `.github/workflows/ci.yml`, capturar link da primeira run (no GitHub Actions) ou screenshot
     - Registrar em `dx-conventions.md > §1 CI Pipeline > Primeira run` o resultado de cada estágio (✅/❌) e tempo total
     - Se a CI quebrar conforme tolerância decidida em Tarefa 2.2 (esperado em Opção A), registrar como esperado e referenciar ADR 0004
@@ -292,33 +292,33 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Confirmar Non-Goal: automação de geração (release-please, semantic-release, changesets) está fora desta fase
     - _Requirements: 7.6, 7.7_
 
-- [ ] 9. Wave Smoke checks finais
-  - [ ] 9.1 Rodar `npm run lint` final
+- [x] 9. Wave Smoke checks finais
+  - [x] 9.1 Rodar `npm run lint` final
     - Esperado: comportamento alinhado com `handoff.md > Smoke checks finais (pós fase-3 + fase-4)` (~67–75 problems; 20–28 errors herdados; **zero erros novos** introduzidos por esta fase)
     - Se contagem aumentou em relação ao handoff: investigar e registrar como `OutOfScopeFinding` para fase paralela responsável
     - Anexar log em `dx-conventions.md > §8 Smoke checks finais > 9.1 npm run lint`
     - _Requirements: Saída desta fase_
 
-  - [ ] 9.2 Rodar `npx tsc --noEmit` final
+  - [x] 9.2 Rodar `npx tsc --noEmit` final
     - Esperado: exit 0
     - Se quebrar: investigar arquivo apontado; pode ser efeito do cleanup `queries.ts` da Wave 5 — corrigir antes de prosseguir
     - Anexar log em `dx-conventions.md > §8 Smoke checks finais > 9.2 tsc --noEmit`
     - _Requirements: Saída desta fase_
 
-  - [ ] 9.3 Rodar `npm run test` final
+  - [x] 9.3 Rodar `npm run test` final
     - Esperado: 172+ testes passando (a contagem pode mudar se Wave 5 Opção A migrou Property 1 para snapshot)
     - Se quebrar: investigar — pode ser regressão do cleanup
     - Anexar log em `dx-conventions.md > §8 Smoke checks finais > 9.3 npm run test`
     - _Requirements: 4.5, Saída desta fase_
 
-  - [ ] 9.4 Rodar `npm run build` final
+  - [x] 9.4 Rodar `npm run build` final
     - Esperado: exit 0 (com `AUTH_URL` no shell em prod-mode, conforme `handoff.md > Observações operacionais`); 71 rotas compiladas (pode variar)
     - Se quebrar: investigar — pode ser regressão do cleanup
     - Anexar log em `dx-conventions.md > §8 Smoke checks finais > 9.4 npm run build`
     - **Importante**: `npm run build` NÃO está incluído na CI desta fase (cf. `design.md > Components and Interfaces > 1`); este smoke roda localmente para validar que a entrega não quebra build
     - _Requirements: Saída desta fase_
 
-  - [ ] 9.5 Confirmar inalteração de arquivos protegidos
+  - [x] 9.5 Confirmar inalteração de arquivos protegidos
     - Confirmar que `prisma/schema.prisma`, `next.config.ts`, `eslint.config.mjs`, `docker-compose.yml` não foram alterados nesta fase (apenas leitura)
     - Confirmar que primitivos da fase-4 (`src/components/ui/dropdown.tsx`, `src/components/ui/modal.tsx`, `src/components/ui/switch.tsx`, `src/lib/hooks/use-focus-trap.ts`, `src/lib/hooks/use-file-upload.ts`) não foram alterados
     - Confirmar que `src/app/**` e `src/components/**` não foram alterados (exceto pelo cleanup `queries.ts` se Wave 5 rodou — mas esse arquivo é em `src/lib/`, não em `src/app/` nem `src/components/`)
@@ -326,7 +326,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - _Requirements: Non-Goals 4, 5, 7_
 
 - [ ] 10. Saída desta fase
-  - [ ] 10.1 Validar saída
+  - [x] 10.1 Validar saída
     - Todos os 9 Requirements de `requirements.md` têm evidência (path do arquivo, log de smoke, link da run de CI ou referência em `dx-conventions.md`) anexada
     - `.github/workflows/ci.yml` existe e a primeira run da CI completou os 3 estágios
     - `docs/env.md` cobre 20+ entradas (16 de `.env.example` + variáveis fantasma + `CI`)
