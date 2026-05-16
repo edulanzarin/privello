@@ -219,13 +219,13 @@ Restrições importantes:
     - _Requirements: 4.1, 4.5_
     - _Validates: Property 4_
 
-  - [~] 9.3 * Implementar `src/lib/security/cron-auth.pbt.ts`
+  - [x] 9.3 * Implementar `src/lib/security/cron-auth.pbt.ts`
     - Property 5 (três caminhos durante a janela): gerador de header (Authorization, X-Cron-Secret, query-only); assertivas separadas por caminho
     - Property 6 (rejeição após `transitionEndsAt`): `vi.useFakeTimers()` + `vi.setSystemTime(transitionEndsAt + 1ms)`; assertiva de rejeição quando query é a única fonte
     - _Requirements: 2.2, 2.3, 2.4, 2.5_
     - _Validates: Property 5, Property 6_
 
-  - [~] 9.4 * Implementar `src/lib/security/dev-auth.pbt.ts`
+  - [x] 9.4 * Implementar `src/lib/security/dev-auth.pbt.ts`
     - Property 7 (404 em produção sem credencial): mockar `process.env.NODE_ENV = "production"`; gerador de request sem credencial
     - Property 8 (401 em dev com mensagem não-vazia): mockar `process.env.NODE_ENV !== "production"`
     - _Requirements: 1.2, 1.3, 1.4_
