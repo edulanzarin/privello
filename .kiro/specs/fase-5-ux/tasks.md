@@ -16,25 +16,25 @@ Restrições importantes:
 
 ## Tasks
 
-- [ ] 1. Validar pré-condições (Spawn-Readiness Gate)
-  - [ ] 1.1 Confirmar `requirements.md > §4` preenchida
+- [x] 1. Validar pré-condições (Spawn-Readiness Gate)
+  - [x] 1.1 Confirmar `requirements.md > §4` preenchida
     - Verificar que a linha `view-transitions` tem `path_consultado`, `trecho_relevante` e `decisao` preenchidos sem ambiguidade
     - Confirmar que `path_consultado` aponta para `node_modules/next/dist/docs/01-app/02-guides/view-transitions.md` e `viewTransition.md` realmente existentes
     - Falha aqui = bloqueio duro (regra E5 de `design.md > Error Handling` do master)
     - _Requirements: 6.1, 6.3_
 
-  - [ ] 1.2 Confirmar fase-2 e fase-4 em `Done` no master
+  - [x] 1.2 Confirmar fase-2 e fase-4 em `Done` no master
     - Ler `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\auditoria-geral\requirements.md` e validar que `Phase Card fase-2-testes` e `Phase Card fase-4-design-system` têm `state: Done` e `doneAt` ISO-8601 preenchidos
     - Confirmar `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\handoff.md` lista `fase-5-ux` como destravada
     - _Requirements: 1.1, 1.2_
 
-  - [ ] 1.3 Confirmar §3 inicialmente vazia
+  - [x] 1.3 Confirmar §3 inicialmente vazia
     - `requirements.md > §3 Achados fora de escopo` deve estar vazia ou conter linhas de placeholder claramente marcadas
     - Caso contrário, corrigir antes de prosseguir
     - _Requirements: 8.3_
 
-- [ ] 2. Inventário baseline das rotas
-  - [ ] 2.1 Criar `inventario-rotas.md` com cabeçalho e metodologia
+- [x] 2. Inventário baseline das rotas
+  - [x] 2.1 Criar `inventario-rotas.md` com cabeçalho e metodologia
     - Em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-5-ux\inventario-rotas.md`
     - Seção 1: cabeçalho (autoria, data, master spec, phase id, count baseline `47 page.tsx + 25 route.ts = 72 rotas`)
     - Seção 2: metodologia (heurísticas das 5 categorias `tela_autenticada`/`listagem_publica`/`formulario`/`pagina_informativa`/`route_handler`; critérios `criar` para `loading.tsx` e `error.tsx`)
@@ -42,19 +42,19 @@ Restrições importantes:
     - Seção 4: Listas vazias não migradas (vazia, preenchida durante Wave 3 se houver)
     - _Requirements: 1.3_
 
-  - [ ] 2.2 Listar as 47 `page.tsx` em `inventario-rotas.md > Inventário de rotas`
+  - [x] 2.2 Listar as 47 `page.tsx` em `inventario-rotas.md > Inventário de rotas`
     - Rodar `Get-ChildItem -Path src/app -Recurse -Filter page.tsx` e capturar caminho de cada arquivo
     - Para cada rota, criar linha com colunas: `caminho`, `categoria`, `loading` (decisão), `error` (decisão), `justificativa` (≤ 30 palavras quando `nao_aplicavel`)
     - Confirmar count = 47; se diferente, registrar discrepância na própria seção e seguir
     - _Requirements: 1.1, 1.3, 1.4, 1.5_
 
-  - [ ] 2.3 Listar as 25 `route.ts` em `inventario-rotas.md > Inventário de rotas`
+  - [x] 2.3 Listar as 25 `route.ts` em `inventario-rotas.md > Inventário de rotas`
     - Mesma estrutura, com `categoria: route_handler`, `loading: nao_aplicavel`, `error: nao_aplicavel`
     - Justificativa única: "Route Handler — fallback via JSON com status apropriado"
     - Confirmar count = 25
     - _Requirements: 1.3, 1.6_
 
-  - [ ] 2.4 Validar contagem agregada
+  - [x] 2.4 Validar contagem agregada
     - Soma de `loading: criar` + `loading: existente` + `loading: nao_aplicavel` deve igualar 72
     - Mesma soma para `error`
     - Identificar o subconjunto `loading: criar` que precisa de novo arquivo (estimativa: ≥ 25 rotas, dado que apenas 4 existem hoje)
