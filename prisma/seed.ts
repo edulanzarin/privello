@@ -1,26 +1,22 @@
 import bcrypt from "bcryptjs";
-import {
-  PlanTier,
-  PrismaClient,
-  UserRole,
-} from "@prisma/client";
+import { PlanTier, PrismaClient, UserRole } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 function img(seed: string, w = 480, h = 720) {
   return `https://picsum.photos/seed/${seed}/${w}/${h}`;
 }
-
 function rnd(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-
 function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
+}
+function future(days: number) {
+  return new Date(Date.now() + days * 86400000);
 }
 
 const TAGLINES = [
@@ -34,6 +30,10 @@ const TAGLINES = [
   "Elegância e discrição acima de tudo.",
   "Para quem aprecia o que há de melhor.",
   "Atendimento exclusivo e personalizado.",
+  "Sensual, discreta e inesquecível.",
+  "Sua experiência começa no primeiro contato.",
+  "Sofisticação sem pressa.",
+  "Presença real, sem filtros.",
 ];
 
 const BIOS = [
@@ -43,24 +43,8 @@ const BIOS = [
   "Sou discreta, pontual e reservada. Atendo com exclusividade para quem sabe o que busca.",
   "Formada, viajada e com ótimo humor. Adoro boa conversa, boa música e momentos sem pressa.",
   "Cuido muito de mim e da minha imagem. Você vai encontrar alguém leve, presente e sem estresse.",
-];
-
-const COMMENTS = [
-  "Incrível, superou minhas expectativas!",
-  "Perfil lindo demais 😍",
-  "Quero agendar, como faço?",
-  "Foto real, muito bonita!",
-  "Simplesmente perfeita ✨",
-  "Sempre elegante e discreta!",
-  "Top! Recomendo muito.",
-  "Linda e muito atenciosa.",
-  "Perfil verificado, ótima escolha.",
-  "A melhor experiência, nota 10!",
-  "Que mulher linda!",
-  "Incrível como sempre 🔥",
-  "Foto nova? Ficou linda!",
-  "Uma deusa!",
-  "Agenda aberta essa semana?",
+  "Sou direta e objetiva. Valorizo seu tempo e o meu. Atendimento impecável e discreto.",
+  "Aprecio a companhia de cavalheiros. Local próprio, ambiente sofisticado e total privacidade.",
 ];
 
 const REVIEW_TEXTS = [
@@ -74,12 +58,41 @@ const REVIEW_TEXTS = [
   "Recomendo de olhos fechados. Tudo ocorreu como combinado.",
 ];
 
-type ProfileRecord = {
-  id: string;
-  planTier: PlanTier;
-  slug: string;
-  [key: string]: unknown;
-};
+const COMMENTS = [
+  "Incrível, superou minhas expectativas!",
+  "Linda demais 😍",
+  "Quero agendar, como faço?",
+  "Foto real, muito bonita!",
+  "Simplesmente perfeita ✨",
+  "Sempre elegante e discreta!",
+  "Top! Recomendo muito.",
+  "Linda e muito atenciosa.",
+  "Perfil verificado, ótima escolha.",
+  "A melhor experiência, nota 10!",
+  "Que mulher linda!",
+  "Incrível como sempre 🔥",
+  "Agenda aberta essa semana?",
+];
+
+// Sample public video URLs for verification
+const VERIFICATION_VIDEOS = [
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+];
+
+const SAMPLE_REELS = [
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
+];
+
+type ProfileRecord = { id: string; planTier: PlanTier; slug: string;[key: string]: unknown };
 
 async function createProfile(opts: {
   email: string;
@@ -91,11 +104,11 @@ async function createProfile(opts: {
   tagline: string;
   bio: string;
   cityId: string;
-  districtId: string;
+  districtId?: string | null;
   priceHour: number;
   planTier: PlanTier;
+  planDays?: number;
   isVerified: boolean;
-  isOnline: boolean;
   servesMen: boolean;
   servesWomen: boolean;
   servesCouples: boolean;
@@ -108,9 +121,12 @@ async function createProfile(opts: {
   ratingCount: number;
   whatsappPhone: string;
   mediaCount?: number;
+  reelCount?: number;
   password?: string;
   featuredUntil?: Date;
   boostLabel?: string;
+  viewsCurrentPeriod?: number;
+  travelsNational?: boolean;
 }): Promise<ProfileRecord> {
   const u = await prisma.user.create({
     data: {
@@ -128,7 +144,7 @@ async function createProfile(opts: {
           tagline: opts.tagline,
           bio: opts.bio,
           cityId: opts.cityId,
-          districtId: opts.districtId,
+          districtId: opts.districtId ?? null,
           priceHour: opts.priceHour,
           priceTwoHours: Math.round(opts.priceHour * 1.75),
           priceOvernight: Math.round(opts.priceHour * 5),
@@ -142,14 +158,15 @@ async function createProfile(opts: {
           servesCouples: opts.servesCouples,
           hasOwnPlace: opts.hasOwnPlace,
           homeVisit: opts.homeVisit,
-          travelsNational: Math.random() > 0.6,
+          travelsNational: opts.travelsNational ?? Math.random() > 0.6,
           whatsappPhone: opts.whatsappPhone,
-          isOnline: opts.isOnline,
+          isOnline: false,
           isVerified: opts.isVerified,
-          videoVerified: opts.isVerified && Math.random() > 0.5,
+          videoVerified: false,
           viewsThisMonth: rnd(200, 9000),
-          viewsCurrentPeriod: rnd(20, 800),
+          viewsCurrentPeriod: opts.viewsCurrentPeriod ?? rnd(20, 800),
           planTier: opts.planTier,
+          planExpiresAt: future(opts.planDays ?? 30),
           ratingAvg: opts.ratingAvg,
           ratingCount: opts.ratingCount,
           memberSince: new Date(Date.now() - rnd(30, 730) * 86400000),
@@ -168,11 +185,28 @@ async function createProfile(opts: {
     data: Array.from({ length: n }, (_, i) => ({
       profileId: prof.id,
       url: img(`${opts.handle}-${i + 1}`),
-      isPublic: true,
+      isPublic: i < Math.ceil(n * 0.6),
       sortOrder: i,
       isCover: i === 0,
     })),
   });
+
+  // Add reels
+  if (opts.reelCount && opts.reelCount > 0) {
+    for (let r = 0; r < opts.reelCount; r++) {
+      await prisma.media.create({
+        data: {
+          profileId: prof.id,
+          url: SAMPLE_REELS[(r + opts.handle.length) % SAMPLE_REELS.length],
+          mediaType: "REEL",
+          isPublic: true,
+          isCover: false,
+          caption: pick(["Disponível hoje ✨", "Boa noite 🌙", "Agenda aberta 🔥", null, "Para quem sabe apreciar", null]),
+          sortOrder: r,
+        },
+      });
+    }
+  }
 
   await prisma.profileDurationOption.createMany({
     data: [
@@ -197,45 +231,71 @@ async function createProfile(opts: {
   return prof as ProfileRecord;
 }
 
-async function main() {
-  // ── Cleanup ───────────────────────────────────────────────────────────────
-  await prisma.financialRecord.deleteMany();
-  await prisma.whatsAppClick.deleteMany();
-  await prisma.verificationCase.deleteMany();
-  await prisma.subscription.deleteMany();
-  await prisma.review.deleteMany();
-  await prisma.mediaComment.deleteMany();
-  await prisma.mediaLike.deleteMany();
-  await prisma.profileDurationOption.deleteMany();
-  await prisma.availabilityRule.deleteMany();
-  await prisma.storyLike.deleteMany();
-  await prisma.storyView.deleteMany();
-  await prisma.story.deleteMany();
-  await prisma.media.deleteMany();
-  await prisma.favorite.deleteMany();
-  await prisma.profile.deleteMany();
-  await prisma.district.deleteMany();
-  await prisma.city.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.verificationToken.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.hotPeriodConfig.deleteMany();
+async function addVerificationCase(opts: {
+  profileId: string;
+  status: "NOVO" | "REVISAO" | "APROVADO" | "REJEITADO";
+  withDocs?: boolean;
+  withVideo?: boolean;
+  withSelfie?: boolean;
+  waitDays?: number;
+}) {
+  const waitingDate = new Date(Date.now() - (opts.waitDays ?? rnd(1, 10)) * 86400000);
+  return prisma.verificationCase.create({
+    data: {
+      profileId: opts.profileId,
+      status: opts.status,
+      documentType: opts.withDocs ? pick(["RG", "CNH", "Passaporte"]) : null,
+      documentFrontUrl: opts.withDocs ? img(`doc-front-${opts.profileId}`, 600, 400) : null,
+      documentBackUrl: opts.withDocs ? img(`doc-back-${opts.profileId}`, 600, 400) : null,
+      selfieUrl: opts.withSelfie !== false ? img(`selfie-${opts.profileId}`, 480, 640) : null,
+      videoUrl: opts.withVideo ? pick(VERIFICATION_VIDEOS) : null,
+      waitingSince: waitingDate,
+      createdAt: waitingDate,
+    },
+  });
+}
 
+async function main() {
+  // ── Cleanup completo ──────────────────────────────────────────────────────
+  await prisma.$transaction([
+    prisma.financialRecord.deleteMany(),
+    prisma.whatsAppClick.deleteMany(),
+    prisma.verificationCase.deleteMany(),
+    prisma.subscription.deleteMany(),
+    prisma.review.deleteMany(),
+    prisma.mediaComment.deleteMany(),
+    prisma.mediaLike.deleteMany(),
+    prisma.storyLike.deleteMany(),
+    prisma.storyView.deleteMany(),
+    prisma.story.deleteMany(),
+    prisma.profileDurationOption.deleteMany(),
+    prisma.availabilityRule.deleteMany(),
+    prisma.media.deleteMany(),
+    prisma.favorite.deleteMany(),
+    prisma.profile.deleteMany(),
+    prisma.district.deleteMany(),
+    prisma.city.deleteMany(),
+    prisma.session.deleteMany(),
+    prisma.account.deleteMany(),
+    prisma.verificationToken.deleteMany(),
+    prisma.hotPeriodConfig.deleteMany(),
+    prisma.user.deleteMany(),
+  ]);
   console.log("✓ DB limpo");
 
   // ── Admin ─────────────────────────────────────────────────────────────────
+  const adminPw = await bcrypt.hash("Admin@privello2025", 12);
   await prisma.user.create({
     data: {
-      name: "Privello",
-      email: "contato.privello@gmail.com",
-      slug: "privello",
-      password: await bcrypt.hash("Edz#7284@", 12),
+      name: "Admin Privello",
+      email: "admin@privello.com",
+      slug: "admin-privello",
+      password: adminPw,
       role: "ADMIN" as UserRole,
       verified: true,
     },
   });
-  console.log("✓ Admin criado");
+  console.log("✓ Admin criado — admin@privello.com / Admin@privello2025");
 
   // ── Cities ────────────────────────────────────────────────────────────────
   const sp = await prisma.city.create({ data: { name: "São Paulo, SP", slug: "sao-paulo-sp", heroImage: img("sp-city", 800, 600) } });
@@ -248,6 +308,8 @@ async function main() {
   const rec = await prisma.city.create({ data: { name: "Recife, PE", slug: "recife-pe", heroImage: img("rec-city", 800, 600) } });
   const ssa = await prisma.city.create({ data: { name: "Salvador, BA", slug: "salvador-ba", heroImage: img("ssa-city", 800, 600) } });
   const gyn = await prisma.city.create({ data: { name: "Goiânia, GO", slug: "goiania-go", heroImage: img("gyn-city", 800, 600) } });
+  const blm = await prisma.city.create({ data: { name: "Blumenau, SC", slug: "blumenau-sc", heroImage: img("blm-city", 800, 600) } });
+  const mao = await prisma.city.create({ data: { name: "Manaus, AM", slug: "manaus-am", heroImage: img("mao-city", 800, 600) } });
 
   // ── Districts ─────────────────────────────────────────────────────────────
   const jardins = await prisma.district.create({ data: { name: "Jardins", slug: "jardins", cityId: sp.id } });
@@ -255,91 +317,115 @@ async function main() {
   const pinheiros = await prisma.district.create({ data: { name: "Pinheiros", slug: "pinheiros", cityId: sp.id } });
   const moema = await prisma.district.create({ data: { name: "Moema", slug: "moema", cityId: sp.id } });
   const leblon = await prisma.district.create({ data: { name: "Leblon", slug: "leblon", cityId: rj.id } });
-  const botafogo = await prisma.district.create({ data: { name: "Botafogo", slug: "botafogo", cityId: rj.id } });
   const ipanema = await prisma.district.create({ data: { name: "Ipanema", slug: "ipanema", cityId: rj.id } });
+  const botafogo = await prisma.district.create({ data: { name: "Botafogo", slug: "botafogo", cityId: rj.id } });
   const savassi = await prisma.district.create({ data: { name: "Savassi", slug: "savassi", cityId: bh.id } });
   const asasul = await prisma.district.create({ data: { name: "Asa Sul", slug: "asa-sul", cityId: bsb.id } });
   const batel = await prisma.district.create({ data: { name: "Batel", slug: "batel", cityId: cwb.id } });
   const moinhos = await prisma.district.create({ data: { name: "Moinhos", slug: "moinhos", cityId: poa.id } });
-  const ctrofln = await prisma.district.create({ data: { name: "Centro", slug: "centro", cityId: fln.id } });
   const boaviagem = await prisma.district.create({ data: { name: "Boa Viagem", slug: "boa-viagem", cityId: rec.id } });
   const barra = await prisma.district.create({ data: { name: "Barra", slug: "barra", cityId: ssa.id } });
-  const setorsul = await prisma.district.create({ data: { name: "Setor Sul", slug: "setor-sul", cityId: gyn.id } });
-
-  const locs = [
-    { city: sp, district: jardins }, // 0
-    { city: sp, district: itaim }, // 1
-    { city: sp, district: pinheiros }, // 2
-    { city: sp, district: moema }, // 3
-    { city: rj, district: leblon }, // 4
-    { city: rj, district: botafogo }, // 5
-    { city: rj, district: ipanema }, // 6
-    { city: bh, district: savassi }, // 7
-    { city: bsb, district: asasul }, // 8
-    { city: cwb, district: batel }, // 9
-    { city: poa, district: moinhos }, // 10
-    { city: fln, district: ctrofln }, // 11
-    { city: rec, district: boaviagem }, // 12
-    { city: ssa, district: barra }, // 13
-    { city: gyn, district: setorsul }, // 14
-  ];
 
   console.log("✓ Cidades e bairros criados");
 
-  // ── 43 Garotas ────────────────────────────────────────────────────────────
-  type G = { name: string; handle: string; loc: number; price: number; tier: PlanTier; verified: boolean; online: boolean; age: number; hair: string; eyes: string; h: number; rating: number; rc: number };
+  // ── Definição dos perfis ──────────────────────────────────────────────────
+  // verified: true = Verificada com selo | false = não verificada
+  // verCase: "APROVADO" | "REJEITADO" | "REVISAO" | "NOVO" | "video" | null
+  type G = {
+    name: string; handle: string; cityId: string; districtId?: string;
+    price: number; tier: PlanTier; planDays?: number;
+    verified: boolean; age: number; hair: string; eyes: string; h: number;
+    rating: number; rc: number;
+    reels?: number; photos?: number; hasPlace?: boolean; homeVisit?: boolean;
+    verCase?: "APROVADO" | "REJEITADO" | "REVISAO" | "NOVO" | "video-novo" | "video-revisao" | null;
+    boost?: boolean; views?: number; travelsNational?: boolean;
+  };
+
   const garotas: G[] = [
-    { name: "Helena", handle: "helena", loc: 0, price: 450, tier: PlanTier.PREMIUM, verified: true, online: true, age: 27, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.9, rc: 42 },
-    { name: "Luna", handle: "luna", loc: 0, price: 650, tier: PlanTier.PREMIUM, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.8, rc: 38 },
-    { name: "Sophia", handle: "sophia", loc: 0, price: 580, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Preto", eyes: "Castanhos", h: 165, rating: 4.7, rc: 29 },
-    { name: "Isabela", handle: "isabela", loc: 1, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 24, hair: "Castanho", eyes: "Verdes", h: 163, rating: 4.5, rc: 18 },
-    { name: "Valentina", handle: "valentina", loc: 1, price: 420, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 28, hair: "Ruivo", eyes: "Castanhos", h: 166, rating: 4.3, rc: 11 },
-    { name: "Mariana", handle: "mariana", loc: 1, price: 500, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 23, hair: "Loiro", eyes: "Castanhos", h: 170, rating: 4.6, rc: 22 },
-    { name: "Camila", handle: "camila", loc: 2, price: 520, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 31 },
-    { name: "Beatriz", handle: "beatriz", loc: 2, price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Preto", eyes: "Pretos", h: 160, rating: 4.2, rc: 8 },
-    { name: "Larissa", handle: "larissa", loc: 3, price: 480, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 29, hair: "Loiro", eyes: "Verdes", h: 169, rating: 4.8, rc: 35 },
-    { name: "Fernanda", handle: "fernanda", loc: 3, price: 400, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 25, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.4, rc: 14 },
-    { name: "Aurora", handle: "aurora", loc: 4, price: 600, tier: PlanTier.PREMIUM, verified: true, online: true, age: 24, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 31 },
-    { name: "Gabriela", handle: "gabriela", loc: 4, price: 700, tier: PlanTier.PREMIUM, verified: true, online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 173, rating: 4.9, rc: 55 },
-    { name: "Natalia", handle: "natalia", loc: 4, price: 550, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 166, rating: 4.6, rc: 27 },
-    { name: "Leticia", handle: "leticia", loc: 5, price: 430, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Verdes", h: 162, rating: 4.5, rc: 19 },
-    { name: "Rafaela", handle: "rafaela", loc: 5, price: 480, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 26, hair: "Loiro", eyes: "Azuis", h: 168, rating: 4.4, rc: 12 },
-    { name: "Bianca", handle: "bianca", loc: 6, price: 620, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 171, rating: 4.9, rc: 48 },
-    { name: "Juliana", handle: "juliana", loc: 6, price: 500, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 24, hair: "Preto", eyes: "Pretos", h: 164, rating: 4.6, rc: 23 },
-    { name: "Amanda", handle: "amanda", loc: 7, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
-    { name: "Patricia", handle: "patricia", loc: 7, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 30, hair: "Loiro", eyes: "Verdes", h: 167, rating: 4.7, rc: 28 },
-    { name: "Renata", handle: "renata", loc: 7, price: 320, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Preto", eyes: "Castanhos", h: 160, rating: 4.1, rc: 7 },
-    { name: "Carolina", handle: "carolina", loc: 8, price: 420, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 26, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.6, rc: 21 },
-    { name: "Daniela", handle: "daniela", loc: 8, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 24, hair: "Loiro", eyes: "Azuis", h: 169, rating: 4.4, rc: 13 },
-    { name: "Priscila", handle: "priscila", loc: 8, price: 500, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Ruivo", eyes: "Verdes", h: 166, rating: 4.8, rc: 36 },
-    { name: "Aline", handle: "aline", loc: 9, price: 360, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 15 },
-    { name: "Tatiane", handle: "tatiane", loc: 9, price: 440, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Preto", eyes: "Pretos", h: 164, rating: 4.6, rc: 24 },
-    { name: "Vanessa", handle: "vanessa", loc: 9, price: 520, tier: PlanTier.PREMIUM, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 33 },
-    { name: "Bruna", handle: "bruna", loc: 10, price: 400, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 24, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.7, rc: 26 },
-    { name: "Claudia", handle: "claudia", loc: 10, price: 350, tier: PlanTier.ESSENCIAL, verified: false, online: false, age: 29, hair: "Loiro", eyes: "Azuis", h: 168, rating: 4.3, rc: 9 },
-    { name: "Debora", handle: "debora", loc: 10, price: 480, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 26, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.6, rc: 20 },
-    { name: "Elisa", handle: "elisa", loc: 11, price: 390, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Loiro", eyes: "Verdes", h: 166, rating: 4.5, rc: 17 },
-    { name: "Fabiana", handle: "fabiana", loc: 11, price: 460, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Castanho", eyes: "Castanhos", h: 169, rating: 4.7, rc: 30 },
-    { name: "Giovana", handle: "giovana", loc: 12, price: 340, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 24, hair: "Preto", eyes: "Castanhos", h: 161, rating: 4.4, rc: 14 },
-    { name: "Heloisa", handle: "heloisa", loc: 12, price: 420, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.6, rc: 22 },
-    { name: "Ingrid", handle: "ingrid", loc: 12, price: 300, tier: PlanTier.ESSENCIAL, verified: false, online: true, age: 22, hair: "Loiro", eyes: "Azuis", h: 162, rating: 4.2, rc: 8 },
-    { name: "Jessica", handle: "jessica", loc: 13, price: 360, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16 },
-    { name: "Karen", handle: "karen", loc: 13, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 28, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 27 },
-    { name: "Livia", handle: "livia", loc: 13, price: 520, tier: PlanTier.PREMIUM, verified: true, online: true, age: 26, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 34 },
-    { name: "Monica", handle: "monica", loc: 14, price: 330, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 13 },
-    { name: "Nathalia", handle: "nathalia", loc: 14, price: 400, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 27, hair: "Preto", eyes: "Pretos", h: 165, rating: 4.6, rc: 21 },
-    { name: "Olivia", handle: "olivia", loc: 0, price: 600, tier: PlanTier.PREMIUM, verified: true, online: true, age: 26, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.9, rc: 51 },
-    { name: "Sabrina", handle: "sabrina", loc: 5, price: 540, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.7, rc: 29 },
-    { name: "Thamires", handle: "thamires", loc: 2, price: 470, tier: PlanTier.DESTAQUE, verified: true, online: true, age: 24, hair: "Loiro", eyes: "Castanhos", h: 166, rating: 4.6, rc: 19 },
-    { name: "Vitoria", handle: "vitoria", loc: 6, price: 390, tier: PlanTier.ESSENCIAL, verified: true, online: false, age: 23, hair: "Castanho", eyes: "Verdes", h: 163, rating: 4.4, rc: 12 },
+    // ── São Paulo – Jardins ──────────────────────────────────────────────
+    { name: "Helena", handle: "helena", cityId: sp.id, districtId: jardins.id, price: 800, tier: PlanTier.PREMIUM, verified: true, age: 27, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.9, rc: 42, reels: 2, photos: 6, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 750 },
+    { name: "Luna", handle: "luna", cityId: sp.id, districtId: jardins.id, price: 950, tier: PlanTier.PREMIUM, verified: true, age: 25, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.8, rc: 38, reels: 2, photos: 5, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 680 },
+    { name: "Sophia", handle: "sophia", cityId: sp.id, districtId: jardins.id, price: 700, tier: PlanTier.DESTAQUE, verified: true, age: 26, hair: "Preto", eyes: "Castanhos", h: 165, rating: 4.7, rc: 29, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 520 },
+    { name: "Olivia", handle: "olivia", cityId: sp.id, districtId: jardins.id, price: 1100, tier: PlanTier.PREMIUM, verified: true, age: 29, hair: "Loiro", eyes: "Azuis", h: 172, rating: 4.9, rc: 51, reels: 3, photos: 7, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 820, travelsNational: true },
+    // ── São Paulo – Itaim ────────────────────────────────────────────────
+    { name: "Isabela", handle: "isabela", cityId: sp.id, districtId: itaim.id, price: 550, tier: PlanTier.ESSENCIAL, verified: true, age: 24, hair: "Castanho", eyes: "Verdes", h: 163, rating: 4.5, rc: 18, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 310 },
+    { name: "Valentina", handle: "valentina", cityId: sp.id, districtId: itaim.id, price: 480, tier: PlanTier.ESSENCIAL, verified: false, age: 28, hair: "Ruivo", eyes: "Castanhos", h: 166, rating: 4.3, rc: 11, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "NOVO", boost: false, views: 180 },
+    { name: "Mariana", handle: "mariana", cityId: sp.id, districtId: itaim.id, price: 620, tier: PlanTier.DESTAQUE, verified: true, age: 23, hair: "Loiro", eyes: "Castanhos", h: 170, rating: 4.6, rc: 22, reels: 1, photos: 4, hasPlace: true, homeVisit: true, verCase: "APROVADO", boost: false, views: 420 },
+    // ── São Paulo – Pinheiros ────────────────────────────────────────────
+    { name: "Camila", handle: "camila", cityId: sp.id, districtId: pinheiros.id, price: 580, tier: PlanTier.DESTAQUE, verified: true, age: 26, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 31, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 480 },
+    { name: "Beatriz", handle: "beatriz", cityId: sp.id, districtId: pinheiros.id, price: 380, tier: PlanTier.ESSENCIAL, verified: false, age: 22, hair: "Preto", eyes: "Pretos", h: 160, rating: 4.2, rc: 8, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: null, boost: false, views: 140 },
+    { name: "Thamires", handle: "thamires", cityId: sp.id, districtId: pinheiros.id, price: 490, tier: PlanTier.DESTAQUE, verified: false, age: 24, hair: "Loiro", eyes: "Castanhos", h: 166, rating: 0, rc: 0, reels: 1, photos: 4, hasPlace: true, homeVisit: true, verCase: "video-revisao", boost: false, views: 220 },
+    // ── São Paulo – Moema ────────────────────────────────────────────────
+    { name: "Larissa", handle: "larissa", cityId: sp.id, districtId: moema.id, price: 520, tier: PlanTier.DESTAQUE, verified: true, age: 29, hair: "Loiro", eyes: "Verdes", h: 169, rating: 4.8, rc: 35, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 560 },
+    { name: "Fernanda", handle: "fernanda", cityId: sp.id, districtId: moema.id, price: 440, tier: PlanTier.ESSENCIAL, verified: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.4, rc: 14, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 290 },
+    // ── SP sem bairro ────────────────────────────────────────────────────
+    { name: "Priya", handle: "priya", cityId: sp.id, price: 650, tier: PlanTier.PREMIUM, verified: false, age: 27, hair: "Preto", eyes: "Castanhos", h: 162, rating: 0, rc: 0, reels: 1, photos: 5, hasPlace: true, homeVisit: false, verCase: "video-novo", boost: false, views: 190 },
+    { name: "Andressa", handle: "andressa", cityId: sp.id, price: 350, tier: PlanTier.ESSENCIAL, verified: false, age: 21, hair: "Castanho", eyes: "Castanhos", h: 161, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "REVISAO", boost: false, views: 110 },
+    // ── Rio de Janeiro ───────────────────────────────────────────────────
+    { name: "Aurora", handle: "aurora", cityId: rj.id, districtId: leblon.id, price: 900, tier: PlanTier.PREMIUM, verified: true, age: 24, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 31, reels: 2, photos: 6, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 640, travelsNational: true },
+    { name: "Gabriela", handle: "gabriela", cityId: rj.id, districtId: leblon.id, price: 1000, tier: PlanTier.PREMIUM, verified: true, age: 27, hair: "Castanho", eyes: "Castanhos", h: 173, rating: 4.9, rc: 55, reels: 2, photos: 6, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 780 },
+    { name: "Natalia", handle: "natalia", cityId: rj.id, districtId: ipanema.id, price: 680, tier: PlanTier.DESTAQUE, verified: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 166, rating: 4.6, rc: 27, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 450 },
+    { name: "Leticia", handle: "leticia", cityId: rj.id, districtId: botafogo.id, price: 460, tier: PlanTier.ESSENCIAL, verified: true, age: 23, hair: "Castanho", eyes: "Verdes", h: 162, rating: 4.5, rc: 19, reels: 0, photos: 3, hasPlace: true, homeVisit: true, verCase: "APROVADO", boost: false, views: 330 },
+    { name: "Bianca", handle: "bianca", cityId: rj.id, districtId: ipanema.id, price: 750, tier: PlanTier.PREMIUM, verified: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 171, rating: 4.9, rc: 48, reels: 2, photos: 5, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 690 },
+    { name: "Rafaela", handle: "rafaela", cityId: rj.id, districtId: botafogo.id, price: 480, tier: PlanTier.ESSENCIAL, verified: false, age: 26, hair: "Loiro", eyes: "Azuis", h: 168, rating: 4.1, rc: 9, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "REJEITADO", boost: false, views: 160 },
+    { name: "Juliana", handle: "juliana", cityId: rj.id, price: 520, tier: PlanTier.DESTAQUE, verified: false, age: 24, hair: "Preto", eyes: "Pretos", h: 164, rating: 0, rc: 0, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "video-novo", boost: false, views: 200 },
+    // ── Belo Horizonte ───────────────────────────────────────────────────
+    { name: "Amanda", handle: "amanda", cityId: bh.id, districtId: savassi.id, price: 420, tier: PlanTier.ESSENCIAL, verified: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 280 },
+    { name: "Patricia", handle: "patricia", cityId: bh.id, districtId: savassi.id, price: 520, tier: PlanTier.DESTAQUE, verified: true, age: 30, hair: "Loiro", eyes: "Verdes", h: 167, rating: 4.7, rc: 28, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 390 },
+    { name: "Renata", handle: "renata", cityId: bh.id, price: 320, tier: PlanTier.ESSENCIAL, verified: false, age: 22, hair: "Preto", eyes: "Castanhos", h: 160, rating: 4.1, rc: 7, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: null, boost: false, views: 120 },
+    // ── Brasília ─────────────────────────────────────────────────────────
+    { name: "Carolina", handle: "carolina", cityId: bsb.id, districtId: asasul.id, price: 500, tier: PlanTier.DESTAQUE, verified: true, age: 26, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.6, rc: 21, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 370 },
+    { name: "Daniela", handle: "daniela", cityId: bsb.id, districtId: asasul.id, price: 420, tier: PlanTier.ESSENCIAL, verified: false, age: 24, hair: "Loiro", eyes: "Azuis", h: 169, rating: 4.2, rc: 10, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "NOVO", boost: false, views: 150 },
+    { name: "Priscila", handle: "priscila", cityId: bsb.id, price: 620, tier: PlanTier.PREMIUM, verified: true, age: 28, hair: "Ruivo", eyes: "Verdes", h: 166, rating: 4.8, rc: 36, reels: 2, photos: 5, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 590 },
+    // ── Curitiba ─────────────────────────────────────────────────────────
+    { name: "Aline", handle: "aline", cityId: cwb.id, districtId: batel.id, price: 400, tier: PlanTier.ESSENCIAL, verified: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 15, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 260 },
+    { name: "Tatiane", handle: "tatiane", cityId: cwb.id, districtId: batel.id, price: 500, tier: PlanTier.DESTAQUE, verified: true, age: 27, hair: "Preto", eyes: "Pretos", h: 164, rating: 4.6, rc: 24, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 350 },
+    { name: "Vanessa", handle: "vanessa", cityId: cwb.id, price: 680, tier: PlanTier.PREMIUM, verified: true, age: 25, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 33, reels: 2, photos: 5, hasPlace: true, homeVisit: true, verCase: "APROVADO", boost: true, views: 610, travelsNational: true },
+    // ── Porto Alegre ─────────────────────────────────────────────────────
+    { name: "Bruna", handle: "bruna", cityId: poa.id, districtId: moinhos.id, price: 450, tier: PlanTier.DESTAQUE, verified: true, age: 24, hair: "Castanho", eyes: "Castanhos", h: 165, rating: 4.7, rc: 26, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 400 },
+    { name: "Claudia", handle: "claudia", cityId: poa.id, districtId: moinhos.id, price: 350, tier: PlanTier.ESSENCIAL, verified: false, age: 29, hair: "Loiro", eyes: "Azuis", h: 168, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "video-novo", boost: false, views: 130 },
+    { name: "Debora", handle: "debora", cityId: poa.id, price: 520, tier: PlanTier.DESTAQUE, verified: false, age: 26, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.3, rc: 11, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "REVISAO", boost: false, views: 240 },
+    // ── Florianópolis ────────────────────────────────────────────────────
+    { name: "Elisa", handle: "elisa", cityId: fln.id, price: 440, tier: PlanTier.ESSENCIAL, verified: true, age: 23, hair: "Loiro", eyes: "Verdes", h: 166, rating: 4.5, rc: 17, reels: 0, photos: 3, hasPlace: true, homeVisit: true, verCase: "APROVADO", boost: false, views: 270 },
+    { name: "Fabiana", handle: "fabiana", cityId: fln.id, price: 540, tier: PlanTier.DESTAQUE, verified: true, age: 27, hair: "Castanho", eyes: "Castanhos", h: 169, rating: 4.7, rc: 30, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 430 },
+    // ── Recife ───────────────────────────────────────────────────────────
+    { name: "Giovana", handle: "giovana", cityId: rec.id, districtId: boaviagem.id, price: 380, tier: PlanTier.ESSENCIAL, verified: true, age: 24, hair: "Preto", eyes: "Castanhos", h: 161, rating: 4.4, rc: 14, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 240 },
+    { name: "Heloisa", handle: "heloisa", cityId: rec.id, districtId: boaviagem.id, price: 460, tier: PlanTier.DESTAQUE, verified: false, age: 26, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.4, rc: 15, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "video-revisao", boost: false, views: 310 },
+    { name: "Ingrid", handle: "ingrid", cityId: rec.id, price: 300, tier: PlanTier.ESSENCIAL, verified: false, age: 22, hair: "Loiro", eyes: "Azuis", h: 162, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: null, boost: false, views: 90 },
+    // ── Salvador ─────────────────────────────────────────────────────────
+    { name: "Jessica", handle: "jessica", cityId: ssa.id, districtId: barra.id, price: 400, tier: PlanTier.ESSENCIAL, verified: true, age: 25, hair: "Preto", eyes: "Castanhos", h: 163, rating: 4.5, rc: 16, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 280 },
+    { name: "Karen", handle: "karen", cityId: ssa.id, districtId: barra.id, price: 520, tier: PlanTier.DESTAQUE, verified: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 167, rating: 4.7, rc: 27, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 380 },
+    { name: "Livia", handle: "livia", cityId: ssa.id, price: 650, tier: PlanTier.PREMIUM, verified: true, age: 26, hair: "Loiro", eyes: "Verdes", h: 170, rating: 4.8, rc: 34, reels: 2, photos: 5, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 580 },
+    // ── Goiânia ──────────────────────────────────────────────────────────
+    { name: "Monica", handle: "monica", cityId: gyn.id, price: 330, tier: PlanTier.ESSENCIAL, verified: true, age: 23, hair: "Castanho", eyes: "Castanhos", h: 162, rating: 4.4, rc: 13, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 200 },
+    { name: "Nathalia", handle: "nathalia", cityId: gyn.id, price: 450, tier: PlanTier.DESTAQUE, verified: false, age: 27, hair: "Preto", eyes: "Pretos", h: 165, rating: 0, rc: 0, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "REVISAO", boost: false, views: 150 },
+    // ── Blumenau ─────────────────────────────────────────────────────────
+    { name: "Sabrina", handle: "sabrina", cityId: blm.id, price: 480, tier: PlanTier.DESTAQUE, verified: true, age: 25, hair: "Castanho", eyes: "Castanhos", h: 168, rating: 4.7, rc: 29, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 360 },
+    { name: "Vitoria", handle: "vitoria", cityId: blm.id, price: 360, tier: PlanTier.ESSENCIAL, verified: true, age: 23, hair: "Loiro", eyes: "Verdes", h: 163, rating: 4.5, rc: 18, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 230 },
+    { name: "Rafaelly", handle: "rafaelly", cityId: blm.id, price: 290, tier: PlanTier.ESSENCIAL, verified: false, age: 21, hair: "Ruivo", eyes: "Castanhos", h: 160, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: null, boost: false, views: 80 },
+    // ── Manaus ───────────────────────────────────────────────────────────
+    { name: "Yasmin", handle: "yasmin", cityId: mao.id, price: 350, tier: PlanTier.ESSENCIAL, verified: false, age: 22, hair: "Preto", eyes: "Castanhos", h: 160, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "NOVO", boost: false, views: 70 },
+    { name: "Luana", handle: "luana", cityId: mao.id, price: 420, tier: PlanTier.DESTAQUE, verified: false, age: 25, hair: "Castanho", eyes: "Castanhos", h: 164, rating: 4.3, rc: 8, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "video-novo", boost: false, views: 120 },
+  ];
+
+  const garotos: G[] = [
+    { name: "Rafael", handle: "rafael", cityId: sp.id, districtId: jardins.id, price: 650, tier: PlanTier.PREMIUM, verified: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 182, rating: 4.8, rc: 24, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 440 },
+    { name: "Bruno", handle: "bruno", cityId: rj.id, districtId: leblon.id, price: 500, tier: PlanTier.DESTAQUE, verified: true, age: 26, hair: "Preto", eyes: "Castanhos", h: 178, rating: 4.6, rc: 17, reels: 1, photos: 4, hasPlace: false, homeVisit: true, verCase: "APROVADO", boost: false, views: 320 },
+    { name: "Thiago", handle: "thiago", cityId: cwb.id, price: 380, tier: PlanTier.ESSENCIAL, verified: false, age: 25, hair: "Loiro", eyes: "Azuis", h: 180, rating: 4.5, rc: 12, reels: 0, photos: 3, hasPlace: false, homeVisit: true, verCase: "REVISAO", boost: false, views: 180 },
+    { name: "Leonardo", handle: "leonardo", cityId: bsb.id, price: 420, tier: PlanTier.DESTAQUE, verified: false, age: 30, hair: "Castanho", eyes: "Verdes", h: 176, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "NOVO", boost: false, views: 90 },
+  ];
+
+  const casais: G[] = [
+    { name: "Casal SP", handle: "casalsp", cityId: sp.id, districtId: itaim.id, price: 1200, tier: PlanTier.PREMIUM, verified: true, age: 27, hair: "Variado", eyes: "Castanhos", h: 170, rating: 4.9, rc: 31, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: true, views: 560 },
+    { name: "Casal RJ", handle: "casalrj", cityId: rj.id, districtId: ipanema.id, price: 950, tier: PlanTier.DESTAQUE, verified: true, age: 26, hair: "Variado", eyes: "Variados", h: 168, rating: 4.7, rc: 22, reels: 1, photos: 4, hasPlace: true, homeVisit: false, verCase: "APROVADO", boost: false, views: 380 },
+    { name: "Casal CWB", handle: "casalcwb", cityId: cwb.id, price: 750, tier: PlanTier.DESTAQUE, verified: false, age: 25, hair: "Variado", eyes: "Variados", h: 167, rating: 0, rc: 0, reels: 0, photos: 3, hasPlace: true, homeVisit: false, verCase: "video-novo", boost: false, views: 140 },
   ];
 
   const profiles: ProfileRecord[] = [];
-
   let code = 100;
-  for (const g of garotas) {
+
+  for (const g of [...garotas, ...garotos, ...casais]) {
     code++;
-    const loc = locs[g.loc];
     const prof = await createProfile({
       email: `${g.handle}@privello.local`,
       name: g.name,
@@ -349,119 +435,39 @@ async function main() {
       age: g.age,
       tagline: pick(TAGLINES),
       bio: pick(BIOS),
-      cityId: loc.city.id,
-      districtId: loc.district.id,
+      cityId: g.cityId,
+      districtId: g.districtId ?? null,
       priceHour: g.price,
       planTier: g.tier,
+      planDays: 30,
       isVerified: g.verified,
-      isOnline: g.online,
-      servesMen: true,
-      servesWomen: false,
-      servesCouples: false,
-      hasOwnPlace: Math.random() > 0.4,
-      homeVisit: Math.random() > 0.5,
+      servesMen: !casais.some(c => c.handle === g.handle) ? garotas.some(x => x.handle === g.handle) : true,
+      servesWomen: garotos.some(x => x.handle === g.handle) || casais.some(c => c.handle === g.handle),
+      servesCouples: casais.some(c => c.handle === g.handle),
+      hasOwnPlace: g.hasPlace ?? false,
+      homeVisit: g.homeVisit ?? false,
+      travelsNational: g.travelsNational ?? Math.random() > 0.7,
       hair: g.hair,
       eyes: g.eyes,
       heightCm: g.h,
       ratingAvg: g.rating,
       ratingCount: g.rc,
       whatsappPhone: "+5511988880000",
-      mediaCount: g.tier === PlanTier.PREMIUM ? 5 : g.tier === PlanTier.DESTAQUE ? 4 : 3,
+      mediaCount: g.photos ?? 3,
+      reelCount: g.reels ?? 0,
+      viewsCurrentPeriod: g.views ?? rnd(50, 400),
+      featuredUntil: g.boost ? future(rnd(3, 10)) : undefined,
+      boostLabel: g.boost ? pick(["Em destaque", "Top da semana", "Mais procurada"]) : undefined,
     });
     profiles.push(prof);
-    process.stdout.write(`  @${g.handle} ✓\n`);
+    process.stdout.write(`  @${g.handle} (${g.tier}) ✓\n`);
   }
 
-  // ── 4 Garotos ─────────────────────────────────────────────────────────────
-  const garotos = [
-    { name: "Rafael", handle: "rafael", loc: 0, price: 500, tier: PlanTier.PREMIUM, verified: true, online: true, age: 28, hair: "Castanho", eyes: "Castanhos", h: 182, rating: 4.8, rc: 24 },
-    { name: "Bruno", handle: "bruno", loc: 4, price: 450, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Preto", eyes: "Castanhos", h: 178, rating: 4.6, rc: 17 },
-    { name: "Thiago", handle: "thiago", loc: 9, price: 380, tier: PlanTier.ESSENCIAL, verified: true, online: true, age: 25, hair: "Loiro", eyes: "Azuis", h: 180, rating: 4.5, rc: 12 },
-    { name: "Leonardo", handle: "leonardo", loc: 8, price: 420, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 30, hair: "Castanho", eyes: "Verdes", h: 176, rating: 4.4, rc: 9 },
-  ];
+  console.log(`\n✓ ${profiles.length} perfis criados`);
 
-  for (const g of garotos) {
-    code++;
-    const loc = locs[g.loc];
-    const prof = await createProfile({
-      email: `${g.handle}@privello.local`,
-      name: g.name,
-      handle: g.handle,
-      publicCode: `PRV-${code}`,
-      displayName: g.name,
-      age: g.age,
-      tagline: pick(["Companhia discreta e agradável.", "Atendimento exclusivo para mulheres.", "Perfil verificado, agenda sob consulta."]),
-      bio: pick(BIOS),
-      cityId: loc.city.id,
-      districtId: loc.district.id,
-      priceHour: g.price,
-      planTier: g.tier,
-      isVerified: g.verified,
-      isOnline: g.online,
-      servesMen: false,
-      servesWomen: true,
-      servesCouples: false,
-      hasOwnPlace: Math.random() > 0.4,
-      homeVisit: Math.random() > 0.5,
-      hair: g.hair,
-      eyes: g.eyes,
-      heightCm: g.h,
-      ratingAvg: g.rating,
-      ratingCount: g.rc,
-      whatsappPhone: "+5511988880000",
-    });
-    profiles.push(prof);
-    process.stdout.write(`  @${g.handle} ✓\n`);
-  }
-
-  // ── 3 Casais ──────────────────────────────────────────────────────────────
-  const casais = [
-    { name: "Casal SP", handle: "casalsp", loc: 0, price: 800, tier: PlanTier.PREMIUM, verified: true, online: true, age: 27, hair: "Variado", eyes: "Castanhos", h: 170, rating: 4.9, rc: 31 },
-    { name: "Casal RJ", handle: "casalrj", loc: 4, price: 700, tier: PlanTier.DESTAQUE, verified: true, online: false, age: 26, hair: "Variado", eyes: "Variados", h: 168, rating: 4.7, rc: 22 },
-    { name: "Casal CWB", handle: "casalcwb", loc: 9, price: 550, tier: PlanTier.DESTAQUE, verified: false, online: false, age: 25, hair: "Variado", eyes: "Variados", h: 167, rating: 4.4, rc: 11 },
-  ];
-
-  for (const g of casais) {
-    code++;
-    const loc = locs[g.loc];
-    const prof = await createProfile({
-      email: `${g.handle}@privello.local`,
-      name: g.name,
-      handle: g.handle,
-      publicCode: `PRV-${code}`,
-      displayName: g.name,
-      age: g.age,
-      tagline: "Experiência a dois, com discrição total.",
-      bio: "Somos um casal verificado. Atendemos com exclusividade e total discrição. Agenda sempre por hora marcada.",
-      cityId: loc.city.id,
-      districtId: loc.district.id,
-      priceHour: g.price,
-      planTier: g.tier,
-      isVerified: g.verified,
-      isOnline: g.online,
-      servesMen: true,
-      servesWomen: true,
-      servesCouples: true,
-      hasOwnPlace: true,
-      homeVisit: false,
-      hair: g.hair,
-      eyes: g.eyes,
-      heightCm: g.h,
-      ratingAvg: g.rating,
-      ratingCount: g.rc,
-      whatsappPhone: "+5511988880000",
-    });
-    profiles.push(prof);
-    process.stdout.write(`  @${g.handle} ✓\n`);
-  }
-
-  console.log(`\n✓ ${garotas.length + garotos.length + casais.length} perfis genéricos criados`);
-
-  // ── Conta especial: @dudalanzarin (PREMIUM + boost 7 dias) ────────────────
+  // ── Conta especial: @dudalanzarin ─────────────────────────────────────────
   code++;
-  const pwHash = await bcrypt.hash("Edz#7284@", 12);
-  const boostUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
+  const pwHash = await bcrypt.hash("Admin@privello2025", 12);
   const dudaProf = await createProfile({
     email: "eduardalanzarin@gmail.com",
     name: "Eduarda Lanzarin",
@@ -473,123 +479,118 @@ async function main() {
     bio: "Sou discreta, sofisticada e pontual. Atendo com exclusividade em local próprio nos Jardins. Perfil verificado.",
     cityId: sp.id,
     districtId: jardins.id,
-    priceHour: 800,
+    priceHour: 1000,
     planTier: PlanTier.PREMIUM,
+    planDays: 30,
     isVerified: true,
-    isOnline: true,
-    servesMen: true,
-    servesWomen: false,
-    servesCouples: false,
-    hasOwnPlace: true,
-    homeVisit: false,
-    hair: "Castanho",
-    eyes: "Castanhos",
-    heightCm: 168,
-    ratingAvg: 5.0,
-    ratingCount: 3,
+    servesMen: true, servesWomen: false, servesCouples: false,
+    hasOwnPlace: true, homeVisit: false, travelsNational: true,
+    hair: "Castanho", eyes: "Castanhos", heightCm: 168,
+    ratingAvg: 5.0, ratingCount: 3,
     whatsappPhone: "+5511999999999",
-    mediaCount: 6,
+    mediaCount: 7, reelCount: 3,
     password: pwHash,
-    featuredUntil: boostUntil,
+    featuredUntil: future(10),
     boostLabel: "Em destaque",
+    viewsCurrentPeriod: 920,
   });
   profiles.push(dudaProf);
-  console.log("✓ @dudalanzarin (Premium + boost) criada — eduardalanzarin@gmail.com");
+  console.log("✓ @dudalanzarin (Premium + boost)");
 
-  // ── 19 Clientes genéricos ─────────────────────────────────────────────────
-  const clientNames = [
-    { name: "Carlos Silva", email: "carlos.silva@email.local" },
-    { name: "Pedro Alves", email: "pedro.alves@email.local" },
-    { name: "Lucas Ferreira", email: "lucas.ferreira@email.local" },
-    { name: "Mateus Costa", email: "mateus.costa@email.local" },
-    { name: "Gabriel Santos", email: "gabriel.santos@email.local" },
-    { name: "Felipe Oliveira", email: "felipe.oliveira@email.local" },
-    { name: "Andre Sousa", email: "andre.sousa@email.local" },
-    { name: "Rodrigo Lima", email: "rodrigo.lima@email.local" },
-    { name: "Diego Pereira", email: "diego.pereira@email.local" },
-    { name: "Marcos Ribeiro", email: "marcos.ribeiro@email.local" },
-    { name: "Vinicius Carvalho", email: "vinicius.carvalho@email.local" },
-    { name: "Thiago Nunes", email: "thiago.nunes@email.local" },
-    { name: "Bruno Martins", email: "bruno.martins@email.local" },
-    { name: "Rafael Gomes", email: "rafael.gomes@email.local" },
-    { name: "Gustavo Torres", email: "gustavo.torres@email.local" },
-    { name: "Leonardo Dias", email: "leonardo.dias@email.local" },
-    { name: "Henrique Araujo", email: "henrique.araujo@email.local" },
-    { name: "Samuel Barbosa", email: "samuel.barbosa@email.local" },
-    { name: "Igor Nascimento", email: "igor.nascimento@email.local" },
-  ];
+  // ── Casos de verificação variados ────────────────────────────────────────
+  const profileByHandle = (h: string) => profiles.find(p => (p as { slug: string }).slug === h);
 
-  const clientUsers: { id: string }[] = [];
-  const clientPw = await bcrypt.hash("Cliente#123", 12);
-
-  for (const c of clientNames) {
-    const u = await prisma.user.create({
-      data: { name: c.name, email: c.email, password: clientPw, role: UserRole.CLIENT, verified: true },
-    });
-    clientUsers.push(u);
+  // Aprovados (já verificadas — apenas registro histórico)
+  const aprovadas = garotas.filter(g => g.verCase === "APROVADO" && g.verified).slice(0, 8);
+  for (const g of aprovadas) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "APROVADO", withDocs: true, withSelfie: true, withVideo: false, waitDays: rnd(20, 60) });
   }
 
-  // ── Conta especial: @edulanzarin (cliente assinante) ──────────────────────
-  const eduClient = await prisma.user.create({
-    data: {
-      name: "Eduardo Lanzarin",
-      slug: "edulanzarin",
-      email: "eduardolanzarin@gmail.com",
-      password: pwHash,
-      role: UserRole.CLIENT,
-      verified: true,
-    },
-  });
-  clientUsers.push(eduClient);
-  console.log("✓ Cliente @edulanzarin criado — eduardolanzarin@gmail.com");
-
-  // ── Assinaturas: 12 genéricos + Eduardo ───────────────────────────────────
-  const subExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  const subscribers = [...clientUsers.slice(0, 12), eduClient];
-  for (const u of subscribers) {
-    await prisma.subscription.create({
-      data: { userId: u.id, status: "ACTIVE", expiresAt: subExpiry },
-    });
+  // Pendentes com video (NOVO - enviaram vídeo de verificação)
+  const videoNovo = [...garotas, ...casais].filter(g => g.verCase === "video-novo");
+  for (const g of videoNovo) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "NOVO", withDocs: true, withSelfie: true, withVideo: true, waitDays: rnd(1, 3) });
   }
-  console.log(`✓ ${subscribers.length} assinaturas criadas`);
 
-  // ── Boosts extras em 6 perfis DESTAQUE/PREMIUM ────────────────────────────
-  const boostCandidates = profiles.filter(p => p.planTier !== PlanTier.ESSENCIAL).slice(0, 6);
-  for (const p of boostCandidates) {
-    await prisma.profile.update({
-      where: { id: p.id },
-      data: {
-        featuredUntil: new Date(Date.now() + rnd(3, 10) * 24 * 60 * 60 * 1000),
-        boostLabel: pick(["Em destaque", "Top da semana", "Mais procurada"]),
-      },
-    });
+  // Em revisão com video
+  const videoRevisao = [...garotas, ...garotos].filter(g => g.verCase === "video-revisao");
+  for (const g of videoRevisao) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "REVISAO", withDocs: true, withSelfie: true, withVideo: true, waitDays: rnd(3, 7) });
   }
-  console.log(`✓ ${boostCandidates.length} boosts adicionais aplicados`);
+
+  // Pendentes sem video (NOVO)
+  const novoSemVideo = [...garotas, ...garotos, ...casais].filter(g => g.verCase === "NOVO");
+  for (const g of novoSemVideo) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "NOVO", withDocs: true, withSelfie: true, withVideo: false, waitDays: rnd(1, 5) });
+  }
+
+  // Em revisão sem video
+  const revisaoSemVideo = [...garotas, ...garotos].filter(g => g.verCase === "REVISAO");
+  for (const g of revisaoSemVideo) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "REVISAO", withDocs: true, withSelfie: true, withVideo: false, waitDays: rnd(2, 8) });
+  }
+
+  // Rejeitados
+  const rejeitados = garotas.filter(g => g.verCase === "REJEITADO");
+  for (const g of rejeitados) {
+    const prof = profileByHandle(g.handle);
+    if (prof) await addVerificationCase({ profileId: prof.id, status: "REJEITADO", withDocs: true, withSelfie: true, withVideo: false, waitDays: 15 });
+  }
+
+  // Duda: aprovada
+  await addVerificationCase({ profileId: dudaProf.id, status: "APROVADO", withDocs: true, withSelfie: true, withVideo: true, waitDays: 25 });
+
+  const vcTotal = await prisma.verificationCase.count();
+  console.log(`✓ ${vcTotal} casos de verificação criados`);
 
   // ── HotPeriodConfig ───────────────────────────────────────────────────────
   await prisma.hotPeriodConfig.create({ data: { id: "hot", startedAt: new Date() } });
 
-  // ── Stories (DESTAQUE ganha 1, PREMIUM ganha 2) ───────────────────────────
+  // ── 20 Clientes ───────────────────────────────────────────────────────────
+  const clientNames = [
+    "Carlos Silva", "Pedro Alves", "Lucas Ferreira", "Mateus Costa",
+    "Gabriel Santos", "Felipe Oliveira", "Andre Sousa", "Rodrigo Lima",
+    "Diego Pereira", "Marcos Ribeiro", "Vinicius Carvalho", "Thiago Nunes",
+    "Bruno Martins", "Rafael Gomes", "Gustavo Torres", "Leonardo Dias",
+    "Henrique Araujo", "Samuel Barbosa", "Igor Nascimento", "Caio Freitas",
+  ];
+  const clientPw = await bcrypt.hash("Cliente#123", 12);
+  const clientUsers: { id: string }[] = [];
+  for (const name of clientNames) {
+    const handle = name.toLowerCase().replace(/\s/g, ".");
+    const u = await prisma.user.create({
+      data: { name, email: `${handle}@email.local`, password: clientPw, role: UserRole.CLIENT, verified: true },
+    });
+    clientUsers.push(u);
+  }
+
+  // Conta do dono (cliente assinante)
+  const eduClient = await prisma.user.create({
+    data: { name: "Eduardo Lanzarin", slug: "edulanzarin", email: "eduardolanzarin@gmail.com", password: pwHash, role: UserRole.CLIENT, verified: true },
+  });
+  clientUsers.push(eduClient);
+  console.log(`✓ ${clientUsers.length} clientes criados`);
+
+  // ── Assinaturas ───────────────────────────────────────────────────────────
+  const subExpiry = future(30);
+  const subscribers = [...clientUsers.slice(0, 14), eduClient];
+  for (const u of subscribers) {
+    await prisma.subscription.create({ data: { userId: u.id, status: "ACTIVE", expiresAt: subExpiry } });
+  }
+  console.log(`✓ ${subscribers.length} assinaturas criadas`);
+
+  // ── Stories ───────────────────────────────────────────────────────────────
   const storyProfiles = await prisma.profile.findMany({
     where: { planTier: { in: ["DESTAQUE", "PREMIUM"] } },
     include: { media: { where: { isCover: true }, take: 1 } },
   });
-  const storyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const storyCaptions = [
-    "Disponível hoje 🌙",
-    "Nova foto adicionada ✨",
-    "Agenda aberta para o fim de semana",
-    "Local próprio, discreto e confortável",
-    "Primeiros 30min com preço especial",
-    null,
-    "Fim de semana livre 💫",
-    null,
-    "Atendo com hora marcada",
-    "Disponível agora",
-    null,
-    "Experiência única e inesquecível",
-  ];
-
+  const storyExpiry = future(1);
+  const storyCaptions = ["Disponível hoje 🌙", "Nova foto ✨", "Agenda aberta", "Local próprio 💫", null, "Atendo agora 🔥", null];
   const createdStories: { id: string }[] = [];
   for (let i = 0; i < storyProfiles.length; i++) {
     const p = storyProfiles[i];
@@ -608,11 +609,9 @@ async function main() {
       createdStories.push(s);
     }
   }
-  console.log(`✓ ${createdStories.length} stories criados`);
 
-  // ── StoryViews e StoryLikes ───────────────────────────────────────────────
   for (const story of createdStories) {
-    const viewers = shuffle(clientUsers).slice(0, rnd(3, 12));
+    const viewers = shuffle(clientUsers).slice(0, rnd(2, 10));
     for (const u of viewers) {
       await prisma.storyView.create({ data: { storyId: story.id, userId: u.id } });
       if (Math.random() > 0.5) {
@@ -620,103 +619,47 @@ async function main() {
       }
     }
   }
-  console.log("✓ StoryViews e StoryLikes criados");
+  console.log(`✓ ${createdStories.length} stories criados`);
 
-  // ── Reels ─────────────────────────────────────────────────────────────────
-  const SAMPLE_VIDEOS = [
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
-  ];
-  const REEL_CAPTIONS = [
-    "Bom dia 🌙",
-    "Disponível hoje ✨",
-    "Nova semana, nova energia",
-    "Fim de semana especial 💫",
-    null,
-    "Atendo com hora marcada",
-    "Agenda aberta 🔥",
-    null,
-    "Para quem sabe apreciar",
-    "Momentos únicos",
-    null,
-    "Local próprio e discreto",
-    "Experiência inesquecível ✨",
-    null,
-    "Olha o que preparei pra vocês 😉",
-  ];
-
-  // Give ~15 profiles 1-2 reels each (PREMIUM and DESTAQUE profiles first)
-  const reelProfiles = [
-    ...profiles.filter(p => p.planTier === PlanTier.PREMIUM),
-    ...profiles.filter(p => p.planTier === PlanTier.DESTAQUE),
-    ...profiles.filter(p => p.planTier === PlanTier.ESSENCIAL),
-  ].slice(0, 15);
-
-  let reelCount = 0;
-  for (let i = 0; i < reelProfiles.length; i++) {
-    const p = reelProfiles[i];
-    const count = i < 8 ? 2 : 1;
-    for (let j = 0; j < count; j++) {
-      await prisma.media.create({
-        data: {
-          profileId: p.id,
-          url: SAMPLE_VIDEOS[(reelCount) % SAMPLE_VIDEOS.length],
-          mediaType: "REEL",
-          isPublic: true,
-          isCover: false,
-          caption: REEL_CAPTIONS[(reelCount) % REEL_CAPTIONS.length],
-          sortOrder: j,
-        },
-      });
-      reelCount++;
-    }
-  }
-  console.log(`✓ ${reelCount} reels criados`);
-
-  // ── MediaLikes e MediaComments ────────────────────────────────────────────
+  // ── MediaLikes e Comments ─────────────────────────────────────────────────
   const allMedia = await prisma.media.findMany({ where: { isPublic: true } });
-
   for (const media of allMedia) {
-    const likers = shuffle(clientUsers).slice(0, rnd(2, 10));
+    const likers = shuffle(clientUsers).slice(0, rnd(1, 8));
     for (const u of likers) {
-      await prisma.mediaLike.createMany({
-        data: [{ mediaId: media.id, userId: u.id }],
-        skipDuplicates: true,
-      });
+      await prisma.mediaLike.createMany({ data: [{ mediaId: media.id, userId: u.id }], skipDuplicates: true });
     }
-    if (Math.random() > 0.55) {
-      const commenter = pick(subscribers);
+    if (Math.random() > 0.6) {
       await prisma.mediaComment.create({
-        data: { mediaId: media.id, userId: commenter.id, text: pick(COMMENTS) },
+        data: { mediaId: media.id, userId: pick(subscribers).id, text: pick(COMMENTS) },
       });
     }
   }
-  console.log("✓ MediaLikes e MediaComments criados");
+  console.log("✓ MediaLikes e Comments criados");
 
   // ── Reviews ───────────────────────────────────────────────────────────────
-  for (const prof of profiles.slice(0, 25)) {
+  for (const prof of profiles.filter(p => typeof p.ratingCount === "number" && p.ratingCount > 0).slice(0, 30)) {
     const reviewers = shuffle(subscribers).slice(0, rnd(1, 4));
     for (const u of reviewers) {
       await prisma.review.create({
-        data: {
-          profileId: prof.id,
-          userId: u.id,
-          rating: rnd(4, 5),
-          comment: Math.random() > 0.3 ? pick(REVIEW_TEXTS) : null,
-        },
+        data: { profileId: prof.id, userId: u.id, rating: rnd(4, 5), comment: Math.random() > 0.3 ? pick(REVIEW_TEXTS) : null },
       }).catch(() => { });
     }
   }
   console.log("✓ Reviews criadas");
 
+  // ── Favoritos ─────────────────────────────────────────────────────────────
+  for (const u of subscribers.slice(0, 10)) {
+    const favProfiles = shuffle(profiles).slice(0, rnd(2, 6));
+    for (const prof of favProfiles) {
+      await prisma.favorite.create({ data: { userId: u.id, profileId: prof.id } }).catch(() => { });
+    }
+  }
+  console.log("✓ Favoritos criados");
+
   const total = await prisma.profile.count();
   console.log(`\n✅ Seed completo — ${total} perfis no banco`);
+  console.log("\n🔑 Admin: admin@privello.com / Admin@privello2025");
+  console.log("🔑 Eduardo (cliente): eduardolanzarin@gmail.com / Admin@privello2025");
 }
 
 main()
