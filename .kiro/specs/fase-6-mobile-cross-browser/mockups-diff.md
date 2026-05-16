@@ -66,7 +66,25 @@ Count = 11 ✓ (alinhado a `requirements.md > §2 Inventário baseline`).
 
 ### Smoke `--list` (Tarefa 3.3)
 
-Log de `npm run test:e2e -- --list` será anexado após Tarefa 3.3.
+`npm run test:e2e -- --list` (executado em 2026-05-17, sessão fase-6) lista 60 specs distribuídas nos 4 projects:
+
+```
+[ios-safari]      → 15 specs (4 ios-bug-condition + 11 preservation)
+[desktop-chrome]  → 15 specs (4 ios-bug-condition + 11 preservation)
+[desktop-firefox] → 15 specs (4 ios-bug-condition + 11 preservation)
+[android-chrome]  → 15 specs (4 ios-bug-condition + 11 preservation)
+Exit code: 0
+```
+
+Os 4 projects foram aceitos pelo Playwright runner sem erro de configuração. Execução completa dos specs nos 4 projects é **opcional** (depende dos browsers instalados localmente — `webkit` e `chromium` são fornecidos por `@playwright/browsers`; `firefox` precisa de `npx playwright install firefox`). Critério de Done desta fase: `--list` exit 0 com 4 projects ✓.
+
+### Tarefa 3.4 — Smoke browser manual desktop Safari + desktop Edge
+
+- **Status:** _Pendente smoke browser manual pelo desenvolvedor humano._
+- **Critério:** smoke local visualizando 3 telas-âncora (`/`, `/p/[slug]`, `/painel`) em cada um.
+- **Cabeçalho preparado:**
+  - **macOS Safari (versão real):** layout não quebra? Fontes carregam? View Transitions executam? Bottom nav fixa? Lightbox abre? `[ ] sim` `[ ] não` — observações:
+  - **Edge (versão real):** mesmas perguntas — observações:
 
 ---
 

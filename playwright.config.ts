@@ -49,6 +49,23 @@ export default defineConfig({
                 browserName: "chromium",
             },
         },
+        // ── Adicionados na fase-6 (mobile/cross-browser) ──
+        // Cobertura Firefox via ESR; ver `.kiro/specs/fase-6-mobile-cross-browser/mockups-diff.md > §Browser Matrix`.
+        {
+            name: "desktop-firefox",
+            use: {
+                ...devices["Desktop Firefox"],
+                browserName: "firefox",
+            },
+        },
+        // Cobertura Android Chrome via Pixel 7 device descriptor.
+        {
+            name: "android-chrome",
+            use: {
+                ...devices["Pixel 7"],
+                browserName: "chromium",
+            },
+        },
     ],
     webServer: {
         // Bind to 0.0.0.0 so 192.168.1.96 is reachable; the npm script already does
