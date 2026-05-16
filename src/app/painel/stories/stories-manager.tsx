@@ -192,7 +192,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
             <button
               type="button"
               onClick={() => { setPreview(null); setSelectedFile(null); }}
-              className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-[10px] font-semibold text-white hover:bg-black/80"
+              className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-2xs font-semibold text-white hover:bg-black/80"
             >
               Trocar
             </button>
@@ -219,7 +219,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
         {/* Caption */}
         <div>
-          <label className="block text-[13px] font-medium text-foreground mb-1.5">
+          <label className="block text-base font-medium text-foreground mb-1.5">
             Texto (opcional)
           </label>
           <input
@@ -227,16 +227,16 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Uma frase sobre o momento..."
             maxLength={150}
-            className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
+            className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
           />
-          <p className="mt-1 text-right text-[10px] text-muted">{caption.length}/150</p>
+          <p className="mt-1 text-right text-2xs text-muted">{caption.length}/150</p>
         </div>
 
         <button
           type="button"
           onClick={handlePublish}
           disabled={!selectedFile || uploading}
-          className="w-full rounded-lg bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
+          className="w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">

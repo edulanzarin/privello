@@ -39,9 +39,9 @@ export default async function AdminFinanceiroPage() {
           { label: "Assinaturas de clientes", value: fmt(subMRR), sub: `${activeSubscriptions.length} assinantes ativos` },
         ].map(({ label, value, sub }) => (
           <div key={label} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</p>
+            <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
             <p className="mt-1.5 text-2xl font-bold tabular-nums">{value}</p>
-            <p className="mt-0.5 text-[10px] text-muted">{sub}</p>
+            <p className="mt-0.5 text-2xs text-muted">{sub}</p>
           </div>
         ))}
       </div>
@@ -50,7 +50,7 @@ export default async function AdminFinanceiroPage() {
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         {planStats.map((g) => (
           <div key={g.planTier} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
+            <p className="text-2xs font-bold uppercase tracking-wider text-muted">
               {PLAN_LABELS[g.planTier] ?? g.planTier}
             </p>
             <p className="mt-1 text-xl font-bold">{g._count} perfis</p>
@@ -67,7 +67,7 @@ export default async function AdminFinanceiroPage() {
           { label: "Canceladas", value: cancelledSubs },
         ].map(({ label, value }) => (
           <div key={label} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</p>
+            <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
             <p className="mt-1 text-xl font-bold">{value}</p>
           </div>
         ))}
@@ -77,11 +77,11 @@ export default async function AdminFinanceiroPage() {
       {activeSubscriptions.length > 0 && (
         <div className="mt-5 rounded border border-line bg-white shadow-sm">
           <div className="border-b border-line px-4 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Assinantes ativos recentes</p>
+            <p className="text-2xs font-bold uppercase tracking-wider text-muted">Assinantes ativos recentes</p>
           </div>
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-line text-[10px] font-bold uppercase tracking-wider text-muted">
+              <tr className="border-b border-line text-2xs font-bold uppercase tracking-wider text-muted">
                 <th className="px-4 py-2.5">Usuário</th>
                 <th className="px-4 py-2.5">Email</th>
                 <th className="px-4 py-2.5">Expira em</th>
@@ -102,7 +102,7 @@ export default async function AdminFinanceiroPage() {
         </div>
       )}
 
-      <p className="mt-6 text-[11px] text-muted">
+      <p className="mt-6 text-xs text-muted">
         * Valores estimados. Integração com Mercado Pago necessária para dados reais de pagamento.
       </p>
     </AdminShell>

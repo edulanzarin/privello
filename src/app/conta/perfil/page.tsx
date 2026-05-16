@@ -84,17 +84,17 @@ export default async function ClientPerfilPage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-                <h1 className="text-[22px] font-semibold tracking-tight">
+                <h1 className="text-3xl font-semibold tracking-tight">
                   {user?.name ?? "Usuário"}
                 </h1>
                 {subscribed && <Badge variant="coral">Assinante</Badge>}
               </div>
               {handle && (
-                <p className="mt-0.5 text-[13px] text-muted">@{handle}</p>
+                <p className="mt-0.5 text-base text-muted">@{handle}</p>
               )}
-              <p className="mt-0.5 text-[13px] text-muted">{session.user.email}</p>
+              <p className="mt-0.5 text-base text-muted">{session.user.email}</p>
               {memberSince && (
-                <p className="mt-2 flex items-center justify-center gap-1.5 text-[12px] text-muted sm:justify-start">
+                <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-muted sm:justify-start">
                   <Calendar className="h-3 w-3" strokeWidth={1.5} />
                   Membro desde {memberSince}
                 </p>
@@ -110,7 +110,7 @@ export default async function ClientPerfilPage() {
               <form action={async () => { "use server"; await signOut({ redirectTo: "/entrar" }); }}>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[12px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
                 >
                   <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
                   Sair
@@ -123,11 +123,11 @@ export default async function ClientPerfilPage() {
         {/* ── Subscription status ── */}
         {subscribed && activeSub ? (
           <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-black/[0.06] bg-white px-5 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-[#248a3d]">
+            <div className="flex items-center gap-2 text-success-dark">
               <Crown className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-              <span className="text-[13px] font-semibold">Assinante ativo</span>
+              <span className="text-base font-semibold">Assinante ativo</span>
             </div>
-            <span className="text-[12px] text-muted">
+            <span className="text-sm text-muted">
               Renova em{" "}
               {new Date(activeSub.expiresAt).toLocaleDateString("pt-BR", {
                 day: "numeric",
@@ -140,11 +140,11 @@ export default async function ClientPerfilPage() {
           <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-black/[0.06] bg-white px-5 py-3 shadow-sm">
             <div className="flex items-center gap-2 text-muted">
               <Lock className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-              <span className="text-[13px]">Sem assinatura — fotos privadas e avaliações bloqueadas</span>
+              <span className="text-base">Sem assinatura — fotos privadas e avaliações bloqueadas</span>
             </div>
             <Link
               href="/assinar"
-              className="shrink-0 rounded-full bg-coral px-4 py-1.5 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+              className="shrink-0 rounded-full bg-coral px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
             >
               Assinar
             </Link>

@@ -66,7 +66,7 @@ export default async function ProfileReelsPage({ params }: PageProps) {
           )}
           <div>
             <p className="text-sm font-bold leading-tight text-white">{profile.displayName}</p>
-            <p className="text-[11px] text-white/50">{profile.city.name} · Reels</p>
+            <p className="text-xs text-white/50">{profile.city.name} · Reels</p>
           </div>
         </Link>
       </div>

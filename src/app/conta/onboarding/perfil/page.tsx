@@ -21,7 +21,7 @@ export default async function OnboardingPerfilPage() {
     <div className="flex min-h-screen flex-col md:flex-row">
       <OnboardingSidebar current="perfil" />
       <main className="flex-1 bg-background px-6 py-10 md:px-14">
-        <p className="text-[11px] font-medium text-muted">Passo 01 de 04</p>
+        <p className="text-xs font-medium text-muted">Passo 01 de 04</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight">
           Seu perfil<span className="text-coral">.</span>
         </h1>

@@ -237,7 +237,7 @@ export function ProviderRegisterForm() {
                 >
                   {done ? "✓" : n}
                 </div>
-                <span className={cn("mt-1.5 text-[9px] font-medium", active ? "text-foreground" : "text-muted")}>
+                <span className={cn("mt-1.5 text-2xs font-medium", active ? "text-foreground" : "text-muted")}>
                   {label}
                 </span>
               </div>
@@ -259,7 +259,7 @@ export function ProviderRegisterForm() {
       {step === 1 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-[14px] font-semibold mb-5">Como você é conhecida</p>
+            <p className="text-md font-semibold mb-5">Como você é conhecida</p>
 
             <div className="space-y-5">
               <Input
@@ -290,7 +290,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card className="overflow-visible">
-            <p className="text-[14px] font-semibold mb-5">Dados básicos</p>
+            <p className="text-md font-semibold mb-5">Dados básicos</p>
 
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -321,7 +321,7 @@ export function ProviderRegisterForm() {
       {step === 2 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-[14px] font-semibold mb-5">Contato</p>
+            <p className="text-md font-semibold mb-5">Contato</p>
             <Input
               label="WhatsApp (com DDD)"
               type="tel"
@@ -332,7 +332,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-[14px] font-semibold mb-5">Apresentação</p>
+            <p className="text-md font-semibold mb-5">Apresentação</p>
 
             <div className="space-y-5">
               <Input
@@ -351,13 +351,13 @@ export function ProviderRegisterForm() {
                   rows={5}
                   placeholder="Fale sobre você, seu estilo, o que você oferece..."
                 />
-                <p className="mt-1 text-[10px] text-muted">{bio.length}/20 mín.</p>
+                <p className="mt-1 text-2xs text-muted">{bio.length}/20 mín.</p>
               </div>
             </div>
           </Card>
 
           <Card>
-            <p className="text-[14px] font-semibold mb-5">Características</p>
+            <p className="text-md font-semibold mb-5">Características</p>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <Input
@@ -412,7 +412,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-[14px] font-semibold mb-5">Atendimento</p>
+            <p className="text-md font-semibold mb-5">Atendimento</p>
 
             <div className="space-y-4">
               <div>
@@ -443,7 +443,7 @@ export function ProviderRegisterForm() {
         <div className="space-y-5 animate-fade-in">
           <Card padding="none">
             <div className="border-b border-line/50 px-6 py-4">
-              <p className="text-[14px] font-semibold">Durações e valores</p>
+              <p className="text-md font-semibold">Durações e valores</p>
               <p className="mt-1 text-xs text-muted">Ative as durações que você oferece.</p>
             </div>
             <div className="divide-y divide-line/50">
@@ -479,7 +479,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-[14px] font-semibold mb-4">Formas de pagamento</p>
+            <p className="text-md font-semibold mb-4">Formas de pagamento</p>
             <div className="flex flex-wrap gap-2">
               {PAYMENT_OPTIONS.map((p) => (
                 <ToggleChip
@@ -499,7 +499,7 @@ export function ProviderRegisterForm() {
       {step === 4 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-[14px] font-semibold mb-2">Dados de acesso</p>
+            <p className="text-md font-semibold mb-2">Dados de acesso</p>
             <p className="text-xs text-muted mb-5">Privados — não aparecem no seu anúncio.</p>
 
             <div className="space-y-4">
@@ -525,7 +525,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card variant="glass">
-            <p className="text-[14px] font-semibold mb-3">Resumo</p>
+            <p className="text-md font-semibold mb-3">Resumo</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
               <span className="text-muted">Nome artístico</span>
               <span className="font-semibold">{displayName}</span>
@@ -546,7 +546,7 @@ export function ProviderRegisterForm() {
       {step === 5 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-[14px] font-semibold mb-1">Foto de perfil</p>
+            <p className="text-md font-semibold mb-1">Foto de perfil</p>
             <p className="text-xs text-muted mb-5">
               Será sua foto principal — você pode trocar depois no painel.
             </p>
@@ -565,7 +565,7 @@ export function ProviderRegisterForm() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="text-[11px]">Toque para selecionar</span>
+                    <span className="text-xs">Toque para selecionar</span>
                   </div>
                 )}
               </div>
@@ -584,7 +584,7 @@ export function ProviderRegisterForm() {
               <button
                 type="button"
                 onClick={() => document.getElementById("photo-input")?.click()}
-                className="rounded-xl border border-black/10 bg-white px-4 py-2 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
+                className="rounded-xl border border-black/10 bg-white px-4 py-2 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
               >
                 {photoPreviewUrl ? "Trocar foto" : "Selecionar foto"}
               </button>

@@ -177,15 +177,15 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-[13px] text-[#ff3b30]">{error}</div>
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-base text-danger">{error}</div>
         )}
 
         {/* ── Localização e contato ── */}
         <Card variant="solid" padding="lg" className="space-y-5">
-          <p className="text-[14px] font-semibold">Localização e contato</p>
+          <p className="text-md font-semibold">Localização e contato</p>
           <div className="space-y-1.5">
-            <span className="block text-[13px] font-medium text-foreground">Cidade onde atende</span>
-            <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-[#0a84ff] focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
+            <span className="block text-base font-medium text-foreground">Cidade onde atende</span>
+            <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-blue focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
               <CityAutocomplete
                 compact
                 initialLabel={cityName}
@@ -204,7 +204,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
         {/* ── Apresentação ── */}
         <Card variant="solid" padding="lg" className="space-y-5">
-          <p className="text-[14px] font-semibold">Apresentação</p>
+          <p className="text-md font-semibold">Apresentação</p>
           <Input
             name="tagline"
             defaultValue={profile.tagline ?? ""}
@@ -225,8 +225,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         {/* ── Voz ── */}
         <Card variant="solid" padding="lg" className="space-y-4">
           <div>
-            <p className="text-[14px] font-semibold">Áudio — Ouça minha voz</p>
-            <p className="mt-0.5 text-[13px] text-muted">Aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.</p>
+            <p className="text-md font-semibold">Áudio — Ouça minha voz</p>
+            <p className="mt-0.5 text-base text-muted">Aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.</p>
           </div>
 
           {pendingAudio ? (
@@ -245,13 +245,13 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                 >
                   <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
                 </button>
-                <p className="flex-1 text-[13px] text-muted">Ouça antes de confirmar</p>
+                <p className="flex-1 text-base text-muted">Ouça antes de confirmar</p>
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => { URL.revokeObjectURL(pendingAudio.localUrl); setPendingAudio(null); }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-[13px] font-medium text-muted transition hover:bg-black/[0.03] hover:text-foreground"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-base font-medium text-muted transition hover:bg-black/[0.03] hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" strokeWidth={2} /> Descartar
                 </button>
@@ -263,7 +263,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                     URL.revokeObjectURL(pendingAudio.localUrl);
                     setPendingAudio(null);
                   }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-[13px] font-medium text-white transition hover:bg-foreground/80 disabled:opacity-40"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-base font-medium text-white transition hover:bg-foreground/80 disabled:opacity-40"
                 >
                   {audioUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   {audioUploading ? "Enviando…" : "Confirmar"}
@@ -289,7 +289,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   : <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
                 }
               </button>
-              <p className="flex-1 truncate text-[13px] text-muted">{audioUrl.split("/").pop()}</p>
+              <p className="flex-1 truncate text-base text-muted">{audioUrl.split("/").pop()}</p>
               <button
                 type="button"
                 onClick={removeAudio}
@@ -315,7 +315,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-50" />
                     <span className="relative inline-flex h-3 w-3 rounded-full bg-coral" />
                   </span>
-                  <span className="flex-1 text-[14px] font-semibold text-coral tabular-nums">
+                  <span className="flex-1 text-md font-semibold text-coral tabular-nums">
                     {Math.floor(recordSecs / 60).toString().padStart(2, "0")}:{(recordSecs % 60).toString().padStart(2, "0")}
                   </span>
                   <button
@@ -337,12 +337,12 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   >
                     <Mic className="h-6 w-6" strokeWidth={1.5} />
                   </button>
-                  <p className="text-[13px] font-medium text-foreground">Gravar agora</p>
+                  <p className="text-base font-medium text-foreground">Gravar agora</p>
                   <button
                     type="button"
                     onClick={() => audioInputRef.current?.click()}
                     disabled={audioUploading}
-                    className="flex items-center gap-1.5 text-[12px] text-muted transition hover:text-foreground disabled:opacity-40"
+                    className="flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground disabled:opacity-40"
                   >
                     {audioUploading
                       ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -358,7 +358,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
         {/* ── Características físicas ── */}
         <Card variant="solid" padding="lg" className="space-y-5">
-          <p className="text-[14px] font-semibold">Características físicas</p>
+          <p className="text-md font-semibold">Características físicas</p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <Input
               name="heightCm"
@@ -391,7 +391,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             />
           </div>
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium text-foreground">Idiomas</label>
+            <label className="block text-base font-medium text-foreground">Idiomas</label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGE_OPTIONS.map((lang) => (
                 <button
@@ -412,9 +412,9 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
         {/* ── Atendimento ── */}
         <Card variant="solid" padding="lg" className="space-y-5">
-          <p className="text-[14px] font-semibold">Atendimento</p>
+          <p className="text-md font-semibold">Atendimento</p>
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium text-foreground">Atende a</label>
+            <label className="block text-base font-medium text-foreground">Atende a</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "servesMen", label: "Homens", checked: profile.servesMen },
@@ -432,7 +432,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium text-foreground">Modalidade</label>
+            <label className="block text-base font-medium text-foreground">Modalidade</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "hasOwnPlace", label: "Local próprio", checked: profile.hasOwnPlace },
@@ -464,7 +464,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
       <Card variant="solid" padding="lg" className="space-y-4">
         <div className="flex items-center gap-2">
           <AtSign className="h-4 w-4 text-muted" strokeWidth={1.5} />
-          <p className="text-[14px] font-semibold">Seu @handle</p>
+          <p className="text-md font-semibold">Seu @handle</p>
         </div>
         <p className="text-xs text-muted">
           É o seu endereço único na plataforma. Visível na URL do seu perfil (privello.com/p/<strong>@handle</strong>).
@@ -478,7 +478,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               onChange={(e) => setHandleValue(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
               placeholder="seuhandle"
               maxLength={30}
-              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
             />
           </div>
           <Button
@@ -501,7 +501,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             {handlePending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
           </Button>
         </div>
-        <p className="text-[10px] text-muted">
+        <p className="text-2xs text-muted">
           Letras minúsculas, números, _ e - · 3 a 30 caracteres · Link do perfil muda ao trocar
         </p>
       </Card>

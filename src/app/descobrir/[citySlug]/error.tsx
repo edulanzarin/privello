@@ -10,14 +10,14 @@ export default function DiscoverError({
     return (
         <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
             <div className="text-center">
-                <p className="text-[15px] font-medium text-foreground">Erro ao carregar</p>
-                <p className="mt-1 text-[13px] text-muted">
+                <p className="text-lg font-medium text-foreground">Erro ao carregar</p>
+                <p className="mt-1 text-base text-muted">
                     Não foi possível carregar os perfis desta cidade.
                 </p>
             </div>
             <button
                 onClick={reset}
-                className="rounded-lg bg-foreground px-5 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                className="rounded-lg bg-foreground px-5 py-2.5 text-base font-medium text-white transition-opacity hover:opacity-90"
             >
                 Tentar novamente
             </button>

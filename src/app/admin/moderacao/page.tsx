@@ -198,11 +198,11 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
         {kpis.map(({ label, value, icon: Icon, sub, alert }) => (
           <div key={label} className={`rounded border bg-white p-3 shadow-sm ${alert ? "border-amber-300" : "border-line"}`}>
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</p>
+              <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
               <Icon className={`h-3.5 w-3.5 ${alert ? "text-amber-500" : "text-muted"}`} strokeWidth={1.5} />
             </div>
             <p className="mt-1.5 text-xl font-bold tabular-nums">{value}</p>
-            <p className="mt-0.5 text-[10px] text-muted">{sub}</p>
+            <p className="mt-0.5 text-2xs text-muted">{sub}</p>
           </div>
         ))}
       </div>
@@ -231,7 +231,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                   name="q"
                   defaultValue={searchQ}
                   placeholder="Buscar por nome…"
-                  className="w-40 rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-[#0a84ff] transition-all"
+                  className="w-40 rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-blue transition-all"
                 />
                 <button type="submit" className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition">
                   Buscar
@@ -264,7 +264,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
               <Link
                 key={key}
                 href={buildQueueHref({ status: key, p: "1" })}
-                className={`rounded px-2.5 py-1 text-[11px] font-semibold transition ${statusFilter === key
+                className={`rounded px-2.5 py-1 text-xs font-semibold transition ${statusFilter === key
                     ? "bg-foreground text-white"
                     : "bg-line text-muted hover:bg-line/70 hover:text-foreground"
                   }`}
@@ -279,7 +279,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
-              <tr className="border-b border-line text-[10px] font-semibold uppercase tracking-wider text-muted">
+              <tr className="border-b border-line text-2xs font-semibold uppercase tracking-wider text-muted">
                 <th className="px-3 py-2.5">Foto</th>
                 <th className="px-3 py-2.5">Nome · cidade</th>
                 <th className="px-3 py-2.5">Docs</th>
@@ -315,7 +315,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                       </td>
                       <td className="px-3 py-2">
                         <p className="font-semibold leading-tight">{row.profile.displayName}, {row.profile.age}</p>
-                        <p className="text-[11px] text-muted">
+                        <p className="text-xs text-muted">
                           {row.profile.city.name}{row.profile.district ? ` · ${row.profile.district.name}` : ""}
                         </p>
                       </td>
@@ -335,11 +335,11 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                             )}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-muted/60">Sem docs</span>
+                          <span className="text-xs text-muted/60">Sem docs</span>
                         )}
                       </td>
                       <td className="px-3 py-2">
-                        <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${STATUS_COLORS[row.status] ?? "bg-line text-muted"}`}>
+                        <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase ${STATUS_COLORS[row.status] ?? "bg-line text-muted"}`}>
                           {STATUS_LABELS[row.status]}
                         </span>
                       </td>
@@ -351,14 +351,14 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                           )}
                           <Link
                             href={`/admin/verificacoes/${row.id}`}
-                            className="rounded border border-line px-2 py-1 text-[10px] font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                            className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
                           >
                             Detalhe
                           </Link>
                           <Link
                             href={`/p/${row.profile.slug}`}
                             target="_blank"
-                            className="rounded border border-line px-2 py-1 text-[10px] font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                            className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
                           >
                             Perfil ↗
                           </Link>

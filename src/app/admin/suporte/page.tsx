@@ -49,7 +49,7 @@ export default async function AdminSuportePage() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold truncate">{t.subject}</p>
-            <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${statusClass[t.status]}`}>
+            <span className={`shrink-0 rounded px-1.5 py-0.5 text-2xs font-bold uppercase ${statusClass[t.status]}`}>
               {statusLabel[t.status]}
             </span>
           </div>
@@ -60,7 +60,7 @@ export default async function AdminSuportePage() {
             </p>
           )}
         </div>
-        <p className="shrink-0 text-[10px] text-muted">{t._count.messages} msg</p>
+        <p className="shrink-0 text-2xs text-muted">{t._count.messages} msg</p>
       </Link>
     );
   }

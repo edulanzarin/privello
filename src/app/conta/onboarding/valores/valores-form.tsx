@@ -94,7 +94,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
     });
   }
 
-  const sel = "w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer disabled:bg-black/[0.03] disabled:text-muted";
+  const sel = "w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer disabled:bg-black/[0.03] disabled:text-muted";
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">
@@ -105,7 +105,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       {/* ── Durações e preços ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
         <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-[14px] font-semibold">Durações e valores</p>
+          <p className="text-md font-semibold">Durações e valores</p>
           <p className="mt-1 text-xs text-muted">Ative as durações que você oferece e defina o valor de cada uma.</p>
         </div>
 
@@ -143,7 +143,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   value={prices[d.key] || ""}
                   onChange={(e) => setPrices((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
                   placeholder="0"
-                  className="w-full rounded-lg border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all disabled:bg-black/[0.03] disabled:text-muted"
+                  className="w-full rounded-lg border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all disabled:bg-black/[0.03] disabled:text-muted"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       {/* ── Formas de pagamento ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
         <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-[14px] font-semibold">Formas de pagamento</p>
+          <p className="text-md font-semibold">Formas de pagamento</p>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-5">
           {PAYMENT_OPTIONS.map((p) => (
@@ -176,13 +176,13 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       </div>
 
       <div className="flex items-center justify-between pt-2">
-        <Link href="/conta/onboarding/fotos" className="rounded-lg border border-line bg-white px-6 py-3 text-[13px] font-medium hover:bg-line active:scale-[0.97] transition">
+        <Link href="/conta/onboarding/fotos" className="rounded-lg border border-line bg-white px-6 py-3 text-base font-medium hover:bg-line active:scale-[0.97] transition">
           ← Voltar
         </Link>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-coral px-8 py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
+          className="rounded-lg bg-coral px-8 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
         >
           {pending ? "Salvando…" : "Continuar →"}
         </button>

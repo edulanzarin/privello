@@ -59,7 +59,7 @@ export function ProfilePhotoUploader({ coverUrl }: Props) {
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
         className={cn(
-          "group relative h-40 w-40 overflow-hidden rounded-full ring-2 ring-offset-4 ring-offset-[#f5f5f7] transition-all active:scale-[0.96] disabled:opacity-70 focus-visible:outline-none",
+          "group relative h-40 w-40 overflow-hidden rounded-full ring-2 ring-offset-4 ring-offset-background transition-all active:scale-[0.96] disabled:opacity-70 focus-visible:outline-none",
           displayUrl ? "ring-coral" : "ring-black/[0.08]",
         )}
       >
@@ -74,7 +74,7 @@ export function ProfilePhotoUploader({ coverUrl }: Props) {
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-black/[0.04] border-2 border-dashed border-black/[0.12] rounded-full transition-all group-hover:border-coral group-hover:bg-coral/[0.04]">
             <Camera className="h-10 w-10 text-muted transition-colors group-hover:text-coral" strokeWidth={1.2} />
-            <span className="mt-2 text-[11px] font-medium text-muted transition-colors group-hover:text-coral">
+            <span className="mt-2 text-xs font-medium text-muted transition-colors group-hover:text-coral">
               Escolher foto
             </span>
           </div>
@@ -90,21 +90,21 @@ export function ProfilePhotoUploader({ coverUrl }: Props) {
 
       {/* Status text */}
       {displayUrl && !uploading && (
-        <p className="text-[13px] font-medium text-[#248a3d]">✓ Foto definida</p>
+        <p className="text-base font-medium text-success-dark">✓ Foto definida</p>
       )}
       {!displayUrl && !uploading && (
-        <p className="text-[13px] text-muted">Toque para escolher</p>
+        <p className="text-base text-muted">Toque para escolher</p>
       )}
       {uploading && (
-        <p className="text-[13px] text-muted">Enviando…</p>
+        <p className="text-base text-muted">Enviando…</p>
       )}
 
       {/* Hint to change */}
       {displayUrl && !uploading && (
-        <p className="text-[11px] text-muted/60">Clique na foto para trocar</p>
+        <p className="text-xs text-muted/60">Clique na foto para trocar</p>
       )}
 
-      {error && <p className="mt-1 text-[12px] text-coral">{error}</p>}
+      {error && <p className="mt-1 text-sm text-coral">{error}</p>}
     </div>
   );
 }

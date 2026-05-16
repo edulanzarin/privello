@@ -95,7 +95,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
                     options={TIME_OPTS}
                   />
                 </div>
-                <span className="text-[13px] text-muted">–</span>
+                <span className="text-base text-muted">–</span>
                 <div className="w-24">
                   <Select
                     name={`wd_${wd}_end`}
@@ -108,7 +108,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
                 </div>
               </div>
             ) : (
-              <span className="ml-auto text-[13px] text-muted">Fechado</span>
+              <span className="ml-auto text-base text-muted">Fechado</span>
             )}
           </div>
         ))}

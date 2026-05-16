@@ -69,9 +69,9 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
     });
   }
 
-  const inputCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
-  const selectCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer";
-  const labelCls = "block text-[13px] font-medium text-foreground mb-1.5";
+  const inputCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
+  const selectCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer";
+  const labelCls = "block text-base font-medium text-foreground mb-1.5";
   const sectionCls = "space-y-2";
 
   return (
@@ -84,11 +84,11 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
 
       {/* ── Localização e contato ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
-        <p className="text-[14px] font-semibold">Localização e contato</p>
+        <p className="text-md font-semibold">Localização e contato</p>
 
         <div className={sectionCls}>
           <span className={labelCls}>Cidade onde atende <span className="text-coral">*</span></span>
-          <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-[#0a84ff] focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
+          <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-blue focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
             <CityAutocomplete
               compact
               initialLabel={cityName}
@@ -111,7 +111,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
 
       {/* ── Apresentação ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
-        <p className="text-[14px] font-semibold">Apresentação</p>
+        <p className="text-md font-semibold">Apresentação</p>
 
         <div className={sectionCls}>
           <label className={labelCls}>Frase de destaque <span className="text-muted font-normal normal-case">(aparece no topo do perfil)</span></label>
@@ -134,13 +134,13 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
             placeholder="Fale sobre você, seu estilo, o que você oferece e como prefere ser contatada..."
             className={`${inputCls} resize-none`}
           />
-          <p className="text-[10px] text-muted">Seja autêntica — perfis com bio completa convertem muito mais.</p>
+          <p className="text-2xs text-muted">Seja autêntica — perfis com bio completa convertem muito mais.</p>
         </div>
       </div>
 
       {/* ── Características físicas ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
-        <p className="text-[14px] font-semibold">Características físicas</p>
+        <p className="text-md font-semibold">Características físicas</p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className={sectionCls}>
@@ -210,7 +210,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
 
       {/* ── Atendimento ── */}
       <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-6">
-        <p className="text-[14px] font-semibold">Atendimento</p>
+        <p className="text-md font-semibold">Atendimento</p>
 
         <div className={sectionCls}>
           <label className={labelCls}>Atende a</label>
@@ -251,7 +251,7 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
         <button
           type="submit"
           disabled={pending || selectedLangs.length === 0}
-          className="rounded-lg bg-coral px-8 py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
+          className="rounded-lg bg-coral px-8 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
         >
           {pending ? "Salvando…" : "Continuar →"}
         </button>

@@ -41,7 +41,7 @@ export default async function OnboardingPublicarPage() {
     <div className="flex min-h-screen flex-col md:flex-row">
       <OnboardingSidebar current="publicar" />
       <main className="flex-1 bg-background px-6 py-10 md:px-14">
-        <p className="text-[11px] font-medium text-muted">Passo 04 de 04</p>
+        <p className="text-xs font-medium text-muted">Passo 04 de 04</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight">
           Publicar perfil<span className="text-coral">.</span>
         </h1>
@@ -71,7 +71,7 @@ export default async function OnboardingPublicarPage() {
 
           {/* Preview card */}
           <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <p className="text-[13px] font-semibold mb-3">Preview</p>
+            <p className="text-base font-semibold mb-3">Preview</p>
             {cover && (
               <div className="relative aspect-[3/4] w-full bg-line overflow-hidden">
                 <Image src={cover.url} alt="" fill className="object-cover" sizes="320px" />
@@ -88,14 +88,14 @@ export default async function OnboardingPublicarPage() {
         </div>
 
         <div className="mt-10 flex items-center justify-between">
-          <Link href="/conta/onboarding/valores" className="rounded-lg border border-line bg-white px-6 py-3 text-[13px] font-medium hover:bg-line active:scale-[0.97] transition">
+          <Link href="/conta/onboarding/valores" className="rounded-lg border border-line bg-white px-6 py-3 text-base font-medium hover:bg-line active:scale-[0.97] transition">
             ← Voltar
           </Link>
           <form action={publishProfile}>
             <button
               type="submit"
               disabled={!allOk}
-              className="rounded-lg bg-coral px-10 py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="rounded-lg bg-coral px-10 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {allOk ? "Publicar perfil" : "Complete os itens acima"}
             </button>

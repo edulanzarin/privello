@@ -32,8 +32,8 @@ export default async function PainelFinanceiroPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
         <Diamond className="h-10 w-10 text-coral" strokeWidth={1} />
         <div>
-          <h1 className="text-[22px] font-semibold tracking-tight">Gestão financeira</h1>
-          <p className="mx-auto mt-3 max-w-sm text-[14px] leading-relaxed text-muted">
+          <h1 className="text-3xl font-semibold tracking-tight">Gestão financeira</h1>
+          <p className="mx-auto mt-3 max-w-sm text-md leading-relaxed text-muted">
             Disponível no plano <strong className="text-foreground">Premium</strong>. Acompanhe faturamento, ticket médio, histórico
             completo e registre cada encontro com privacidade total.
           </p>
@@ -43,7 +43,7 @@ export default async function PainelFinanceiroPage() {
             Fazer upgrade para Premium
           </Button>
         </Link>
-        <p className="text-[12px] text-muted">Sem fidelidade. Cancele quando quiser.</p>
+        <p className="text-sm text-muted">Sem fidelidade. Cancele quando quiser.</p>
       </div>
     );
   }
@@ -66,18 +66,18 @@ export default async function PainelFinanceiroPage() {
       {/* Header + form */}
       <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="text-[11px] font-medium text-muted">Financeiro</p>
-          <h1 className="mt-1 text-[22px] font-semibold tracking-tight capitalize">
+          <p className="text-xs font-medium text-muted">Financeiro</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight capitalize">
             {monthName} {year}
           </h1>
-          <p className="mt-1 text-[14px] text-muted">
+          <p className="mt-1 text-md text-muted">
             {rows.length} {rows.length === 1 ? "registro" : "registros"} · apenas você vê isso
           </p>
         </div>
 
         {/* Add form */}
         <Card variant="solid" padding="md" className="xl:w-[420px] shrink-0">
-          <p className="text-[13px] font-semibold tracking-tight mb-4">+ Registrar encontro</p>
+          <p className="text-base font-semibold tracking-tight mb-4">+ Registrar encontro</p>
           <form action={addFinancialRecord} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
@@ -139,7 +139,7 @@ export default async function PainelFinanceiroPage() {
                 />
               </div>
               <div className="flex items-end pb-1">
-                <label className="flex items-center gap-2 text-[13px] cursor-pointer">
+                <label className="flex items-center gap-2 text-base cursor-pointer">
                   <input type="checkbox" name="isNoShow" className="h-4 w-4 accent-coral rounded" />
                   No-show
                 </label>
@@ -163,13 +163,13 @@ export default async function PainelFinanceiroPage() {
       {/* Table */}
       <Card variant="solid" padding="none">
         <div className="border-b border-black/[0.06] px-5 py-4 flex items-center justify-between">
-          <p className="text-[11px] font-medium text-muted">
+          <p className="text-xs font-medium text-muted">
             Registros · {rows.length} {rows.length === 1 ? "encontro" : "encontros"} · {formatBrl(total)} total
           </p>
-          <p className="text-[11px] text-muted">Passe o mouse para editar ou excluir</p>
+          <p className="text-xs text-muted">Passe o mouse para editar ou excluir</p>
         </div>
         {rows.length === 0 ? (
-          <p className="px-5 py-10 text-center text-[14px] text-muted">
+          <p className="px-5 py-10 text-center text-md text-muted">
             Nenhum registro este mês. Use o formulário acima para registrar um encontro.
           </p>
         ) : (

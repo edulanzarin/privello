@@ -28,7 +28,7 @@ export default function RedefinirSenhaPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9f9f7] px-4 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
       <div className="w-full max-w-sm">
         <Link href="/" className="font-serif text-xl">
           privello<span className="text-coral">.</span>
@@ -40,7 +40,7 @@ export default function RedefinirSenhaPage({
             Escolha uma nova senha para sua conta.
           </p>
 
-          <label className="mt-6 block text-[13px] font-medium text-foreground">
+          <label className="mt-6 block text-base font-medium text-foreground">
             Nova senha
           </label>
           <input
@@ -49,11 +49,11 @@ export default function RedefinirSenhaPage({
             required
             minLength={8}
             autoComplete="new-password"
-            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
+            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
             placeholder="Mínimo 8 caracteres"
           />
 
-          <label className="mt-4 block text-[13px] font-medium text-foreground">
+          <label className="mt-4 block text-base font-medium text-foreground">
             Confirmar nova senha
           </label>
           <input
@@ -62,7 +62,7 @@ export default function RedefinirSenhaPage({
             required
             minLength={8}
             autoComplete="new-password"
-            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
+            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
             placeholder="Repita a senha"
           />
 
@@ -73,7 +73,7 @@ export default function RedefinirSenhaPage({
           <button
             type="submit"
             disabled={pending}
-            className="mt-6 w-full rounded-lg bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
           >
             {pending ? "Salvando…" : "Redefinir senha"}
           </button>

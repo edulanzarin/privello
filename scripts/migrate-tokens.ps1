@@ -29,23 +29,30 @@ $hexMap = @{
 # Mapa font-size
 $fontSizeMap = @{
     '\[10px\]' = '2xs'
+    '\[9px\]' = '2xs'
     '\[11px\]' = 'xs'
     '\[12px\]' = 'sm'
     '\[13px\]' = 'base'
     '\[14px\]' = 'md'
     '\[15px\]' = 'lg'
     '\[16px\]' = 'xl'
+    '\[17px\]' = 'xl'
     '\[18px\]' = '2xl'
     '\[22px\]' = '3xl'
+    '\[24px\]' = '3xl'
     '\[28px\]' = '4xl'
+    '\[34px\]' = '5xl'
+    '\[44px\]' = '6xl'
+    '\[56px\]' = '7xl'
+    '\[64px\]' = '8xl'
 }
 
 foreach ($path in $Paths) {
-    if (-not (Test-Path $path)) {
+    if (-not (Test-Path -LiteralPath $path)) {
         Write-Warning "Skipping $path (not found)"
         continue
     }
-    $content = Get-Content $path -Raw
+    $content = Get-Content -LiteralPath $path -Raw
     $orig = $content
 
     # Font-size: text-[Npx] -> text-<token>
@@ -63,7 +70,7 @@ foreach ($path in $Paths) {
     }
 
     if ($content -ne $orig) {
-        Set-Content $path $content -NoNewline
+        Set-Content -LiteralPath $path -Value $content -NoNewline
         Write-Host "Updated: $path"
     } else {
         Write-Host "No change: $path"

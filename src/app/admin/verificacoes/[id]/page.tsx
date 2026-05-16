@@ -22,7 +22,7 @@ function DocImage({ url, label }: { url: string | null; label: string }) {
   const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url);
   return (
     <div className="space-y-1">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</p>
+      <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
       {isVideo ? (
         <video src={url} controls className="h-64 w-full rounded border border-line object-contain bg-black" />
       ) : (
@@ -44,7 +44,7 @@ function statusBadge(status: string) {
     REJEITADO: "bg-zinc-200 text-zinc-800",
   };
   return (
-    <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${map[status] ?? "bg-line text-muted"}`}>
+    <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase ${map[status] ?? "bg-line text-muted"}`}>
       {status}
     </span>
   );

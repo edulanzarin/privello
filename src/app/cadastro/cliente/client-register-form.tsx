@@ -35,7 +35,7 @@ export function ClientRegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       {error && (
-        <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-[13px] text-[#ff3b30]">
+        <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-base text-danger">
           {error}
         </div>
       )}
@@ -61,7 +61,7 @@ export function ClientRegisterForm() {
           placeholder="joao-silva"
         />
         {slug && (
-          <p className="mt-1.5 text-[12px] text-muted">
+          <p className="mt-1.5 text-sm text-muted">
             Seu perfil: <span className="font-medium text-foreground">privello.com/@{slug}</span>
           </p>
         )}
@@ -95,7 +95,7 @@ export function ClientRegisterForm() {
         {pending ? "Criando conta…" : "Criar conta"}
       </Button>
 
-      <p className="text-center text-[12px] text-muted">
+      <p className="text-center text-sm text-muted">
         Ao criar conta você confirma ter +18 anos.
       </p>
     </form>

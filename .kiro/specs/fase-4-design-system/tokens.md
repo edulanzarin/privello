@@ -147,20 +147,24 @@ Tailwind v4 gera variantes via syntax `<token>/<percent>` ou `<token>/[<decimal>
 
 ### Escala tipográfica explícita
 
-> A introdução desta escala redefine `text-sm`, `text-base` etc. em relação aos defaults do Tailwind. Mudança consciente e alinhada ao spec arquivado §2.1.
+> A introdução desta escala redefine `text-sm`, `text-base` etc. em relação aos defaults do Tailwind. Mudança consciente e alinhada ao spec arquivado §2.1. A escala foi estendida em Wave 10 para cobrir tamanhos previamente arbitrários (`9px`, `17px`, `24px`, `34px`, `44px`, `56px`, `64px`).
 
 | Classe | Valor | Uso típico |
 |---|---|---|
-| `text-2xs` | 10px | Badges minúsculos, captions |
+| `text-2xs` | 10px | Badges minúsculos, captions, marcadores `9px` foram absorvidos aqui |
 | `text-xs` | 11px | Texto auxiliar, timestamps |
 | `text-sm` | 12px | Labels, meta-informação |
 | `text-base` | 13px | Texto corrido em mobile |
 | `text-md` | 14px | Texto corrido principal |
 | `text-lg` | 15px | Subtítulos pequenos |
-| `text-xl` | 16px | Subtítulos |
+| `text-xl` | 16px | Subtítulos, logo (`17px` foi absorvido aqui) |
 | `text-2xl` | 18px | Títulos de card |
-| `text-3xl` | 22px | Títulos de seção |
-| `text-4xl` | 28px | Títulos de página, hero |
+| `text-3xl` | 22px | Títulos de seção, `24px` foi absorvido aqui |
+| `text-4xl` | 28px | Títulos de página |
+| `text-5xl` | 34px | Hero heading médio (novo em Wave 10) |
+| `text-6xl` | 44px | Hero heading grande (novo em Wave 10) |
+| `text-7xl` | 56px | Hero responsivo `sm:` (novo em Wave 10) |
+| `text-8xl` | 64px | Hero responsivo `lg:` (novo em Wave 10) |
 
 ---
 
@@ -302,7 +306,31 @@ Arquivos migrados em massa via `scripts/migrate-tokens.ps1`:
 
 ## Lint anti-regressão
 
-> Preenchido após Wave 11.
+> Configurado em `eslint.config.mjs` durante Wave 11 (Tarefas 11.1–11.3).
+
+### Regra
+
+Override em `eslint.config.mjs` aplicado a `src/components/**/*.{ts,tsx}` e `src/app/**/*.{ts,tsx}`, ignorando `src/lib/email-templates.ts` e `src/components/admin/admin-charts.tsx`.
+
+A regra `no-restricted-syntax` proíbe quatro padrões:
+
+1. `Literal[value=/#[0-9a-fA-F]{3,8}\b/]` — hex literais em strings JSX/JS regulares.
+2. `Literal[value=/text-\[\d+(\.\d+)?(px|rem|em)\]/]` — classe Tailwind de tamanho de fonte arbitrário em strings regulares.
+3. `TemplateElement[value.cooked=/#[0-9a-fA-F]{3,8}\b/]` — hex literais em template strings.
+4. `TemplateElement[value.cooked=/text-\[\d+(\.\d+)?(px|rem|em)\]/]` — font-size arbitrário em template strings.
+
+Mensagens em pt-BR direcionam para `tokens.md` e listam tokens semânticos / classes da escala canônica como alternativa.
+
+### Validação (Tarefa 11.3)
+
+Smoke test executado durante Wave 11 com arquivo temporário `src/components/_lint-smoke.tsx` contendo:
+
+- Hex literal em variável `const hex = "#0a84ff"` → **error** disparado pelo selector 1.
+- `className="text-[14px]"` em string regular → **error** disparado pelo selector 2.
+- Template string com `\`text-[12px] color-#ff3b30\`` → **error**s disparados pelos selectors 3 e 4.
+- Hex inline em `className="text-[15px]"` → **error** disparado pelo selector 2.
+
+Resultado: **5 erros** no arquivo de smoke; arquivo removido em seguida; `npm run lint` no repositório completo passa sem `no-restricted-syntax` errors.
 
 ---
 

@@ -3,7 +3,7 @@ import { CheckCircle } from "lucide-react";
 
 export default function AssinaturaSuccessPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9f9f7] px-4 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
       <div className="w-full max-w-sm text-center">
         <Link href="/" className="font-serif text-xl">
           privello<span className="text-coral">.</span>
@@ -17,13 +17,13 @@ export default function AssinaturaSuccessPage() {
           </p>
           <Link
             href="/"
-            className="mt-6 inline-block w-full rounded-lg bg-foreground py-3 text-center text-[13px] font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
+            className="mt-6 inline-block w-full rounded-lg bg-foreground py-3 text-center text-base font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
           >
             Explorar conteúdo
           </Link>
           <Link
             href="/reels"
-            className="mt-2 inline-block w-full rounded-lg border border-line py-3 text-center text-[13px] font-semibold text-muted hover:text-foreground hover:bg-line/40 transition"
+            className="mt-2 inline-block w-full rounded-lg border border-line py-3 text-center text-base font-semibold text-muted hover:text-foreground hover:bg-line/40 transition"
           >
             Ver Reels exclusivos
           </Link>

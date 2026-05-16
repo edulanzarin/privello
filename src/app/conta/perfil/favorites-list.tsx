@@ -34,13 +34,13 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
     return (
       <div className="rounded-2xl border border-black/[0.06] bg-white px-6 py-14 text-center shadow-sm">
         <Heart className="mx-auto h-10 w-10 text-muted" strokeWidth={1} />
-        <p className="mt-4 text-[17px] font-semibold">Nenhum perfil curtido ainda.</p>
-        <p className="mt-2 text-[14px] text-muted">
+        <p className="mt-4 text-xl font-semibold">Nenhum perfil curtido ainda.</p>
+        <p className="mt-2 text-md text-muted">
           Explore acompanhantes e curta os perfis que te interessam.
         </p>
         <Link
           href="/buscar"
-          className="mt-6 inline-block rounded-full bg-coral px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+          className="mt-6 inline-block rounded-full bg-coral px-6 py-2.5 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Explorar perfis
         </Link>
@@ -71,19 +71,19 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
                 <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
               </div>
               <div className="p-3">
-                <p className="text-[13px] font-semibold leading-tight truncate">
+                <p className="text-base font-semibold leading-tight truncate">
                   {profile.displayName}, {profile.age}
                 </p>
-                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted truncate">
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-muted truncate">
                   <MapPin className="h-2.5 w-2.5 shrink-0" strokeWidth={1.5} />
                   {profile.city.name}
                 </p>
                 <div className="mt-1.5 flex items-center justify-between">
-                  <span className="flex items-center gap-0.5 text-[11px]">
-                    <Star className="h-3 w-3 fill-[#ff9500] text-[#ff9500]" strokeWidth={0} />
+                  <span className="flex items-center gap-0.5 text-xs">
+                    <Star className="h-3 w-3 fill-warning text-warning" strokeWidth={0} />
                     <span className="font-medium">{profile.ratingAvg.toFixed(1)}</span>
                   </span>
-                  <span className="text-[11px] font-semibold text-coral">
+                  <span className="text-xs font-semibold text-coral">
                     {formatBrl(profile.priceHour)}/h
                   </span>
                 </div>
@@ -96,7 +96,7 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
       {remaining > 0 && (
         <button
           onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-          className="mt-4 w-full rounded-xl border border-black/10 bg-white py-3 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.99]"
+          className="mt-4 w-full rounded-xl border border-black/10 bg-white py-3 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.99]"
         >
           Ver mais · {remaining} restante{remaining !== 1 ? "s" : ""}
         </button>

@@ -60,8 +60,8 @@ export default async function PainelAvaliacoesPage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-[22px] font-semibold tracking-tight">Avaliações</h1>
-        <p className="mt-1 text-[14px] text-muted">
+        <h1 className="text-3xl font-semibold tracking-tight">Avaliações</h1>
+        <p className="mt-1 text-md text-muted">
           O que os clientes dizem sobre você. Visível para assinantes no seu perfil.
         </p>
       </div>
@@ -69,7 +69,7 @@ export default async function PainelAvaliacoesPage() {
       {/* Summary */}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] font-medium text-muted">Média geral</p>
+          <p className="text-xs font-medium text-muted">Média geral</p>
           <p className="mt-2 text-4xl font-bold tabular-nums">
             {profile.ratingAvg > 0 ? profile.ratingAvg.toFixed(1) : "—"}
           </p>
@@ -81,7 +81,7 @@ export default async function PainelAvaliacoesPage() {
         </div>
 
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] font-medium text-muted">Total</p>
+          <p className="text-xs font-medium text-muted">Total</p>
           <p className="mt-2 text-4xl font-bold tabular-nums">{profile.ratingCount}</p>
           <p className="mt-1 text-xs text-muted">
             avaliação{profile.ratingCount !== 1 ? "ões" : ""}
@@ -89,7 +89,7 @@ export default async function PainelAvaliacoesPage() {
         </div>
 
         <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] font-medium text-muted flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5" strokeWidth={1.5} />
             Distribuição
           </p>
@@ -115,14 +115,14 @@ export default async function PainelAvaliacoesPage() {
       {reviews.length === 0 ? (
         <div className="rounded-2xl border border-black/[0.06] bg-white p-10 text-center">
           <MessageSquare className="mx-auto h-8 w-8 text-muted/40" strokeWidth={1.5} />
-          <p className="mt-3 text-[14px] font-semibold">Nenhuma avaliação ainda</p>
-          <p className="mt-1 text-[13px] text-muted">
+          <p className="mt-3 text-md font-semibold">Nenhuma avaliação ainda</p>
+          <p className="mt-1 text-base text-muted">
             As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil.
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          <p className="text-[13px] font-medium text-muted">
+          <p className="text-base font-medium text-muted">
             {reviews.length} avaliação{reviews.length !== 1 ? "ões" : ""}
           </p>
           {reviews.map((r) => (
@@ -138,11 +138,11 @@ export default async function PainelAvaliacoesPage() {
                     </p>
                     <div className="mt-1 flex items-center gap-2">
                       <StarRow rating={r.rating} />
-                      <span className="text-[11px] text-muted">{ratingLabel(r.rating)}</span>
+                      <span className="text-xs text-muted">{ratingLabel(r.rating)}</span>
                     </div>
                   </div>
                 </div>
-                <time className="shrink-0 text-[11px] text-muted">
+                <time className="shrink-0 text-xs text-muted">
                   {r.createdAt.toLocaleDateString("pt-BR", {
                     day: "numeric",
                     month: "short",

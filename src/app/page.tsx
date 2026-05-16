@@ -52,18 +52,18 @@ export default async function HomePage() {
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
           <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
-              <h1 className="text-[44px] font-bold leading-[1.05] tracking-tight sm:text-[56px] lg:text-[64px]">
+              <h1 className="text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl">
                 Acompanhantes verificadas,{" "}
                 <span className="text-coral">
                   perto de você.
                 </span>
               </h1>
-              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted">
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
                 Fotos reais, áudio e vídeo. Perfis com verificação de identidade. Você escolhe a cidade, o horário e com quem se encontrar.
               </p>
             </div>
             <aside className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
-              <ul className="space-y-4 text-[14px]">
+              <ul className="space-y-4 text-md">
                 <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
                   <span className="text-muted">Perfis ativos</span>
                   <span className="font-semibold tabular-nums">{stats.profiles.toLocaleString("pt-BR")}</span>
@@ -81,7 +81,7 @@ export default async function HomePage() {
                   <span className="font-semibold">24h</span>
                 </li>
               </ul>
-              <p className="mt-4 text-[12px] leading-relaxed text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-muted">
                 Selo de verificação via documento + selfie. Conteúdo adulto (+18).
               </p>
             </aside>
@@ -96,7 +96,7 @@ export default async function HomePage() {
                 <Link
                   key={p.href}
                   href={p.href}
-                  className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
+                  className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
                 >
                   {p.label}
                 </Link>
@@ -109,7 +109,7 @@ export default async function HomePage() {
         {boosted.profiles.length > 0 && (
           <section className="border-t border-black/[0.06] py-16">
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="text-[28px] font-semibold tracking-tight">
+              <h2 className="text-4xl font-semibold tracking-tight">
                 Em destaque{" "}
                 <span className="text-muted font-normal">· boost ativo</span>
               </h2>
@@ -126,7 +126,7 @@ export default async function HomePage() {
         {/* ── Em alta da semana ── */}
         <section className="border-t border-black/[0.06] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="text-[28px] font-semibold tracking-tight">
+            <h2 className="text-4xl font-semibold tracking-tight">
               Em alta <span className="text-muted font-normal">da semana</span>
             </h2>
           </div>
@@ -146,26 +146,26 @@ export default async function HomePage() {
 
         <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-2">
-            <h2 className="text-[28px] font-semibold tracking-tight sm:text-[34px]">
+            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
               Verificação <span className="text-coral">séria.</span> Sem rodeios.
             </h2>
-            <ol className="space-y-8 text-[14px]">
+            <ol className="space-y-8 text-md">
               <li className="flex gap-4">
-                <span className="text-[22px] font-bold text-coral">01</span>
+                <span className="text-3xl font-bold text-coral">01</span>
                 <div>
                   <p className="font-semibold">Cadastro do perfil</p>
                   <p className="mt-1 text-muted">Informações, valores e fotos públicas/privadas com diretrizes claras.</p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <span className="text-[22px] font-bold text-coral">02</span>
+                <span className="text-3xl font-bold text-coral">02</span>
                 <div>
                   <p className="font-semibold">Publicação imediata</p>
                   <p className="mt-1 text-muted">Seu perfil entra na listagem assim que completar o cadastro.</p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <span className="text-[22px] font-bold text-coral">03</span>
+                <span className="text-3xl font-bold text-coral">03</span>
                 <div>
                   <p className="font-semibold">Verificação opcional → selo</p>
                   <p className="mt-1 text-muted">Envie documento + selfie para ganhar o selo de verificada. Conferência humana e trilha de auditoria.</p>

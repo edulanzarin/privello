@@ -31,9 +31,9 @@ function originBadge(origin: FinancialOrigin) {
   }
 }
 
-const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
+const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
 const sel = `${inp} cursor-pointer`;
-const lbl = "block text-[13px] font-medium text-foreground mb-1.5";
+const lbl = "block text-base font-medium text-foreground mb-1.5";
 
 export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[700px] text-left text-sm">
         <thead>
-          <tr className="border-b border-line text-[10px] font-semibold text-muted">
+          <tr className="border-b border-line text-2xs font-semibold text-muted">
             <th className="px-4 py-3">Data</th>
             <th className="px-4 py-3">Cliente</th>
             <th className="px-4 py-3">Duração</th>
@@ -75,7 +75,7 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
                 <td className="px-4 py-3 text-muted">{r.locationLabel}</td>
                 <td className="px-4 py-3 text-muted">{r.paymentLabel}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${originBadge(r.origin)}`}>
+                  <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase ${originBadge(r.origin)}`}>
                     {r.origin}
                   </span>
                 </td>

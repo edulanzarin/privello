@@ -171,14 +171,14 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
           {VIS_TABS.map((t) => (
             <button key={t.key} type="button" onClick={() => setVisTab(t.key)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-3 text-[12px] font-semibold transition",
+                "flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition",
                 visTab === t.key
                   ? "border-b-2 border-coral text-foreground -mb-px"
                   : "text-muted hover:text-foreground",
               )}>
               {t.label}
               <span className={cn(
-                "rounded-full px-1.5 py-0.5 text-[10px]",
+                "rounded-full px-1.5 py-0.5 text-2xs",
                 visTab === t.key ? "bg-coral/10 text-coral" : "bg-black/[0.04] text-muted",
               )}>{t.count}</span>
             </button>
@@ -187,7 +187,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Alerts */}
         {visTab === "publica" && (
-          <p className="text-[12px] text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
+          <p className="text-sm text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
         )}
         {visTab === "privada" && (
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -220,12 +220,12 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
             return (
               <button key={t.key} type="button" onClick={() => setTypeTab(t.key)}
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium transition",
+                  "flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition",
                   typeTab === t.key
                     ? "border-b-2 border-foreground text-foreground -mb-px"
                     : "text-muted hover:text-foreground",
                 )}>
-                {t.label} <span className="text-[10px] text-muted">({count})</span>
+                {t.label} <span className="text-2xs text-muted">({count})</span>
               </button>
             );
           })}
@@ -268,7 +268,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                       </div>
                     )}
                     {m.isCover && (
-                      <span className="absolute left-1.5 top-1.5 rounded-full bg-coral px-2 py-[2px] text-[9px] font-semibold text-white">
+                      <span className="absolute left-1.5 top-1.5 rounded-full bg-coral px-2 py-[2px] text-2xs font-semibold text-white">
                         Capa
                       </span>
                     )}
@@ -281,7 +281,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
               <div className="pt-2 text-center">
                 <button
                   onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  className="rounded-full border border-black/10 bg-white px-6 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
+                  className="rounded-full border border-black/10 bg-white px-6 py-2.5 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
                 >
                   Ver mais · {filtered.length - visible} restantes
                 </button>
@@ -294,8 +294,8 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       {/* ── RIGHT: sticky upload panel ── */}
       <div className="space-y-5 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm lg:sticky lg:top-24 lg:self-start">
         <div>
-          <p className="text-[15px] font-semibold">Adicionar mídia</p>
-          <p className="mt-0.5 text-[13px] text-muted">Foto ou vídeo para o seu perfil.</p>
+          <p className="text-lg font-semibold">Adicionar mídia</p>
+          <p className="mt-0.5 text-base text-muted">Foto ou vídeo para o seu perfil.</p>
         </div>
 
         {/* Preview grid or drop zone */}
@@ -330,8 +330,8 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
           <button type="button" onClick={() => fileRef.current?.click()}
             className="flex w-full flex-col items-center justify-center gap-3 border-2 border-dashed border-black/[0.12] rounded-xl py-12 text-muted transition hover:border-coral hover:text-coral">
             <ImagePlus className="h-8 w-8" strokeWidth={1.25} />
-            <span className="text-[14px] font-semibold">Selecionar arquivos</span>
-            <span className="text-[11px] text-muted/60">
+            <span className="text-md font-semibold">Selecionar arquivos</span>
+            <span className="text-xs text-muted/60">
               JPG, PNG, WebP, MP4, WebM · máx 50MB
             </span>
           </button>
@@ -344,7 +344,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Caption */}
         <div>
-          <label className="mb-1.5 block text-[12px] font-medium text-muted">
+          <label className="mb-1.5 block text-sm font-medium text-muted">
             Legenda (opcional)
           </label>
           <input
@@ -353,9 +353,9 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
             onChange={(e) => setCaption(e.target.value)}
             maxLength={150}
             placeholder="Uma breve descrição…"
-            className="w-full rounded-lg border border-black/10 px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="w-full rounded-lg border border-black/10 px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
-          <p className="mt-0.5 text-right text-[10px] text-muted">{caption.length}/150</p>
+          <p className="mt-0.5 text-right text-2xs text-muted">{caption.length}/150</p>
         </div>
 
         {/* Privacy — iOS toggle (same as Reels) */}
@@ -363,8 +363,8 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
           <div className="flex items-center gap-2.5">
             {!uploadPublic ? <Lock className="h-4 w-4 text-muted" strokeWidth={1.5} /> : <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />}
             <div>
-              <p className="text-[13px] font-medium">{uploadPublic ? "Público" : "Privado"}</p>
-              <p className="text-[11px] text-muted">
+              <p className="text-base font-medium">{uploadPublic ? "Público" : "Privado"}</p>
+              <p className="text-xs text-muted">
                 {uploadPublic ? "Visível para todos" : "Só assinantes veem"}
               </p>
             </div>
@@ -378,7 +378,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Publish button */}
         <button type="button" onClick={uploadFiles} disabled={!pendingFiles.length || uploading}
-          className="w-full rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40">
+          className="w-full rounded-full bg-coral py-3 text-md font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40">
           {uploading
             ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Enviando…</span>
             : pendingFiles.length > 0
@@ -387,7 +387,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
         </button>
 
         {!uploadPublic && (
-          <p className="text-[11px] text-muted">Conteúdo explícito permitido na galeria privada.</p>
+          <p className="text-xs text-muted">Conteúdo explícito permitido na galeria privada.</p>
         )}
       </div>
 
@@ -460,7 +460,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                       </button>
                     )}
                     {curItem.isCover ? (
-                      <p className="text-[10px] text-white/30 text-center max-w-[100px]">
+                      <p className="text-2xs text-white/30 text-center max-w-[100px]">
                         Defina outra foto de perfil antes de remover
                       </p>
                     ) : (

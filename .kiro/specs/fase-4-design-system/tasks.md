@@ -275,26 +275,26 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Anexar log final em `tokens.md > Migration log`
     - _Requirements: 5.2, 5.3, 7.2_
 
-- [ ] 11. Lint anti-regressão
-  - [ ] 11.1 Adicionar regra ESLint custom em `eslint.config.mjs`
+- [x] 11. Lint anti-regressão
+  - [x] 11.1 Adicionar regra ESLint custom em `eslint.config.mjs`
     - Decisão registrada em `design.md`: opção (a) — ESLint custom rule via `no-restricted-syntax`
     - Adicionar override cobrindo `src/components/**/*.{ts,tsx}` e `src/app/**/*.{ts,tsx}`
     - Selectors: `Literal[value=/#[0-9a-fA-F]{3,8}\b/]` e `Literal[value=/text-\[\d+(\.\d+)?(px|rem|em)\]/]`
     - Mensagens em pt-BR explicando o token alternativo a usar
     - _Requirements: 6.1, 6.2, 6.4_
 
-  - [ ] 11.2 Configurar overrides para arquivos isentos
+  - [x] 11.2 Configurar overrides para arquivos isentos
     - `src/lib/email-templates.ts` — HTML de email, regra não se aplica
     - Demais arquivos listados em `tokens.md > Exceções declaradas` (ex.: `src/components/admin/admin-charts.tsx` se cores de chart permanecerem)
     - _Requirements: 6.4_
 
-  - [ ] 11.3 Validar a regra
+  - [x] 11.3 Validar a regra
     - Criar arquivo de teste temporário `src/components/_lint-smoke.tsx` (ou usar arquivo já migrado adicionando hex/`text-[Npx]` propositalmente em branch local) e rodar `npm run lint` — deve falhar
     - Remover o arquivo de teste; rodar `npm run lint` novamente — deve passar (assumindo todas as ondas terminadas)
     - Documentar o teste em `tokens.md > Lint anti-regressão`
     - _Requirements: 6.3_
 
-  - [ ] 11.4 Declarar contrato com a CI da Fase 7
+  - [x] 11.4 Declarar contrato com a CI da Fase 7
     - Em `tokens.md > Contrato com a CI da Fase 7`: o lint configurado nesta fase é consumido pela CI da Fase 7. Esta fase não toca configuração de CI.
     - _Requirements: 6.5_
 

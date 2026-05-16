@@ -29,7 +29,7 @@ export function AgeGate() {
       <p className="text-2xl font-black tracking-tight text-white">
         privello<span className="text-coral">.</span>
       </p>
-      <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-white/30">
+      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-white/30">
         Conteúdo adulto · +18
       </p>
 
@@ -57,7 +57,7 @@ export function AgeGate() {
         </a>
       </div>
 
-      <p className="mt-8 text-[10px] text-white/20">
+      <p className="mt-8 text-2xs text-white/20">
         <Link href="/politica-de-privacidade" className="underline underline-offset-2">
           Política de privacidade
         </Link>
