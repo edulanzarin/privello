@@ -31,7 +31,7 @@ Restrições importantes:
     - Caso contrário, corrigir antes de prosseguir
     - _Requirements: 8.3_
 
-- [ ] 2. Inventário baseline das 43 rotas
+- [x] 2. Inventário baseline das 43 rotas
   - [x] 2.1 Criar `metricas-baseline.md` com cabeçalho e metodologia
     - Em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-3-backend\metricas-baseline.md`
     - Seção 1: cabeçalho (autoria, data inicial, master spec, phase id)
@@ -53,14 +53,14 @@ Restrições importantes:
     - Comparar com `src/lib/services/index.ts` para identificar duplicações em `@/lib/queries` ↔ `@/lib/services`
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 2.4 Capturar métricas baseline em `getProfileBySlug` (antes)
+  - [x] 2.4 Capturar métricas baseline em `getProfileBySlug` (antes)
     - Rodar `PRISMA_DEBUG_QUERIES=1 npm run dev` em terminal separado
     - Em outro terminal: `curl -s http://localhost:3000/p/<slug-com-muita-midia> > /dev/null` × 5
     - Contar linhas `[prisma]` no log e medir tempo total via `console.time` ad-hoc
     - Registrar em `metricas-baseline.md > Métricas antes/depois` na linha `getProfileBySlug` (coluna "antes")
     - _Requirements: 1.5, 6.3_
 
-  - [ ] 2.5 Capturar métricas baseline em `getSectionProfiles` e `listStoriesForCity` (antes)
+  - [x] 2.5 Capturar métricas baseline em `getSectionProfiles` e `listStoriesForCity` (antes)
     - Mesma metodologia de 2.4, requests para `/api/profiles/section?type=hot&offset=0` e para uma página que consome `listStoriesForCity` (ex.: `/descobrir/[citySlug]`)
     - Registrar em `metricas-baseline.md > Métricas antes/depois` na linha de cada função (coluna "antes")
     - _Requirements: 4.5, 6.3_

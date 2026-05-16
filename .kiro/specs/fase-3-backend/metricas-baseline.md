@@ -195,9 +195,32 @@ A migração tem dois sub-objetivos: (1) remover as duplicações listadas acima
 > Linhas preenchidas conforme cada otimização é aplicada. Cada linha
 > referencia o commit de entrega.
 
+### 4.1 Baseline (capturado em 2026-05-16, Tasks 2.4 e 2.5)
+
+Ambiente: `PRISMA_DEBUG_QUERIES=1 npm run dev` em `localhost:3000`,
+banco populado por `npm run db:seed` (57 perfis, 265 mídias, 12 cidades),
+Next 16.2.6 (Turbopack), Postgres 16-alpine via docker-compose. Cliente:
+PowerShell `Invoke-WebRequest` 5 medições com mediana descartando p10/p90.
+Tempos em "ms p50" representam o tempo total da request observado pelo
+cliente (inclui SSR + HTML render); "queries" é o count de linhas `[prisma]`
+registradas em uma única requisição (após warm-up do Turbopack).
+
+| # | otimização                                  | arquivo                                          | antes (queries) | depois (queries) | antes (ms p50) | depois (ms p50) | método              | commit |
+|---|---------------------------------------------|--------------------------------------------------|----------------:|-----------------:|---------------:|----------------:|---------------------|--------|
+| 1 | `getProfileBySlug` paginação cursor + select | `src/lib/services/profile.service.ts`           | 14 (1 join + Stories sidebar) | _(Wave 5)_ | 268 | _(Wave 5)_ | `Invoke-WebRequest /p/olivia` × 5 (warm) | _(pendente)_ |
+| 2 | `getSectionProfiles` ORDER BY SQL           | `src/app/api/profiles/section/route.ts`         | 1 + sort em JS  | _(Wave 6)_       | 51            | _(Wave 6)_     | `Invoke-WebRequest /api/profiles/section?type=hot&offset=0` × 5 | _(pendente)_ |
+| 3 | `listStoriesForCity` distinct                | `/descobrir/[citySlug]` (consome `listStories…`) | ~10 (multi)     | _(Wave 6)_       | 1157          | _(Wave 6)_     | `Invoke-WebRequest /descobrir/sao-paulo-sp` × 5 | _(pendente)_ |
+
+**Notas:**
+- A linha 1 inclui ~14 queries por request — o `getProfileBySlug` em si emite ~12 queries via o `include` profundo (profile + city + district + media + reviews + reviews.user + availabilityRules + durationOptions + Stories de profile pública por outra fonte na mesma página). A meta da Wave 5 é cortar a paginação de mídia (≤ 12 itens via cursor); o count de queries pode estabilizar próximo do atual mas o tempo p50 deve cair quando o payload por mídia diminuir.
+- A linha 2 (`/api/profiles/section`) já é rápida (51ms p50). A meta da Wave 6 é eliminar o `sortProfileCards` em memória e o passo de `sort` extra no caso `boosted` que faz `sorted.slice(...)`. Métrica depois deve manter ou diminuir o tempo.
+- A linha 3 (`/descobrir/sao-paulo-sp`) tem alta variação (959-1700 ms; mediana 1157ms). A página executa `listStoriesForCity` + `listProfilesForCity` + `getCitiesWithReels`. A meta da Wave 6 (`distinct` no Prisma vs `Map JS`) é reduzir agrupamento em JS. Como a variação no baseline é > 20%, esta linha conta como **indicativa**; o gate na Wave 6 exige paridade exata (Property 1) e não regressão de tempo p50.
+
+### 4.2 Outras otimizações
+
 | # | otimização | arquivo | antes (queries) | depois (queries) | antes (ms p50) | depois (ms p50) | método | commit |
-|---|------------|---------|-----------------|------------------|----------------|-----------------|--------|--------|
-| _(linhas preenchidas em 2.4-2.5 e Waves 3-7)_ | | | | | | | | |
+|---|------------|---------|----------------:|-----------------:|---------------:|----------------:|--------|--------|
+| _(linhas adicionadas conforme Waves 3-7 entregam mudanças de comportamento de query)_ | | | | | | | | |
 
 ## 5. Decisões
 
