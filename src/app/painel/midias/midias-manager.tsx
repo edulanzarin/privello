@@ -394,7 +394,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
       </div>
 
       {/* ── Full-screen lightbox ── */}
-      <Modal open={!!curItem} onClose={closeLb} position="fullscreen" className="bg-black flex w-full flex-col">
+      <Modal open={!!curItem} onClose={closeLb} position="fullscreen" className="bg-black flex w-full flex-col touch-none">
         {curItem && (
           <>
             {/* Top bar */}

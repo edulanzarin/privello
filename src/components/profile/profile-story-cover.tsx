@@ -232,7 +232,7 @@ export function ProfileStoryCover({
         open={open && !!localGroup && !!activeStory}
         onClose={close}
         position="fullscreen"
-        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full"
+        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full touch-none"
       >
         {open && localGroup && activeStory ? (
           <div

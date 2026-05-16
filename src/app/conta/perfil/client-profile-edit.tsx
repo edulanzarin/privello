@@ -6,6 +6,7 @@ import { updateClientNameAction, updateClientSlugAction } from "@/app/_actions/c
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 interface ClientProfileEditProps {
     currentName: string;
@@ -19,6 +20,8 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
+    // fase-6: bottom-sheet em mobile (≤ 640px), center em desktop. Cf. mockups-diff.md > §Bottom-sheet decisões.
+    const isMobile = useMediaQuery("(max-width: 640px)");
 
     function handleSaveName() {
         setError(null);
@@ -61,7 +64,7 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
         <Modal
             open={open}
             onClose={() => setOpen(false)}
-            position="center"
+            position={isMobile ? "bottom" : "center"}
             className="w-full max-w-md rounded-2xl border border-white/30 bg-white/90 p-6 shadow-2xl backdrop-blur-xl animate-fade-in"
         >
             <div className="flex items-center justify-between mb-6">

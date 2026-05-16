@@ -230,7 +230,7 @@ export function PainelSidebar({
 
           {/* Drawer */}
           <aside
-            className="relative flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-sidebar px-4 py-6 pb-20 text-white"
+            className="relative flex w-72 max-w-[85vw] flex-col overflow-y-auto overscroll-contain bg-sidebar px-4 py-6 pb-20 text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { giveWarning, suspendProfile, unsuspendProfile } from "@/app/_actions/admin-moderation";
 import { AlertTriangle, Ban, CheckCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 type WarningFormProps = {
   profileId: string;
@@ -18,6 +19,8 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
+  // fase-6: bottom-sheet em mobile (≤ 640px), center em desktop. Cf. mockups-diff.md > §Bottom-sheet decisões.
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   function openModal(m: "warn" | "suspend") {
     setMode(m);
@@ -90,7 +93,12 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
         )}
       </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} className="w-full max-w-sm bg-white p-6 shadow-xl">
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        position={isMobile ? "bottom" : "center"}
+        className="w-full max-w-sm bg-white p-6 shadow-xl"
+      >
         <h2 className="font-bold text-sm mb-1">
           {mode === "warn" ? "Advertir" : "Suspender"} — <span className="font-normal text-muted">{profileName}</span>
         </h2>

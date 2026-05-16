@@ -285,7 +285,7 @@ export function StoryBar({
         open={activeGroupIdx !== null && !!activeGroup && !!activeStory}
         onClose={closeViewer}
         position="fullscreen"
-        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full"
+        className="bg-black/90 backdrop-blur-sm flex items-center justify-center w-full touch-none"
       >
         {activeGroupIdx !== null && activeGroup && activeStory ? (
           <>

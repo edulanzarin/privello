@@ -414,7 +414,7 @@ export function ReelsFeed({
   return (
     <div
       ref={containerRef}
-      className="h-[calc(100dvh-52px)] overflow-y-scroll snap-y snap-mandatory"
+      className="h-[calc(100dvh-52px)] overflow-y-scroll snap-y snap-mandatory overscroll-y-contain"
       style={{ scrollbarWidth: "none" }}
     >
       {reels.map((reel, idx) => (
