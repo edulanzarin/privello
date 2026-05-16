@@ -1,6 +1,53 @@
 import type { NextConfig } from "next";
 import type { RemotePattern } from "next/dist/shared/lib/image-config";
 
+// AGENTS_Rule (area: headers) — consulta em 2026-03-14:
+//   - node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md
+//     (guia "Content Security Policy" — cobre nonce dinâmico via middleware,
+//     opção de header estático em next.config.ts, e o trade-off com static
+//     rendering. Decisão herdada: estático em Report-Only, sem nonce.)
+//   - node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/headers.md
+//     (referência de `headers()` em next.config.js — formato
+//     `{ source, headers: [{ key, value }] }`, ordem de matching, restrições
+//     de path. `source: "/(.*)"` aplica a todos os paths.)
+//
+// Cross-references desta fase:
+//   - .kiro/specs/fase-1-seguranca/csp-origins.md > §3 — string CSP final.
+//     Esta função reproduz §3 verbatim, com a única diferenciação dev/prod:
+//     `'unsafe-eval'` em `script-src` apenas em dev (React Fast Refresh).
+//     Em prod, `'unsafe-eval'` é removido para não normalizar `eval()` em
+//     bundles servidos a usuários reais.
+//   - .kiro/specs/fase-1-seguranca/nextauth-prod.md > §5 — janela de
+//     validação Report-Only ≥ 7 dias e procedimento de reversão antes da
+//     transição para enforcement. A Fase 1 entrega apenas Report-Only; a
+//     transição vira commit posterior, fora do escopo desta entrega.
+//
+// `'unsafe-inline'` é aceito em `script-src` e `style-src` nesta fase porque
+// o design escolheu CSP estático sem nonce (nonce-CSP forçaria dynamic
+// rendering em todas as rotas e conflitaria com a Fase 3). Ver
+// `design.md > Overview > AGENTS_Rule` deste spec-filho.
+function buildCSP(isProd: boolean): string {
+  const scriptSrc = isProd
+    ? "script-src 'self' 'unsafe-inline'"
+    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+
+  return [
+    "default-src 'self'",
+    scriptSrc,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://picsum.photos https://commondatastorage.googleapis.com https://storage.googleapis.com https://*.googleusercontent.com",
+    "connect-src 'self' https://servicodados.ibge.gov.br",
+    "font-src 'self' data:",
+    "media-src 'self' blob: https://commondatastorage.googleapis.com https://storage.googleapis.com",
+    "frame-ancestors 'self'",
+    "frame-src 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ") + "; ";
+}
+
 const extraOrigins = (process.env.NEXT_DEV_ALLOWED_ORIGINS ?? "")
   .split(",")
   .map((s) => s.trim())
@@ -12,6 +59,15 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
+  // 180 dias sem preload — janela compatível com a transição CSP em
+  // nextauth-prod.md > §5 (Tarefa 7.3 de fase-1-seguranca, Requirement 7.4).
+  { key: "Strict-Transport-Security", value: "max-age=15552000; includeSubDomains" },
+  // Tarefa 7.2 — CSP em Report-Only (não bloqueia, apenas reporta). Origens
+  // listadas em csp-origins.md > §3; helper `buildCSP` no topo deste arquivo.
+  {
+    key: "Content-Security-Policy-Report-Only",
+    value: buildCSP(process.env.NODE_ENV === "production"),
+  },
 ];
 
 // AGENTS_Rule (area: images-config) — consulta em 2026-03-14:

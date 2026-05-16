@@ -168,17 +168,17 @@ Restrições importantes:
     - Aceitar `'unsafe-inline'` em script-src e style-src nesta fase (decisão do design); registrar em comentário no `next.config.ts`
     - _Requirements: 7.2_
 
-  - [~] 7.2 Editar `next.config.ts > async headers()` para adicionar CSP-Report-Only
+  - [x] 7.2 Editar `next.config.ts > async headers()` para adicionar CSP-Report-Only
     - Adicionar header `Content-Security-Policy-Report-Only` com a string CSP construída em 7.1
     - Aplicar em `source: "/(.*)"`
     - Comentário no arquivo cita: `node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md` + `headers.md`, com a data da consulta
     - _Requirements: 7.1, 7.2_
 
-  - [~] 7.3 Adicionar HSTS direto
+  - [x] 7.3 Adicionar HSTS direto
     - No mesmo bloco `securityHeaders`, adicionar `{ key: "Strict-Transport-Security", value: "max-age=15552000; includeSubDomains" }` (180 dias, sem `preload`)
     - _Requirements: 7.4_
 
-  - [~] 7.4 Preservar headers existentes
+  - [x] 7.4 Preservar headers existentes
     - X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control continuam intactos
     - Modificar qualquer um deles vira `OutOfScopeFinding`
     - _Requirements: 7.5_
