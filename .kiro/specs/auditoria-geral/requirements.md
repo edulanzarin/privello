@@ -194,6 +194,9 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\backend-performance-phase5`
 - **agents_rule_areas**: `cache-components` (`"use cache"`, `cacheLife`, `cacheTag` quando aplicáveis), `route-segment-config` (classificação das 43 rotas com `force-dynamic` quanto a `dynamic`/`revalidate`/`fetchCache`), `server-actions` (revisão de Server Actions tocadas durante a migração `queries.ts` → `services/`).
+- **state**: `InProgress`
+- **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-3-backend\`
+- **promoted_at**: 2026-05-16
 
 <!-- Já resolvido (cf. `design.md > Estado de partida`) — entram como `Resolvido` na Revalidação do spec-filho e NÃO viram tarefa de entrega:
   - Camada `src/lib/services/` já iniciada com `subscription`, `profile`, `city` e `media`; o trabalho desta fase é concluir a migração (EAR 5), não criar a estrutura inicial.
@@ -228,6 +231,10 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **out_of_scope**: redesign visual e introdução de bibliotecas externas de UI (Radix, shadcn etc.).
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\design-system`
+- **agents_rule_areas**: nenhuma (a fase NÃO toca APIs do Next.js)
+- **state**: `InProgress`
+- **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-4-design-system\`
+- **promoted_at**: 2026-05-16
 
 #### Acceptance Criteria
 
