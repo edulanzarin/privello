@@ -160,13 +160,13 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Requirements: 1.6_
 
 - [ ] 7. Saída desta fase
-  - [~] 7.1 Validar saída
+  - [x] 7.1 Validar saída
     - Todos os 7 Requirements de `requirements.md` têm evidência (path:linha de código de teste, log de `vitest --run`, ou link de PR) anexada
     - `testing-conventions.md` cobre as quatro áreas (localização, nomenclatura, cobertura, persistência de contraexemplo) e a tabela de pureza
     - Seção `OutOfScopeFinding` em `requirements.md` está vazia ou cada linha aponta commit no master spec
     - _Requirements: 7.2_
 
-  - [~] 7.2 Atualizar Phase Card no master `requirements.md`
+  - [x] 7.2 Atualizar Phase Card no master `requirements.md`
     - `state: InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601
     - Manter `child_spec_path` apontando para esta pasta

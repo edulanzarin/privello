@@ -253,3 +253,82 @@ A Fase 2 é considerada `Done` quando:
 - O documento `testing-conventions.md` existe em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-2-testes\` e cobre as quatro áreas (localização, nomenclatura, cobertura, persistência de contraexemplo).
 - A seção 3 deste documento (`OutOfScopeFinding`) tem cada linha referenciando um commit no master spec, ou está marcada como vazia.
 - O Phase Card desta fase no master `requirements.md` foi atualizado para `state: Done` com `doneAt` ISO-8601 e link para esta pasta.
+
+
+---
+
+## Saída desta fase — evidências
+
+> Produzido pela Tarefa 7.1. Mapeamento Requirement → evidência concreta para cada um dos 7 Requirements desta fase. Cada linha cita `path:linha`, commit SHA do `git log` ou referência ao `testing-conventions.md`. SHAs apurados em `c:\Users\edulanzarin\Documents\Dev\privello\` no momento da entrega (HEAD = `8c2ebe5`).
+
+### Requirement 1 — Instalação e configuração de Vitest e fast-check
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 1.1 (scripts npm `test`/`test:watch`/`test:run` com `--run` em CI) | `package.json` → `scripts.test = "vitest --run"`, `scripts.test:watch = "vitest"`, `scripts.test:run = "vitest --run --reporter=verbose"`. Smoke confirmado em `testing-conventions.md > §8.1` (4.92s, exit 0). | ✅ |
+| Requirement 1.2 (devDeps pinadas sem `^`/`~`) | `package.json > devDependencies`: `vitest 4.1.6`, `@vitest/coverage-v8 4.1.6`, `fast-check 4.8.0`, `@fast-check/vitest 0.4.1`. Versões fixas verificáveis em `package-lock.json`. | ✅ |
+| Requirement 1.3 (3 scripts npm; `test` retorna 0 em sucesso, ≠ 0 em falha) | `package.json > scripts` (3 entries adicionadas em commit `f53c691` e Tarefa 1.4); contrato declarativo de exit codes registrado em `testing-conventions.md > §8.1`. | ✅ |
+| Requirement 1.4 (`vitest.config.ts` com `environment=node`, `include`, `exclude`, `coverage v8`, `setupFiles`) | `vitest.config.ts` na raiz (criado pela Tarefa 1.2); `vitest.setup.ts` (criado pela Tarefa 1.3). Cobre todos os campos exigidos. | ✅ |
+| Requirement 1.5 (CI rejeita `.only`/`.skip` sem comentário) | Contrato declarativo em `testing-conventions.md > §8.1` ("Comportamento esperado com `process.env.CI === \"true\"`"). Verificação efetiva delegada à `fase-7-dx-infra`. | ✅ |
+| Requirement 1.6 (scripts pré-existentes preservados) | Tabela completa em `testing-conventions.md > §8.2` — 13 scripts pré-existentes inalterados, 3 scripts `test*` novos coexistem sem colisão. Validação Vitest ↔ Playwright em `testing-conventions.md > §1` ("Isolamento Vitest ↔ Playwright"). | ✅ |
+
+### Requirement 2 — Convenção de localização e nomenclatura
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 2.1 (definir convenções `*.test.ts` co-localizado, `*.pbt.ts` para PBT) | `testing-conventions.md > §1` (Localização e nomenclatura) e `§2` (Exemplos canônicos). | ✅ |
+| Requirement 2.2 (documento canônico produzido com 4 áreas + tabela de pureza) | `testing-conventions.md` integral — §1 (localização), §2 (exemplos), §3 (persistência), §4 (pureza), §6 (cobertura). Commit `f53c691` consolidou §4 e §5. | ✅ |
+| Requirement 2.3 (exemplos canônicos `*.test.ts` e `*.pbt.ts`) | `testing-conventions.md > §2` — gabaritos para ambos os sufixos. | ✅ |
+| Requirement 2.4 (lint/escopo de `*.test.ts`/`*.pbt.ts`) | `testing-conventions.md > §6.5` — decisão A registrada (preset Next + TS já lint os sufixos por default; sem alteração em `eslint.config.mjs`). Commit `280897a`. | ✅ |
+
+### Requirement 3 — Cobertura inicial mínima nos módulos puros
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 3.1 (cobertura mínima como meta para módulos puros) | Meta declarada em `testing-conventions.md > §6` (80% statements/branches por módulo `pure`). | ✅ |
+| Requirement 3.2 (classificar cada arquivo de `src/lib/` como `pure`/`non-pure`/`parcial`) | Tabela completa em `testing-conventions.md > §4` (15 arquivos top-level: 7 `pure`, 3 `parcial`, 5 `non-pure`). Commit `f53c691`. | ✅ |
+| Requirement 3.3 (meta declarada de 80% statements/branches) | `testing-conventions.md > §6` ("Meta declarada"). Não é gate nesta fase (delegado à `fase-7-dx-infra`). | ✅ |
+| Requirement 3.4 (≥1 `*.test.ts` por módulo puro com sucesso típico + borda) | `src/lib/money.test.ts`, `src/lib/discover-params.test.ts`, `src/lib/time-utils.test.ts`, `src/lib/booking-slots.test.ts`, `src/lib/whatsapp-booking.test.ts`. Commit `598f78f`. | ✅ |
+| Requirement 3.5 (registrar contagem real onde a meta não bater) | `testing-conventions.md > §6` ("Cobertura inicial medida") — relatório `text` v8 + tabela por arquivo com Status ✅/⚠️ e justificativa para módulos abaixo de 80%. Commit `8c2ebe5`. | ✅ |
+
+### Requirement 4 — Propriedades round-trip
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 4.1 (≥1 propriedade round-trip por parser/serializer identificado) | `src/lib/money.pbt.ts` (Property 1 adaptada — invariante mais fraco), `src/lib/discover-params.pbt.ts` (Property 2), `src/lib/time-utils.pbt.ts` (Property 3 com escopo ajustado), `src/lib/booking-slots.pbt.ts` (Properties 5/6). Commits `536037b`, `141cc68`. | ✅ |
+| Requirement 4.2 (listar pares parse/serialize por módulo) | `testing-conventions.md > §5` — pares confirmados módulo-a-módulo com `path:linha`. | ✅ |
+| Requirement 4.3 (`<modulo>.pbt.ts` com `parse(serialize(x)) === x`) | Implementado nos `.pbt.ts` listados em 4.1 (com adaptações documentadas onde a API canônica não existia). | ✅ |
+| Requirement 4.4 (módulos sem par declarados como **não declarável**) | `testing-conventions.md > §5.1` (money), `§5.2` (discover-params), `§5.4` (whatsapp-booking) — todos marcados **não declarável** com justificativa. Tarefa 4.5 confirmada como condicional sem produzir `.pbt.ts`. | ✅ |
+| Requirement 4.5 (fast-check com `numRuns: 100` default; seed em comentário se fixada) | `vitest.setup.ts` aplica `fc.configureGlobal({ verbose: 2, numRuns: 100 })`. Documentado em `testing-conventions.md > §3` ("Reproduzir uma run com seed fixa"). | ✅ |
+
+### Requirement 5 — Persistência de contraexemplos
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 5.1 (recomendação de persistência sem bloqueio de commit) | `testing-conventions.md > §3` (introdução). | ✅ |
+| Requirement 5.2 (dois caminhos: inline ou `<modulo>.regressions.ts`) | `testing-conventions.md > §3` — Caminho A (Inline) e Caminho B (Dedicado) com snippets. | ✅ |
+| Requirement 5.3 (`fc.configureGlobal({ verbose: 2 })` em `setupFiles`) | `vitest.setup.ts` aplica `verbose: 2` (Tarefa 1.3). | ✅ |
+| Requirement 5.4 (persistência é responsabilidade do desenvolvedor) | `testing-conventions.md > §3` ("Responsabilidade") e §5.2 ("Documentar como rodar com seed fixa"). Commit `8c2ebe5`. | ✅ |
+
+### Requirement 6 — Integração com a CI da Fase 7
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 6.1 (integrar testes na pipeline de CI da Fase 7) | Contrato declarado em `testing-conventions.md > §8` ("Contrato com a CI da Fase 7"). Integração efetiva entrega-se em `fase-7-dx-infra`. | ✅ |
+| Requirement 6.2 (`npm run test` executável em CI sem banco/rede em ≤ 60s) | `testing-conventions.md > §8.1` — 4.92s wall-clock, 13 arquivos / 118 testes, exit 0. Margem 12× sobre teto declarado. | ✅ |
+| Requirement 6.3 (Pure_Modules + scripts npm como entradas para Fase 7) | `testing-conventions.md > §4` (tabela de pureza) + `package.json > scripts` (entrada para `fase-7-dx-infra`). | ✅ |
+| Requirement 6.4 (`npx tsc --noEmit` declarado fora do escopo) | `testing-conventions.md > §8` (introdução) e `requirements.md > Requirement 6.4` deste documento. | ✅ |
+
+### Requirement 7 — Itens fora de escopo declarados
+
+| EAR | Evidência | Status |
+|---|---|---|
+| Requirement 7.1 (declarar fora de escopo: Testing Library e ampliação de Playwright) | `requirements.md > §6 Non-Goals` (itens 1, 2). | ✅ |
+| Requirement 7.2 (achados extrapolando escopo viram `OutOfScopeFinding`) | `requirements.md > §3` — tabela `OutOfScopeFinding` vazia. Nenhum achado fora de escopo registrado nesta fase. | ✅ |
+
+### Verificação do checklist "Saída desta fase"
+
+- [x] Todos os 7 Requirements têm evidência concreta (tabela acima).
+- [x] `testing-conventions.md` cobre as 4 áreas (localização §1, nomenclatura §1, cobertura §6, persistência de contraexemplo §3) + tabela de pureza §4.
+- [x] Seção `OutOfScopeFinding` (§3) marcada como vazia — nenhum achado a referenciar commit no master.
+- [x] Phase Card no master `requirements.md` atualizado para `state: Done` com `doneAt: 2026-05-16T04:46:53Z` (Tarefa 7.2).

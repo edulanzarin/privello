@@ -156,9 +156,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **out_of_scope**: cobertura de componentes React via Testing Library e ampliação dos testes Playwright — entram em fases posteriores.
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\backend-performance-phase5`
-- **state**: `InProgress`
+- **state**: `Done`
 - **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-2-testes\`
 - **promoted_at**: 2026-03-14
+- **doneAt**: 2026-05-16T04:46:53Z
+- **spawn_readiness_note**: Spawn-Readiness Gate re-avaliado para fase-3, fase-4, fase-5 e fase-7 (dependentes diretas); gate executável quando suas próprias dependências forem satisfeitas (ex.: fase-3 depende também de fase-1).
 
 #### Acceptance Criteria
 
