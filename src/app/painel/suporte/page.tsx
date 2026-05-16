@@ -69,7 +69,7 @@ export default async function PainelSuportePage() {
           />
           <button
             type="submit"
-            className="rounded-lg bg-foreground px-5 py-2.5 text-base font-semibold text-white transition hover:bg-foreground/80 active:scale-[0.97]"
+            className="min-h-[44px] rounded-lg bg-foreground px-5 py-2.5 text-base font-semibold text-white transition hover:bg-foreground/80 active:scale-[0.97]"
           >
             Abrir chamado
           </button>

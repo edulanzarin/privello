@@ -329,7 +329,8 @@ export function StoryBar({
                 </Link>
                 <button
                   onClick={closeViewer}
-                  className="rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60"
+                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm hover:bg-black/60"
+                  aria-label="Fechar"
                 >
                   <X className="h-5 w-5" strokeWidth={2} />
                 </button>
@@ -374,7 +375,8 @@ export function StoryBar({
                   <button
                     onClick={toggleLike}
                     disabled={likePending}
-                    className="flex items-center gap-1.5 text-sm text-white disabled:opacity-60"
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 text-sm text-white disabled:opacity-60"
+                    aria-label={activeStory.likedByMe ? "Descurtir story" : "Curtir story"}
                   >
                     <Heart
                       className={cn(

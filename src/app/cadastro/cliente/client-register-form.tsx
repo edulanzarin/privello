@@ -90,7 +90,7 @@ export function ClientRegisterForm() {
         variant="coral"
         size="lg"
         loading={pending}
-        className="w-full"
+        className="w-full min-h-[44px]"
       >
         {pending ? "Criando conta…" : "Criar conta"}
       </Button>

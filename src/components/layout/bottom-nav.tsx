@@ -60,7 +60,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
                 key={item.key}
                 href={item.href}
                 className={cn(
-                  "relative flex flex-col items-center gap-[2px] px-10 py-1 text-2xs font-medium transition-colors",
+                  "relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-[2px] px-10 py-1 text-2xs font-medium transition-colors",
                   item.active ? "text-coral" : "text-muted hover:text-foreground",
                 )}
               >
@@ -138,7 +138,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
               href={item.href}
               onClick={item.onClick}
               className={cn(
-                "relative flex flex-col items-center gap-[2px] px-5 py-1 text-2xs font-medium transition-colors",
+                "relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-[2px] px-5 py-1 text-2xs font-medium transition-colors",
                 item.active ? "text-coral" : "text-muted hover:text-foreground",
               )}
             >

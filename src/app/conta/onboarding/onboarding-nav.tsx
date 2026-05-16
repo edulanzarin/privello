@@ -18,7 +18,7 @@ type Props = Omit<LinkProps, "href"> & {
  */
 export function OnboardingNext({ href, children, className, ...rest }: Props) {
     return (
-        <Link href={href} transitionTypes={["nav-forward"]} className={className} {...rest}>
+        <Link href={href} transitionTypes={["nav-forward"]} className={className ?? "min-h-[44px]"} {...rest}>
             {children}
         </Link>
     );
@@ -26,7 +26,7 @@ export function OnboardingNext({ href, children, className, ...rest }: Props) {
 
 export function OnboardingBack({ href, children, className, ...rest }: Props) {
     return (
-        <Link href={href} transitionTypes={["nav-back"]} className={className} {...rest}>
+        <Link href={href} transitionTypes={["nav-back"]} className={className ?? "min-h-[44px]"} {...rest}>
             {children}
         </Link>
     );

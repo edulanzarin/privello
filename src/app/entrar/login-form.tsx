@@ -40,7 +40,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         variant="coral"
         size="lg"
         loading={pending}
-        className="w-full mt-2"
+        className="w-full mt-2 min-h-[44px]"
       >
         {pending ? "Entrando…" : "Entrar"}
       </Button>

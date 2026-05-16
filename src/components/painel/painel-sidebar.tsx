@@ -211,7 +211,7 @@ export function PainelSidebar({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="rounded-md p-2 text-white/70 hover:bg-white/10 hover:text-white"
+            className="min-h-[44px] min-w-[44px] rounded-md p-2 text-white/70 hover:bg-white/10 hover:text-white"
             aria-label="Menu"
           >
             <Menu className="h-5 w-5" strokeWidth={1.5} />
@@ -240,7 +240,8 @@ export function PainelSidebar({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1.5 text-white/70 hover:bg-white/10"
+                className="min-h-[44px] min-w-[44px] rounded-md p-1.5 text-white/70 hover:bg-white/10"
+                aria-label="Fechar menu"
               >
                 <X className="h-5 w-5" strokeWidth={1.5} />
               </button>

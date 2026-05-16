@@ -70,7 +70,7 @@ export default function RecuperarSenhaPage() {
             <button
               type="submit"
               disabled={pending}
-              className="mt-6 w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+              className="mt-6 min-h-[44px] w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
             >
               {pending ? "Enviando…" : "Enviar link"}
             </button>

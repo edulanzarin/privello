@@ -224,7 +224,11 @@ function ReelPlayer({
         {/* Right sidebar: actions */}
         {!reel.isLocked && (
           <div className="absolute bottom-6 right-3 flex flex-col items-center gap-6">
-            <button onClick={() => setMuted((m) => !m)} className="flex flex-col items-center gap-1">
+            <button
+              onClick={() => setMuted((m) => !m)}
+              className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1"
+              aria-label={muted ? "Ativar som" : "Mudo"}
+            >
               {muted ? (
                 <VolumeX className="h-7 w-7 text-white drop-shadow" strokeWidth={1.5} />
               ) : (
@@ -235,7 +239,11 @@ function ReelPlayer({
             <button
               onClick={toggleLike}
               disabled={!isClient}
-              className={cn("flex flex-col items-center gap-1", !isClient && "opacity-50 cursor-not-allowed")}
+              className={cn(
+                "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1",
+                !isClient && "opacity-50 cursor-not-allowed",
+              )}
+              aria-label={liked ? "Descurtir" : "Curtir"}
             >
               <Heart
                 className={cn("h-7 w-7 drop-shadow transition", liked ? "fill-coral text-coral" : "text-white")}
@@ -244,7 +252,11 @@ function ReelPlayer({
               <span className="text-xs font-semibold text-white drop-shadow">{likes}</span>
             </button>
 
-            <button onClick={openComments} className="flex flex-col items-center gap-1">
+            <button
+              onClick={openComments}
+              className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1"
+              aria-label="Comentários"
+            >
               <MessageCircle className="h-7 w-7 text-white drop-shadow" strokeWidth={1.5} />
               <span className="text-xs font-semibold text-white drop-shadow">{commentCount}</span>
             </button>

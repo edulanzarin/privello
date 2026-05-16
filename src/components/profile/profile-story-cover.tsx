@@ -260,7 +260,7 @@ export function ProfileStoryCover({
                 <p className="truncate text-xs font-semibold text-white">{localGroup.displayName}</p>
                 <p className="text-2xs text-white/60">{timeAgo(activeStory.createdAt)}</p>
               </div>
-              <button onClick={close} className="rounded-full bg-white/10 p-1.5 text-white hover:bg-white/20">
+              <button onClick={close} className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/10 p-1.5 text-white hover:bg-white/20" aria-label="Fechar">
                 <X className="h-4 w-4" strokeWidth={2} />
               </button>
             </div>
@@ -289,9 +289,10 @@ export function ProfileStoryCover({
               </span>
               {isClient ? (
                 <button
-                  className="pointer-events-auto flex items-center gap-1.5 text-sm text-white disabled:opacity-60"
+                  className="pointer-events-auto flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 text-sm text-white disabled:opacity-60"
                   onClick={(e) => { e.stopPropagation(); toggleLike(); }}
                   disabled={likePending}
+                  aria-label={activeStory.likedByMe ? "Descurtir story" : "Curtir story"}
                 >
                   <Heart className={cn("h-6 w-6 transition", activeStory.likedByMe ? "fill-coral text-coral scale-110" : "text-white/80")} strokeWidth={1.5} />
                   <span className="text-xs text-white/70">{activeStory.likeCount}</span>

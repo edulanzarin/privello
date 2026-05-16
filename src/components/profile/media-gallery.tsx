@@ -192,7 +192,8 @@ function PostModal({
     >
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-20 hidden rounded-full bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 sm:block"
+        className="absolute right-4 top-4 z-20 hidden min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 sm:flex"
+        aria-label="Fechar"
       >
         <X className="h-5 w-5" strokeWidth={1.5} />
       </button>
@@ -205,7 +206,8 @@ function PostModal({
         <div className="relative aspect-[3/4] w-full shrink-0 bg-black sm:aspect-auto sm:flex-1">
           <button
             onClick={onClose}
-            className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm sm:hidden"
+            className="absolute left-3 top-3 z-10 flex min-h-[44px] items-center gap-1 rounded-full bg-black/40 px-2.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm sm:hidden"
+            aria-label="Voltar"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2} />
             Voltar
@@ -245,14 +247,16 @@ function PostModal({
               <button
                 onClick={() => setIdx((i) => i - 1)}
                 disabled={idx === 0}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+                className="absolute left-2 top-1/2 inline-flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+                aria-label="Anterior"
               >
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
               <button
                 onClick={() => setIdx((i) => i + 1)}
                 disabled={idx === items.length - 1}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+                className="absolute right-2 top-1/2 inline-flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 text-foreground shadow disabled:opacity-0 hover:bg-white"
+                aria-label="Próximo"
               >
                 <ChevronRight className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -349,14 +353,20 @@ function PostModal({
               <button
                 onClick={toggleLike}
                 disabled={!isClient || likePending}
-                className={cn("transition", (!isClient || likePending) && "opacity-40 cursor-not-allowed")}
+                className={cn(
+                  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center transition",
+                  (!isClient || likePending) && "opacity-40 cursor-not-allowed",
+                )}
+                aria-label={curLike.liked ? "Descurtir" : "Curtir"}
               >
                 <Heart
                   className={cn("h-6 w-6 transition-transform active:scale-125", curLike.liked ? "fill-coral text-coral" : "text-foreground hover:text-muted")}
                   strokeWidth={1.5}
                 />
               </button>
-              <MessageCircle className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              <span className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center" aria-hidden="true">
+                <MessageCircle className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              </span>
               <span className="ml-auto text-xs text-muted">{idx + 1} / {items.length}</span>
             </div>
             <p className="mt-1.5 text-md font-semibold">

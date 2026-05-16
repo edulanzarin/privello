@@ -601,7 +601,7 @@ export function ProviderRegisterForm() {
       {/* Navigation */}
       <div className="mt-8 flex items-center justify-between">
         {step > 1 ? (
-          <Button variant="secondary" onClick={back} disabled={pending}>
+          <Button variant="secondary" onClick={back} disabled={pending} className="min-h-[44px]">
             ← Voltar
           </Button>
         ) : (
@@ -609,11 +609,11 @@ export function ProviderRegisterForm() {
         )}
 
         {step < 5 ? (
-          <Button variant="coral" size="lg" onClick={next}>
+          <Button variant="coral" size="lg" onClick={next} className="min-h-[44px]">
             {step < 4 ? "Continuar →" : "Próximo →"}
           </Button>
         ) : (
-          <Button variant="coral" size="lg" onClick={handleFinish} loading={pending}>
+          <Button variant="coral" size="lg" onClick={handleFinish} loading={pending} className="min-h-[44px]">
             {pending ? "Criando perfil…" : "Finalizar cadastro"}
           </Button>
         )}

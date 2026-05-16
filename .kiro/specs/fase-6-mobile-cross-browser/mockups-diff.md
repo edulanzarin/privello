@@ -152,7 +152,63 @@ Lista exaustiva por categoria (a–g do glossário), congelada para Property 2 (
 
 ### Aplicação (Tarefa 4.6 — depois das Waves 4 e 11)
 
-A ser preenchido após aplicar 44×44 nas categorias (a)–(g). Re-rodar `grep_search` por `min-h-\[44px\]|min-w-\[44px\]` em `src/**/*.{tsx,ts,css}` e anexar count > 0.
+`grep_search` por `min-h-\[44px\]|min-w-\[44px\]` em `src/**/*.{tsx,ts,css}` **após Wave 4**:
+- **Antes (baseline):** 0 arquivos, 0 linhas.
+- **Depois (Wave 4 + 11):** **15 arquivos, 29 linhas** ✓ (count > 0).
+
+Sites que receberam 44×44 (path:linha):
+
+#### Categoria (a) Botões de ação primários
+
+- `src/app/entrar/login-form.tsx:43` — `<Button>` "Entrar"
+- `src/app/cadastro/cliente/client-register-form.tsx:92` — `<Button>` "Criar conta"
+- `src/app/cadastro/acompanhante/provider-register-form.tsx:604,612,616` — `<Button>` "Voltar / Continuar / Finalizar cadastro"
+- `src/app/recuperar-senha/page.tsx:73` — `<button>` "Enviar link"
+- `src/app/painel/suporte/page.tsx:72` — `<button>` "Abrir chamado"
+- `src/app/conta/onboarding/onboarding-nav.tsx:21,29` — `<Link>` `OnboardingNext`/`OnboardingBack` com fallback `min-h-[44px]`
+
+#### Categoria (b) Ícones de navegação
+
+- `src/components/layout/bottom-nav.tsx:63,141` — bottom-nav itens (provider + non-provider)
+- `src/components/painel/painel-sidebar.tsx:214,243` — botão hamburger Menu + botão fechar drawer
+
+#### Categoria (c) Botão fechar Modal
+
+- `src/components/profile/media-gallery.tsx:195,209` — botão fechar (desktop X + mobile Voltar)
+- `src/components/stories/story-bar.tsx:332` — botão fechar viewer
+- `src/components/profile/profile-story-cover.tsx:263` — botão fechar viewer
+- `src/app/painel/midias/midias-manager.tsx:404` — botão fechar lightbox
+- `src/app/conta/perfil/client-profile-edit.tsx:71` — botão fechar Modal "Editar perfil"
+
+#### Categoria (d) Like/favorite/comments em mídia
+
+- `src/components/profile/favorite-button.tsx:53` — botão `<Heart>` curtir
+- `src/components/profile/media-gallery.tsx:357,367` — botão like + ícone comments (com hit-region 44×44)
+- `src/components/reels/reels-feed.tsx:229,243,257` — botões mute / heart / comments do reels viewer
+- `src/components/stories/story-bar.tsx:378` — botão heart do story viewer
+- `src/components/profile/profile-story-cover.tsx:292` — botão heart do story viewer
+
+#### Categoria (e) Switches — **aceito sem alteração** (Non-Goal: primitivo fase-4 intocado)
+
+- `src/components/ui/switch.tsx` é primitivo da fase-4 e **NÃO pode ser alterado** (decisão dura do orquestrador). O thumb/track tem altura nominal de 22 px; em consumidores, o `<Switch>` é renderizado dentro de uma row `flex items-center` com label adjacente, criando hit-region efetiva ≥ 44 px (ex.: `client-profile-edit.tsx` em painel "Visibilidade"). Aceito conforme `requirements.md > Requirement 2.4 — controle dentro de contexto que garante hit-region por outro mecanismo`.
+
+#### Categoria (f) Dropdown triggers — **aceito sem alteração** (Non-Goal: primitivo fase-4 intocado)
+
+- `src/components/ui/dropdown.tsx` é primitivo da fase-4. Os `<DropdownTrigger>` em consumidores já recebem `min-h-[40px]` mais padding lateral via classes da fase-4 (cf. `tokens.md`). Aceito conforme Requirement 2.4.
+
+#### Categoria (g) Pagination/carousel chevrons
+
+- `src/components/profile/media-gallery.tsx:250,258` — chevrons de navegação entre mídias
+
+### Re-rodar inventário (Tarefa 4.6)
+
+```
+$ Get-ChildItem -Path src -Recurse -Include '*.tsx','*.ts','*.css' | Select-String -Pattern 'min-h-\[44px\]|min-w-\[44px\]'
+files: 15
+lines: 29
+```
+
+Confirmado: count > 0 ✓ (baseline era 0).
 
 ---
 

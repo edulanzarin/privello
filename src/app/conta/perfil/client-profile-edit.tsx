@@ -66,7 +66,7 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
         >
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Editar perfil</h2>
-                <button onClick={() => setOpen(false)} className="rounded-full p-1.5 hover:bg-line transition">
+                <button onClick={() => setOpen(false)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-full p-1.5 hover:bg-line transition" aria-label="Fechar">
                     <X className="h-4 w-4" strokeWidth={1.5} />
                 </button>
             </div>

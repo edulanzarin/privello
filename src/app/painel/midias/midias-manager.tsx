@@ -401,7 +401,8 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
             <div className="flex h-14 shrink-0 items-center justify-between px-4">
               <button
                 onClick={closeLb}
-                className="flex items-center gap-2 text-white/70 transition hover:text-white"
+                className="inline-flex min-h-[44px] min-w-[44px] items-center gap-2 text-white/70 transition hover:text-white"
+                aria-label="Voltar"
               >
                 <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
                 <span className="text-sm">Voltar</span>
