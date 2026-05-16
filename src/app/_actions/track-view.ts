@@ -1,5 +1,27 @@
 "use server";
 
+/**
+ * Server Actions — Contagem de visualizações de perfil
+ *
+ * Caminho: src/app/_actions/track-view.ts
+ *
+ * Cobre o tracking de views em perfis públicos com proteção anti-spam:
+ * - O dono do perfil nunca conta view no próprio perfil.
+ * - O mesmo visitante (cookie `pv_<profileId>`) só conta uma view por perfil
+ *   a cada 1 hora (`COOLDOWN_MS`).
+ *
+ * Convenções:
+ * - Server action Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`TrackProfileViewSchema` em
+ *   `src/lib/validation/track-view.schema.ts`).
+ * - Contrato silencioso: nunca lança e nunca retorna — view tracking não pode
+ *   quebrar a página pública. Falhas (auth, parse, DB) são engolidas.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.12
+ * - src/lib/validation/track-view.schema.ts
+ */
+
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +33,15 @@ const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
  * Increments view counts with anti-spam protection:
  * - Providers never count views on their own profile
  * - Same visitor (cookie-based) can only count once per hour per profile
+ *
+ * @param profileId - cuid do `Profile` alvo (`TrackProfileViewSchema`).
+ * @returns `void`. Sempre silencioso, inclusive em parse fail.
+ *
+ * Side effects:
+ * - Lê/escreve cookie `pv_<profileId>` (httpOnly, SameSite=Lax, maxAge=3600).
+ * - `prisma.profile.update` incrementa `viewsThisMonth` e `viewsCurrentPeriod`.
+ *
+ * @see src/lib/validation/track-view.schema.ts (`TrackProfileViewSchema`)
  */
 export async function trackProfileView(profileId: string) {
   try {

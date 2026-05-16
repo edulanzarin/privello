@@ -1,5 +1,31 @@
 "use server";
 
+/**
+ * Server Actions — Autenticação e cadastro
+ *
+ * Caminho: src/app/_actions/auth.ts
+ *
+ * Cobre login (NextAuth credentials), cadastro de cliente e cadastro de
+ * acompanhante (provider). Inclui rate limit por IP no fluxo de login para
+ * mitigar brute-force antes mesmo de tocar no backend de auth.
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`LoginActionSchema`, `SignupClientSchema`,
+ *   `SignupProviderSchema` em `src/lib/validation/`).
+ * - Hash de senha com `bcrypt` (cost 12).
+ * - Rate limit aplicado no `loginAction` via `rateLimit` + `rateLimitConfigFor`
+ *   (chave = IP do cliente extraído de `x-forwarded-for`/`x-real-ip`).
+ * - Auto-login pós-cadastro via `signIn("credentials", ...)` com `redirectTo`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.2
+ * - .kiro/specs/fase-1-seguranca/rate-limits.md (entrada `login`)
+ * - src/lib/validation/auth.schema.ts
+ * - src/lib/rate-limit.ts e src/lib/rate-limit-config.ts
+ * - src/lib/auth.ts (NextAuth `signIn`)
+ */
+
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -32,6 +58,28 @@ async function resolveClientIp(): Promise<string> {
 }
 
 // ── Login ─────────────────────────────────────────────────────────────────────
+/**
+ * Autentica via credenciais (e-mail + senha) e redireciona conforme o papel.
+ * Aplica rate-limit por IP antes de chamar o backend de auth.
+ *
+ * @param formData - FormData com:
+ *   - `email` (string, required, lowercased): e-mail do usuário.
+ *   - `password` (string, required, min 1).
+ *   - `callbackUrl` (string, optional): destino pós-login para clientes;
+ *     ignorado quando aponta para `/painel` (redireciona conforme role).
+ * @returns Em sucesso, dispara redirect via NextAuth (não retorna).
+ *   Em falha: `{ error, issues?, retryAfter? }` — `retryAfter` é preenchido
+ *   quando o rate-limit é atingido.
+ *
+ * Side effects:
+ * - Rate limit: bucket `login` (ver `rate-limits.md`), key = IP do cliente.
+ * - Redirect determinístico:
+ *   - `ADMIN`/`MODERATOR` → `/admin/moderacao`.
+ *   - `PROVIDER` → `/painel`.
+ *   - `CLIENT` → `callbackUrl` se válido, senão `/`.
+ *
+ * @see src/lib/validation/auth.schema.ts (`LoginActionSchema`)
+ */
 export async function loginAction(formData: FormData) {
   const parsed = LoginActionSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) {
@@ -84,6 +132,23 @@ export async function loginAction(formData: FormData) {
 }
 
 // ── Cadastro cliente ──────────────────────────────────────────────────────────
+/**
+ * Cadastra um novo usuário `CLIENT` e dispara auto-login.
+ *
+ * @param formData - FormData com:
+ *   - `name` (string, trim, 2–60 chars).
+ *   - `slug` (string, regex `^[a-z0-9][a-z0-9-]*$`, min 3).
+ *   - `email` (string, required, e-mail válido).
+ *   - `password` (string, min 8).
+ * @returns Em sucesso, redireciona para `/` via `signIn`.
+ *   Em falha: `{ error, issues? }`.
+ *
+ * Side effects:
+ * - `prisma.user.create` com `role = "CLIENT"`.
+ * - `signIn("credentials")` ao final.
+ *
+ * @see src/lib/validation/auth.schema.ts (`SignupClientSchema`)
+ */
 export async function registerClientAction(formData: FormData) {
   const parsed = SignupClientSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return { error: "Validation failed", issues: parsed.error.issues };
@@ -114,6 +179,34 @@ export async function registerClientAction(formData: FormData) {
 }
 
 // ── Cadastro acompanhante ─────────────────────────────────────────────────────
+/**
+ * Cadastra um `User` com `Profile` PROVIDER, salva a foto de perfil em
+ * `public/uploads/<profileId>/` e dispara auto-login para `/painel`.
+ *
+ * @param formData - FormData com (campos coercidos para os tipos do schema):
+ *   - `email`, `password`, `displayName`, `slug`, `age`, `citySlug`,
+ *     `cityQuery`, `bio`, `tagline?`, `whatsapp?`, `heightCm?`, `dressSize?`,
+ *     `hair?`, `eyes?`, `languages?`.
+ *   - Booleanos de público/local: `servesMen`, `servesWomen`, `servesCouples`,
+ *     `hasOwnPlace`, `homeVisit`, `travelsNational`, `travelsInternational`
+ *     (chegam como `"1"`/string e são coercidos pelo schema).
+ *   - `paymentMethods?` (string).
+ *   - `durationsJson` (JSON string) — convertido para `durations: []` antes
+ *     de validar; cada item exige `minutes`, `priceBrl` (≥1) e `label?`.
+ *   - `photo` (File, obrigatório, MIME validado abaixo do schema; tamanho
+ *     verificado no handler de salvamento).
+ * @returns Em sucesso, redireciona para `/painel`.
+ *   Em falha: `{ error, issues? }`.
+ *
+ * Side effects:
+ * - `prisma.user.create` (com `profile` aninhado e `durationOptions`).
+ * - Cria/garante `City` via `getOrCreateCityBySlug`.
+ * - Escreve foto em `public/uploads/<profileId>/<timestamp>.<ext>` (não-fatal:
+ *   se falhar, conta segue criada e foto pode ser anexada depois pelo painel).
+ * - `signIn("credentials")` ao final.
+ *
+ * @see src/lib/validation/auth.schema.ts (`SignupProviderSchema`)
+ */
 export async function registerProviderAction(formData: FormData) {
   // The provider form ships its `durations` payload as a JSON string in
   // `durationsJson`. Normalize it before handing the FormData to the schema

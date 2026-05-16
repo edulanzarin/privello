@@ -1,5 +1,40 @@
 "use server";
 
+/**
+ * Server Actions — Configurações do painel do acompanhante
+ *
+ * Caminho: src/app/painel/_actions/provider-settings.ts
+ *
+ * Cobre as ações disparadas pelo painel do acompanhante:
+ * - Stories do painel (`createStory`, `deleteStory`) — gateadas por plano
+ *   `DESTAQUE`/`PREMIUM`.
+ * - `saveAvailabilityWindows` — janelas de disponibilidade (7 dias × abrir/
+ *   horário inicial/final).
+ * - `saveDurationOptions` — recria as durações + métodos de pagamento.
+ * - Financeiro: `addFinancialRecord`, `updateFinancialRecord`,
+ *   `deleteFinancialRecord`.
+ * - `changeHandle` — troca o `@` (slug) do perfil.
+ * - `claimFreeBoost` — boost grátis 24 h, exclusivo do plano Premium e
+ *   limitado a 1 boost ativo por vez.
+ * - `devActivatePlan` — ativa plano sem pagamento (apenas em
+ *   `NODE_ENV !== "production"`).
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`PainelCreateStorySchema`, `PainelDeleteStorySchema`,
+ *   `SaveAvailabilityWindowsSchema`, `SaveDurationOptionsSchema`,
+ *   `AddFinancialRecordSchema`, `UpdateFinancialRecordSchema`,
+ *   `DeleteFinancialRecordSchema`, `ChangeHandleSchema`,
+ *   `DevActivatePlanSchema` em `src/lib/validation/painel-provider-settings.schema.ts`).
+ * - Autenticação requerida via `auth()`; sem perfil → redirect para
+ *   `/conta/onboarding/perfil`.
+ * - Revalidação de cache via `revalidatePath` em `/painel/*` e `/p/<slug>`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §3.1
+ * - src/lib/validation/painel-provider-settings.schema.ts
+ */
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -17,6 +52,21 @@ import {
   formDataToObject,
 } from "@/lib/validation";
 
+/**
+ * Cria um story de painel (24 h de duração). Disponível apenas para perfis
+ * com plano `DESTAQUE` ou `PREMIUM`.
+ *
+ * @param formData - FormData com:
+ *   - `mediaUrl` (URL).
+ *   - `caption?` (trim, ≤500 chars, nullable — `PainelCreateStorySchema`).
+ * @returns `void` (silencioso em gating de plano ou validation fail).
+ *
+ * Side effects:
+ * - `prisma.story.create` (`mediaType: "IMAGE"`, `expiresAt = now + 24h`).
+ * - `revalidatePath("/painel/stories")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`PainelCreateStorySchema`)
+ */
 export async function createStory(formData: FormData) {
   const profile = await getSessionProfile();
   if (profile.planTier !== "DESTAQUE" && profile.planTier !== "PREMIUM") {
@@ -33,6 +83,19 @@ export async function createStory(formData: FormData) {
   revalidatePath("/painel/stories");
 }
 
+/**
+ * Remove um story do perfil logado.
+ *
+ * @param formData - FormData com:
+ *   - `storyId` (cuid — `PainelDeleteStorySchema`).
+ * @returns `void` (silencioso em validation fail).
+ *
+ * Side effects:
+ * - `prisma.story.deleteMany` filtrado por `profileId`.
+ * - `revalidatePath("/painel/stories")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`PainelDeleteStorySchema`)
+ */
 export async function deleteStory(formData: FormData) {
   const profile = await getSessionProfile();
   const parsed = PainelDeleteStorySchema.safeParse(formDataToObject(formData));
@@ -49,6 +112,25 @@ async function getSessionProfile() {
   return profile;
 }
 
+/**
+ * Recria a tabela `AvailabilityRule` do perfil com 7 dias da semana, cada um
+ * com `open` (`AVAILABLE`/`CLOSED`), `startTime` e `endTime`.
+ *
+ * @param formData - FormData com, para cada `weekday` em `0..6`:
+ *   - `wd_<weekday>_open` (checkbox `"on"`).
+ *   - `wd_<weekday>_start` (HH:MM, default `"09:00"` quando aberto).
+ *   - `wd_<weekday>_end` (HH:MM, default `"18:00"` quando aberto).
+ *   `SaveAvailabilityWindowsSchema` valida regex e `end > start` quando aberto.
+ * @returns `{ error, issues? }` em validation fail; `void` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.$transaction`:
+ *   - `AvailabilityRule.deleteMany` para o perfil.
+ *   - `AvailabilityRule.createMany` com 7 linhas.
+ * - `revalidatePath("/painel/disponibilidade")` e `("/p/<slug>")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`SaveAvailabilityWindowsSchema`)
+ */
 export async function saveAvailabilityWindows(formData: FormData) {
   const profile = await getSessionProfile();
 
@@ -83,6 +165,29 @@ export async function saveAvailabilityWindows(formData: FormData) {
   revalidatePath(`/p/${profile.slug}`);
 }
 
+/**
+ * Recria a tabela `ProfileDurationOption` do perfil a partir das linhas
+ * preenchidas no painel (até 12 slots `dur_<i>_*`). Atualiza `priceHour` e
+ * `paymentMethods` no `Profile` quando aplicável.
+ *
+ * @param formData - FormData com, para cada slot `i` em `0..11`:
+ *   - `dur_<i>_minutes` (number, 15–2880).
+ *   - `dur_<i>_label?` (string, default `"<minutes> min"`).
+ *   - `dur_<i>_price` (number ≥ 0).
+ *   E também:
+ *   - `paymentMethods?` (string).
+ *   `SaveDurationOptionsSchema` valida o array final agregado.
+ * @returns `{ error, issues? }` em validation fail; `void` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.$transaction`:
+ *   - `Profile.update` (atualiza `priceHour` se houver opção 60 min e
+ *     `paymentMethods` se enviado).
+ *   - `ProfileDurationOption.deleteMany` + `createMany` (recria do zero).
+ * - `revalidatePath("/painel/valores")` e `("/p/<slug>")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`SaveDurationOptionsSchema`)
+ */
 export async function saveDurationOptions(formData: FormData) {
   const profile = await getSessionProfile();
 
@@ -138,6 +243,24 @@ export async function saveDurationOptions(formData: FormData) {
   revalidatePath(`/p/${profile.slug}`);
 }
 
+/**
+ * Atualiza um registro financeiro existente do perfil logado.
+ *
+ * @param formData - FormData com:
+ *   - `recordId` (cuid).
+ *   - `clientLabel` (trim, 1–120 chars).
+ *   - `durationLabel`/`locationLabel`/`paymentLabel` (trim, ≤120 chars; quando
+ *     vazios, persistidos como `"—"`).
+ *   - `amountBrl` (int positivo).
+ *   - `isNoShow?` (boolean coerced) — `UpdateFinancialRecordSchema`.
+ * @returns `{ error, issues? }` em validation fail; `void` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.financialRecord.updateMany` filtrado por `profileId`.
+ * - `revalidatePath("/painel/financeiro")` e `("/painel")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`UpdateFinancialRecordSchema`)
+ */
 export async function updateFinancialRecord(formData: FormData) {
   const profile = await getSessionProfile();
   const parsed = UpdateFinancialRecordSchema.safeParse(formDataToObject(formData));
@@ -160,6 +283,19 @@ export async function updateFinancialRecord(formData: FormData) {
   revalidatePath("/painel");
 }
 
+/**
+ * Remove um registro financeiro do perfil logado.
+ *
+ * @param formData - FormData com:
+ *   - `recordId` (cuid — `DeleteFinancialRecordSchema`).
+ * @returns `{ error, issues? }` em validation fail; `void` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.financialRecord.deleteMany` filtrado por `profileId`.
+ * - `revalidatePath("/painel/financeiro")` e `("/painel")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`DeleteFinancialRecordSchema`)
+ */
 export async function deleteFinancialRecord(formData: FormData) {
   const profile = await getSessionProfile();
   const parsed = DeleteFinancialRecordSchema.safeParse(formDataToObject(formData));
@@ -173,6 +309,23 @@ export async function deleteFinancialRecord(formData: FormData) {
   revalidatePath("/painel");
 }
 
+/**
+ * Troca o `@` (slug) do perfil logado. Strip de `@` e lowercase aplicados
+ * antes da validação Zod.
+ *
+ * @param formData - FormData com:
+ *   - `handle` (string, regex `^[a-z0-9_-]{3,30}$` após normalização —
+ *     `ChangeHandleSchema`).
+ * @returns `{ error, issues? }` em falha (validação ou colisão);
+ *   `undefined` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.profile.update({ slug: handle })`.
+ * - `revalidatePath` em `/painel`, `/painel/perfil`, `/p/<oldSlug>`,
+ *   `/p/<newHandle>`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`ChangeHandleSchema`)
+ */
 export async function changeHandle(formData: FormData): Promise<{ error: string; issues?: import("zod").ZodIssue[] } | undefined> {
   const profile = await getSessionProfile();
   const raw = (formData.get("handle") as string ?? "").trim().toLowerCase().replace(/^@/, "");
@@ -193,6 +346,26 @@ export async function changeHandle(formData: FormData): Promise<{ error: string;
   revalidatePath(`/p/${handle}`);
 }
 
+/**
+ * Adiciona um registro financeiro manual ao perfil logado.
+ *
+ * @param formData - FormData com:
+ *   - `clientLabel`, `durationLabel`, `locationLabel`, `paymentLabel` (mesma
+ *     política do `updateFinancialRecord`).
+ *   - `amountBrl` (int positivo).
+ *   - `isNoShow?` (boolean coerced).
+ *   - `notes?` (trim, ≤2000 chars, nullable).
+ *   `AddFinancialRecordSchema`.
+ * @returns `void`. Em validation fail, **lança** `Error("Preencha cliente e
+ *   valor.")` — diferente das demais ações deste arquivo, que retornam
+ *   silenciosamente.
+ *
+ * Side effects:
+ * - `prisma.financialRecord.create` (`origin: "MANUAL"`, `occurredAt: now`).
+ * - `revalidatePath("/painel/financeiro")`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`AddFinancialRecordSchema`)
+ */
 export async function addFinancialRecord(formData: FormData) {
   const profile = await getSessionProfile();
   const parsed = AddFinancialRecordSchema.safeParse(formDataToObject(formData));
@@ -218,6 +391,18 @@ export async function addFinancialRecord(formData: FormData) {
 }
 
 // ── Boost grátis para Premium (1x por mês) ────────────────────────────────────
+/**
+ * Ativa um boost grátis de 24 horas para perfis Premium com plano vigente.
+ * Bloqueia se já existe boost ativo (`featuredUntil > now`).
+ *
+ * @returns Em sucesso, redireciona para `/painel/plano`.
+ *   Em falha: `{ error }` (perfil não-Premium, plano expirado ou boost já ativo).
+ *
+ * Side effects:
+ * - `prisma.profile.update({ featuredUntil: now+24h, boostLabel: "Em destaque" })`.
+ * - `revalidatePath("/painel/plano")` e `("/painel")`.
+ * - Redirect para `/painel/plano`.
+ */
 export async function claimFreeBoost() {
   const profile = await getSessionProfile();
 
@@ -246,6 +431,22 @@ export async function claimFreeBoost() {
 }
 
 // ── Dev only: ativar plano sem pagamento ───────────────────────────────────────
+/**
+ * Ativa um plano por 30 dias sem passar por pagamento. **No-op em produção**
+ * (`NODE_ENV === "production"`).
+ *
+ * @param formData - FormData com:
+ *   - `tier` (`"ESSENCIAL" | "DESTAQUE" | "PREMIUM"` — `DevActivatePlanSchema`).
+ * @returns `void`. Em validation fail ou em produção, retorna silenciosamente.
+ *   Em sucesso, redireciona para `/painel/plano`.
+ *
+ * Side effects:
+ * - `prisma.profile.update({ planTier, planExpiresAt: now+30d, isOnline: true })`.
+ * - `revalidatePath("/painel/plano")` e `("/painel")`.
+ * - Redirect para `/painel/plano`.
+ *
+ * @see src/lib/validation/painel-provider-settings.schema.ts (`DevActivatePlanSchema`)
+ */
 export async function devActivatePlan(formData: FormData) {
   if (process.env.NODE_ENV === "production") return;
 

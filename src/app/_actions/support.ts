@@ -1,5 +1,31 @@
 "use server";
 
+/**
+ * Server Actions — Suporte (tickets)
+ *
+ * Caminho: src/app/_actions/support.ts
+ *
+ * Cobre o fluxo de suporte:
+ * - Provider: `openTicket`, `replyTicket`.
+ * - Admin/Moderator: `replyTicket`, `closeTicket`, `reopenTicket`.
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`OpenTicketSchema`, `ReplyTicketSchema`,
+ *   `CloseTicketSchema`, `ReopenTicketSchema` em
+ *   `src/lib/validation/support.schema.ts`).
+ * - Autenticação requerida via `auth()`; admin actions exigem
+ *   `role ∈ {ADMIN, MODERATOR}`.
+ * - `replyTicket` autoriza dono do ticket ou admin; bloqueia ticket fechado.
+ *   Se admin responde, ticket `OPEN` passa a `IN_PROGRESS`.
+ * - Revalidação de cache via `revalidatePath` em `/painel/suporte` e
+ *   `/admin/suporte/*`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.11
+ * - src/lib/validation/support.schema.ts
+ */
+
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +46,20 @@ async function getSession() {
 
 // ── Provider actions ──────────────────────────────────────────────────────────
 
+/**
+ * Abre um ticket de suporte com a primeira mensagem do usuário.
+ *
+ * @param formData - FormData com:
+ *   - `subject` (trim, 1–120 chars).
+ *   - `text` (trim, 1–5000 chars).
+ * @returns `{ ticketId }` em sucesso ou `{ error, issues? }` em falha.
+ *
+ * Side effects:
+ * - `prisma.supportTicket.create` com `messages.create` aninhado.
+ * - `revalidatePath("/painel/suporte")`.
+ *
+ * @see src/lib/validation/support.schema.ts (`OpenTicketSchema`)
+ */
 export async function openTicket(formData: FormData): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; ticketId?: string }> {
   const session = await getSession();
   const parsed = OpenTicketSchema.safeParse(formDataToObject(formData));
@@ -40,6 +80,23 @@ export async function openTicket(formData: FormData): Promise<{ error?: string; 
   return { ticketId: ticket.id };
 }
 
+/**
+ * Posta uma resposta em um ticket. Provider só pode responder ao próprio ticket;
+ * admin/moderator pode responder qualquer um. Tickets `CLOSED` rejeitam reply.
+ * Resposta de admin em ticket `OPEN` o move para `IN_PROGRESS`.
+ *
+ * @param ticketId - cuid do `SupportTicket` (`ReplyTicketSchema`).
+ * @param text - Texto da mensagem (trim, 1–5000 chars).
+ * @returns `{ error?, issues? }` — vazio em sucesso.
+ *
+ * Side effects:
+ * - `prisma.supportMessage.create`.
+ * - Pode atualizar `SupportTicket.status` para `IN_PROGRESS`.
+ * - Atualiza `SupportTicket.updatedAt`.
+ * - `revalidatePath` em `/painel/suporte/<id>` e `/admin/suporte/<id>`.
+ *
+ * @see src/lib/validation/support.schema.ts (`ReplyTicketSchema`)
+ */
 export async function replyTicket(ticketId: string, text: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   const session = await getSession();
   const parsed = ReplyTicketSchema.safeParse({ ticketId, text });
@@ -95,6 +152,18 @@ async function requireAdmin() {
   return session;
 }
 
+/**
+ * Fecha um ticket (admin/moderator).
+ *
+ * @param ticketId - cuid do `SupportTicket` (`CloseTicketSchema`).
+ * @returns `void` (silencioso em validation fail).
+ *
+ * Side effects:
+ * - `prisma.supportTicket.update({ status: "CLOSED" })`.
+ * - `revalidatePath` em `/admin/suporte/<id>` e `/admin/suporte`.
+ *
+ * @see src/lib/validation/support.schema.ts (`CloseTicketSchema`)
+ */
 export async function closeTicket(ticketId: string): Promise<void> {
   await requireAdmin();
   const parsed = CloseTicketSchema.safeParse({ ticketId });
@@ -107,6 +176,18 @@ export async function closeTicket(ticketId: string): Promise<void> {
   revalidatePath("/admin/suporte");
 }
 
+/**
+ * Reabre um ticket previamente fechado (admin/moderator).
+ *
+ * @param ticketId - cuid do `SupportTicket` (`ReopenTicketSchema`).
+ * @returns `void` (silencioso em validation fail).
+ *
+ * Side effects:
+ * - `prisma.supportTicket.update({ status: "OPEN" })`.
+ * - `revalidatePath` em `/admin/suporte/<id>` e `/admin/suporte`.
+ *
+ * @see src/lib/validation/support.schema.ts (`ReopenTicketSchema`)
+ */
 export async function reopenTicket(ticketId: string): Promise<void> {
   await requireAdmin();
   const parsed = ReopenTicketSchema.safeParse({ ticketId });

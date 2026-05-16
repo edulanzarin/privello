@@ -1,5 +1,28 @@
 "use server";
 
+/**
+ * Server Actions — Moderação administrativa
+ *
+ * Caminho: src/app/_actions/admin-moderation.ts
+ *
+ * Cobre as ações restritas a `ADMIN`/`MODERATOR` para advertir, suspender,
+ * reativar e moderar mídias de perfis. Toda ação aqui é gateada por
+ * `requireAdmin()`, que redireciona caso a sessão não tenha papel suficiente.
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (schemas em `src/lib/validation/admin-moderation.schema.ts`).
+ * - Autenticação requerida (admin ou moderador) via `auth()` + lookup de role.
+ * - Revalidação de cache via `revalidatePath` em `/admin/perfis`, `/admin/midias`
+ *   e `/p/<slug>` quando há mutação.
+ * - Notificações por e-mail (advertência/suspensão/reativação) via `sendEmail`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.1
+ * - src/lib/validation/admin-moderation.schema.ts
+ * - src/lib/email-templates.ts (warningTemplate/suspensionTemplate/unsuspensionTemplate)
+ */
+
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +51,23 @@ async function requireAdmin() {
   return session.user.id;
 }
 
+/**
+ * Registra uma advertência contra o perfil. Se o total de advertências atinge
+ * `SUSPENSION_THRESHOLD`, suspende automaticamente o perfil e envia e-mail.
+ *
+ * @param profileId - cuid do `Profile` alvo.
+ * @param reason - Motivo da advertência (trim, 1–500 chars — `GiveWarningSchema`).
+ * @returns `{ error?, issues?, suspended? }`. `suspended === true` indica que
+ *   esta advertência cruzou o threshold e o perfil foi suspenso.
+ *
+ * Side effects:
+ * - Cria `Warning` no DB.
+ * - Pode atualizar `Profile.isSuspended` quando o threshold é atingido.
+ * - `sendEmail` (advertência ou suspensão).
+ * - `revalidatePath("/admin/perfis")` e `revalidatePath("/p/<slug>")`.
+ *
+ * @see src/lib/validation/admin-moderation.schema.ts (`GiveWarningSchema`)
+ */
 export async function giveWarning(profileId: string, reason: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[]; suspended?: boolean }> {
   const adminId = await requireAdmin();
 
@@ -80,6 +120,22 @@ export async function giveWarning(profileId: string, reason: string): Promise<{ 
   return { suspended };
 }
 
+/**
+ * Suspende manualmente um perfil (sem depender do threshold de advertências)
+ * e envia e-mail de notificação ao usuário.
+ *
+ * @param profileId - cuid do `Profile` alvo.
+ * @param note - Observação opcional sobre a suspensão (trim, ≤500 chars —
+ *   `SuspendProfileSchema`).
+ * @returns `{ error?, issues? }` — vazio em caso de sucesso.
+ *
+ * Side effects:
+ * - `Profile.isSuspended = true`, `suspendedAt = now`.
+ * - `sendEmail` (suspensionTemplate).
+ * - `revalidatePath("/admin/perfis")` e `revalidatePath("/p/<slug>")`.
+ *
+ * @see src/lib/validation/admin-moderation.schema.ts (`SuspendProfileSchema`)
+ */
 export async function suspendProfile(profileId: string, note: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
@@ -111,6 +167,19 @@ export async function suspendProfile(profileId: string, note: string): Promise<{
   return {};
 }
 
+/**
+ * Reativa um perfil previamente suspenso e envia e-mail informando.
+ *
+ * @param profileId - cuid do `Profile` (`UnsuspendProfileSchema`).
+ * @returns `{ error?, issues? }` — vazio em caso de sucesso.
+ *
+ * Side effects:
+ * - `Profile.isSuspended = false`, limpa `suspendedAt` e `suspensionNote`.
+ * - `sendEmail` (unsuspensionTemplate).
+ * - `revalidatePath("/admin/perfis")` e `revalidatePath("/p/<slug>")`.
+ *
+ * @see src/lib/validation/admin-moderation.schema.ts (`UnsuspendProfileSchema`)
+ */
 export async function unsuspendProfile(profileId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
@@ -142,6 +211,20 @@ export async function unsuspendProfile(profileId: string): Promise<{ error?: str
   return {};
 }
 
+/**
+ * Remove definitivamente uma mídia (admin/moderador) — usado quando o conteúdo
+ * viola termos. Diferente de `toggleMediaVisibility`, não há retorno.
+ *
+ * @param mediaId - cuid do registro `Media` (`DeleteAdminMediaSchema`).
+ * @returns `{ error?, issues? }` — vazio em caso de sucesso.
+ *
+ * Side effects:
+ * - `prisma.media.delete`.
+ * - `revalidatePath("/admin/midias")` e `revalidatePath("/p/<slug>")` do
+ *   perfil dono da mídia.
+ *
+ * @see src/lib/validation/admin-moderation.schema.ts (`DeleteAdminMediaSchema`)
+ */
 export async function deleteAdminMedia(mediaId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 
@@ -162,6 +245,20 @@ export async function deleteAdminMedia(mediaId: string): Promise<{ error?: strin
   return {};
 }
 
+/**
+ * Alterna a visibilidade pública (`isPublic`) de uma mídia. Usado por moderação
+ * para ocultar/exibir sem deletar.
+ *
+ * @param mediaId - cuid do registro `Media` (`ToggleMediaVisibilitySchema`).
+ * @returns `{ error?, issues? }` — vazio em caso de sucesso.
+ *
+ * Side effects:
+ * - `Media.isPublic` invertido.
+ * - `revalidatePath("/admin/midias")` e `revalidatePath("/p/<slug>")` do
+ *   perfil dono da mídia.
+ *
+ * @see src/lib/validation/admin-moderation.schema.ts (`ToggleMediaVisibilitySchema`)
+ */
 export async function toggleMediaVisibility(mediaId: string): Promise<{ error?: string; issues?: import("zod").ZodIssue[] }> {
   await requireAdmin();
 

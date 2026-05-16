@@ -1,5 +1,32 @@
 "use server";
 
+/**
+ * Server Actions — Onboarding do acompanhante
+ *
+ * Caminho: src/app/_actions/onboarding.ts
+ *
+ * Cobre os 4 passos do onboarding do acompanhante:
+ *   1. `saveOnboardingPerfil` — dados básicos, cidade, atributos, públicos.
+ *   2. Fotos — `addPhotoByUrl`, `removePhoto`, `setCoverPhoto`,
+ *      `updateMediaCaption`.
+ *   3. `saveOnboardingValores` — durações + preços + métodos de pagamento.
+ *   4. `publishProfile` — publica o perfil quando os pré-requisitos estão ok.
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`OnboardingPerfilSchema`, `AddPhotoByUrlSchema`,
+ *   `RemovePhotoSchema`, `SetCoverPhotoSchema`, `UpdateMediaCaptionSchema`,
+ *   `OnboardingValoresSchema` em `src/lib/validation/onboarding.schema.ts`).
+ * - Autenticação requerida via `auth()` + lookup de `Profile`; sem perfil →
+ *   redirect para `/entrar`.
+ * - Revalidação de cache via `revalidatePath` em `/conta/onboarding/*`,
+ *   `/painel/perfil`, `/painel/midias` e `/p/<slug>`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.6
+ * - src/lib/validation/onboarding.schema.ts
+ */
+
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
@@ -25,6 +52,28 @@ async function getProviderProfile() {
 }
 
 // ── Step 1: Perfil ────────────────────────────────────────────────────────────
+/**
+ * Salva os dados do passo 1 do onboarding (perfil) e segue para o passo 2 a
+ * menos que o form venha do painel (`_from = "painel"`).
+ *
+ * @param formData - FormData com:
+ *   - `cityQuery`, `citySlug` (string, required): cidade alvo (upsert por slug).
+ *   - `bio`, `tagline?`, `whatsappPhone?`.
+ *   - `heightCm?` (number coerced), `dressSize?`, `hair?`, `eyes?`, `languages?`.
+ *   - Booleanos via checkbox (`"on"`): `servesMen`, `servesWomen`, `servesCouples`,
+ *     `hasOwnPlace`, `homeVisit`, `travelsNational`, `travelsInternational`.
+ *   - `_from?` (string): origem do form; se `"painel"`, não redireciona.
+ * @returns `{ ok: true }` quando vem do painel ou `{ error, issues? }` em
+ *   falha. No fluxo de onboarding, redireciona para `/conta/onboarding/fotos`.
+ *
+ * Side effects:
+ * - `prisma.city.upsert` por slug.
+ * - `prisma.profile.update` com os campos do schema.
+ * - `revalidatePath("/conta/onboarding/perfil")`, `("/painel/perfil")`,
+ *   `("/p/<slug>")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`OnboardingPerfilSchema`)
+ */
 export async function saveOnboardingPerfil(formData: FormData) {
   const profile = await getProviderProfile();
 
@@ -75,6 +124,21 @@ export async function saveOnboardingPerfil(formData: FormData) {
 }
 
 // ── Step 2: Fotos — add a photo by URL ───────────────────────────────────────
+/**
+ * Anexa uma mídia (foto) ao perfil a partir de uma URL. A primeira foto pública
+ * cadastrada é marcada como capa.
+ *
+ * @param formData - FormData com:
+ *   - `url` (string, URL válida — `AddPhotoByUrlSchema`).
+ *   - `isPublic?` (boolean coerced, default true).
+ * @returns `{ ok: true }` em sucesso ou `{ error, issues? }` em falha.
+ *
+ * Side effects:
+ * - `prisma.media.create` (mídia ligada ao `profileId`).
+ * - `revalidatePath("/conta/onboarding/fotos")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`AddPhotoByUrlSchema`)
+ */
 export async function addPhotoByUrl(formData: FormData) {
   const profile = await getProviderProfile();
   const parsed = AddPhotoByUrlSchema.safeParse(formDataToObject(formData));
@@ -93,6 +157,20 @@ export async function addPhotoByUrl(formData: FormData) {
   return { ok: true };
 }
 
+/**
+ * Remove uma foto do perfil. Se a foto removida era capa, promove a próxima
+ * pública (menor `sortOrder`) a capa.
+ *
+ * @param mediaId - cuid da `Media` (`RemovePhotoSchema`).
+ * @returns `void` (silencioso em validation fail, mantém o contrato).
+ *
+ * Side effects:
+ * - `prisma.media.deleteMany` filtrando por `profileId`.
+ * - Possível `update` para remarcar a capa.
+ * - `revalidatePath("/conta/onboarding/fotos")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`RemovePhotoSchema`)
+ */
 export async function removePhoto(mediaId: string) {
   const profile = await getProviderProfile();
   const parsed = RemovePhotoSchema.safeParse({ mediaId });
@@ -112,6 +190,19 @@ export async function removePhoto(mediaId: string) {
   revalidatePath("/conta/onboarding/fotos");
 }
 
+/**
+ * Define a foto informada como capa do perfil, removendo o flag `isCover`
+ * das demais.
+ *
+ * @param mediaId - cuid da `Media` (`SetCoverPhotoSchema`).
+ * @returns `void`.
+ *
+ * Side effects:
+ * - Dois `updateMany` em `Media`.
+ * - `revalidatePath("/conta/onboarding/fotos")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`SetCoverPhotoSchema`)
+ */
 export async function setCoverPhoto(mediaId: string) {
   const profile = await getProviderProfile();
   const parsed = SetCoverPhotoSchema.safeParse({ mediaId });
@@ -121,6 +212,20 @@ export async function setCoverPhoto(mediaId: string) {
   revalidatePath("/conta/onboarding/fotos");
 }
 
+/**
+ * Atualiza a legenda de uma mídia do perfil.
+ *
+ * @param mediaId - cuid da `Media`.
+ * @param caption - Texto trim, ≤500 chars (`UpdateMediaCaptionSchema`).
+ *   String vazia é normalizada para `null`.
+ * @returns `{ error, issues? }` apenas em validation fail; `void` em sucesso.
+ *
+ * Side effects:
+ * - `prisma.media.updateMany` filtrado por `profileId`.
+ * - `revalidatePath("/painel/midias")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`UpdateMediaCaptionSchema`)
+ */
 export async function updateMediaCaption(mediaId: string, caption: string) {
   const profile = await getProviderProfile();
   const parsed = UpdateMediaCaptionSchema.safeParse({ mediaId, caption });
@@ -143,6 +248,27 @@ const DURATION_DEFS = [
   { key: "travel", minutes: 1440, label: "Diária" },
 ] as const;
 
+/**
+ * Salva o passo 3 (valores e métodos de pagamento), persiste preços
+ * agregados em `Profile` e recria a tabela de `ProfileDurationOption`.
+ * Exige preço para 1 hora (60 min); redireciona ao próximo passo.
+ *
+ * @param formData - FormData com:
+ *   - `paymentMethods?` (string).
+ *   - Para cada `key` em `DURATION_DEFS` (30min, 1h, 2h, 3h, 4h, overnight,
+ *     travel): `enabled_<key>` (=== `"1"`) e `price_<key>` (number > 0).
+ * @returns `{ error, issues? }` em falha. Em sucesso, redireciona para
+ *   `/conta/onboarding/publicar`.
+ *
+ * Side effects:
+ * - `prisma.$transaction`:
+ *   - `Profile.update` com `priceHour`, `priceTwoHours`, `priceOvernight`,
+ *     `priceTravelDay`, `paymentMethods`.
+ *   - `ProfileDurationOption.deleteMany` + `createMany` (recria do zero).
+ * - `revalidatePath("/conta/onboarding/valores")`.
+ *
+ * @see src/lib/validation/onboarding.schema.ts (`OnboardingValoresSchema`)
+ */
 export async function saveOnboardingValores(formData: FormData) {
   const profile = await getProviderProfile();
 
@@ -197,7 +323,22 @@ export async function saveOnboardingValores(formData: FormData) {
 }
 
 // ── Step 4: Publicar ──────────────────────────────────────────────────────────
-// Aceita FormData implicitamente (via `<form action={...}>`) mas não consome — só checa estado da DB.
+/**
+ * Marca o perfil como publicado (`isOnline = true`) se os pré-requisitos
+ * estão ok (bio, preço hora, foto de capa pública). Redireciona para o passo
+ * pendente quando algo falta.
+ *
+ * Aceita FormData implicitamente (via `<form action={...}>`) mas não consome —
+ * só checa estado da DB.
+ *
+ * @returns `void` (sempre redireciona).
+ *
+ * Side effects:
+ * - `prisma.profile.update({ isOnline: true })` quando válido.
+ * - `revalidatePath("/p/<slug>")`.
+ * - Redirect para `/painel`, `/conta/onboarding/valores` ou
+ *   `/conta/onboarding/fotos` conforme estado.
+ */
 export async function publishProfile(): Promise<void> {
   const profile = await getProviderProfile();
 

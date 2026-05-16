@@ -1,10 +1,46 @@
 "use server";
 
+/**
+ * Server Actions — Favoritos do cliente
+ *
+ * Caminho: src/app/_actions/favorites.ts
+ *
+ * Cobre o toggle de favorito em perfis, a leitura do estado atual e a listagem
+ * dos favoritos do usuário logado. O acompanhante não pode favoritar o próprio
+ * perfil; sessões com JWT órfão (após reseed) são detectadas e tratadas.
+ *
+ * Convenções:
+ * - Server actions Next.js 16 (`"use server"` no topo).
+ * - Validação via Zod (`ToggleFavoriteSchema`, `GetFavoriteStatusSchema` em
+ *   `src/lib/validation/favorites.schema.ts`).
+ * - Autenticação requerida via `auth()`. `getClientFavorites` retorna `[]`
+ *   quando não há sessão; `getFavoriteStatus` retorna `false`.
+ * - Revalidação de cache via `revalidatePath("/conta/perfil")` em mutações.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.4
+ * - src/lib/validation/favorites.schema.ts
+ */
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { ToggleFavoriteSchema, GetFavoriteStatusSchema } from "@/lib/validation";
 
+/**
+ * Adiciona ou remove o perfil dos favoritos do usuário logado.
+ *
+ * @param profileId - cuid do `Profile` alvo (`ToggleFavoriteSchema`).
+ * @returns `{ favorited: boolean }` indicando o novo estado, ou
+ *   `{ error, issues? }` em falha (sem sessão, JWT obsoleto, auto-favorito
+ *   ou input inválido).
+ *
+ * Side effects:
+ * - Cria/remove `Favorite` no DB.
+ * - `revalidatePath("/conta/perfil")` para refrescar a lista do cliente.
+ *
+ * @see src/lib/validation/favorites.schema.ts (`ToggleFavoriteSchema`)
+ */
 export async function toggleFavorite(profileId: string) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Faça login para curtir perfis." };
@@ -41,6 +77,15 @@ export async function toggleFavorite(profileId: string) {
   }
 }
 
+/**
+ * Retorna se o usuário logado já favoritou o perfil informado. Mantém contrato
+ * silencioso: qualquer falha de validação ou ausência de sessão devolve `false`.
+ *
+ * @param profileId - cuid do `Profile` (`GetFavoriteStatusSchema`).
+ * @returns `boolean`.
+ *
+ * @see src/lib/validation/favorites.schema.ts (`GetFavoriteStatusSchema`)
+ */
 export async function getFavoriteStatus(profileId: string) {
   const session = await auth();
   if (!session?.user?.id) return false;
@@ -52,6 +97,13 @@ export async function getFavoriteStatus(profileId: string) {
   return !!fav;
 }
 
+/**
+ * Lista os favoritos do usuário logado com dados básicos do perfil (cidade,
+ * bairro, foto de capa pública), ordenados por mais recente.
+ *
+ * @returns Array de `Favorite` com `profile` aninhado, ou `[]` se não houver
+ *   sessão.
+ */
 export async function getClientFavorites() {
   const session = await auth();
   if (!session?.user?.id) return [];
