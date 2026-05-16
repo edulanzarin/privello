@@ -260,9 +260,9 @@ function PostModal({
         <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-black/[0.06]">
           <div className="flex items-center gap-3 border-b border-black/[0.06] px-4 py-3 sm:shrink-0">
             <div className="min-w-0 flex-1">
-              <Link href={`/p/${slug}`} className="text-[14px] font-semibold hover:underline">@{slug}</Link>
+              <Link href={`/p/${slug}`} className="text-md font-semibold hover:underline">@{slug}</Link>
             </div>
-            <p className="text-[11px] text-muted">{fmtDate(item.createdAt)}</p>
+            <p className="text-xs text-muted">{fmtDate(item.createdAt)}</p>
           </div>
 
           <div className="px-4 py-3 sm:flex-1 sm:overflow-y-auto">
@@ -293,7 +293,7 @@ function PostModal({
                             <span className="font-bold">{c.user.slug ? `@${c.user.slug}` : c.user.name}</span>{" "}
                             <span className="text-foreground/80">{c.text}</span>
                           </p>
-                          <p className="mt-0.5 text-[11px] text-muted">{fmtDate(c.createdAt)}</p>
+                          <p className="mt-0.5 text-xs text-muted">{fmtDate(c.createdAt)}</p>
                         </div>
                         {canDelete && (
                           <button
@@ -345,9 +345,9 @@ function PostModal({
                 />
               </button>
               <MessageCircle className="h-6 w-6 text-foreground" strokeWidth={1.5} />
-              <span className="ml-auto text-[11px] text-muted">{idx + 1} / {items.length}</span>
+              <span className="ml-auto text-xs text-muted">{idx + 1} / {items.length}</span>
             </div>
-            <p className="mt-1.5 text-[14px] font-semibold">
+            <p className="mt-1.5 text-md font-semibold">
               {curLike.count} {curLike.count === 1 ? "curtida" : "curtidas"}
             </p>
           </div>
@@ -360,21 +360,21 @@ function PostModal({
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && postComment()}
                 placeholder="Adicione um comentário…"
                 maxLength={500}
-                className="flex-1 text-[14px] outline-none placeholder:text-muted/60"
+                className="flex-1 text-md outline-none placeholder:text-muted/60"
               />
-              <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-[13px] font-semibold text-[#0a84ff] disabled:opacity-30 transition-opacity">
+              <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-base font-semibold text-blue disabled:opacity-30 transition-opacity">
                 Publicar
               </button>
             </div>
           ) : isClient ? (
             <div className="sticky bottom-0 border-t border-black/[0.06] bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href={`/assinar?from=/p/${slug}`} className="text-[13px] font-medium text-[#0a84ff] hover:underline">
+              <Link href={`/assinar?from=/p/${slug}`} className="text-base font-medium text-blue hover:underline">
                 Assine para comentar
               </Link>
             </div>
           ) : (
             <div className="sticky bottom-0 border-t border-black/[0.06] bg-white px-4 py-3 text-center sm:static sm:shrink-0">
-              <Link href={`/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`} className="text-[13px] font-medium text-[#0a84ff] hover:underline">
+              <Link href={`/entrar?callbackUrl=${encodeURIComponent(`/assinar?from=/p/${slug}`)}`} className="text-base font-medium text-blue hover:underline">
                 Entre para curtir e comentar
               </Link>
             </div>
@@ -422,7 +422,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
             key={t.key}
             onClick={() => switchTab(t.key)}
             className={cn(
-              "relative flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-[12px] font-semibold transition-colors",
+              "relative flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-sm font-semibold transition-colors",
               tab === t.key
                 ? "text-foreground bg-white border border-black/[0.06] border-b-white -mb-px"
                 : "text-muted hover:text-foreground",
@@ -430,7 +430,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
           >
             {t.label}
             {t.count !== null && (
-              <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold", tab === t.key ? "bg-coral/10 text-coral" : "bg-black/[0.04] text-muted")}>
+              <span className={cn("rounded-full px-1.5 py-0.5 text-2xs font-semibold", tab === t.key ? "bg-coral/10 text-coral" : "bg-black/[0.04] text-muted")}>
                 {t.count}
               </span>
             )}
@@ -440,7 +440,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
 
       {activeItems.length === 0 ? (
         <div className="flex min-h-[200px] items-center justify-center">
-          <p className="text-[14px] text-muted">
+          <p className="text-md text-muted">
             {"Nenhuma foto publicada."}
           </p>
         </div>
@@ -487,7 +487,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
                   {locked && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40">
                       <Lock className="h-5 w-5 text-white" strokeWidth={1.5} />
-                      <span className="rounded-full bg-coral px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                      <span className="rounded-full bg-coral px-3 py-1 text-2xs font-bold uppercase tracking-wide text-white">
                         Assinar
                       </span>
                     </div>

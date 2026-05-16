@@ -54,19 +54,19 @@ function LockedReelOverlay({ profileSlug }: { profileSlug: string }) {
         <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
       </div>
       <div className="text-center px-6">
-        <p className="text-[15px] font-semibold text-white">Reel exclusivo</p>
-        <p className="mt-1 text-[13px] text-white/60">Assine para desbloquear reels privados</p>
+        <p className="text-lg font-semibold text-white">Reel exclusivo</p>
+        <p className="mt-1 text-base text-white/60">Assine para desbloquear reels privados</p>
       </div>
       <div className="flex flex-col gap-2 w-44">
         <Link
           href="/assinar"
-          className="block rounded-full bg-coral py-2.5 text-center text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+          className="block rounded-full bg-coral py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Assinar · {SUBSCRIPTION_PRICE_LABEL}
         </Link>
         <Link
           href={`/p/${profileSlug}`}
-          className="block rounded-full border border-white/20 py-2 text-center text-[12px] font-medium text-white/70 transition hover:text-white hover:border-white/40"
+          className="block rounded-full border border-white/20 py-2 text-center text-sm font-medium text-white/70 transition hover:text-white hover:border-white/40"
         >
           Ver perfil
         </Link>
@@ -179,7 +179,7 @@ function ReelPlayer({
 
         {/* Private badge */}
         {reel.isPrivate && (
-          <div className="absolute left-3 top-14 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white/80 backdrop-blur-sm">
+          <div className="absolute left-3 top-14 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-2xs font-semibold text-white/80 backdrop-blur-sm">
             <Lock className="h-2.5 w-2.5" strokeWidth={2} />
             Exclusivo
           </div>
@@ -196,12 +196,12 @@ function ReelPlayer({
               )}
             </div>
             <div>
-              <p className="text-[14px] font-semibold text-white drop-shadow">{reel.profile.displayName}</p>
-              <p className="text-[11px] text-white/60">{reel.profile.cityName} · Reels</p>
+              <p className="text-md font-semibold text-white drop-shadow">{reel.profile.displayName}</p>
+              <p className="text-xs text-white/60">{reel.profile.cityName} · Reels</p>
             </div>
           </Link>
           {!reel.isLocked && reel.caption && (
-            <p className="mt-3 text-[13px] leading-snug text-white/90 drop-shadow line-clamp-2">
+            <p className="mt-3 text-base leading-snug text-white/90 drop-shadow line-clamp-2">
               {reel.caption}
             </p>
           )}
@@ -227,12 +227,12 @@ function ReelPlayer({
                 className={cn("h-7 w-7 drop-shadow transition", liked ? "fill-coral text-coral" : "text-white")}
                 strokeWidth={1.5}
               />
-              <span className="text-[11px] font-semibold text-white drop-shadow">{likes}</span>
+              <span className="text-xs font-semibold text-white drop-shadow">{likes}</span>
             </button>
 
             <button onClick={openComments} className="flex flex-col items-center gap-1">
               <MessageCircle className="h-7 w-7 text-white drop-shadow" strokeWidth={1.5} />
-              <span className="text-[11px] font-semibold text-white drop-shadow">{commentCount}</span>
+              <span className="text-xs font-semibold text-white drop-shadow">{commentCount}</span>
             </button>
           </div>
         )}
@@ -250,7 +250,7 @@ function ReelPlayer({
             >
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-black/[0.06] shrink-0">
-                <p className="text-[15px] font-semibold">{commentCount} comentários</p>
+                <p className="text-lg font-semibold">{commentCount} comentários</p>
                 <button
                   onClick={() => setShowComments(false)}
                   className="rounded-full p-1 hover:bg-black/[0.04] transition-colors"
@@ -262,20 +262,20 @@ function ReelPlayer({
               {/* Comments list */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                 {loadingComments ? (
-                  <p className="text-center text-[13px] text-muted py-6">Carregando…</p>
+                  <p className="text-center text-base text-muted py-6">Carregando…</p>
                 ) : comments.length === 0 ? (
-                  <p className="text-center text-[13px] text-muted py-6">Seja o primeiro a comentar.</p>
+                  <p className="text-center text-base text-muted py-6">Seja o primeiro a comentar.</p>
                 ) : (
                   comments.map((c) => (
                     <div key={c.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-[11px] font-bold text-white">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
                         {(c.user.name ?? "?")[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-foreground">
+                        <p className="text-sm font-semibold text-foreground">
                           {c.user.slug ? `@${c.user.slug}` : c.user.name}
                         </p>
-                        <p className="text-[13px] text-foreground/80 leading-snug mt-0.5">{c.text}</p>
+                        <p className="text-base text-foreground/80 leading-snug mt-0.5">{c.text}</p>
                       </div>
                     </div>
                   ))
@@ -291,7 +291,7 @@ function ReelPlayer({
                     onKeyDown={(e) => e.key === "Enter" && postComment()}
                     placeholder="Adicionar comentário…"
                     maxLength={500}
-                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-[14px] outline-none placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
+                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-md outline-none placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
                   />
                   <button
                     onClick={postComment}
@@ -305,7 +305,7 @@ function ReelPlayer({
                 <div className="border-t border-black/[0.06] px-4 py-3 text-center shrink-0">
                   <Link
                     href={isClient ? "/assinar" : "/entrar"}
-                    className="text-[13px] font-medium text-[#0a84ff] hover:underline"
+                    className="text-base font-medium text-blue hover:underline"
                   >
                     {isClient ? "Assine para comentar" : "Entre para comentar"}
                   </Link>
@@ -380,7 +380,7 @@ export function ReelsFeed({
   if (reels.length === 0) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-3 text-white/50">
-        <p className="text-[14px]">Nenhum reel disponível ainda.</p>
+        <p className="text-md">Nenhum reel disponível ainda.</p>
       </div>
     );
   }

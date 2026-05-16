@@ -53,7 +53,7 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
       <div className="flex items-center gap-1 flex-wrap">
         {/* Warning badge */}
         {warningCount > 0 && (
-          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${warningCount >= 3 ? "bg-red-100 text-red-700" : warningCount === 2 ? "bg-orange-100 text-orange-700" : "bg-yellow-100 text-yellow-700"}`}>
+          <span className={`text-2xs font-bold px-1.5 py-0.5 rounded ${warningCount >= 3 ? "bg-red-100 text-red-700" : warningCount === 2 ? "bg-orange-100 text-orange-700" : "bg-yellow-100 text-yellow-700"}`}>
             {warningCount} adv.
           </span>
         )}
@@ -62,7 +62,7 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
           <button
             onClick={handleUnsuspend}
             disabled={pending}
-            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-success/30 bg-success/10 text-success hover:bg-success/20 transition disabled:opacity-40"
+            className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-success/30 bg-success/10 text-success hover:bg-success/20 transition disabled:opacity-40"
             title="Reativar conta"
           >
             <CheckCircle className="h-3 w-3" strokeWidth={2} />
@@ -72,7 +72,7 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
           <>
             <button
               onClick={() => openModal("warn")}
-              className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition"
+              className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition"
               title="Dar advertência"
             >
               <AlertTriangle className="h-3 w-3" strokeWidth={2} />
@@ -80,7 +80,7 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
             </button>
             <button
               onClick={() => openModal("suspend")}
-              className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"
+              className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"
               title="Suspender conta"
             >
               <Ban className="h-3 w-3" strokeWidth={2} />

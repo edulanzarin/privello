@@ -168,10 +168,14 @@ Tailwind v4 gera variantes via syntax `<token>/<percent>` ou `<token>/[<decimal>
 
 > Preenchido conforme as ondas avançam.
 
-- **Cores de chart em `src/components/admin/admin-charts.tsx`**: cores de visualização de dados não pertencem à paleta semântica; podem permanecer como literais. (A confirmar na Wave 2.)
-- **`#b36200`** (texto escuro sobre warning): não pertence à paleta. Tentativa: substituir por `text-warning` direto e validar contraste sobre `bg-warning/10`. Se contraste insuficiente, manter como exceção textual.
+- **Cores de chart em `src/components/admin/admin-charts.tsx`**: cores de visualização de dados não pertencem à paleta semântica; permanecem como literais (`#1a1a1a`, `#e05c5c`, `#7c6af7`, `#e5e5e3`). Confirmado na Wave 10 — 9 ocorrências mantidas. Override no ESLint (`eslint.config.mjs`) isenta apenas este arquivo.
+- **`#b36200`** (texto escuro sobre warning): mapeado para `--privello-warning-dark` em `globals.css` e exposto como `--color-warning-dark` em `@theme inline`. Usado como `text-warning-dark` em `src/app/painel/plano/page.tsx`, `src/app/painel/suporte/page.tsx` e `src/app/painel/suporte/[id]/page.tsx`.
+- **`#248a3d`** (texto escuro sobre success): mapeado para `--privello-success-dark` e exposto como `--color-success-dark`. Usado como `text-success-dark` em `src/app/p/[slug]/page.tsx` e badge variants.
+- **`#25d366`** (verde do WhatsApp — cor de marca externa): mapeado para `--privello-whatsapp` e exposto como `--color-whatsapp`. Usado como `bg-whatsapp` em `src/components/profile/whatsapp-button.tsx`. Cor de marca externa, não muda com o design system; mantida como token isolado.
 - **Animação `fire-border` em `globals.css`**: cores específicas (`#ff4500`, `#ff8c00`, `#ffd700`, `#ff6600`, `#ff2200`) compõem um gradiente conic; substituir por tokens semânticos descaracterizaria o efeito. Permanecem em `globals.css` (fora do alcance da regra ESLint, que cobre `src/components/**` e `src/app/**`).
 - **`globals.css > :root` e `@theme inline`**: definições legítimas de tokens; não são "literais" no sentido da regra anti-regressão.
+- **`text-[9px]`** (label "Perfil" em mídia, badges minúsculas): foram migrados para `text-2xs` (10px) — diferença visual mínima, alinhamento com escala canônica.
+- **`text-[17px]`** (logo `privello.` em `site-header.tsx`): foi migrado para `text-xl` (16px) — 1px de diferença, alinhamento com escala canônica.
 
 ---
 
@@ -217,7 +221,82 @@ Mesmo padrão usado por `<input type="checkbox">` controlado em React.
 - Hex literais em escopo: ~167 ocorrências (excluindo `globals.css` e `email-templates.ts`).
 - Font-size arbitrários: 677 ocorrências.
 
-_(entradas das demais ondas serão adicionadas conforme execução)_
+### Wave 9 — Consolidação de upload
+
+- `useFileUpload` expandido com `strategy: "fetch" | "xhr"` (default `"fetch"`) e `onProgress?: (percent: number) => void`. Implementação branched em XHR para reproduzir `xhr.upload.onprogress`.
+- 7 sites migrados:
+  - `src/components/painel/media-manager.tsx:126` (fetch)
+  - `src/app/painel/perfil/perfil-editor.tsx:128` (fetch, `/api/upload`) e `:144` (fetch, `/api/upload-audio`)
+  - `src/app/painel/midias/midias-manager.tsx:128` (fetch)
+  - `src/app/painel/stories/stories-manager.tsx:63` (fetch)
+  - `src/app/conta/onboarding/fotos/photo-uploader.tsx:33` (fetch)
+  - `src/components/painel/reels-manager.tsx:52` (xhr + onProgress)
+  - `src/app/conta/verificacao/page.tsx:138` (fetch, `/api/upload/verification`)
+
+### Wave 10 — Cauda de hex literais e font-size
+
+- Hex literais em escopo (antes desta wave): 48 ocorrências em 23 arquivos.
+- Hex literais em escopo (após esta wave): **9 ocorrências em 1 arquivo** (`src/components/admin/admin-charts.tsx` — exceção declarada).
+- Font-size arbitrários (antes desta wave): 174 ocorrências.
+- Font-size arbitrários (após esta wave): **0 ocorrências**.
+
+Arquivos migrados em massa via `scripts/migrate-tokens.ps1`:
+
+| Arquivo | hex antes | hex depois | font antes | font depois |
+|---|---:|---:|---:|---:|
+| `src/components/ui/badge.tsx` | 2 | 0 | 1 | 0 |
+| `src/components/ui/select.tsx` | 2 | 0 | 4 | 0 |
+| `src/components/ui/input.tsx` | 2 | 0 | 5 | 0 |
+| `src/components/ui/textarea.tsx` | 2 | 0 | 4 | 0 |
+| `src/components/ui/button.tsx` | 2 | 0 | 3 | 0 |
+| `src/components/ui/switch.tsx` | 1 | 0 | — | — |
+| `src/app/painel/page.tsx` | 6 | 0 | — | — |
+| `src/components/profile/media-gallery.tsx` | 3 | 0 | 13 | 0 |
+| `src/components/painel/reels-manager.tsx` | 1 | 0 | 17 | 0 |
+| `src/components/reels/reels-feed.tsx` | 1 | 0 | 19 | 0 |
+| `src/components/painel/media-manager.tsx` | 2 | 0 | 9 | 0 (5 mapeados de `text-[9px]` → `text-2xs`) |
+| `src/components/solicitar/solicitar-whatsapp-panel.tsx` | 2 | 0 | 8 | 0 |
+| `src/app/planos/page.tsx` | — | — | 10 | 0 |
+| `src/app/assinar/page.tsx` | 1 | 0 | 7 | 0 |
+| `src/components/painel/painel-sidebar.tsx` | 2 | 0 | 7 | 0 (1 mapeado de `text-[9px]` → `text-2xs`) |
+| `src/app/buscar/buscar-form.tsx` | — | — | 5 | 0 |
+| `src/components/marketing/city-autocomplete.tsx` | — | — | 5 | 0 |
+| `src/components/admin/warning-form.tsx` | — | — | 4 | 0 |
+| `src/components/admin/media-actions.tsx` | — | — | 4 | 0 |
+| `src/components/profile/profile-story-cover.tsx` | — | — | 4 | 0 (1 mapeado de `text-[9px]` → `text-2xs`) |
+| `src/components/layout/site-header.tsx` | 1 | 0 | 4 | 0 (1 mapeado de `text-[17px]` → `text-xl`) |
+| `src/app/painel/error.tsx` | — | — | 3 | 0 |
+| `src/components/support/ticket-chat.tsx` | 1 | 0 | 3 | 0 |
+| `src/components/stories/story-bar.tsx` | — | — | 3 | 0 |
+| `src/components/profile/profile-list-row.tsx` | — | — | 3 | 0 (1 mapeado de `text-[9px]` → `text-2xs`) |
+| `src/components/marketing/hero-search-form.tsx` | — | — | 3 | 0 |
+| `src/app/recuperar-senha/page.tsx` | 2 | 0 | 3 | 0 |
+| `src/components/profile/audio-player.tsx` | — | — | 2 | 0 |
+| `src/components/ui/stat-card.tsx` | — | — | 2 | 0 |
+| `src/components/discover/city-switcher.tsx` | — | — | 2 | 0 |
+| `src/components/layout/bottom-nav.tsx` | 2 | 0 | 2 | 0 |
+| `src/components/layout/site-footer.tsx` | — | — | 2 | 0 |
+| `src/components/ui/card.tsx` | — | — | 2 | 0 |
+| `src/components/ui/avatar.tsx` | — | — | 1 | 0 |
+| `src/components/ui/toggle-chip.tsx` | — | — | 1 | 0 |
+| `src/components/admin/admin-shell.tsx` | 1 | 0 | — | — |
+| `src/components/admin/admin-city-filter.tsx` | 1 | 0 | — | — |
+| `src/components/admin/quick-actions.tsx` | — | — | 1 | 0 |
+| `src/components/profile/whatsapp-button.tsx` | 1 | 0 (mapeado para `bg-whatsapp` — token novo) | — | — |
+| `src/components/profile/share-button.tsx` | 1 | 0 | — | — |
+| `src/components/profile/audio-play-button.tsx` | — | — | 1 | 0 |
+| `src/components/profile/favorite-button.tsx` | — | — | 1 | 0 |
+| `src/components/profile/photo-carousel.tsx` | — | — | 1 | 0 (mapeado de `text-[9px]` → `text-2xs`) |
+| `src/app/em-alta/page.tsx` | — | — | 1 | 0 |
+| `src/app/em-destaque/page.tsx` | — | — | 1 | 0 |
+| `src/app/assinar/subscribe-button.tsx` | — | — | 1 | 0 |
+
+**Adições em `globals.css`** durante esta wave:
+
+- `--privello-success-dark: #248a3d` + `--color-success-dark` (token escuro para texto sobre `bg-success/10`).
+- `--privello-warning-dark: #b36200` + `--color-warning-dark` (token escuro para texto sobre `bg-warning/10`).
+- `--privello-whatsapp: #25d366` + `--color-whatsapp` (cor de marca externa).
+- `--privello-accent-purple: #5856d6` + `--color-accent-purple` (já mapeado em waves anteriores; usado por `admin-charts` quando aplicável).
 
 ---
 

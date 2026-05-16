@@ -32,7 +32,7 @@ export function AudioPlayButton({ src, className }: { src: string; className?: s
       type="button"
       onClick={toggle}
       className={cn(
-        "flex items-center gap-1 rounded-full px-2 py-[3px] text-[10px] font-medium transition",
+        "flex items-center gap-1 rounded-full px-2 py-[3px] text-2xs font-medium transition",
         playing
           ? "border border-coral/30 bg-coral/10 text-coral"
           : "border border-black/[0.07] bg-white text-muted hover:border-coral/20 hover:text-coral",

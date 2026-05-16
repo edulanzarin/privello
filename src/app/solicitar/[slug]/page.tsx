@@ -15,7 +15,7 @@ import {
   parseMonthParam,
 } from "@/lib/time-utils";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlug } from "@/lib/queries";
+import { getProfileBySlug } from "@/lib/services";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";

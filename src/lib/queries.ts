@@ -1,5 +1,80 @@
+/**
+ * @deprecated 2026-05-30 — funções migradas para `@/lib/services/*` na
+ * Wave 7 da fase-3-backend (cf. `metricas-baseline.md > §5 Decisões >
+ * queries.ts final`). Remoção planejada após 2026-06-13 (janela ≥ 14 dias
+ * conforme design.md > Boundaries).
+ *
+ * Este arquivo agora contém:
+ *   1. Re-exports temporários de `@/lib/services` para compatibilidade.
+ *   2. Os helpers `sortProfileCards` e `finalizeDiscoverOrder` JUSTIFICADOS:
+ *      são oráculo da Property 1 (`discover.service.pbt.ts` valida paridade
+ *      do agrupamento por `planTier` em JS — cf. design.md > Correctness
+ *      Properties). Removê-los exigirá refatoração da Property 1 para
+ *      comparar contra um snapshot (já planejado em
+ *      `design.md > Testing Strategy > teste de paridade vs unitário`).
+ *   3. O include `profileCardInclude` JUSTIFICADO: ainda referenciado pelo
+ *      tipo legado `ProfileCardPayload` que esses helpers consomem.
+ *
+ * Após a janela, este arquivo deve sumir e a Property 1 passa a usar um
+ * snapshot estático como oráculo (sem dependência de SQL).
+ */
+
 import type { PlanTier, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+
+// ─── Re-exports a partir da camada de services ────────────────────────────
+// Mantém a compatibilidade dos consumidores que ainda importem de
+// `@/lib/queries`. Após a janela de remoção, qualquer import remanescente
+// vira erro de build e migra para `@/lib/services` ou é removido.
+
+export {
+  isSubscriber,
+  getActiveSubscription,
+  getProfileBySlug,
+  getProfileBySlugForPainel,
+  getProfileMediaPage,
+  getUserReviewForProfile,
+  getCityBySlug,
+  getOrCreateCityBySlug,
+  getAllCities,
+  getCitiesWithReels,
+  getMediaWithCounts,
+  listMediaComments,
+  listProfilesForCity,
+  searchProfilesGlobal,
+  getPremiumWeekProfiles,
+  getHotProfiles,
+  getBoostedProfiles,
+  getSectionProfiles,
+  getStoriesForProfile,
+  listStoriesForCity,
+  getPlatformStats,
+  getHotPeriodStart,
+  listWhatsAppClicksRecent,
+  countWhatsAppClicksToday,
+  listFinancialRecordsForMonth,
+  listReels,
+  listModerationQueue,
+} from "@/lib/services";
+
+export type {
+  GetProfileBySlugOptions,
+  ProfileMediaItem,
+  ProfileMediaPage,
+  DiscoverFilters,
+  GenderFilter,
+  ProfileSort,
+  StoryGroup,
+} from "@/lib/services";
+
+// ─── JUSTIFICADO: oráculo da Property 1 ──────────────────────────────────
+//
+// `profileCardInclude`, `ProfileCardPayload`, `sortProfileCards`,
+// `finalizeDiscoverOrder` permanecem aqui por enquanto porque são lidos
+// como ORÁCULO em `discover.service.pbt.ts` (Property 1). Há equivalentes
+// privados em `discover.service.ts > __test_internal__` (`profileCardInclude`,
+// `sortProfileCardsInner`, `finalizeDiscoverOrderInner`). Após a janela de
+// remoção, o teste passa a comparar contra um snapshot estático e este
+// bloco vai embora.
 
 const profileCardInclude = {
   city: { select: { name: true, slug: true } },
@@ -12,89 +87,16 @@ const profileCardInclude = {
   },
 } satisfies Prisma.ProfileInclude;
 
-export type ProfileCardPayload = Prisma.ProfileGetPayload<{ include: typeof profileCardInclude }>;
+export type ProfileCardPayload = Prisma.ProfileGetPayload<{
+  include: typeof profileCardInclude;
+}>;
 
-export async function getPlatformStats() {
-  const [profiles, verified, cities] = await Promise.all([
-    prisma.profile.count(),
-    prisma.profile.count({ where: { isVerified: true } }),
-    prisma.city.count(),
-  ]);
-  const verifiedPct = profiles === 0 ? 0 : Math.round((verified / profiles) * 100);
-  return { profiles, verified, cities, verifiedPct };
-}
+import type { ProfileSort as _ProfileSort } from "@/lib/services";
 
-export async function getCityBySlug(slug: string) {
-  // Try exact match first (e.g. "blumenau-sc")
-  const exact = await prisma.city.findUnique({
-    where: { slug },
-    include: { districts: { orderBy: { name: "asc" } } },
-  });
-  if (exact) return exact;
-
-  // Fallback: strip the last segment (state suffix) and try again.
-  // Handles legacy slugs like "sao-paulo" when the URL has "sao-paulo-sp".
-  const parts = slug.split("-");
-  if (parts.length > 1) {
-    const withoutState = parts.slice(0, -1).join("-");
-    return prisma.city.findUnique({
-      where: { slug: withoutState },
-      include: { districts: { orderBy: { name: "asc" } } },
-    });
-  }
-
-  return null;
-}
-
-/**
- * Derives a human-readable city name from a slug like "blumenau-sc" → "Blumenau, SC"
- * or "sao-paulo-sp" → "São Paulo, SP".
- */
-function cityNameFromSlug(slug: string): { displayName: string; uf: string } {
-  const parts = slug.split("-");
-  const uf = parts[parts.length - 1].toUpperCase();
-  const cityParts = parts.slice(0, -1).map((p) => p.charAt(0).toUpperCase() + p.slice(1));
-  return { displayName: cityParts.join(" "), uf };
-}
-
-/**
- * Like getCityBySlug but creates the city on-the-fly if it doesn't exist.
- */
-export async function getOrCreateCityBySlug(slug: string) {
-  const existing = await getCityBySlug(slug);
-  if (existing) return existing;
-
-  // City not in DB — create it with "Name, UF" format
-  const { displayName, uf } = cityNameFromSlug(slug);
-  const name = uf ? `${displayName}, ${uf}` : displayName;
-
-  const city = await prisma.city.upsert({
-    where: { slug },
-    update: {},
-    create: { slug, name },
-    include: { districts: { orderBy: { name: "asc" } } },
-  });
-  return city;
-}
-
-export type GenderFilter = "garotos" | "casais" | undefined;
-
-export type DiscoverFilters = {
-  gender?: GenderFilter;
-  priceMin?: number;
-  priceMax?: number;
-  ageMin?: number;
-  ageMax?: number;
-  verifiedOnly?: boolean;
-  hasOwnPlace?: boolean;
-  homeVisit?: boolean;
-  excludeProfileId?: string;
-  search?: string;
-};
-
-export type ProfileSort = "relevance" | "price_asc" | "price_desc" | "rating";
-
-export function sortProfileCards<T extends ProfileCardPayload>(profiles: T[], sort: ProfileSort): T[] {
+export function sortProfileCards<T extends ProfileCardPayload>(
+  profiles: T[],
+  sort: _ProfileSort,
+): T[] {
   const copy = [...profiles];
   switch (sort) {
     case "price_asc":
@@ -103,7 +105,10 @@ export function sortProfileCards<T extends ProfileCardPayload>(profiles: T[], so
       return copy.sort((a, b) => b.priceHour - a.priceHour);
     case "rating":
     case "relevance":
-      return copy.sort((a, b) => b.ratingAvg - a.ratingAvg || b.ratingCount - a.ratingCount);
+      return copy.sort(
+        (a, b) =>
+          b.ratingAvg - a.ratingAvg || b.ratingCount - a.ratingCount,
+      );
     default:
       return copy;
   }
@@ -111,13 +116,19 @@ export function sortProfileCards<T extends ProfileCardPayload>(profiles: T[], so
 
 const PLAN_ORDER: PlanTier[] = ["PREMIUM", "DESTAQUE", "ESSENCIAL"];
 
-export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[], sort: ProfileSort): T[] {
-  const inner: ProfileSort = sort === "relevance" ? "rating" : sort;
+export function finalizeDiscoverOrder<T extends ProfileCardPayload>(
+  profiles: T[],
+  sort: _ProfileSort,
+): T[] {
+  const inner: _ProfileSort = sort === "relevance" ? "rating" : sort;
   const now = new Date();
 
-  // Boosted profiles always come first, sorted by plan then views
-  const boosted = profiles.filter((p) => p.featuredUntil != null && new Date(p.featuredUntil) > now);
-  const rest = profiles.filter((p) => !(p.featuredUntil != null && new Date(p.featuredUntil) > now));
+  const boosted = profiles.filter(
+    (p) => p.featuredUntil != null && new Date(p.featuredUntil) > now,
+  );
+  const rest = profiles.filter(
+    (p) => !(p.featuredUntil != null && new Date(p.featuredUntil) > now),
+  );
 
   const sortedBoosted: T[] = [];
   for (const tier of PLAN_ORDER) {
@@ -131,527 +142,4 @@ export function finalizeDiscoverOrder<T extends ProfileCardPayload>(profiles: T[
     out.push(...sortProfileCards(g, inner));
   }
   return out;
-}
-
-export async function listProfilesForCity(cityId: string, filters: DiscoverFilters, sort: ProfileSort = "relevance") {
-  const now = new Date();
-  const where: Prisma.ProfileWhereInput = {
-    cityId,
-    isSuspended: false,
-    planExpiresAt: { gt: now },
-    media: { some: { isCover: true } },
-  };
-
-  // Default: show profiles that serve men (garotas).
-  // "garotos" = servesWomen, "casais" = servesCouples, default/undefined = servesMen
-  if (filters.gender === "garotos") where.servesWomen = true;
-  else if (filters.gender === "casais") where.servesCouples = true;
-  else where.servesMen = true;
-
-  if (filters.priceMin != null || filters.priceMax != null) {
-    where.priceHour = {};
-    if (filters.priceMin != null) where.priceHour.gte = filters.priceMin;
-    if (filters.priceMax != null) where.priceHour.lte = filters.priceMax;
-  }
-  if (filters.ageMin != null || filters.ageMax != null) {
-    where.age = {};
-    if (filters.ageMin != null) where.age.gte = filters.ageMin;
-    if (filters.ageMax != null) where.age.lte = filters.ageMax;
-  }
-  if (filters.verifiedOnly) where.isVerified = true;
-  if (filters.hasOwnPlace) where.hasOwnPlace = true;
-  if (filters.homeVisit) where.homeVisit = true;
-  if (filters.excludeProfileId) where.id = { not: filters.excludeProfileId };
-  if (filters.search) {
-    const q = filters.search.replace(/^@/, "").trim();
-    where.OR = [
-      { displayName: { contains: q, mode: "insensitive" } },
-      { slug: { contains: q, mode: "insensitive" } },
-    ];
-  }
-
-  const profiles = await prisma.profile.findMany({
-    where,
-    include: profileCardInclude,
-    orderBy: [{ lastUpdatedAt: "desc" }],
-    take: 60,
-  });
-
-  return finalizeDiscoverOrder(profiles, sort);
-}
-
-export async function searchProfilesGlobal(q: string, limit = 30) {
-  const term = q.replace(/^@/, "").trim();
-  if (!term) return [];
-  const now = new Date();
-  const profiles = await prisma.profile.findMany({
-    where: {
-      isSuspended: false,
-      planExpiresAt: { gt: now },
-      OR: [
-        { displayName: { contains: term, mode: "insensitive" } },
-        { slug: { contains: term, mode: "insensitive" } },
-      ],
-    },
-    include: profileCardInclude,
-    orderBy: [{ lastUpdatedAt: "desc" }],
-    take: limit,
-  });
-  return finalizeDiscoverOrder(profiles, "relevance");
-}
-
-export async function getProfileBySlug(slug: string, userId?: string) {
-  return prisma.profile.findUnique({
-    where: { slug },
-    include: {
-      city: true,
-      district: true,
-      media: {
-        orderBy: { createdAt: "desc" },
-        include: {
-          _count: { select: { likes: true, comments: true } },
-          likes: userId ? { where: { userId }, select: { id: true } } : false,
-        },
-      },
-      reviews: {
-        orderBy: { createdAt: "desc" },
-        take: 12,
-        include: { user: { select: { id: true, name: true, slug: true } } },
-      },
-      availabilityRules: { orderBy: [{ weekday: "asc" }] },
-      durationOptions: {
-        where: { active: true },
-        orderBy: [{ sortOrder: "asc" }, { minutes: "asc" }],
-      },
-    },
-  });
-}
-
-export async function isSubscriber(userId: string): Promise<boolean> {
-  const now = new Date();
-  const sub = await prisma.subscription.findFirst({
-    where: { userId, status: "ACTIVE", expiresAt: { gt: now } },
-  });
-  return !!sub;
-}
-
-export async function getUserReviewForProfile(profileId: string, userId: string) {
-  return prisma.review.findUnique({ where: { profileId_userId: { profileId, userId } } });
-}
-
-export async function getPremiumWeekProfiles() {
-  const now = new Date();
-  return prisma.profile.findMany({
-    where: { planTier: { in: ["PREMIUM", "DESTAQUE"] }, isSuspended: false, planExpiresAt: { gt: now } },
-    include: profileCardInclude,
-    orderBy: [{ featuredUntil: "desc" }, { ratingAvg: "desc" }],
-    take: 8,
-  });
-}
-
-/**
- * "Em alta da semana" — purely by viewsCurrentPeriod, no plan grouping.
- * Most viewed profiles this week, regardless of plan tier.
- */
-export async function getHotProfiles(limit = 20) {
-  const now = new Date();
-  const profiles = await prisma.profile.findMany({
-    where: {
-      isSuspended: false,
-      planExpiresAt: { gt: now },
-      media: { some: { isCover: true } },
-    },
-    include: profileCardInclude,
-    orderBy: { viewsCurrentPeriod: "desc" },
-    take: limit,
-  });
-  return profiles;
-}
-
-/**
- * Profiles with an active boost (featuredUntil > now).
- * Ordered by plan tier then viewsCurrentPeriod.
- * Boost lasts 24h — after that they fall back into the normal ranking.
- */
-export async function getBoostedProfiles(limit = 8) {
-  const now = new Date();
-  const profiles = await prisma.profile.findMany({
-    where: {
-      featuredUntil: { gt: now },
-      isSuspended: false,
-      planExpiresAt: { gt: now },
-      media: { some: { isCover: true } },
-    },
-    include: profileCardInclude,
-    orderBy: { viewsCurrentPeriod: "desc" },
-    take: limit * 3,
-  });
-
-  const out: typeof profiles = [];
-  for (const tier of PLAN_ORDER) {
-    const group = profiles
-      .filter((p) => p.planTier === tier)
-      .sort((a, b) => b.viewsCurrentPeriod - a.viewsCurrentPeriod);
-    out.push(...group);
-    if (out.length >= limit) break;
-  }
-
-  return out.slice(0, limit);
-}
-
-const SECTION_PAGE_SIZE = 8;
-
-export async function getSectionProfiles(
-  type: "hot" | "boosted",
-  offset = 0,
-  limit = SECTION_PAGE_SIZE,
-) {
-  if (type === "hot") {
-    const now = new Date();
-    const rows = await prisma.profile.findMany({
-      where: {
-        isSuspended: false,
-        planExpiresAt: { gt: now },
-        media: { some: { isCover: true } },
-      },
-      include: profileCardInclude,
-      orderBy: { viewsCurrentPeriod: "desc" },
-      skip: offset,
-      take: limit + 1,
-    });
-    const hasMore = rows.length > limit;
-    return { profiles: rows.slice(0, limit), hasMore };
-  }
-
-  // boosted — in-memory tier sort, so fetch a generous batch
-  const now = new Date();
-  const rows = await prisma.profile.findMany({
-    where: {
-      featuredUntil: { gt: now },
-      isSuspended: false,
-      planExpiresAt: { gt: now },
-      media: { some: { isCover: true } },
-    },
-    include: profileCardInclude,
-    orderBy: { viewsCurrentPeriod: "desc" },
-    take: offset + limit + 100,
-  });
-  const sorted = [...rows].sort((a, b) => {
-    const order: Record<string, number> = { PREMIUM: 0, DESTAQUE: 1, ESSENCIAL: 2 };
-    const diff = (order[a.planTier] ?? 2) - (order[b.planTier] ?? 2);
-    return diff !== 0 ? diff : b.viewsCurrentPeriod - a.viewsCurrentPeriod;
-  });
-  const page = sorted.slice(offset, offset + limit);
-  const hasMore = sorted.length > offset + limit;
-  return { profiles: page, hasMore };
-}
-
-export async function getHotPeriodStart(): Promise<Date | null> {
-  const cfg = await prisma.hotPeriodConfig.findUnique({ where: { id: "hot" } });
-  return cfg?.startedAt ?? null;
-}
-
-export async function getAllCities() {
-  return prisma.city.findMany({ orderBy: { name: "asc" } });
-}
-
-export async function getCitiesWithReels() {
-  const rows = await prisma.profile.findMany({
-    where: { media: { some: { mediaType: "REEL", isPublic: true } } },
-    select: { city: { select: { id: true, name: true, slug: true } } },
-    distinct: ["cityId"],
-  });
-  return rows
-    .map((r) => r.city)
-    .filter((c): c is NonNullable<typeof c> => !!c)
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-export async function getProfileBySlugForPainel(slug: string) {
-  return prisma.profile.findUnique({
-    where: { slug },
-    include: {
-      user: { select: { name: true, email: true } },
-      city: true,
-      district: true,
-    },
-  });
-}
-
-export async function listWhatsAppClicksRecent(profileId: string, take = 8) {
-  return prisma.whatsAppClick.findMany({
-    where: { profileId },
-    orderBy: { clickedAt: "desc" },
-    take,
-  });
-}
-
-export async function countWhatsAppClicksToday(profileId: string) {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  return prisma.whatsAppClick.count({
-    where: { profileId, clickedAt: { gte: start } },
-  });
-}
-
-export type StoryGroup = {
-  profileId: string;
-  slug: string;
-  displayName: string;
-  coverUrl: string;
-  allSeen: boolean;
-  stories: {
-    id: string;
-    mediaUrl: string;
-    mediaType: string;
-    caption: string | null;
-    createdAt: string;
-    viewCount: number;
-    likeCount: number;
-    seenByMe: boolean;
-    likedByMe: boolean;
-  }[];
-};
-
-export async function getStoriesForProfile(profileId: string, userId?: string): Promise<StoryGroup | null> {
-  const now = new Date();
-  const rawStories = await prisma.story.findMany({
-    where: { profileId, expiresAt: { gt: now } }, // no plan restriction for individual profile
-    include: {
-      profile: {
-        select: {
-          id: true, slug: true, displayName: true,
-          media: { where: { isCover: true }, take: 1, select: { url: true } },
-        },
-      },
-      _count: { select: { views: true, likes: true } },
-      views: userId ? { where: { userId }, select: { id: true } } : false,
-      likes: userId ? { where: { userId }, select: { id: true } } : false,
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (rawStories.length === 0) return null;
-
-  const p = rawStories[0].profile;
-  const group: StoryGroup = {
-    profileId: p.id,
-    slug: p.slug,
-    displayName: p.displayName,
-    coverUrl: p.media[0]?.url ?? "https://picsum.photos/seed/x/200/200",
-    allSeen: false,
-    stories: rawStories.map((s) => ({
-      id: s.id,
-      mediaUrl: s.mediaUrl,
-      mediaType: s.mediaType,
-      caption: s.caption,
-      createdAt: s.createdAt.toISOString(),
-      viewCount: s._count.views,
-      likeCount: s._count.likes,
-      seenByMe: userId ? (s.views as { id: string }[]).length > 0 : false,
-      likedByMe: userId ? (s.likes as { id: string }[]).length > 0 : false,
-    })),
-  };
-  group.allSeen = group.stories.every((s) => s.seenByMe);
-  return group;
-}
-
-export async function listStoriesForCity(cityId: string, userId?: string, gender?: string): Promise<StoryGroup[]> {
-  const now = new Date();
-
-  // Build profile filter matching the same gender logic as listProfilesForCity
-  const profileWhere: Prisma.ProfileWhereInput = {
-    cityId,
-    planTier: { in: ["DESTAQUE", "PREMIUM"] },
-  };
-  if (gender === "garotos") profileWhere.servesWomen = true;
-  else if (gender === "casais") profileWhere.servesCouples = true;
-  else profileWhere.servesMen = true;
-
-  const rawStories = await prisma.story.findMany({
-    where: {
-      expiresAt: { gt: now },
-      profile: profileWhere,
-    },
-    include: {
-      profile: {
-        select: {
-          id: true,
-          slug: true,
-          displayName: true,
-          media: { where: { isCover: true }, take: 1, select: { url: true } },
-        },
-      },
-      _count: { select: { views: true, likes: true } },
-      views: userId ? { where: { userId }, select: { id: true } } : false,
-      likes: userId ? { where: { userId }, select: { id: true } } : false,
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  // Group by profile, keep profile order by most recent story
-  const groups = new Map<string, StoryGroup>();
-  for (const s of rawStories) {
-    const pId = s.profile.id;
-    if (!groups.has(pId)) {
-      groups.set(pId, {
-        profileId: pId,
-        slug: s.profile.slug,
-        displayName: s.profile.displayName,
-        coverUrl: s.profile.media[0]?.url ?? "https://picsum.photos/seed/x/200/200",
-        allSeen: false,
-        stories: [],
-      });
-    }
-    const g = groups.get(pId)!;
-    const seenByMe = userId ? (s.views as { id: string }[]).length > 0 : false;
-    const likedByMe = userId ? (s.likes as { id: string }[]).length > 0 : false;
-    g.stories.push({
-      id: s.id,
-      mediaUrl: s.mediaUrl,
-      mediaType: s.mediaType,
-      caption: s.caption,
-      createdAt: s.createdAt.toISOString(),
-      viewCount: s._count.views,
-      likeCount: s._count.likes,
-      seenByMe,
-      likedByMe,
-    });
-  }
-
-  // Mark allSeen
-  for (const g of groups.values()) {
-    g.allSeen = g.stories.every((s) => s.seenByMe);
-  }
-
-  return Array.from(groups.values());
-}
-
-export async function listFinancialRecordsForMonth(profileId: string, year: number, month: number) {
-  const start = new Date(year, month - 1, 1);
-  const end = new Date(year, month, 0, 23, 59, 59, 999);
-  return prisma.financialRecord.findMany({
-    where: { profileId, occurredAt: { gte: start, lte: end } },
-    orderBy: { occurredAt: "desc" },
-  });
-}
-
-export async function listReels({
-  cityId,
-  profileId,
-  cursor,
-  limit = 10,
-  userId,
-  viewerIsSubscriber = false,
-  ownerId,
-}: {
-  cityId?: string;
-  profileId?: string;
-  cursor?: string;
-  limit?: number;
-  userId?: string;
-  viewerIsSubscriber?: boolean;
-  // If set, this user owns the profile — they always see their own private reels
-  ownerId?: string;
-}) {
-  const profileFilter = {
-    isSuspended: false,
-    ...(cityId ? { cityId } : {}),
-    ...(profileId ? { id: profileId } : {}),
-  };
-
-  const where: import("@prisma/client").Prisma.MediaWhereInput = {
-    mediaType: "REEL",
-    // Include public reels always; include private reels too (they show as locked for non-subscribers)
-    profile: profileFilter,
-  };
-
-  const items = await prisma.media.findMany({
-    where,
-    take: limit + 1,
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-    orderBy: { createdAt: "desc" },
-    include: {
-      profile: {
-        select: {
-          id: true,
-          slug: true,
-          displayName: true,
-          city: { select: { name: true, slug: true } },
-          media: { where: { isCover: true }, take: 1, select: { url: true } },
-        },
-      },
-      _count: { select: { likes: true, comments: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : false,
-    },
-  });
-
-  const hasMore = items.length > limit;
-  if (hasMore) items.pop();
-
-  return {
-    reels: items.map((r) => {
-      const isPrivate = !r.isPublic;
-      // Locked = private AND viewer is not subscriber AND viewer is not the owner
-      const isLocked = isPrivate && !viewerIsSubscriber && r.profile.id !== ownerId;
-      return {
-        id: r.id,
-        url: isLocked ? "" : r.url,
-        caption: isLocked ? null : r.caption,
-        isPrivate,
-        isLocked,
-        createdAt: r.createdAt.toISOString(),
-        likeCount: r._count.likes,
-        commentCount: r._count.comments,
-        likedByMe: userId ? (r.likes as { id: string }[]).length > 0 : false,
-        profile: {
-          id: r.profile.id,
-          slug: r.profile.slug,
-          displayName: r.profile.displayName,
-          coverUrl: r.profile.media[0]?.url ?? null,
-          cityName: r.profile.city.name,
-          citySlug: r.profile.city.slug,
-        },
-      };
-    }),
-    hasMore,
-    nextCursor: hasMore ? items[items.length - 1].id : null,
-  };
-}
-
-export async function listMediaWithCounts(mediaId: string, userId?: string) {
-  return prisma.media.findUnique({
-    where: { id: mediaId },
-    include: {
-      _count: { select: { likes: true, comments: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : false,
-    },
-  });
-}
-
-export async function listMediaComments(mediaId: string) {
-  return prisma.mediaComment.findMany({
-    where: { mediaId },
-    orderBy: { createdAt: "asc" },
-    take: 50,
-    include: {
-      user: { select: { id: true, name: true, slug: true } },
-    },
-  });
-}
-
-export async function listModerationQueue() {
-  return prisma.verificationCase.findMany({
-    orderBy: { waitingSince: "asc" },
-    take: 80,
-    include: {
-      profile: {
-        include: {
-          city: { select: { name: true } },
-          district: { select: { name: true } },
-          media: { take: 1, orderBy: { sortOrder: "asc" }, select: { url: true } },
-        },
-      },
-    },
-  });
 }

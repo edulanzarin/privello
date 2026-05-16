@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { getClientFavorites } from "@/app/_actions/favorites";
-import { isSubscriber } from "@/lib/queries";
+import { isSubscriber } from "@/lib/services";
 import { FavoritesList } from "./favorites-list";
 import { ClientAvatarUpload } from "./client-avatar-upload";
 import { ClientProfileEdit } from "./client-profile-edit";

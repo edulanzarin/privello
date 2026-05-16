@@ -41,7 +41,7 @@ export function Switch({
             className={cn(
                 "flex shrink-0 items-center rounded-full transition-colors duration-200",
                 s.track,
-                checked ? "bg-[#30d158]" : "bg-black/[0.09]",
+                checked ? "bg-success" : "bg-black/[0.09]",
                 disabled && "cursor-not-allowed opacity-50",
                 className,
             )}

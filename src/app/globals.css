@@ -14,6 +14,7 @@
   --privello-success-dark: #248a3d;
   --privello-warning-dark: #b36200;
   --privello-accent-purple: #5856d6;
+  --privello-whatsapp: #25d366;
 }
 
 @theme inline {
@@ -30,6 +31,7 @@
   --color-danger: var(--privello-danger);
   --color-blue: var(--privello-blue);
   --color-accent-purple: var(--privello-accent-purple);
+  --color-whatsapp: var(--privello-whatsapp);
   --text-2xs: 10px;
   --text-xs: 11px;
   --text-sm: 12px;

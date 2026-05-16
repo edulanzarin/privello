@@ -24,7 +24,7 @@ export function QuickActions({ caseId }: { caseId: string }) {
   }
 
   if (pending) {
-    return <span className="text-[10px] text-muted">Salvando…</span>;
+    return <span className="text-2xs text-muted">Salvando…</span>;
   }
 
   return (

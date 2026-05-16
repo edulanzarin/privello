@@ -97,7 +97,7 @@ export function PhotoCarousel({ photos, privateCount, displayName }: Props) {
             <div className="relative flex h-16 w-12 shrink-0 items-center justify-center border-2 border-dashed border-line bg-black/5">
               <div className="text-center">
                 <Lock className="mx-auto h-4 w-4 text-muted" strokeWidth={1.5} />
-                <p className="mt-0.5 text-[9px] font-semibold text-muted">+{privateCount}</p>
+                <p className="mt-0.5 text-2xs font-semibold text-muted">+{privateCount}</p>
               </div>
             </div>
           )}

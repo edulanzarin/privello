@@ -14,7 +14,7 @@ export interface AvatarProps {
 }
 
 const sizeStyles: Record<AvatarSize, { container: string; text: string; imgSize: number }> = {
-    xs: { container: "h-7 w-7", text: "text-[10px]", imgSize: 28 },
+    xs: { container: "h-7 w-7", text: "text-2xs", imgSize: 28 },
     sm: { container: "h-9 w-9", text: "text-xs", imgSize: 36 },
     md: { container: "h-12 w-12", text: "text-sm", imgSize: 48 },
     lg: { container: "h-16 w-16", text: "text-lg", imgSize: 64 },

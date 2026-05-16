@@ -77,7 +77,7 @@ export function TicketChat({
             >
               {msg.text}
             </div>
-            <span className="mt-0.5 text-[10px] text-muted">
+            <span className="mt-0.5 text-2xs text-muted">
               {msg.isAdmin ? "Suporte · " : ""}
               {new Date(msg.createdAt).toLocaleString("pt-BR", {
                 day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
@@ -104,7 +104,7 @@ export function TicketChat({
             placeholder="Escreva sua mensagem… (Enter para enviar)"
             rows={2}
             maxLength={2000}
-            className="flex-1 resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-[14px] text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="flex-1 resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <button
             onClick={handleSend}
@@ -115,7 +115,7 @@ export function TicketChat({
           </button>
         </div>
       ) : (
-        <div className="border-t border-black/[0.06] px-4 py-3 text-center text-[13px] text-muted">
+        <div className="border-t border-black/[0.06] px-4 py-3 text-center text-base text-muted">
           Ticket fechado.
         </div>
       )}

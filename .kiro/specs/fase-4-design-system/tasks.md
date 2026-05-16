@@ -262,14 +262,14 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - `useFileUpload({ endpoint: "/api/upload/verification" })`
     - _Requirements: 5.4_
 
-- [ ] 10. Eliminação de hex literais e font-size — Wave restante (cauda)
-  - [ ] 10.1 Migrar arquivos com 1–4 hex literais e/ou 1–10 ocorrências de `text-[Npx]`
+- [x] 10. Eliminação de hex literais e font-size — Wave restante (cauda)
+  - [x] 10.1 Migrar arquivos com 1–4 hex literais e/ou 1–10 ocorrências de `text-[Npx]`
     - Lista derivada do inventário (paths em `inventario-baseline.md` ou `tokens.md > Migration baseline`)
     - Aplicar mapeamento canônico em massa
     - Pode ser quebrada em sub-tarefas por subdiretório (`src/app/painel/`, `src/components/profile/`, `src/components/reels/`, etc.) se conveniente
     - _Requirements: 5.2, 5.3, 5.6_
 
-  - [ ] 10.2 Validar contagem final
+  - [x] 10.2 Validar contagem final
     - Re-rodar inventário (`grep -r '#[0-9a-fA-F]\{3,8\}' src/components/ src/app/`) e (`grep -rE 'text-\[\d+(\.\d+)?(px|rem|em)\]' src/`)
     - Confirmar contagem **zero** em arquivos do escopo, exceto exceções declaradas em `tokens.md`
     - Anexar log final em `tokens.md > Migration log`

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { BuscarForm } from "./buscar-form";
-import { searchProfilesGlobal } from "@/lib/queries";
+import { searchProfilesGlobal } from "@/lib/services";
 import { MapPin, BadgeCheck } from "lucide-react";
 
 // Cache strategy: revalidate=120 (legacy Route Segment Config).

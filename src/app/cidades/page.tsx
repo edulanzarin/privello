@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getAllCities } from "@/lib/queries";
+import { getAllCities } from "@/lib/services";
 
 // Cache strategy: revalidate=900 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 5.

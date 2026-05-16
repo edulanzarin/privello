@@ -37,3 +37,13 @@ export type {
 } from "./discover.service";
 export { getStoriesForProfile, listStoriesForCity } from "./story.service";
 export type { StoryGroup } from "./story.service";
+export { getPlatformStats, getHotPeriodStart } from "./stats.service";
+export type { PlatformStats } from "./stats.service";
+export {
+    listWhatsAppClicksRecent,
+    countWhatsAppClicksToday,
+} from "./whatsapp-click.service";
+export { listFinancialRecordsForMonth } from "./financial.service";
+export { listReels } from "./reels.service";
+export type { ListReelsOptions, ReelItem, ReelsPage } from "./reels.service";
+export { listModerationQueue } from "./moderation.service";

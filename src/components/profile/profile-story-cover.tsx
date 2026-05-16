@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { Heart, X, Eye, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
-import type { StoryGroup } from "@/lib/queries";
+import type { StoryGroup } from "@/lib/services";
 
 const DURATION = 5000;
 
@@ -182,7 +182,7 @@ export function ProfileStoryCover({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-black/[0.04]">
-            <p className="text-[13px] text-muted">Sem foto</p>
+            <p className="text-base text-muted">Sem foto</p>
           </div>
         )}
 
@@ -190,7 +190,7 @@ export function ProfileStoryCover({
         {hasStory && (
           <span
             className={cn(
-              "pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur-sm",
+              "pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold text-white backdrop-blur-sm",
               !allSeen ? "bg-coral shadow-sm" : "bg-black/40",
             )}
           >
@@ -231,7 +231,7 @@ export function ProfileStoryCover({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-semibold text-white">{localGroup.displayName}</p>
-                <p className="text-[10px] text-white/60">{timeAgo(activeStory.createdAt)}</p>
+                <p className="text-2xs text-white/60">{timeAgo(activeStory.createdAt)}</p>
               </div>
               <button onClick={close} className="rounded-full bg-white/10 p-1.5 text-white hover:bg-white/20">
                 <X className="h-4 w-4" strokeWidth={2} />
@@ -271,14 +271,14 @@ export function ProfileStoryCover({
               ) : (
                 <Link
                   href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
-                  className="pointer-events-auto text-[10px] text-white/50 hover:text-white/80 transition"
+                  className="pointer-events-auto text-2xs text-white/50 hover:text-white/80 transition"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Entre para curtir
                 </Link>
               )}
             </div>
-            </div>
+          </div>
         ) : null}
       </Modal>
     </>

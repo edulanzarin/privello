@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
-import { getOrCreateCityBySlug } from "@/lib/queries";
+import { getOrCreateCityBySlug } from "@/lib/services";
 import {
   LoginActionSchema,
   SignupClientSchema,

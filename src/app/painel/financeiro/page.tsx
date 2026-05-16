@@ -4,7 +4,7 @@ import { Diamond } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatBrl } from "@/lib/money";
-import { listFinancialRecordsForMonth } from "@/lib/queries";
+import { listFinancialRecordsForMonth } from "@/lib/services";
 import { addFinancialRecord } from "@/app/painel/_actions/provider-settings";
 import { FinancialTable } from "./financial-table";
 import { Card } from "@/components/ui/card";

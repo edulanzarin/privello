@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { isSubscriber, listReels } from "@/lib/queries";
+import { isSubscriber, listReels } from "@/lib/services";
 import { prisma } from "@/lib/prisma";
 import { ReelsQuerySchema } from "@/lib/validation";
 

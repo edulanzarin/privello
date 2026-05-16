@@ -46,7 +46,7 @@ export function CardHeader({ className, children, ...props }: HTMLAttributes<HTM
 
 export function CardTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
     return (
-        <h3 className={cn("text-[15px] font-semibold tracking-tight", className)} {...props}>
+        <h3 className={cn("text-lg font-semibold tracking-tight", className)} {...props}>
             {children}
         </h3>
     );
@@ -54,7 +54,7 @@ export function CardTitle({ className, children, ...props }: HTMLAttributes<HTML
 
 export function CardDescription({ className, children, ...props }: HTMLAttributes<HTMLParagraphElement>) {
     return (
-        <p className={cn("text-[13px] text-muted", className)} {...props}>
+        <p className={cn("text-base text-muted", className)} {...props}>
             {children}
         </p>
     );

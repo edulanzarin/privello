@@ -44,11 +44,11 @@ export function BuscarForm() {
           <label className="flex items-center gap-3 bg-white px-4 py-3">
             <Users className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
             <span className="w-full">
-              <span className="block text-[11px] font-medium text-muted">Procuro</span>
+              <span className="block text-xs font-medium text-muted">Procuro</span>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="mt-0.5 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-[14px] font-medium outline-none focus:ring-0"
+                className="mt-0.5 w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-md font-medium outline-none focus:ring-0"
               >
                 {GENDER_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -62,7 +62,7 @@ export function BuscarForm() {
       <button
         onClick={handleCitySearch}
         disabled={!citySlug}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
       >
         <Search className="h-4 w-4" strokeWidth={2} />
         Buscar acompanhantes
@@ -71,7 +71,7 @@ export function BuscarForm() {
       {/* Top cities */}
       {topCities.length > 0 && (
         <div className="pt-2">
-          <p className="text-[11px] font-medium text-muted">Cidades com mais perfis</p>
+          <p className="text-xs font-medium text-muted">Cidades com mais perfis</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {topCities.map((c) => (
               <button
@@ -80,7 +80,7 @@ export function BuscarForm() {
                   sessionStorage.setItem(LAST_CITY_KEY, c.slug);
                   router.push(`/descobrir/${c.slug}`);
                 }}
-                className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
+                className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
               >
                 {c.label}
               </button>

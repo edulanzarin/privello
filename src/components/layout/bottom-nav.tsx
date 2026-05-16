@@ -60,8 +60,8 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
                 key={item.key}
                 href={item.href}
                 className={cn(
-                  "relative flex flex-col items-center gap-[2px] px-10 py-1 text-[10px] font-medium transition-colors",
-                  item.active ? "text-coral" : "text-[#8e8e93] hover:text-foreground",
+                  "relative flex flex-col items-center gap-[2px] px-10 py-1 text-2xs font-medium transition-colors",
+                  item.active ? "text-coral" : "text-muted hover:text-foreground",
                 )}
               >
                 <Icon
@@ -138,8 +138,8 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
               href={item.href}
               onClick={item.onClick}
               className={cn(
-                "relative flex flex-col items-center gap-[2px] px-5 py-1 text-[10px] font-medium transition-colors",
-                item.active ? "text-coral" : "text-[#8e8e93] hover:text-foreground",
+                "relative flex flex-col items-center gap-[2px] px-5 py-1 text-2xs font-medium transition-colors",
+                item.active ? "text-coral" : "text-muted hover:text-foreground",
               )}
             >
               <Icon

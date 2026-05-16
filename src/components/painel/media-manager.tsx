@@ -73,17 +73,17 @@ function MediaGrid({
               <Image src={m.url} alt="" fill className="object-cover" sizes="128px" />
             )}
             {m.isCover && (
-              <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">Perfil</span>
+              <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-2xs font-bold uppercase text-white">Perfil</span>
             )}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/60 opacity-0 transition group-hover:opacity-100">
               {onSetCover && !m.isCover && (
                 <button type="button" onClick={() => onSetCover(m.id)}
-                  className="flex items-center gap-1 rounded bg-coral px-2 py-1 text-[9px] font-bold uppercase text-white">
+                  className="flex items-center gap-1 rounded bg-coral px-2 py-1 text-2xs font-bold uppercase text-white">
                   <Star className="h-2.5 w-2.5" /> Perfil
                 </button>
               )}
               <button type="button" onClick={() => onRemove(m.id)}
-                className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
+                className="flex items-center gap-1 text-2xs text-white/80 hover:text-coral">
                 <Trash2 className="h-3 w-3" /> Remover
               </button>
             </div>
@@ -97,7 +97,7 @@ function MediaGrid({
             isPrivate ? "border-line hover:border-foreground hover:text-foreground" : "border-line hover:border-coral hover:text-coral",
           )}>
           {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" strokeWidth={1.25} />}
-          <span className="text-[10px] font-semibold uppercase">{label}</span>
+          <span className="text-2xs font-semibold uppercase">{label}</span>
         </button>
       </div>
     </div>
@@ -268,13 +268,13 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
                           ) : (
                             <img src={s.mediaUrl} alt="" className="h-full w-full object-cover" />
                           )}
-                          <div className="absolute inset-x-0 bottom-0 bg-black/60 px-1.5 py-1 text-[9px] text-white/80">
+                          <div className="absolute inset-x-0 bottom-0 bg-black/60 px-1.5 py-1 text-2xs text-white/80">
                             {h}h {m}m
                           </div>
                           <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition group-hover:opacity-100">
                             <form action={deleteStory}>
                               <input type="hidden" name="storyId" value={s.id} />
-                              <button type="submit" className="flex items-center gap-1 text-[9px] text-white/80 hover:text-coral">
+                              <button type="submit" className="flex items-center gap-1 text-2xs text-white/80 hover:text-coral">
                                 <Trash2 className="h-3 w-3" /> Remover
                               </button>
                             </form>
@@ -290,17 +290,17 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
                   <p className="mb-3 text-xs font-medium text-muted">Publicar story</p>
                   <form action={createStory} className="space-y-3 max-w-sm">
                     <div>
-                      <label className="block text-[13px] font-medium text-foreground mb-1.5">URL da imagem / vídeo</label>
+                      <label className="block text-base font-medium text-foreground mb-1.5">URL da imagem / vídeo</label>
                       <input name="mediaUrl" required placeholder="https://..."
-                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
+                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <div>
-                      <label className="block text-[13px] font-medium text-foreground mb-1.5">Legenda (opcional)</label>
+                      <label className="block text-base font-medium text-foreground mb-1.5">Legenda (opcional)</label>
                       <input name="caption" placeholder="Uma frase..." maxLength={150}
-                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
+                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <button type="submit" disabled={storyPending}
-                      className="rounded-lg bg-coral px-5 py-2.5 text-[13px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition disabled:opacity-50">
+                      className="rounded-lg bg-coral px-5 py-2.5 text-base font-semibold text-white hover:brightness-110 active:scale-[0.97] transition disabled:opacity-50">
                       Publicar (24h)
                     </button>
                   </form>

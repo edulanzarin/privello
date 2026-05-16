@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ProfileCard } from "@/components/profile/profile-card";
-import type { ProfileCardPayload } from "@/lib/queries";
+import type { ProfileCardPayload } from "@/lib/services";
 
 type Props = {
   type: "hot" | "boosted";

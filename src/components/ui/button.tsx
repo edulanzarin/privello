@@ -14,21 +14,21 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
     primary:
-        "bg-[#0a84ff] text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
+        "bg-blue text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
     secondary:
         "bg-white border border-black/10 text-foreground shadow-sm hover:bg-black/[0.03] active:bg-black/[0.06] active:scale-[0.98]",
     ghost:
         "text-muted hover:text-foreground hover:bg-black/[0.04] active:bg-black/[0.06]",
     danger:
-        "bg-[#ff3b30] text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
+        "bg-danger text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
     coral:
         "bg-coral text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-    sm: "px-3 py-[5px] text-[12px] gap-1.5 rounded-md",
-    md: "px-4 py-[7px] text-[13px] gap-2 rounded-lg",
-    lg: "px-6 py-[9px] text-[14px] gap-2 rounded-lg",
+    sm: "px-3 py-[5px] text-sm gap-1.5 rounded-md",
+    md: "px-4 py-[7px] text-base gap-2 rounded-lg",
+    lg: "px-6 py-[9px] text-md gap-2 rounded-lg",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

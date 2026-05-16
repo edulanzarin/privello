@@ -3,14 +3,14 @@ import { redirect } from "next/navigation";
 import { Eye, Heart, TrendingUp, Zap, ArrowUpRight, AlertCircle, Ban } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { listFinancialRecordsForMonth } from "@/lib/queries";
+import { listFinancialRecordsForMonth } from "@/lib/services";
 import { formatBrl } from "@/lib/money";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 24 (painel home autenticado).
 export const dynamic = "force-dynamic";
 
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────────
-function BarChart({ data, color = "#ff375f" }: { data: number[]; color?: string }) {
+function BarChart({ data, color = "var(--color-coral)" }: { data: number[]; color?: string }) {
   const max = Math.max(...data, 1);
   const n = data.length;
   const slotW = 100 / n;
@@ -37,7 +37,7 @@ function BarChart({ data, color = "#ff375f" }: { data: number[]; color?: string 
 }
 
 // ── Sparkline ─────────────────────────────────────────────────────────────────
-function Sparkline({ data, color = "#86868b" }: { data: number[]; color?: string }) {
+function Sparkline({ data, color = "var(--color-muted)" }: { data: number[]; color?: string }) {
   if (data.length < 2) return null;
   const max = Math.max(...data, 1);
   const pts = data
@@ -194,7 +194,7 @@ export default async function PainelOverviewPage() {
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{profile.viewsThisMonth.toLocaleString("pt-BR")}</p>
           <p className="mt-0.5 text-xs text-muted">acumulado</p>
           <div className="mt-3 h-8">
-            <Sparkline data={[...Array(7)].map((_, i) => Math.max(0, viewsPeriod - (6 - i) * 2))} color="#86868b" />
+            <Sparkline data={[...Array(7)].map((_, i) => Math.max(0, viewsPeriod - (6 - i) * 2))} color="var(--color-muted)" />
           </div>
         </div>
 
@@ -207,7 +207,7 @@ export default async function PainelOverviewPage() {
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{favoritesCount}</p>
           <p className="mt-0.5 text-xs text-muted">perfis salvos</p>
           <div className="mt-3 h-8">
-            <BarChart data={[1, 1, 2, 2, 3, 4, Math.max(favoritesCount, 4)]} color="#ff375f" />
+            <BarChart data={[1, 1, 2, 2, 3, 4, Math.max(favoritesCount, 4)]} color="var(--color-coral)" />
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export default async function PainelOverviewPage() {
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{formatBrl(totalMonth)}</p>
           <p className="mt-0.5 text-xs text-muted capitalize">{monthName}</p>
           <div className="mt-3 h-8">
-            <BarChart data={revenueByDay} color="#ff375f" />
+            <BarChart data={revenueByDay} color="var(--color-coral)" />
           </div>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default async function PainelOverviewPage() {
             </Link>
           </div>
           <div className="h-32">
-            <BarChart data={revenueByDay} color="#ff375f" />
+            <BarChart data={revenueByDay} color="var(--color-coral)" />
           </div>
           <div className="mt-2 flex justify-between text-2xs text-muted">
             <span>-13 dias</span>

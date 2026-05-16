@@ -30,11 +30,11 @@ export function ShareButton({ displayName, slug, className }: { displayName: str
     <button
       type="button"
       onClick={handleShare}
-      className={`inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]${className ? ` ${className}` : ""}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-base font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]${className ? ` ${className}` : ""}`}
       title="Compartilhar perfil"
     >
       {copied ? (
-        <Check className="h-4 w-4 text-[#30d158]" strokeWidth={2} />
+        <Check className="h-4 w-4 text-success" strokeWidth={2} />
       ) : (
         <Share2 className="h-4 w-4" strokeWidth={1.5} />
       )}

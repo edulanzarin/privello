@@ -9,7 +9,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
 import { ProfileListRow } from "@/components/profile/profile-list-row";
 import { buildDiscoverHref, parseDiscoverSearchParams } from "@/lib/discover-params";
-import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "@/lib/queries";
+import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "@/lib/services";
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 

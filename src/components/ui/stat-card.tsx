@@ -19,11 +19,11 @@ export function StatCard({ label, value, icon: Icon, subtitle, className, childr
             )}
         >
             <div className="flex items-center justify-between">
-                <p className="text-[11px] font-medium text-muted">{label}</p>
+                <p className="text-xs font-medium text-muted">{label}</p>
                 {Icon && <Icon className="h-4 w-4 text-muted" strokeWidth={1.5} />}
             </div>
             <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
-            {subtitle && <p className="mt-0.5 text-[11px] text-muted">{subtitle}</p>}
+            {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
             {children && <div className="mt-3">{children}</div>}
         </div>
     );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { listReels, getCitiesWithReels, getCityBySlug, isSubscriber } from "@/lib/queries";
+import { listReels, getCitiesWithReels, getCityBySlug, isSubscriber } from "@/lib/services";
 import { prisma } from "@/lib/prisma";
 import { ReelsFeed } from "@/components/reels/reels-feed";
 import { ReelsCityFilter } from "@/components/reels/city-filter";

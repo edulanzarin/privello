@@ -40,7 +40,7 @@ export function AudioPlayer({ src }: { src: string }) {
       <audio ref={audioRef} src={src} preload="metadata" />
       <Volume2 className="h-4 w-4 shrink-0 text-coral" strokeWidth={1.5} />
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium text-muted">Ouça minha voz</p>
+        <p className="text-xs font-medium text-muted">Ouça minha voz</p>
         {/* Waveform progress bar */}
         <div
           className="mt-1.5 h-1.5 w-full cursor-pointer rounded-full bg-line overflow-hidden"
@@ -57,7 +57,7 @@ export function AudioPlayer({ src }: { src: string }) {
           />
         </div>
         {duration > 0 && (
-          <p className="mt-1 text-[10px] text-muted">{fmt(progress)} / {fmt(duration)}</p>
+          <p className="mt-1 text-2xs text-muted">{fmt(progress)} / {fmt(duration)}</p>
         )}
       </div>
       <button

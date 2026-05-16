@@ -35,10 +35,10 @@ export async function SiteHeader({ variant = "default", activeHref }: SiteHeader
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/[0.08] bg-[#f5f5f7]">
+    <header className="sticky top-0 z-50 border-b border-black/[0.08] bg-background">
       <div className="mx-auto flex h-11 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <Link href={session?.user?.role === "PROVIDER" ? "/painel" : "/"} className="text-[17px] font-bold tracking-tight text-foreground">
+        <Link href={session?.user?.role === "PROVIDER" ? "/painel" : "/"} className="text-xl font-bold tracking-tight text-foreground">
           privello<span className="text-coral">.</span>
         </Link>
 
@@ -55,7 +55,7 @@ export async function SiteHeader({ variant = "default", activeHref }: SiteHeader
                 fallback={userName || handle || undefined}
                 size="xs"
               />
-              <span className="hidden text-[13px] font-medium text-foreground sm:inline">
+              <span className="hidden text-base font-medium text-foreground sm:inline">
                 {handle ? `@${handle}` : session.user.name?.split(" ")[0]}
               </span>
             </Link>
@@ -63,13 +63,13 @@ export async function SiteHeader({ variant = "default", activeHref }: SiteHeader
             <>
               <Link
                 href="/entrar"
-                className="rounded-full px-4 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-black/[0.04]"
+                className="rounded-full px-4 py-1.5 text-base font-medium text-foreground transition-colors hover:bg-black/[0.04]"
               >
                 Entrar
               </Link>
               <Link
                 href="/cadastro"
-                className="rounded-full bg-coral px-4 py-1.5 text-[13px] font-medium text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.97]"
+                className="rounded-full bg-coral px-4 py-1.5 text-base font-medium text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.97]"
               >
                 Criar conta
               </Link>

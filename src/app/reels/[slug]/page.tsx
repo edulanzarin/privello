@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { listReels, isSubscriber } from "@/lib/queries";
+import { listReels, isSubscriber } from "@/lib/services";
 import { ReelsFeed } from "@/components/reels/reels-feed";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 11 (reels/[slug] lê auth() para userId).

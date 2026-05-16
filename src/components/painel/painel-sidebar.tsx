@@ -78,7 +78,7 @@ function NavContent({
         {navItems.map((item, idx) => {
           if (item.type === "sep") {
             return (
-              <p key={idx} className="mt-4 mb-1 px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-white/30">
+              <p key={idx} className="mt-4 mb-1 px-3 text-2xs font-bold uppercase tracking-[0.2em] text-white/30">
                 {item.label}
               </p>
             );
@@ -91,7 +91,7 @@ function NavContent({
                 <item.icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                 <span className="flex-1">{item.label}</span>
                 {item.badge && (
-                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/30">
+                  <span className="rounded bg-white/10 px-1.5 py-0.5 text-2xs font-semibold text-white/30">
                     {item.badge}
                   </span>
                 )}
@@ -122,14 +122,14 @@ function NavContent({
           return (
             <Link key={item.href} href={item.href} onClick={onClose}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-base text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white",
                 isActive && "bg-white/[0.08] text-white font-medium",
               )}>
               <item.icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
               <span className="flex-1">{item.label}</span>
               {item.badge && (
                 <span className={cn(
-                  "rounded px-1.5 py-0.5 text-[10px] font-semibold",
+                  "rounded px-1.5 py-0.5 text-2xs font-semibold",
                   item.label === "Financeiro" ? "bg-coral/20 text-coral" : "bg-white/10 text-white",
                 )}>
                   {item.badge}
@@ -144,15 +144,15 @@ function NavContent({
       <div className="mt-4 rounded-lg border border-white/10 p-3">
         <div className="flex items-center gap-2">
           {hasPlan ? (
-            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#30d158]" strokeWidth={2} />
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2} />
           ) : (
             <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-amber-400" />
           )}
-          <p className={cn("text-[12px] font-medium", hasPlan ? "text-[#30d158]" : "text-amber-400")}>
+          <p className={cn("text-sm font-medium", hasPlan ? "text-success" : "text-amber-400")}>
             {hasPlan ? (PLAN_LABELS[planTier ?? ""] ?? planTier) : "Sem plano ativo"}
           </p>
         </div>
-        <Link href="/painel/plano" onClick={onClose} className="mt-2 block text-[11px] text-coral/80 hover:text-coral transition">
+        <Link href="/painel/plano" onClick={onClose} className="mt-2 block text-xs text-coral/80 hover:text-coral transition">
           {hasPlan ? "Gerenciar plano →" : "Assinar um plano →"}
         </Link>
       </div>
@@ -161,7 +161,7 @@ function NavContent({
         <Avatar src={avatarUrl} fallback={displayName} size="sm" className="shrink-0 bg-white/10 text-white/60" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">{displayName}</p>
-          {handle && <p className="truncate text-[11px] text-white/40">@{handle}</p>}
+          {handle && <p className="truncate text-xs text-white/40">@{handle}</p>}
         </div>
         <LogoutButton />
       </div>

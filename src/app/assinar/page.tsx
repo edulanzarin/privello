@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Check, Lock, ImageIcon, Film, Star } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { isSubscriber } from "@/lib/queries";
+import { isSubscriber } from "@/lib/services";
 import { SubscribeButton } from "./subscribe-button";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 22 (assinar verifica subscription via auth()).
@@ -38,13 +38,13 @@ export default async function AssinarPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f5f5f7] px-4 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center">
-          <p className="text-[13px] font-semibold text-coral">Privello Assinante</p>
+          <p className="text-base font-semibold text-coral">Privello Assinante</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight">Acesso total</h1>
-          <p className="mt-2 text-[14px] text-muted">Desbloqueie conteúdo exclusivo em todo o site.</p>
+          <p className="mt-2 text-md text-muted">Desbloqueie conteúdo exclusivo em todo o site.</p>
         </div>
 
         {/* Pricing card */}
@@ -52,9 +52,9 @@ export default async function AssinarPage({ searchParams }: Props) {
           <div className="flex items-end gap-1">
             <span className="text-5xl font-semibold tracking-tight">R$&nbsp;19</span>
             <span className="mb-1 text-2xl font-semibold tracking-tight">,90</span>
-            <span className="mb-2 ml-1 text-[14px] text-muted">/mês</span>
+            <span className="mb-2 ml-1 text-md text-muted">/mês</span>
           </div>
-          <p className="mt-1 text-[13px] text-muted">Cancele quando quiser · Renovação mensal</p>
+          <p className="mt-1 text-base text-muted">Cancele quando quiser · Renovação mensal</p>
 
           <ul className="mt-6 space-y-3">
             {PERKS.map((p) => (
@@ -63,8 +63,8 @@ export default async function AssinarPage({ searchParams }: Props) {
                   <Check className="h-3 w-3 text-coral" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <p className="text-[14px] font-medium">{p.label}</p>
-                  <p className="text-[13px] text-muted">{p.sub}</p>
+                  <p className="text-md font-medium">{p.label}</p>
+                  <p className="text-base text-muted">{p.sub}</p>
                 </div>
               </li>
             ))}
@@ -82,7 +82,7 @@ export default async function AssinarPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <p className="mt-4 text-center text-[13px] text-muted">
+        <p className="mt-4 text-center text-base text-muted">
           Integração de pagamento em breve · Assinatura ativada para demonstração
         </p>
       </div>

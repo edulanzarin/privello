@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSectionProfiles } from "@/lib/queries";
+import { getSectionProfiles } from "@/lib/services";
 import { ProfilesSectionQuerySchema } from "@/lib/validation";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 43 (Route Handler com cursor pagination).

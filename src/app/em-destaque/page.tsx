@@ -3,7 +3,7 @@ import { Zap } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
-import { getBoostedProfiles } from "@/lib/queries";
+import { getBoostedProfiles } from "@/lib/services";
 
 // Cache strategy: revalidate=120 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 7.
@@ -19,7 +19,7 @@ export default async function EmDestaqueePage() {
       <main className="min-h-screen pb-16">
         <div className="border-b border-line bg-white">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">
+            <p className="text-2xs font-semibold uppercase tracking-[0.25em] text-muted">
               Boost ativo
             </p>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MapPin, Home, Car, Images, Clapperboard, Star, ShieldCheck } from "lucide-react";
 import { formatBrl } from "@/lib/money";
 import { cn } from "@/lib/utils";
-import type { ProfileCardPayload } from "@/lib/queries";
+import type { ProfileCardPayload } from "@/lib/services";
 import { AudioPlayButton } from "@/components/profile/audio-play-button";
 
 type ProfileCardProps = {

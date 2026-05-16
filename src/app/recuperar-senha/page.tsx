@@ -21,7 +21,7 @@ export default function RecuperarSenhaPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f9f9f7] px-4 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
       <div className="w-full max-w-sm">
         <Link href="/" className="font-serif text-xl">
           privello<span className="text-coral">.</span>
@@ -51,7 +51,7 @@ export default function RecuperarSenhaPage() {
               Informe seu email e enviaremos um link para redefinir a senha.
             </p>
 
-            <label className="mt-6 block text-[13px] font-medium text-foreground">
+            <label className="mt-6 block text-base font-medium text-foreground">
               Email
             </label>
             <input
@@ -59,7 +59,7 @@ export default function RecuperarSenhaPage() {
               type="email"
               required
               autoComplete="email"
-              className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
+              className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
               placeholder="seu@email.com"
             />
 
@@ -70,7 +70,7 @@ export default function RecuperarSenhaPage() {
             <button
               type="submit"
               disabled={pending}
-              className="mt-6 w-full rounded-lg bg-coral py-3 text-[14px] font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+              className="mt-6 w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
             >
               {pending ? "Enviando…" : "Enviar link"}
             </button>

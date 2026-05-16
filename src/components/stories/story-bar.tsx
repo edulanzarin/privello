@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, X, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
-import type { StoryGroup } from "@/lib/queries";
+import type { StoryGroup } from "@/lib/services";
 
 const STORY_DURATION = 5000; // ms for image stories
 
@@ -225,7 +225,7 @@ export function StoryBar({
                     />
                   </div>
                 </div>
-                <p className="max-w-[62px] truncate text-[10px] font-medium text-muted">
+                <p className="max-w-[62px] truncate text-2xs font-medium text-muted">
                   {group.displayName.split(" ")[0]}
                 </p>
               </button>
@@ -278,7 +278,7 @@ export function StoryBar({
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white leading-none">{activeGroup.displayName}</p>
-                    <p className="mt-0.5 text-[10px] text-white/60">{timeAgo(activeStory.createdAt)}</p>
+                    <p className="mt-0.5 text-2xs text-white/60">{timeAgo(activeStory.createdAt)}</p>
                   </div>
                 </Link>
                 <button
@@ -341,7 +341,7 @@ export function StoryBar({
                 ) : (
                   <Link
                     href={`/entrar?callbackUrl=${encodeURIComponent(pathname)}`}
-                    className="text-[10px] text-white/50 hover:text-white/80 transition"
+                    className="text-2xs text-white/50 hover:text-white/80 transition"
                     onClick={(e) => e.stopPropagation()}
                   >
                     Entre para curtir

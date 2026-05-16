@@ -59,16 +59,16 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
           <p className="font-semibold">
             {profile.displayName}, {profile.age}
           </p>
-          <p className="text-[13px] text-muted">
+          <p className="text-base text-muted">
             {profile.cityName}
           </p>
           {profile.isOnline ? (
-            <p className="mt-1 text-[11px] font-semibold text-[#30d158]">Online agora</p>
+            <p className="mt-1 text-xs font-semibold text-success">Online agora</p>
           ) : null}
         </div>
       </div>
 
-      <h2 className="mt-6 text-[11px] font-medium text-muted">Resumo</h2>
+      <h2 className="mt-6 text-xs font-medium text-muted">Resumo</h2>
       <dl className="mt-3 space-y-2 text-sm">
         <div className="flex justify-between gap-2">
           <dt className="text-muted">Dia</dt>
@@ -101,12 +101,12 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
         Pagamento direto à anunciante. A Privello não intermedia valores neste fluxo.
       </p>
 
-      <label className="mt-6 block text-[11px] font-medium text-muted">Observações</label>
+      <label className="mt-6 block text-xs font-medium text-muted">Observações</label>
       <textarea
         rows={3}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        className="mt-2 w-full rounded-lg border border-black/10 bg-white p-3 text-[14px] shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-[#0a84ff] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none"
+        className="mt-2 w-full rounded-lg border border-black/10 bg-white p-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none"
         placeholder="Ex.: primeira vez, preferência de roupa, chegada discreta…"
       />
 
@@ -122,15 +122,15 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
             body: JSON.stringify({ profileId: profile.id, source: "solicitar" }),
           }).catch(() => { });
         }}
-        className={`mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-[14px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97] ${disabled ? "pointer-events-none opacity-40" : ""
+        className={`mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-md font-semibold text-white transition hover:brightness-110 active:scale-[0.97] ${disabled ? "pointer-events-none opacity-40" : ""
           }`}
       >
         Marcar no WhatsApp
       </a>
       {disabled ? (
-        <p className="mt-2 text-[10px] text-coral">Cadastre um WhatsApp no perfil ou escolha um horário válido.</p>
+        <p className="mt-2 text-2xs text-coral">Cadastre um WhatsApp no perfil ou escolha um horário válido.</p>
       ) : (
-        <p className="mt-2 text-[10px] leading-relaxed text-muted">
+        <p className="mt-2 text-2xs leading-relaxed text-muted">
           Abre o aplicativo com a mensagem pronta. A confirmação final é direto entre vocês — sem fila de ocupação
           visível no site.
         </p>

@@ -27,7 +27,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f4f4f2]">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950 text-white">
         <div className="mx-auto flex h-12 max-w-screen-xl items-center gap-6 px-4 sm:px-6">

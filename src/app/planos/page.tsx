@@ -14,7 +14,7 @@ export default function PlanosPage() {
       <SiteHeader />
       <main className="min-h-screen pb-20">
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted">Planos para acompanhantes</p>
+          <p className="text-2xs font-semibold uppercase tracking-[0.25em] text-muted">Planos para acompanhantes</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">
             Sua presença, <em className="not-italic text-foreground/80">com o peso que merece</em>
             <span className="text-coral">.</span>
@@ -41,7 +41,7 @@ export default function PlanosPage() {
               </p>
               <Link
                 href="/entrar"
-                className="mt-8 block w-full rounded-lg bg-foreground py-3 text-center text-[13px] font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
+                className="mt-8 block w-full rounded-lg bg-foreground py-3 text-center text-base font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
               >
                 Assinar Basic
               </Link>
@@ -68,7 +68,7 @@ export default function PlanosPage() {
 
             {/* Encanto */}
             <article className="relative flex flex-col border-2 border-foreground bg-foreground p-8 text-white">
-              <span className="absolute right-4 top-0 -translate-y-1/2 bg-coral px-2 py-1 text-[10px] font-bold uppercase tracking-wide">
+              <span className="absolute right-4 top-0 -translate-y-1/2 bg-coral px-2 py-1 text-2xs font-bold uppercase tracking-wide">
                 Mais escolhido
               </span>
               <h2 className="font-serif text-2xl">Plus</h2>
@@ -76,7 +76,7 @@ export default function PlanosPage() {
               <p className="mt-6 text-3xl font-semibold">R$ 89 / mês</p>
               <Link
                 href="/entrar"
-                className="mt-8 block w-full rounded-lg bg-white py-3 text-center text-[13px] font-semibold text-foreground hover:bg-white/90 active:scale-[0.97] transition"
+                className="mt-8 block w-full rounded-lg bg-white py-3 text-center text-base font-semibold text-foreground hover:bg-white/90 active:scale-[0.97] transition"
               >
                 Assinar Plus
               </Link>
@@ -110,7 +110,7 @@ export default function PlanosPage() {
               <p className="mt-6 text-3xl font-semibold">R$ 189 / mês</p>
               <Link
                 href="/entrar"
-                className="mt-8 block w-full rounded-lg bg-white py-3 text-center text-[13px] font-semibold text-coral hover:bg-white/90 active:scale-[0.97] transition"
+                className="mt-8 block w-full rounded-lg bg-white py-3 text-center text-base font-semibold text-coral hover:bg-white/90 active:scale-[0.97] transition"
               >
                 Assinar Premium
               </Link>
@@ -136,24 +136,24 @@ export default function PlanosPage() {
           {/* Boost */}
           <div className="mt-12 grid gap-6 border border-line bg-white p-8 lg:grid-cols-[1fr_auto_auto] lg:items-center">
             <div>
-              <p className="text-[11px] font-medium text-coral">À la carte</p>
+              <p className="text-xs font-medium text-coral">À la carte</p>
               <h3 className="mt-2 font-serif text-xl">Boost de 24 horas</h3>
               <p className="mt-2 text-sm text-muted">
                 Sobe seu perfil ao topo da listagem por um dia. Disparo único, sem mensalidade extra.
               </p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase text-muted">Aumento médio</p>
+              <p className="text-2xs font-semibold uppercase text-muted">Aumento médio</p>
               <p className="text-2xl font-bold">+340% views</p>
             </div>
             <div className="flex flex-col items-center gap-3 sm:flex-row">
               <div className="text-center">
-                <p className="text-[10px] font-semibold uppercase text-muted">Disparo único</p>
+                <p className="text-2xs font-semibold uppercase text-muted">Disparo único</p>
                 <p className="text-2xl font-bold">R$ 89</p>
               </div>
               <Link
                 href="/painel"
-                className="rounded-lg bg-coral px-6 py-3 text-[13px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition"
+                className="rounded-lg bg-coral px-6 py-3 text-base font-semibold text-white hover:brightness-110 active:scale-[0.97] transition"
               >
                 Disparar boost
               </Link>
@@ -166,7 +166,7 @@ export default function PlanosPage() {
           </p>
 
           <section className="mx-auto mt-20 max-w-2xl">
-            <p className="text-[11px] font-medium text-muted">Dúvidas frequentes</p>
+            <p className="text-xs font-medium text-muted">Dúvidas frequentes</p>
             <h2 className="mt-2 font-serif text-3xl">
               Tudo que perguntam<span className="text-coral">.</span>
             </h2>

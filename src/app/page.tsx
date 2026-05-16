@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
 import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
-import { getPlatformStats, getSectionProfiles } from "@/lib/queries";
+import { getPlatformStats, getSectionProfiles } from "@/lib/services";
 import { prisma } from "@/lib/prisma";
 
 // Cache strategy: revalidate=60 (legacy Route Segment Config).

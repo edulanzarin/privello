@@ -1,4 +1,4 @@
-import type { DiscoverFilters, GenderFilter, ProfileSort } from "@/lib/queries";
+import type { DiscoverFilters, GenderFilter, ProfileSort } from "@/lib/services";
 
 export function parseDiscoverSearchParams(raw: Record<string, string | string[] | undefined>): {
   filters: DiscoverFilters;

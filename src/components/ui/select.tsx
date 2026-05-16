@@ -19,21 +19,21 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         return (
             <div className="space-y-1.5">
                 {label && (
-                    <label htmlFor={selectId} className="block text-[13px] font-medium text-foreground">
+                    <label htmlFor={selectId} className="block text-base font-medium text-foreground">
                         {label}
                     </label>
                 )}
-                {hint && <p className="text-[12px] text-muted">{hint}</p>}
+                {hint && <p className="text-sm text-muted">{hint}</p>}
                 <div className="relative">
                     <select
                         ref={ref}
                         id={selectId}
                         className={cn(
-                            "w-full appearance-none rounded-lg border border-black/10 bg-white px-3 py-[7px] pr-8 text-[14px] text-foreground",
+                            "w-full appearance-none rounded-lg border border-black/10 bg-white px-3 py-[7px] pr-8 text-md text-foreground",
                             "shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]",
                             "transition-all duration-150 cursor-pointer",
                             "hover:border-black/20",
-                            "focus:border-[#0a84ff] focus:outline-none focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]",
+                            "focus:border-blue focus:outline-none focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]",
                             "disabled:bg-black/[0.03] disabled:text-muted disabled:cursor-not-allowed",
                             error && "border-red-400 focus:border-red-400 focus:shadow-[0_0_0_3px_rgba(255,59,48,0.2)]",
                             className,
@@ -53,7 +53,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" strokeWidth={2} />
                 </div>
-                {error && <p className="text-[12px] text-[#ff3b30]">{error}</p>}
+                {error && <p className="text-sm text-danger">{error}</p>}
             </div>
         );
     },

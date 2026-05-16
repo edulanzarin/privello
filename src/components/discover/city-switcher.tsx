@@ -28,7 +28,7 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex items-center gap-2 py-2">
           <MapPin className="h-3.5 w-3.5 shrink-0 text-coral" strokeWidth={2} />
-          <span className="text-[11px] font-medium text-muted whitespace-nowrap">
+          <span className="text-xs font-medium text-muted whitespace-nowrap">
             Cidade:
           </span>
 
@@ -57,7 +57,7 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
             <div className="flex flex-1 items-center gap-2">
               <button
                 onClick={() => setSearching(true)}
-                className="flex items-center gap-1 text-[13px] font-semibold text-foreground transition-colors hover:text-coral"
+                className="flex items-center gap-1 text-base font-semibold text-foreground transition-colors hover:text-coral"
               >
                 {displayName}
                 <ChevronDown className="h-3 w-3 text-muted" strokeWidth={2} />
