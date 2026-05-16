@@ -228,6 +228,20 @@ registradas em uma única requisição (após warm-up do Turbopack).
 > diante. Cada decisão com data, alternativas consideradas e trade-offs em
 > ≤ 100 palavras.
 
+### 5.1 Cache Components — `cacheComponents: true` (Wave 3.2)
+
+- **decisão**: **não ativar** `cacheComponents: true` em `next.config.ts` nesta fase.
+- **data**: 2026-05-16
+- **critério aplicado**: `% de rotas candidatas a "use cache" ≥ 30%` (cf. design.md > Wave 3.2 e tasks.md > 3.2). Resultado real: 0 rotas candidatas / 43 (= 0%) — bem abaixo do limiar.
+- **causa**: 36/43 rotas (84%) dependem de `auth()` por request (painéis admin/provider/cliente, onboarding, login/registro com redirect, página de perfil que carrega `userId` para `likes`, Route Handler com cursor). 7/43 são rotas públicas com janela de cache aceitável (home, em-alta, em-destaque, cidades, buscar, novidades, planos) e foram migradas para `revalidate=N` legado. Nenhuma combina conteúdo público estável + ausência de `cookies()`/`headers()` de forma que torne `"use cache"` claramente ganhador sem refactor amplo (que ficaria fora do escopo desta fase).
+- **alternativas consideradas**:
+  - **Ativar a flag e migrar todas as 43 rotas** — bloqueado pelo critério de 30%; ativar tem custo (remoção de todos os route segment configs legados, validação ≥ 7 dias em homologação, mudança de comportamento em `<Activity>`).
+  - **Manter o estado atual com `force-dynamic` em todas** — desperdiçaria oportunidade de cache em 7 rotas (home, em-alta, em-destaque, cidades, buscar, novidades, planos).
+- **trade-offs**: ao manter o modelo legado (Route Segment Config), perdemos `cacheTag`/`revalidateTag` (substituído por `revalidate=N` baseado em tempo). Páginas autenticadas continuam SSR estrito. Cache Components fica como decisão para uma fase futura quando (a) houver mais conteúdo público para cachear ou (b) rotas autenticadas migrarem para Server Components com fetches isolados em sub-componentes que possam ter `"use cache"` próprio.
+- **doc consultada**: `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md` + `cacheComponents.md` + `use-cache.md` (cf. requirements.md > §4).
+
+### 5.2 Outras decisões
+
 | # | decisão | data | alternativas | trade-offs |
 |---|---------|------|--------------|-----------|
-| _(linhas preenchidas em 3.2, 6.1, 7.9)_ | | | | |
+| _(linhas preenchidas em 6.1, 7.9)_ | | | | |
