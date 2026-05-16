@@ -77,7 +77,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Se a CI quebrar conforme tolerância decidida em Tarefa 2.2 (esperado em Opção A), registrar como esperado e referenciar ADR 0004
     - _Requirements: 1.7_
 
-- [ ] 3. Wave Docker doc
+- [x] 3. Wave Docker doc
   - [x] 3.1 Decidir localização da Docker doc
     - Avaliar `docs/docker.md` separado vs seção `## Docker (Postgres de dev)` em `README.md`
     - Decisão preferida: `docs/docker.md` (mantém README enxuto)
@@ -101,12 +101,12 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Manter o resto do README inalterado
     - _Requirements: 2.3_
 
-  - [ ] 3.4 Verificar discrepâncias entre `docker-compose.yml` e a doc
+  - [x] 3.4 Verificar discrepâncias entre `docker-compose.yml` e a doc
     - Cruzar cada campo da tabela em 3.2 com `docker-compose.yml:1-15`
     - Se houver discrepância, registrar como `OutOfScopeFinding` em `requirements.md > §3` e propor commit no master spec (não absorver correção do compose nesta fase)
     - _Requirements: 2.5_
 
-- [ ] 4. Wave Env vars doc
+- [x] 4. Wave Env vars doc
   - [x] 4.1 Decidir localização da Env vars doc
     - Avaliar `docs/env.md` separado vs seção `## Variáveis de ambiente` em `README.md`
     - Decisão preferida: `docs/env.md` (consistente com `docs/docker.md`; mantém escopo claro)
@@ -120,7 +120,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Documentar a lista final em `dx-conventions.md > §3 Env vars doc > Inventário`
     - _Requirements: 3.4_
 
-  - [ ] 4.3 Criar `docs/env.md`
+  - [x] 4.3 Criar `docs/env.md`
     - Criar `docs/env.md` conforme esboço de `design.md > Components and Interfaces > 3`:
       - Tabela canônica com 4 colunas: `Variable | Description | Example | Environment`
       - 16 entradas de `.env.example` (auth, dev, cron, images, db, email, MP)
@@ -130,14 +130,14 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Cada `Description` em pt-BR, cada `Example` realista (sem segredos reais — apenas placeholders ou comandos de geração)
     - _Requirements: 3.2, 3.3, 3.7, 3.8_
 
-  - [ ] 4.4 Decidir atualizar `.env.example` com variáveis fantasma
+  - [x] 4.4 Decidir atualizar `.env.example` com variáveis fantasma
     - Para cada variável fantasma listada em 4.2, decidir: (a) adicionar a `.env.example` com placeholder e comentário, ou (b) deixar fora explicitamente
     - Recomendação do design: adicionar `PRISMA_DEBUG_QUERIES` e `MP_WEBHOOK_SECRET`; deixar `NEXTAUTH_URL` fora (alias legado, não introduzir em ambientes novos); `NODE_ENV` e `CI` são setados pelo runtime/CI, não vão em `.env.example`
     - **Caso adicione**: editar `.env.example` (única alteração permitida nesta fase fora dos novos arquivos) com placeholder + comentário em pt-BR; preservar a estrutura existente
     - **Caso não adicione**: registrar a decisão em `dx-conventions.md > §3 Env vars doc > Decisão sobre .env.example`
     - _Requirements: 3.5_
 
-  - [ ] 4.5 Adicionar link curto no README
+  - [x] 4.5 Adicionar link curto no README
     - Adicionar linha em `README.md` apontando para `docs/env.md`
     - Manter o resto do README inalterado
     - _Requirements: 3.6_
