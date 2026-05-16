@@ -61,14 +61,14 @@ Restrições importantes:
     - _Requirements: 1.4, 1.5_
 
 - [ ] 3. Wave EmptyState primitive
-  - [ ] 3.1 Criar `src/components/ui/empty-state.tsx`
+  - [x] 3.1 Criar `src/components/ui/empty-state.tsx`
     - Implementar `<EmptyState>` com props `title`, `description?`, `icon?`, `action?`, `className?` conforme assinatura em `design.md > Components and Interfaces > 4`
     - Suportar `action.href` (renderiza `<Link>`), `action.onClick` (renderiza `<button>`), e ambos (prefere `href`, `onClick` como handler complementar)
     - Estilo via tokens da fase-4: `bg-white border border-black/[0.06] rounded-2xl px-6 py-14 text-center shadow-sm`, `text-xl font-semibold` no título, `text-md text-muted` na descrição
     - **Zero hex literal** e **zero `text-[Npx]`** no arquivo
     - _Requirements: 4.1, 4.2, 4.3, 4.6_
 
-  - [ ] 3.2 Criar `src/components/ui/empty-state.test.ts`
+  - [x] 3.2 Criar `src/components/ui/empty-state.test.ts`
     - Renderiza com props mínimas (`title`)
     - Renderiza com `description`, `icon`, `action.href` (renderiza `<a>`)
     - Renderiza com `action.onClick` (renderiza `<button>` que dispara handler)
@@ -113,14 +113,14 @@ Restrições importantes:
     - _Requirements: 4.5_
 
 - [ ] 4. Wave Loading state primitive
-  - [ ] 4.1 Criar `src/components/ui/loading-skeleton.tsx`
+  - [x] 4.1 Criar `src/components/ui/loading-skeleton.tsx`
     - Exportar `<LoadingSkeleton>` com prop `variant: "card" | "list" | "detail" | "form" | "gallery" | "text-block"`, `count?: number`, `className?: string`, `ariaLabel?: string` (default "Carregando...")
     - Cada variante implementa estrutura específica (cf. `design.md > Components and Interfaces > 2`)
     - Aplicar `aria-busy="true"` e `aria-label` no container raiz
     - **Zero hex literal** e **zero `text-[Npx]`** — usar tokens (`bg-black/[0.04]`, `bg-line`, classes da escala tipográfica para dimensionar)
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 4.2 Criar `src/components/ui/loading-skeleton.test.ts`
+  - [x] 4.2 Criar `src/components/ui/loading-skeleton.test.ts`
     - Cada variant renderiza container com `aria-busy="true"` e `aria-label` esperado
     - `count` controla número de itens repetidos (default por variant)
     - `className` é mesclado no container raiz (via `cn`)
@@ -192,7 +192,7 @@ Restrições importantes:
     - _Validates: Property 2 (parcial — `loading.tsx`)_
 
 - [ ] 5. Wave Error boundary primitive
-  - [ ] 5.1 Criar `src/components/ui/error-state.tsx`
+  - [x] 5.1 Criar `src/components/ui/error-state.tsx`
     - Exportar `<ErrorState>` com props `title`, `description?`, `onRetry`, `homeHref?`, `variant?: "inline" | "page"`, `digest?`, `className?`
     - `role="alert"` quando `variant === "page"`, `role="status"` quando `variant === "inline"`
     - Botão "Tentar novamente" como `<button onClick={onRetry}>` (não `<a>`)
@@ -201,7 +201,7 @@ Restrições importantes:
     - **Não expor** `error.message` nem `error.stack` — apenas `digest` opcional em texto pequeno (variant `page`)
     - _Requirements: 3.1, 3.2, 3.5, 3.6_
 
-  - [ ] 5.2 Criar `src/components/ui/error-state.test.ts`
+  - [x] 5.2 Criar `src/components/ui/error-state.test.ts`
     - Renderiza com `variant="page"` aplica `role="alert"`
     - Renderiza com `variant="inline"` aplica `role="status"`
     - Botão "Tentar novamente" dispara `onRetry` ao clicar
@@ -236,21 +236,21 @@ Restrições importantes:
     - _Validates: Property 2 (completa — `error.tsx`)_
 
 - [ ] 6. Wave UI otimista com rollback
-  - [ ] 6.1 Criar `src/lib/hooks/use-optimistic-toggle.ts`
+  - [x] 6.1 Criar `src/lib/hooks/use-optimistic-toggle.ts`
     - Implementar `useOptimisticToggle<T>` com `useOptimistic` + `useState` + `useTransition` conforme `design.md > Components and Interfaces > 5`
     - Export retorna `{ value, committed, toggle, pending }`
     - Em erro: `onError?(err)` é chamado e `committed` permanece inalterado (rollback automático via `useOptimistic`)
     - Re-exportar em `src/lib/hooks/index.ts`
     - _Requirements: 5.1, 5.2, 5.5_
 
-  - [ ] 6.2 Criar `src/lib/hooks/use-optimistic-toggle.test.ts`
+  - [x] 6.2 Criar `src/lib/hooks/use-optimistic-toggle.test.ts`
     - Toggle → action sucesso → `committed` atualiza para valor do servidor
     - Toggle → action falha (Promise.reject) → `committed` permanece, `onError` é chamado
     - Pending fica `true` durante a transition, `false` ao final
     - Múltiplos toggles em sequência convergem corretamente
     - _Requirements: 5.2, 5.5_
 
-  - [ ] 6.3 * Criar `src/lib/hooks/use-optimistic-toggle.pbt.ts` (Property 1)
+  - [x] 6.3 * Criar `src/lib/hooks/use-optimistic-toggle.pbt.ts` (Property 1)
     - Property 1 (rollback idempotente): para todo `s0` e sequência `[(t_i, success_i)]`, `committed_final` = última `t_i` com sucesso (ou `s0`); `value_final === committed_final`
     - Geradores: `fc.boolean()` para `T`; `fc.array(fc.tuple(fc.boolean(), fc.boolean()), { minLength: 1, maxLength: 10 })` para sequências
     - Mock `action` que resolve/rejeita conforme bit
