@@ -41,6 +41,18 @@ function mockMatchMedia(matches: boolean) {
     });
 }
 
+function renderLightbox(open: boolean, child: React.ReactNode) {
+    act(() => {
+        root!.render(
+            createElement(MediaLightbox, {
+                open,
+                onClose: () => { },
+                children: child,
+            }),
+        );
+    });
+}
+
 beforeEach(() => {
     mountNode = document.createElement("div");
     document.body.appendChild(mountNode);
@@ -59,30 +71,14 @@ afterEach(() => {
 describe("MediaLightbox — comportamento responsivo", () => {
     it("não renderiza nada quando open=false", () => {
         mockMatchMedia(true);
-        act(() => {
-            root!.render(
-                createElement(
-                    MediaLightbox,
-                    { open: false, onClose: () => { } },
-                    createElement("div", { "data-testid": "child" }, "filho"),
-                ),
-            );
-        });
+        renderLightbox(false, createElement("div", { "data-testid": "child" }, "filho"));
         expect(document.querySelector("[role=\"dialog\"]")).toBeNull();
         expect(document.querySelector("[data-testid=\"child\"]")).toBeNull();
     });
 
     it("mobile (matchMedia.matches=true): aplica position=fullscreen no Modal interno", () => {
         mockMatchMedia(true);
-        act(() => {
-            root!.render(
-                createElement(
-                    MediaLightbox,
-                    { open: true, onClose: () => { } },
-                    createElement("div", { "data-testid": "child" }, "filho"),
-                ),
-            );
-        });
+        renderLightbox(true, createElement("div", { "data-testid": "child" }, "filho"));
         const dialog = document.querySelector<HTMLDivElement>("[role=\"dialog\"]");
         expect(dialog).not.toBeNull();
         // position="fullscreen" maps to "items-stretch justify-stretch" no Modal primitivo.
@@ -92,15 +88,7 @@ describe("MediaLightbox — comportamento responsivo", () => {
 
     it("desktop (matchMedia.matches=false): aplica position=center no Modal interno", () => {
         mockMatchMedia(false);
-        act(() => {
-            root!.render(
-                createElement(
-                    MediaLightbox,
-                    { open: true, onClose: () => { } },
-                    createElement("div", { "data-testid": "child" }, "filho"),
-                ),
-            );
-        });
+        renderLightbox(true, createElement("div", { "data-testid": "child" }, "filho"));
         const dialog = document.querySelector<HTMLDivElement>("[role=\"dialog\"]");
         expect(dialog).not.toBeNull();
         // position="center" maps to "items-center justify-center" no Modal primitivo.
@@ -110,16 +98,7 @@ describe("MediaLightbox — comportamento responsivo", () => {
 
     it("aplica touch-none no container do conteúdo (gestos)", () => {
         mockMatchMedia(true);
-        act(() => {
-            root!.render(
-                createElement(
-                    MediaLightbox,
-                    { open: true, onClose: () => { } },
-                    createElement("div", { "data-testid": "child" }, "filho"),
-                ),
-            );
-        });
-        // O conteúdo recebe className com `touch-none` (vem do MediaLightbox -> Modal className).
+        renderLightbox(true, createElement("div", { "data-testid": "child" }, "filho"));
         const child = document.querySelector("[data-testid=\"child\"]");
         expect(child).not.toBeNull();
         // touch-none é aplicado no `<div ref={contentRef} className={cn("relative z-10", className)}>` do Modal.
@@ -129,15 +108,7 @@ describe("MediaLightbox — comportamento responsivo", () => {
 
     it("preserva role=dialog e aria-modal do Modal interno (ARIA)", () => {
         mockMatchMedia(false);
-        act(() => {
-            root!.render(
-                createElement(
-                    MediaLightbox,
-                    { open: true, onClose: () => { } },
-                    createElement("div", null, "filho"),
-                ),
-            );
-        });
+        renderLightbox(true, createElement("div", null, "filho"));
         const dialog = document.querySelector("[role=\"dialog\"]");
         expect(dialog).not.toBeNull();
         expect(dialog!.getAttribute("aria-modal")).toBe("true");

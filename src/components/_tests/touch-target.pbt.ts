@@ -21,7 +21,7 @@
  *  e `.kiro/specs/fase-6-mobile-cross-browser/mockups-diff.md > §Critical Controls inventário`.
  */
 
-import { describe, beforeEach, afterEach, expect } from "vitest";
+import { describe, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";

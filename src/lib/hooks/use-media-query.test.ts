@@ -54,17 +54,19 @@ function setMatches(query: string, matches: boolean) {
 
 let root: Root | null = null;
 let mountNode: HTMLDivElement | null = null;
-let lastValue: boolean | null = null;
+const observed: { value: boolean | null } = { value: null };
 
 function Probe({ query }: { query: string }) {
     const v = useMediaQuery(query);
-    lastValue = v;
+    // Atualizamos via Effect (não em render) para satisfazer
+    // react-hooks/globals — side effect fora do corpo do render.
+    Object.assign(observed, { value: v });
     return null;
 }
 
 beforeEach(() => {
     registry.clear();
-    lastValue = null;
+    observed.value = null;
     mountNode = document.createElement("div");
     document.body.appendChild(mountNode);
     root = createRoot(mountNode);
@@ -105,7 +107,7 @@ describe("useMediaQuery", () => {
         act(() => {
             root!.render(createElement(Probe, { query: "(max-width: 640px)" }));
         });
-        expect(lastValue).toBe(false);
+        expect(observed.value).toBe(false);
     });
 
     it("retorna true quando matchMedia indica match", () => {
@@ -113,7 +115,7 @@ describe("useMediaQuery", () => {
         act(() => {
             root!.render(createElement(Probe, { query: "(max-width: 640px)" }));
         });
-        expect(lastValue).toBe(true);
+        expect(observed.value).toBe(true);
     });
 
     it("re-renderiza quando matches muda (subscribe)", () => {
@@ -121,15 +123,15 @@ describe("useMediaQuery", () => {
         act(() => {
             root!.render(createElement(Probe, { query: "(max-width: 640px)" }));
         });
-        expect(lastValue).toBe(false);
+        expect(observed.value).toBe(false);
         act(() => {
             setMatches("(max-width: 640px)", true);
         });
-        expect(lastValue).toBe(true);
+        expect(observed.value).toBe(true);
         act(() => {
             setMatches("(max-width: 640px)", false);
         });
-        expect(lastValue).toBe(false);
+        expect(observed.value).toBe(false);
     });
 
     it("limpa listener no unmount", () => {

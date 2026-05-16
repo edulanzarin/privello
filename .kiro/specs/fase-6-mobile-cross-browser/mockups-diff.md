@@ -507,5 +507,60 @@ Todas as `divergencias_a_corrigir` foram absorvidas pelas Waves 2/3/4/6/7/9 dest
 
 ## §Smoke checks finais
 
-A ser preenchido nas Tarefas 13.1–13.6 (lint, tsc, test, build, e2e --list, cross-browser manual).
+> Logs capturados na sessão de execução autônoma da fase-6 (2026-05-17).
+
+### Tarefa 13.1 — `npm run lint`
+
+```
+✖ 71 problems (29 errors, 42 warnings)
+```
+
+**Resultado:** ✓ **zero novos erros / warnings introduzidos pela fase-6**. Total idêntico ao baseline pós-fase-5/7 (71/29/42 — cf. `handoff.md > §Smoke checks finais`). Tolerância de lint herdada via ADR 0004 (Opção B `continue-on-error: true` em CI). Lint nos 6 arquivos novos da fase-6 (`use-media-query.{ts,test.ts}`, `media-lightbox.{tsx,test.ts}`, `client-profile-edit.pbt.ts`, `touch-target.pbt.ts`): **0 problemas**.
+
+### Tarefa 13.2 — `npx tsc --noEmit`
+
+```
+Exit Code: 0
+```
+
+**Resultado:** ✓ **zero erros de tipo**.
+
+### Tarefa 13.3 — `npx vitest run`
+
+```
+Test Files  36 passed (36)
+     Tests  305 passed (305)
+  Duration  ~15s
+```
+
+**Resultado:** ✓ **305 testes verdes** em 36 arquivos. Baseline pós-fase-5 era **293**. Delta **+12 testes** (4 do `useMediaQuery` + 5 do `<MediaLightbox>` + 1 do Property 1 + 2 do Property 2). Suite estável (sem flakes em 2 runs consecutivas).
+
+### Tarefa 13.4 — `npm run build`
+
+```
+✓ Compiled successfully in 10.6s
+✗ Error occurred prerendering page "/api/cities" — DB authentication failed (pré-existente)
+```
+
+**Resultado:** ⚠️ **falha pré-existente em prerender de `/api/cities`** quando DB local não está rodando. **NÃO é regressão** — mesma condição registrada em `handoff.md` e `docs/adr/0004-ci-pipeline.md`. CI da fase-7 não roda `npm run build` por design.
+
+### Tarefa 13.5 — `npm run test:e2e -- --list`
+
+```
+[ios-safari]      → 15 specs
+[desktop-chrome]  → 15 specs
+[desktop-firefox] → 15 specs
+[android-chrome]  → 15 specs
+Exit Code: 0
+```
+
+**Resultado:** ✓ **4 projects rodáveis** sem erro de configuração.
+
+### Tarefa 13.6 — Cross-browser manual
+
+- **Status:** _Pendente smoke browser manual pelo desenvolvedor humano._
+- **Critério:** smoke local visualizando 3 telas-âncora (`/`, `/p/[slug]`, `/painel`) em desktop Safari + desktop Edge.
+- **Cabeçalho preparado** (cf. §Browser Matrix > Cobertura Playwright vs manual):
+  - **macOS Safari (versão real):** layout não quebra? Fontes carregam? View Transitions executam? `[ ] sim` `[ ] não` — observações:
+  - **Edge (versão real):** mesmas perguntas — observações:
 
