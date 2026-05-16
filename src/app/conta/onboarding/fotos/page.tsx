@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProfilePhotoUploader } from "./photo-uploader";
 
-// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 19 (onboarding/fotos autenticado, uploads).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 19 (onboarding/fotos autenticado, uploads).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingFotosPage() {
@@ -37,10 +37,10 @@ export default async function OnboardingFotosPage() {
             Foto de perfil
           </h1>
           <p className="mt-2 text-md text-muted">
-            Escolha a foto que aparecerÃ¡ como foto de perfil do seu anÃºncio. Ã‰ obrigatÃ³ria para ativar seu perfil.
+            Escolha a foto que aparecerá como foto de perfil do seu anúncio. É obrigatória para ativar seu perfil.
           </p>
 
-          {/* Clickable profile circle â€” opens file picker */}
+          {/* Clickable profile circle — opens file picker */}
           <div className="mt-8 flex justify-center">
             <ProfilePhotoUploader coverUrl={coverPhoto?.url ?? null} />
           </div>
@@ -52,17 +52,17 @@ export default async function OnboardingFotosPage() {
                 href="/painel/plano"
                 className="inline-flex items-center justify-center rounded-full bg-coral px-8 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
               >
-                Escolher plano â†’
+                Escolher plano →
               </Link>
             ) : (
               <span className="inline-block rounded-full bg-black/[0.06] px-8 py-3 text-md font-medium text-muted cursor-not-allowed">
-                Escolher plano â†’
+                Escolher plano →
               </span>
             )}
           </div>
 
           <p className="mt-4 text-sm text-muted">
-            VocÃª poderÃ¡ adicionar mais fotos depois no painel.
+            Você poderá adicionar mais fotos depois no painel.
           </p>
         </div>
       </div>

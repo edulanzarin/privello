@@ -22,7 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
 
-// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 2 (perfil personalizado por sessÃ£o).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 2 (perfil personalizado por sessão).
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -39,17 +39,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
   if (!profile) return {};
 
-  const title = `${profile.displayName}, ${profile.age} anos â€” Acompanhante em ${profile.city.name}`;
+  const title = `${profile.displayName}, ${profile.age} anos — Acompanhante em ${profile.city.name}`;
   const description = profile.tagline
-    ? `${profile.tagline} Â· Acompanhante em ${profile.city.name}. Perfil verificado no Privello.`
-    : `Acompanhante em ${profile.city.name}. Veja fotos, Ã¡udio e vÃ­deo no Privello.`;
+    ? `${profile.tagline} · Acompanhante em ${profile.city.name}. Perfil verificado no Privello.`
+    : `Acompanhante em ${profile.city.name}. Veja fotos, áudio e vídeo no Privello.`;
   const coverUrl = profile.media[0]?.url;
 
   return {
     title,
     description,
     openGraph: {
-      title: `${title} Â· privello.`,
+      title: `${title} · privello.`,
       description,
       ...(coverUrl ? { images: [{ url: coverUrl, width: 800, height: 1000 }] } : {}),
     },
@@ -70,9 +70,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const isLoggedIn = !!session?.user?.id;
 
   // Resolver ownership ANTES de buscar o perfil completo, para que possamos
-  // passar `includePrivate: ownerView` ao service (Wave 5 â€” Req 1). Donos
-  // veem suas mÃ­dias privadas; demais usuÃ¡rios sÃ³ veem pÃºblicas (com overlay
-  // locked para nÃ£o-assinantes em fase-5).
+  // passar `includePrivate: ownerView` ao service (Wave 5 — Req 1). Donos
+  // veem suas mídias privadas; demais usuários só veem públicas (com overlay
+  // locked para não-assinantes em fase-5).
   let isProvider = false;
   let viewerProfileId: string | null = null;
   if (session?.user?.id) {
@@ -92,8 +92,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const profile = await getProfileBySlug(slug, {
     userId: session?.user?.id,
-    // Quando o viewer Ã© dono do perfil sendo exibido, mostramos privadas;
-    // do contrÃ¡rio, AC 1.2 limita a â‰¤ 12 itens pÃºblicos por sortOrder.
+    // Quando o viewer é dono do perfil sendo exibido, mostramos privadas;
+    // do contrário, AC 1.2 limita a ≤ 12 itens públicos por sortOrder.
     includePrivate: viewerProfileId != null,
   });
   if (!profile) notFound();
@@ -102,7 +102,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const ownerView = viewerProfileId != null && viewerProfileId === profile.id;
 
-  // Only non-provider users can interact â€” providers are read-only on all profiles
+  // Only non-provider users can interact — providers are read-only on all profiles
   const canInteract = isLoggedIn && !ownerView && !isProvider;
   const initialFavorited = canInteract ? await getFavoriteStatus(profile.id) : false;
 
@@ -142,10 +142,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
     seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie", color: "text-success" });
   }
   if (profile.videoVerified) {
-    seals.push({ icon: Video, label: "VÃ­deo verificado", sub: "GravaÃ§Ã£o autenticada", color: "text-accent-purple" });
+    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada", color: "text-accent-purple" });
   }
-  seals.push({ icon: Clock3, label: `Membro hÃ¡ ${monthsVerified} meses`, sub: `Desde ${memberLabel}`, color: "text-muted" });
-  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizaÃ§Ãµes`, sub: "este mÃªs", color: "text-blue" });
+  seals.push({ icon: Clock3, label: `Membro há ${monthsVerified} meses`, sub: `Desde ${memberLabel}`, color: "text-muted" });
+  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`, sub: "este mês", color: "text-blue" });
 
   return (
     <>
@@ -157,7 +157,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       <ViewTransition enter="slide-up" default="none">
         <main className="min-h-screen pb-28">
 
-          {/* â”€â”€ Breadcrumb â”€â”€ */}
+          {/* ── Breadcrumb ── */}
           <div className="border-b border-black/[0.06]">
             <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-muted sm:px-6">
               <Link href="/buscar" className="transition-colors hover:text-foreground">Descobrir</Link>
@@ -167,12 +167,12 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* â”€â”€ Hero section â”€â”€ */}
+          {/* ── Hero section ── */}
           <section className="bg-white border-b border-black/[0.06]">
             <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
 
-                {/* â”€â”€ Left: Round profile photo â”€â”€ */}
+                {/* ── Left: Round profile photo ── */}
                 <div className="shrink-0">
                   <ProfileStoryCover
                     storyGroup={storyGroup}
@@ -183,7 +183,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   />
                 </div>
 
-                {/* â”€â”€ Right: Info â”€â”€ */}
+                {/* ── Right: Info ── */}
                 <div className="flex flex-1 flex-col items-center sm:items-start text-center sm:text-left">
 
                   {/* Status badges */}
@@ -200,7 +200,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     )}
                     {profile.videoVerified && (
                       <span className="flex items-center gap-1.5 rounded-full bg-accent-purple/10 px-2.5 py-[3px] text-xs font-semibold text-accent-purple">
-                        <Video className="h-3 w-3" strokeWidth={2} /> VÃ­deo
+                        <Video className="h-3 w-3" strokeWidth={2} /> Vídeo
                       </span>
                     )}
                   </div>
@@ -210,14 +210,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   </h1>
                   <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-md text-muted">
                     <span className="font-medium text-foreground">{profile.age} anos</span>
-                    <span className="text-black/20">Â·</span>
+                    <span className="text-black/20">·</span>
                     <span className="inline-flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} />
                       {profile.city.name}
                     </span>
                     {profile.ratingCount > 0 && (
                       <>
-                        <span className="text-black/20">Â·</span>
+                        <span className="text-black/20">·</span>
                         <span className="inline-flex items-center gap-1">
                           <Star className="h-3.5 w-3.5 fill-warning text-warning" strokeWidth={0} />
                           <span className="font-medium text-foreground">{profile.ratingAvg.toFixed(1)}</span>
@@ -264,7 +264,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                   )}
 
-                  {/* CTAs primÃ¡rios */}
+                  {/* CTAs primários */}
                   {!ownerView ? (
                     <>
                       <div className="mt-5 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:max-w-none">
@@ -272,7 +272,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                           href={`/solicitar/${profile.slug}`}
                           className="flex items-center justify-center gap-2 rounded-full bg-coral py-3 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
                         >
-                          Marcar horÃ¡rio
+                          Marcar horário
                         </Link>
                         <WhatsAppButton phone={profile.whatsappPhone} profileId={profile.id} className="w-full py-3" />
                       </div>
@@ -295,7 +295,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* â”€â”€ Media Gallery (tabs: Fotos | VÃ­deos | Reels) â”€â”€ */}
+          {/* ── Media Gallery (tabs: Fotos | Vídeos | Reels) ── */}
           <section className="border-t border-black/[0.06]">
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <MediaGallery
@@ -311,7 +311,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* â”€â”€ Bio + Characteristics + Availability â”€â”€ */}
+          {/* ── Bio + Characteristics + Availability ── */}
           <section className="border-t border-black/[0.06] bg-background py-14">
             <div className="mx-auto grid max-w-4xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr]">
 
@@ -325,14 +325,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
                 <div className="grid gap-8 sm:grid-cols-2">
                   <div>
-                    <h3 className="text-xs font-medium text-muted">CaracterÃ­sticas</h3>
+                    <h3 className="text-xs font-medium text-muted">Características</h3>
                     <ul className="mt-3 space-y-0">
                       {[
-                        ["Altura", profile.heightCm ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m` : "â€”"],
-                        ["Manequim", profile.dressSize ?? "â€”"],
-                        ["Cabelo", profile.hair ?? "â€”"],
-                        ["Olhos", profile.eyes ?? "â€”"],
-                        ["Idiomas", profile.languages ?? "â€”"],
+                        ["Altura", profile.heightCm ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m` : "—"],
+                        ["Manequim", profile.dressSize ?? "—"],
+                        ["Cabelo", profile.hair ?? "—"],
+                        ["Olhos", profile.eyes ?? "—"],
+                        ["Idiomas", profile.languages ?? "—"],
                       ].map(([k, v]) => (
                         <li key={String(k)} className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                           <span className="text-muted">{k}</span>
@@ -362,13 +362,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       ) : null}
                       {profile.priceTravelDay ? (
                         <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                          <span className="text-muted">Viagem (diÃ¡ria)</span>
+                          <span className="text-muted">Viagem (diária)</span>
                           <span className="font-semibold">{formatBrl(profile.priceTravelDay)}</span>
                         </li>
                       ) : null}
                       <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
                         <span className="text-muted">Pagamento</span>
-                        <span className="font-medium">{profile.paymentMethods ?? "â€”"}</span>
+                        <span className="font-medium">{profile.paymentMethods ?? "—"}</span>
                       </li>
                     </ul>
                   </div>
@@ -381,8 +381,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       ["Homens", profile.servesMen],
                       ["Casais", profile.servesCouples],
                       ["Mulheres", profile.servesWomen],
-                      ["Local prÃ³prio", profile.hasOwnPlace],
-                      ["Hotel / domicÃ­lio", profile.homeVisit],
+                      ["Local próprio", profile.hasOwnPlace],
+                      ["Hotel / domicílio", profile.homeVisit],
                       ["Viagens nacionais", profile.travelsNational],
                       ["Viagens internacionais", profile.travelsInternational],
                     ].map(([label, on]) => (
@@ -405,7 +405,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 <ul className="mt-4 space-y-0">
                   {profile.availabilityRules.map((r) => (
                     <li key={r.id} className="flex items-center justify-between border-b border-black/[0.05] py-2.5 text-base">
-                      <span>{DAYS_PT[r.weekday]} Â· {r.startTime} â€“ {r.endTime}</span>
+                      <span>{DAYS_PT[r.weekday]} · {r.startTime} – {r.endTime}</span>
                       <span className="text-xs font-medium uppercase">
                         {r.status === "CLOSED" ? (
                           <span className="text-muted">Fechado</span>
@@ -413,7 +413,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                           <span className="text-coral">Ocupada</span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-success-dark">
-                            <span className="h-[5px] w-[5px] rounded-full bg-success" />DisponÃ­vel
+                            <span className="h-[5px] w-[5px] rounded-full bg-success" />Disponível
                           </span>
                         )}
                       </span>
@@ -426,10 +426,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       href={`/solicitar/${profile.slug}`}
                       className="mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-md font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
                     >
-                      Montar horÃ¡rio â†’ WhatsApp
+                      Montar horário → WhatsApp
                     </Link>
                     <p className="mt-3 text-sm leading-relaxed text-muted text-center">
-                      Escolha dia, horÃ¡rio e duraÃ§Ã£o. Abrimos o WhatsApp com texto pronto â€” sem intermediÃ¡rios.
+                      Escolha dia, horário e duração. Abrimos o WhatsApp com texto pronto — sem intermediários.
                     </p>
                   </>
                 )}
@@ -437,15 +437,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* â”€â”€ Reviews â”€â”€ */}
+          {/* ── Reviews ── */}
           <section className="border-t border-black/[0.06] py-14">
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-3xl font-semibold tracking-tight">
                   {profile.ratingAvg > 0 ? (
-                    <>{profile.ratingAvg.toFixed(1)} <span className="text-xl text-muted font-normal">Â· {profile.ratingCount} avaliaÃ§Ãµes</span></>
+                    <>{profile.ratingAvg.toFixed(1)} <span className="text-xl text-muted font-normal">· {profile.ratingCount} avaliações</span></>
                   ) : (
-                    <span className="text-2xl text-muted">Sem avaliaÃ§Ãµes ainda</span>
+                    <span className="text-2xl text-muted">Sem avaliações ainda</span>
                   )}
                 </h2>
                 {/* CTA for eligible clients */}
@@ -455,7 +455,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       href={`/avaliar/${profile.slug}`}
                       className="shrink-0 rounded-lg border border-foreground px-4 py-2 text-base font-semibold text-foreground transition hover:bg-foreground hover:text-white active:scale-[0.97]"
                     >
-                      {userReview ? "Editar avaliaÃ§Ã£o" : "Avaliar"}
+                      {userReview ? "Editar avaliação" : "Avaliar"}
                     </Link>
                   ) : (
                     <Link
@@ -469,7 +469,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
 
               {profile.reviews.length === 0 ? (
-                <p className="mt-8 text-sm text-muted">Nenhuma avaliaÃ§Ã£o ainda.</p>
+                <p className="mt-8 text-sm text-muted">Nenhuma avaliação ainda.</p>
               ) : (
                 <div className="mt-10 grid gap-4 md:grid-cols-3">
                   {profile.reviews.map((r) => (
@@ -483,7 +483,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                             {r.user.slug ? `@${r.user.slug}` : r.user.name}
                           </p>
                           <p className="mt-0.5 flex items-center gap-1 text-base text-muted">
-                            {"â˜…".repeat(r.rating)}{"â˜†".repeat(5 - r.rating)}
+                            {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
                             <span className="ml-1">{r.createdAt.toLocaleDateString("pt-BR")}</span>
                           </p>
                         </div>
@@ -496,7 +496,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         <div className="mt-4 flex items-center gap-2 rounded-lg bg-black/[0.03] px-3 py-2">
                           <Lock className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
                           <Link href={`/assinar?from=/p/${profile.slug}`} className="text-base text-coral hover:underline">
-                            Assine para ver o comentÃ¡rio
+                            Assine para ver o comentário
                           </Link>
                         </div>
                       )}

@@ -13,7 +13,7 @@ import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 
-// dynamic justificado â€” ver .kiro/specs/fase-3-backend/metricas-baseline.md > Â§3.2 linha 3 (descobrir lÃª auth() para isLoggedIn).
+// dynamic justificado — ver .kiro/specs/_archive/auditoria-2026-05/fase-3-backend/metricas-baseline.md > §3.2 linha 3 (descobrir lê auth() para isLoggedIn).
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ citySlug: string }> }): Promise<Metadata> {
@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: { params: Promise<{ citySlug:
   const title = `Acompanhantes em ${city.name}`;
   return {
     title,
-    description: `Encontre acompanhantes em ${city.name}. Perfis verificados com fotos reais, Ã¡udio e vÃ­deo. Acesse agora no Privello.`,
+    description: `Encontre acompanhantes em ${city.name}. Perfis verificados com fotos reais, áudio e vídeo. Acesse agora no Privello.`,
     openGraph: {
-      title: `${title} Â· privello.`,
-      description: `Acompanhantes verificadas em ${city.name}. Fotos reais, Ã¡udio e vÃ­deo.`,
+      title: `${title} · privello.`,
+      description: `Acompanhantes verificadas em ${city.name}. Fotos reais, áudio e vídeo.`,
     },
   };
 }
@@ -65,12 +65,12 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
 
   const sortLabel =
     sort === "price_asc"
-      ? "Menor preÃ§o /h"
+      ? "Menor preço /h"
       : sort === "price_desc"
-        ? "Maior preÃ§o /h"
+        ? "Maior preço /h"
         : sort === "rating"
-          ? "Melhor avaliaÃ§Ã£o"
-          : "RelevÃ¢ncia";
+          ? "Melhor avaliação"
+          : "Relevância";
 
   // Active filter pills
   const activePills: { label: string; href: string }[] = [];
@@ -80,13 +80,13 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   }
   if (filters.priceMin != null || filters.priceMax != null) {
     activePills.push({
-      label: `R$ ${filters.priceMin ?? "â€”"}â€“${filters.priceMax ?? "â€”"} /h`,
+      label: `R$ ${filters.priceMin ?? "—"}–${filters.priceMax ?? "—"} /h`,
       href: buildDiscoverHref(citySlug, { pmin: null, pmax: null }, sp),
     });
   }
   if (filters.ageMin != null || filters.ageMax != null) {
     activePills.push({
-      label: `${filters.ageMin ?? "â€”"}â€“${filters.ageMax ?? "â€”"} anos`,
+      label: `${filters.ageMin ?? "—"}–${filters.ageMax ?? "—"} anos`,
       href: buildDiscoverHref(citySlug, { amin: null, amax: null }, sp),
     });
   }
@@ -94,10 +94,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     activePills.push({ label: "Verificadas", href: buildDiscoverHref(citySlug, { verified: null }, sp) });
   }
   if (filters.hasOwnPlace) {
-    activePills.push({ label: "Local prÃ³prio", href: buildDiscoverHref(citySlug, { local: null }, sp) });
+    activePills.push({ label: "Local próprio", href: buildDiscoverHref(citySlug, { local: null }, sp) });
   }
   if (filters.homeVisit) {
-    activePills.push({ label: "A domicÃ­lio", href: buildDiscoverHref(citySlug, { domicilio: null }, sp) });
+    activePills.push({ label: "A domicílio", href: buildDiscoverHref(citySlug, { domicilio: null }, sp) });
   }
   if (filters.search) {
     activePills.push({ label: `"${filters.search}"`, href: buildDiscoverHref(citySlug, { q: null }, sp) });
@@ -109,7 +109,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
       <CitySessionSaver citySlug={citySlug} />
       <CitySwitcher currentCityName={city.name} citySlug={citySlug} />
       <main className="min-h-screen pb-28">
-        {/* â”€â”€ Header â”€â”€ */}
+        {/* ── Header ── */}
         <div className="border-b border-black/[0.06] bg-white/50 backdrop-blur-sm">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted">
@@ -117,7 +117,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
             </p>
             <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <h1 className="text-4xl font-semibold tracking-tight sm:text-4xl">
-                {city.name} <span className="text-muted font-normal">Â·</span>{" "}
+                {city.name} <span className="text-muted font-normal">·</span>{" "}
                 <span className="text-3xl font-normal text-muted sm:text-4xl">
                   {count.toLocaleString("pt-BR")} perfis
                 </span>
@@ -131,10 +131,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     <ul className="absolute left-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-base shadow-xl overflow-hidden animate-scale-in">
                       {(
                         [
-                          ["relevance", "RelevÃ¢ncia"],
-                          ["price_asc", "Menor preÃ§o /h"],
-                          ["price_desc", "Maior preÃ§o /h"],
-                          ["rating", "Melhor avaliaÃ§Ã£o"],
+                          ["relevance", "Relevância"],
+                          ["price_asc", "Menor preço /h"],
+                          ["price_desc", "Maior preço /h"],
+                          ["rating", "Melhor avaliação"],
                         ] as const
                       ).map(([value, label]) => (
                         <li key={value}>
@@ -164,7 +164,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-3 py-[4px] text-sm font-medium text-foreground transition-colors hover:bg-black/[0.08]"
                   >
                     {pill.label}
-                    <span className="text-coral font-bold text-xs">Ã—</span>
+                    <span className="text-coral font-bold text-xs">×</span>
                   </Link>
                 ))}
               </div>
@@ -172,21 +172,21 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           </div>
         </div>
 
-        {/* â”€â”€ Stories â”€â”€ */}
+        {/* ── Stories ── */}
         {storyGroups.length > 0 && (
           <StoryBar groups={storyGroups} isClient={isLoggedIn} />
         )}
 
-        {/* â”€â”€ Body â”€â”€ */}
+        {/* ── Body ── */}
         {count === 0 ? (
-          /* â”€â”€ Empty state â”€â”€ */
+          /* ── Empty state ── */
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="mx-auto max-w-md text-center">
-              <p className="text-4xl font-semibold tracking-tight">Ainda nÃ£o hÃ¡ perfis em {city.name}.</p>
+              <p className="text-4xl font-semibold tracking-tight">Ainda não há perfis em {city.name}.</p>
               <p className="mt-3 text-md leading-relaxed text-muted">
                 {activePills.length > 0
                   ? "Nenhum perfil corresponde aos filtros selecionados. Tente remover alguns filtros."
-                  : "Seja o primeiro a se cadastrar nessa cidade ou explore outras regiÃµes."}
+                  : "Seja o primeiro a se cadastrar nessa cidade ou explore outras regiões."}
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 {activePills.length > 0 && (
@@ -208,7 +208,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           </div>
         ) : (
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[260px_1fr] lg:px-6">
-            {/* â”€â”€ Sidebar â”€â”€ */}
+            {/* ── Sidebar ── */}
             <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
               {/* Search by name / @handle */}
               <form method="get" className="flex gap-2">
@@ -216,7 +216,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                 <input
                   name="q"
                   defaultValue={filters.search ?? ""}
-                  placeholder="Nome ou @handleâ€¦"
+                  placeholder="Nome ou @handle…"
                   className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
                 />
                 <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
@@ -235,7 +235,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
               <details className="group lg:open" open>
                 <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm lg:hidden">
                   <span>Filtros</span>
-                  <span className="text-muted group-open:rotate-180 transition-transform">â–¾</span>
+                  <span className="text-muted group-open:rotate-180 transition-transform">▾</span>
                 </summary>
 
                 <div className="flex items-center justify-between pt-2 lg:pt-0">
@@ -249,7 +249,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   <input type="hidden" name="ordem" value={sort === "relevance" ? "" : sort} />
                   {filters.search && <input type="hidden" name="q" value={filters.search} />}
 
-                  {/* GÃªnero */}
+                  {/* Gênero */}
                   <div>
                     <p className="text-xs font-medium text-muted">Procuro</p>
                     <div className="mt-2.5 flex flex-col gap-2">
@@ -268,9 +268,9 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     </div>
                   </div>
 
-                  {/* Sinais de confianÃ§a */}
+                  {/* Sinais de confiança */}
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted">ConfianÃ§a</p>
+                    <p className="text-xs font-medium text-muted">Confiança</p>
                     <label className="flex cursor-pointer items-center gap-2 text-base">
                       <input type="checkbox" name="verified" value="1" defaultChecked={filters.verifiedOnly} className="accent-coral rounded" />
                       Apenas verificadas
@@ -284,25 +284,25 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                     Aplicar ({count.toLocaleString("pt-BR")})
                   </button>
 
-                  {/* Filtros avanÃ§ados */}
+                  {/* Filtros avançados */}
                   <details className="group">
                     <summary className="cursor-pointer list-none text-xs font-medium text-muted group-open:mb-4">
-                      AvanÃ§ados â–¾
+                      Avançados ▾
                     </summary>
                     <div className="space-y-4">
                       <div>
-                        <p className="text-xs font-medium text-muted">PreÃ§o /h</p>
+                        <p className="text-xs font-medium text-muted">Preço /h</p>
                         <div className="mt-2 flex gap-2">
                           <input
                             name="pmin"
                             defaultValue={filters.priceMin ?? ""}
-                            placeholder="mÃ­n"
+                            placeholder="mín"
                             className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                           <input
                             name="pmax"
                             defaultValue={filters.priceMax ?? ""}
-                            placeholder="mÃ¡x"
+                            placeholder="máx"
                             className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                         </div>
@@ -313,13 +313,13 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                           <input
                             name="amin"
                             defaultValue={filters.ageMin ?? ""}
-                            placeholder="mÃ­n"
+                            placeholder="mín"
                             className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                           <input
                             name="amax"
                             defaultValue={filters.ageMax ?? ""}
-                            placeholder="mÃ¡x"
+                            placeholder="máx"
                             className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
                           />
                         </div>
@@ -328,18 +328,18 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                         <p className="text-xs font-medium text-muted">Atendimento</p>
                         <label className="flex cursor-pointer items-center gap-2 text-base">
                           <input type="checkbox" name="local" value="1" defaultChecked={filters.hasOwnPlace} className="accent-coral rounded" />
-                          Local prÃ³prio
+                          Local próprio
                         </label>
                         <label className="flex cursor-pointer items-center gap-2 text-base">
                           <input type="checkbox" name="domicilio" value="1" defaultChecked={filters.homeVisit} className="accent-coral rounded" />
-                          A domicÃ­lio
+                          A domicílio
                         </label>
                       </div>
                       <button
                         type="submit"
                         className="w-full rounded-lg border border-black/10 bg-white py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
                       >
-                        Aplicar avanÃ§ados
+                        Aplicar avançados
                       </button>
                     </div>
                   </details>
@@ -347,10 +347,10 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
               </details>
             </aside>
 
-            {/* â”€â”€ Results â”€â”€ */}
+            {/* ── Results ── */}
             <div>
               <div className="rounded-lg bg-foreground/90 px-4 py-2 text-center text-sm font-medium text-white/90">
-                Perfis com destaque aparecem primeiro â€” todos passaram pela mesma verificaÃ§Ã£o.
+                Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
               </div>
               <ViewTransition
                 key={citySlug}
