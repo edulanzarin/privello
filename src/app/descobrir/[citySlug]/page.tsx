@@ -13,7 +13,7 @@ import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 
-// dynamic justificado — ver .kiro/specs/_archive/auditoria-2026-05/fase-3-backend/metricas-baseline.md > §3.2 linha 3 (descobrir lê auth() para isLoggedIn).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 3 (descobrir lê auth() para isLoggedIn).
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ citySlug: string }> }): Promise<Metadata> {

@@ -1,11 +1,17 @@
-# Handoff — Auditoria Privello completa (7/7 fases Done)
+# Handoff — Auditoria Privello completa (7/7 fases Done) + cleanup pós-auditoria
 
-> Última atualização: 2026-05-17T00:00:00Z (sessão de fechamento da fase-6)
+> Última atualização: 2026-05-17T00:00:00Z (sessão de cleanup pós-auditoria + correção de mojibake UTF-8)
 > Sessão anterior: ver histórico no fim deste arquivo.
 
-## Status atual — Auditoria concluída
+## Status atual — Auditoria concluída + organização final
 
 **Todas as 7 fases do master `auditoria-geral` estão `state: Done`.** Ciclo do master fechado.
+
+Adicionalmente, esta sessão fez:
+
+1. **Correção de mojibake UTF-8** — 6 arquivos pt-BR estavam com encoding corrompido (acentos, hífens, símbolos). Bug real visível em `/descobrir/[citySlug]`, `/p/[slug]`, e os 4 passos do onboarding `/conta/onboarding/*`. Corrigido + script `scripts/fix-mojibake.mjs` para detectar/corrigir caso aconteça de novo.
+2. **Limpeza da raiz** — `ARCHITECTURE.md`, `ARCHITECTURE_AUDIT.md`, `REFACTOR_PLAN.md` movidos para `docs/legacy/` (com README explicando o histórico). `CLAUDE.md` removido (era só `@AGENTS.md`, redundante). `.kiro/AUTO_APPROVE_SETUP.md` movido para `.kiro/_archive/` (também com README).
+3. **Documento de deploy Vercel** — `docs/deploy-vercel.md` cobrindo passo-a-passo de provisionamento (Neon/Supabase + Vercel), env vars obrigatórias, cron jobs, webhook MP, domínio, e o **bloqueante de uploads efêmeros** que precisa ser resolvido antes de produção real (migrar para Vercel Blob/R2/S3).
 
 - Master: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\auditoria-geral\requirements.md`
 - Phase Card fase-1 (`fase-1-seguranca`) → `Done` em 2026-05-16T04:47:12Z
