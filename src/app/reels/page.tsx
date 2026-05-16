@@ -7,6 +7,7 @@ import { ReelsCityFilter } from "@/components/reels/city-filter";
 import { ReelsCityRestorer } from "@/components/reels/city-restorer";
 import { ArrowLeft } from "lucide-react";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 10 (reels lê auth() para userId).
 export const dynamic = "force-dynamic";
 
 type PageProps = { searchParams: Promise<{ cidade?: string }> };

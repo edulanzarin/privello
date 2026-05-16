@@ -21,6 +21,7 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 2 (perfil personalizado por sessão).
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

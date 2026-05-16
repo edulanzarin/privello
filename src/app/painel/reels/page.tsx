@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ReelsManager } from "@/components/painel/reels-manager";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 27 (reels do provider).
 export const dynamic = "force-dynamic";
 
 export default async function PainelReelsPage() {

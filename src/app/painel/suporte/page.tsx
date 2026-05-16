@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openTicket } from "@/app/_actions/support";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 34 (lista de tickets do provider).
 export const dynamic = "force-dynamic";
 
 const statusLabel: Record<string, string> = {

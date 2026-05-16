@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { ClientRegisterForm } from "./client-register-form";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 15 (cadastro/cliente lê auth()).
 export const dynamic = "force-dynamic";
 
 export default async function CadastroClientePage() {

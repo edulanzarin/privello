@@ -88,8 +88,8 @@ que vira `OutOfScopeFinding` em `requirements.md > §3`).
 | 5  | `src/app/cidades/page.tsx`                             | force-dynamic   | revalidate=900    | Lista de cidades; mudança esporádica; janela de 15min                                        | route-segment-config |
 | 6  | `src/app/em-alta/page.tsx`                             | force-dynamic   | revalidate=120    | Hot ranking semanal; estável em janela de 2min                                               | route-segment-config |
 | 7  | `src/app/em-destaque/page.tsx`                         | force-dynamic   | revalidate=120    | Boosted ranking; estável em janela de 2min                                                   | route-segment-config |
-| 8  | `src/app/novidades/page.tsx`                           | force-dynamic   | static            | Página estática sem DB; pode ser pré-renderizada                                             | route-segment-config |
-| 9  | `src/app/planos/page.tsx`                              | force-dynamic   | static            | Página estática sem DB; pode ser pré-renderizada                                             | route-segment-config |
+| 8  | `src/app/novidades/page.tsx`                           | force-dynamic   | revalidate=900    | Página estática mas `SiteHeader` chama `auth()`; janela 15min aceitável; refactor static fica para fase-5 | route-segment-config |
+| 9  | `src/app/planos/page.tsx`                              | force-dynamic   | revalidate=900    | Página estática mas `SiteHeader` chama `auth()`; janela 15min aceitável; refactor static fica para fase-5 | route-segment-config |
 | 10 | `src/app/reels/page.tsx`                               | force-dynamic   | dynamic justif.   | Lê `auth()` para `userId`; conteúdo por usuário (likes); marca privadas como locked          | — |
 | 11 | `src/app/reels/[slug]/page.tsx`                        | force-dynamic   | dynamic justif.   | Lê `auth()` para `userId`; mesma justificativa do `/reels`                                   | — |
 | 12 | `src/app/solicitar/[slug]/page.tsx`                    | force-dynamic   | dynamic justif.   | Lê `auth()` + `searchParams` dinâmicos; redirect provider→perfil; SSR estrito                | — |
@@ -129,13 +129,13 @@ que vira `OutOfScopeFinding` em `requirements.md > §3`).
 
 | classe alvo          | count | %      |
 |----------------------|------:|-------:|
-| revalidate=N         |     6 |  14.0% |
-| static               |     2 |   4.7% |
-| dynamic justificado  |    35 |  81.4% |
+| revalidate=N         |     7 |  16.3% |
+| static               |     0 |   0.0% |
+| dynamic justificado  |    36 |  83.7% |
 | cache-components     |     0 |   0.0% |
 | **Total**            |    43 | 100.0% |
 
-**Critério de adoção de `cacheComponents: true`** (cf. design.md > Architecture > Cache Components, Wave 3.2): se ≥ 30% das rotas (≥ 13/43) virarem candidatas a `"use cache"`. Resultado: **0 candidatas (0%)** — abaixo do limiar. **Decisão**: não ativar `cacheComponents` nesta fase. Rotas migradas para `revalidate=N` (6 rotas) e `static` (2 rotas) seguem o modelo legado de Route Segment Config.
+**Critério de adoção de `cacheComponents: true`** (cf. design.md > Architecture > Cache Components, Wave 3.2): se ≥ 30% das rotas (≥ 13/43) virarem candidatas a `"use cache"`. Resultado: **0 candidatas (0%)** — abaixo do limiar. **Decisão**: não ativar `cacheComponents` nesta fase. Rotas migradas para `revalidate=N` (7 rotas) seguem o modelo legado de Route Segment Config. As 2 rotas inicialmente classificadas como `static` (`novidades`, `planos`) foram reclassificadas para `revalidate=900` porque consomem `SiteHeader` que chama `auth()` — refactor para static puro fica para fase-5 ou fase-7.
 
 ## 3.5 Inventário queries.ts → services
 

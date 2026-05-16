@@ -1,7 +1,10 @@
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
-export const dynamic = "force-dynamic";
+// Cache strategy: revalidate=900 (legacy Route Segment Config).
+// Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 8.
+// Página estática mas SiteHeader chama auth(); janela 15min aceitável; refactor static fica para fase-5.
+export const revalidate = 900;
 
 export default function NovidadesPage() {
   return (

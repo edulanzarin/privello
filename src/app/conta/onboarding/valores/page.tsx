@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
 import { ValoresForm } from "./valores-form";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 18 (onboarding/valores autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingValoresPage() {

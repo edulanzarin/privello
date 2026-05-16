@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TicketChat } from "@/components/support/ticket-chat";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 35 (chat de ticket).
 export const dynamic = "force-dynamic";
 
 const statusLabel: Record<string, string> = {

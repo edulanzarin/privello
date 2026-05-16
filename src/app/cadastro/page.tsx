@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { UserRound, Users } from "lucide-react";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 14 (cadastro lê auth() para redirect).
 export const dynamic = "force-dynamic";
 
 export default async function CadastroPage() {

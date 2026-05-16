@@ -54,8 +54,8 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Seção "Migration log": antes/depois de count por arquivo conforme as ondas avançam
     - _Requirements: 1.5, 2.5_
 
-- [ ] 3. Primitivo Dropdown
-  - [ ] 3.1 Criar `src/components/ui/dropdown.tsx` com compound component
+- [x] 3. Primitivo Dropdown
+  - [x] 3.1 Criar `src/components/ui/dropdown.tsx` com compound component
     - Exportar: `Dropdown`, `DropdownTrigger`, `DropdownContent`, `DropdownItem`
     - API conforme `design.md > Components and Interfaces > 2`: `open?`, `defaultOpen?`, `onOpenChange?`, `align?`, `trapFocus?`, `variant?`
     - Estado: controlado (`open` controlado externamente) ou interno (`defaultOpen`)
@@ -63,7 +63,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - **Zero hex literal** no arquivo
     - _Requirements: 3.2, 3.10_
 
-  - [ ] 3.2 Implementar comportamento do Dropdown
+  - [x] 3.2 Implementar comportamento do Dropdown
     - `DropdownTrigger`: renderiza com `aria-haspopup="menu"`, `aria-expanded={open}`. Suporta `asChild` para clonar o filho.
     - `DropdownContent`: renderiza com `role="menu"`. Listener de outside click no document. Consome `useEscapeKey` para fechar.
     - `DropdownItem`: `<button role="menuitem">`. Variantes `default`/`danger`/`disabled`.
@@ -71,32 +71,32 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - `align`: `start`/`center`/`end` controla alinhamento horizontal relativo ao trigger via classe utilitária (`left-0`/`left-1/2 -translate-x-1/2`/`right-0`).
     - _Requirements: 3.4, 3.5, 3.6, 3.7, 3.8, 3.9_
 
-  - [ ] 3.3 Validar consistência de API com Modal/Switch
+  - [x] 3.3 Validar consistência de API com Modal/Switch
     - Modal usa `open: boolean` + `onClose: () => void`. Dropdown usa `open?: boolean` + `onOpenChange?: (open: boolean) => void`. Diferença consciente — registrar em `tokens.md > API conventions`.
     - Switch usa `checked: boolean` + `onChange: (checked: boolean) => void`. Mesmo padrão `valor + callback`.
     - Toda prop deve ter tipo TS exportado para que consumidores possam reusar (`DropdownProps`, `DropdownItemProps`, etc.)
     - _Requirements: 3.1, 3.3_
 
-- [ ] 4. Focus trap reutilizável
-  - [ ] 4.1 Criar `src/lib/hooks/use-focus-trap.ts`
+- [x] 4. Focus trap reutilizável
+  - [x] 4.1 Criar `src/lib/hooks/use-focus-trap.ts`
     - Decisão registrada em `design.md`: **hook**, não componente
     - Signature: `useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean, options?: { autoFocus?: "first" | "data-autofocus" | false })`
     - Implementação: `useEffect` que adiciona `keydown` listener; quando `active` vai para `true`, salva `document.activeElement` e move foco para o primeiro focável (ou `[data-autofocus]`); quando `active` vai para `false`, devolve foco
     - Seletor de focáveis: `'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'` filtrado por `:not(:disabled)`
     - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-  - [ ] 4.2 Re-exportar em `src/lib/hooks/index.ts`
+  - [x] 4.2 Re-exportar em `src/lib/hooks/index.ts`
     - Adicionar `export { useFocusTrap } from "./use-focus-trap"`
     - Manter exports existentes intactos
     - _Requirements: 4.2_
 
-  - [ ] 4.3 Integrar `useFocusTrap` em `src/components/ui/modal.tsx`
+  - [x] 4.3 Integrar `useFocusTrap` em `src/components/ui/modal.tsx`
     - Adicionar `const contentRef = useRef<HTMLDivElement>(null)` e `useFocusTrap(contentRef, open)`
     - Anexar `ref={contentRef}` ao container interno (`<div className={cn("relative z-10", className)}>`)
     - **Sem breaking change na API pública**: `open`, `onClose`, `children`, `className`, `persistent`, `position` preservados
     - _Requirements: 4.8_
 
-  - [ ] 4.4 Integrar `useFocusTrap` no Dropdown (opcional via prop)
+  - [x] 4.4 Integrar `useFocusTrap` no Dropdown (opcional via prop)
     - `DropdownContent` aceita `trapFocus?: boolean` (default: `true` quando há ≥ 2 items, senão `false`)
     - Quando `trapFocus === true`, ativar `useFocusTrap(contentRef, open)`
     - _Requirements: 4.9_
@@ -298,21 +298,21 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Em `tokens.md > Contrato com a CI da Fase 7`: o lint configurado nesta fase é consumido pela CI da Fase 7. Esta fase não toca configuração de CI.
     - _Requirements: 6.5_
 
-- [ ] 12. Testes determinísticos para Dropdown e focus trap
-  - [ ] 12.1 Criar `src/components/ui/dropdown.test.ts`
+- [x] 12. Testes determinísticos para Dropdown e focus trap
+  - [x] 12.1 Criar `src/components/ui/dropdown.test.ts`
     - Testar: outside click fecha; Escape fecha; ArrowDown/ArrowUp navegam entre items; Enter dispara `onClick` do item ativo
     - ARIA: `aria-haspopup="menu"` no trigger; `aria-expanded` reflete estado; `role="menu"` no content; `role="menuitem"` em items
     - Variantes: `default`/`danger`/`disabled` aplicam classes corretas; `disabled` não dispara `onClick`
     - Estado controlado vs interno: forçar prop `open={true}` mesmo quando internamente seria `false`; validar que estado externo prevalece
     - _Requirements: 8.1, 8.2_
 
-  - [ ] 12.2 Criar `src/lib/hooks/use-focus-trap.test.ts`
+  - [x] 12.2 Criar `src/lib/hooks/use-focus-trap.test.ts`
     - Renderizar componente helper que consome o hook (3-5 botões dentro de container)
     - Testar: ao ativar, foco vai para o primeiro elemento focável; Tab no último cicla para o primeiro; Shift+Tab no primeiro cicla para o último; ao desativar, foco volta ao elemento anterior
     - Testar `data-autofocus`: quando presente, foco vai para esse elemento ao ativar
     - _Requirements: 8.1, 8.2_
 
-  - [ ] 12.3 Atualizar/criar smoke test do Modal com focus trap integrado
+  - [x] 12.3 Atualizar/criar smoke test do Modal com focus trap integrado
     - Se `src/components/ui/modal.test.ts` não existir, criar com smoke mínimo
     - Testar: abrir Modal, simular Tab múltiplas vezes, foco não escapa do container
     - _Requirements: 4.8, 8.2_

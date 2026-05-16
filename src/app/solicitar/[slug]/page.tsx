@@ -24,6 +24,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { DAYS_PT } from "@/lib/constants";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 12 (solicitar lê auth() + searchParams).
 export const dynamic = "force-dynamic";
 
 type Props = {

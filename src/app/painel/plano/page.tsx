@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UpgradeButton, BoostButton, FreeBoostButton } from "./upgrade-button";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 33 (gestão de plano e boost).
 export const dynamic = "force-dynamic";
 
 const PLANS = [
@@ -62,11 +63,10 @@ export default async function PainelPlanoPage() {
       </div>
 
       {/* Boost card */}
-      <div className={`rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${
-        isBoosted
+      <div className={`rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${isBoosted
           ? "border-[#ff9500]/25 bg-[#ff9500]/[0.05]"
           : "border-black/[0.06] bg-white"
-      }`}>
+        }`}>
         <div className="flex items-center gap-2">
           <Zap className={`h-4 w-4 ${isBoosted ? "text-[#ff9500]" : "text-muted"}`} strokeWidth={1.5} />
           <p className="text-[14px] font-semibold">Boost de 24h</p>
@@ -101,11 +101,10 @@ export default async function PainelPlanoPage() {
           return (
             <div
               key={plan.tier}
-              className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${
-                isActive
+              className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${isActive
                   ? "border-coral/25 bg-coral/[0.04]"
                   : "border-black/[0.06] bg-white"
-              }`}
+                }`}
             >
               {isActive && (
                 <span className="mb-3 inline-flex items-center rounded-full bg-coral/10 px-2.5 py-0.5 text-[11px] font-semibold text-coral">

@@ -5,6 +5,7 @@ import { StoriesManager } from "./stories-manager";
 import Link from "next/link";
 import { Diamond } from "lucide-react";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 28 (stories do provider).
 export const dynamic = "force-dynamic";
 
 export default async function PainelStoriesPage() {
@@ -45,7 +46,7 @@ export default async function PainelStoriesPage() {
   }
 
   const now = new Date();
-  const activeStories  = profile.stories.filter((s) => new Date(s.expiresAt) > now);
+  const activeStories = profile.stories.filter((s) => new Date(s.expiresAt) > now);
   const expiredStories = profile.stories.filter((s) => new Date(s.expiresAt) <= now);
 
   return (

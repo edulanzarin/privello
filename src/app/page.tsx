@@ -8,7 +8,11 @@ import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
 import { getPlatformStats, getSectionProfiles } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// Cache strategy: revalidate=60 (legacy Route Segment Config).
+// Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 1.
+// Home pública (cidades top + stats + hot/boosted sections); janela de 60s aceitável.
+// Decisão de não ativar `cacheComponents: true` registrada em §5.1.
+export const revalidate = 60;
 
 async function getTopCities(limit = 5) {
   const cities = await prisma.city.findMany({

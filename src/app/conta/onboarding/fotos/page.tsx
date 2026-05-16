@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProfilePhotoUploader } from "./photo-uploader";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 19 (onboarding/fotos autenticado, uploads).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingFotosPage() {

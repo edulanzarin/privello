@@ -6,7 +6,10 @@ import { BuscarForm } from "./buscar-form";
 import { searchProfilesGlobal } from "@/lib/queries";
 import { MapPin, BadgeCheck } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+// Cache strategy: revalidate=120 (legacy Route Segment Config).
+// Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 4.
+// Busca global por nome/handle; resultado público; janela de 2min aceitável.
+export const revalidate = 120;
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

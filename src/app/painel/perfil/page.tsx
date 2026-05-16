@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PerfilEditor } from "./perfil-editor";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 25 (editor de perfil do provider).
 export const dynamic = "force-dynamic";
 
 export default async function PainelPerfilPage() {

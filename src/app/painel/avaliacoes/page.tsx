@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 31 (avaliações recebidas).
 export const dynamic = "force-dynamic";
 
 const STARS = [1, 2, 3, 4, 5];

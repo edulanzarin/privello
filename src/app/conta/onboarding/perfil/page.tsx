@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
 import { PerfilForm } from "./perfil-form";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 17 (onboarding/perfil autenticado).
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPerfilPage() {

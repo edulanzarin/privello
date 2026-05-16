@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 13 (entrar lê auth() para redirect).
 export const dynamic = "force-dynamic";
 
 type Props = { searchParams: Promise<{ callbackUrl?: string; error?: string }> };

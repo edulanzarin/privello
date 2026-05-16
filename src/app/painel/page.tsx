@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { listFinancialRecordsForMonth } from "@/lib/queries";
 import { formatBrl } from "@/lib/money";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 24 (painel home autenticado).
 export const dynamic = "force-dynamic";
 
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────────

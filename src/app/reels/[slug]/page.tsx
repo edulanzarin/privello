@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { listReels, isSubscriber } from "@/lib/queries";
 import { ReelsFeed } from "@/components/reels/reels-feed";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 11 (reels/[slug] lê auth() para userId).
 export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ slug: string }> };

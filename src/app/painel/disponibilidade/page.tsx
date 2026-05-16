@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AvailabilityForm } from "./availability-form";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 29 (regras de disponibilidade).
 export const dynamic = "force-dynamic";
 
 export default async function PainelDisponibilidadePage() {

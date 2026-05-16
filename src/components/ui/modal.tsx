@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, type ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollLock } from "@/lib/hooks/use-scroll-lock";
 import { useEscapeKey } from "@/lib/hooks/use-escape-key";
+import { useFocusTrap } from "@/lib/hooks/use-focus-trap";
 
 type ModalProps = {
     open: boolean;
@@ -18,8 +19,11 @@ type ModalProps = {
 };
 
 /**
- * Modal genérico com backdrop, Escape key e scroll lock.
- * Substitui as 3 implementações duplicadas (lightbox, story viewer, comments panel).
+ * Modal genérico com backdrop, Escape key, scroll lock e focus trap integrado.
+ * Substitui as 3+ implementações duplicadas (lightbox, story viewer, comments panel).
+ *
+ * API pública preservada: `open`, `onClose`, `children`, `className`, `persistent`, `position`.
+ * Focus trap ativo automaticamente enquanto `open === true`.
  */
 export function Modal({
     open,
@@ -29,8 +33,11 @@ export function Modal({
     persistent = false,
     position = "center",
 }: ModalProps) {
+    const contentRef = useRef<HTMLDivElement>(null);
+
     useScrollLock(open);
     useEscapeKey(onClose, open);
+    useFocusTrap(contentRef, open);
 
     const handleBackdropClick = useCallback(
         (e: React.MouseEvent) => {
@@ -65,7 +72,7 @@ export function Modal({
             />
 
             {/* Content */}
-            <div className={cn("relative z-10", className)}>
+            <div ref={contentRef} className={cn("relative z-10", className)}>
                 {children}
             </div>
         </div>

@@ -5,7 +5,10 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
 import { getBoostedProfiles } from "@/lib/queries";
 
-export const dynamic = "force-dynamic";
+// Cache strategy: revalidate=120 (legacy Route Segment Config).
+// Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 7.
+// Boosted ranking; estável em janela de 2min.
+export const revalidate = 120;
 
 export default async function EmDestaqueePage() {
   const profiles = await getBoostedProfiles(100);

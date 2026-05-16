@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { StatCard } from "@/components/ui/stat-card";
 
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 32 (financeiro do provider).
 export const dynamic = "force-dynamic";
 
 export default async function PainelFinanceiroPage() {
