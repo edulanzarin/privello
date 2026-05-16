@@ -66,7 +66,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Requirements: 2.4_
 
 - [ ] 3. Classificar pureza e cobrir módulos puros
-  - [~] 3.1 Confirmar pureza de cada arquivo em `src/lib/`
+  - [x] 3.1 Confirmar pureza de cada arquivo em `src/lib/`
     - Ler caso a caso e marcar na tabela do `testing-conventions.md`: `pure`, `non-pure`, `parcial` (com nota)
     - Candidatos esperados a `pure`: `discover-params`, `booking-slots`, `time-utils`, `money`, `whatsapp-booking`, `utils`, `constants`
     - Para cada arquivo `non-pure` ou `parcial`, registrar nota explicando por que não vira tarefa nesta fase
@@ -99,7 +99,7 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Requirements: 3.4_
 
 - [ ] 4. Property tests para pares parse/serialize
-  - [~] 4.1 Identificar pares parse/serialize por módulo
+  - [x] 4.1 Identificar pares parse/serialize por módulo
     - Lendo cada módulo classificado como `pure`, identificar pares `(parse, serialize)`/`(encode, decode)` e registrar a lista em `testing-conventions.md > Pares parse/serialize identificados`
     - WHERE um módulo da lista alvo (Property 1–6 do `design.md > Correctness Properties`) não tiver par aplicável, anotar como **não declarável** com justificativa
     - _Requirements: 4.2, 4.4_

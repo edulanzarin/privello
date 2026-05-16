@@ -233,39 +233,128 @@ Persistência de contraexemplo é **responsabilidade do desenvolvedor**. Nesta f
 
 ## 4. Pureza dos módulos de `src/lib/`
 
-Tabela inicial baseada em `design.md > Components and Interfaces > §4`. A confirmação caso a caso é entregue pela Tarefa 3.1 (lendo cada módulo). `parcial` significa que parte do módulo é pura e testável e parte tem efeito.
+Tabela confirmada pela Tarefa 3.1 lendo cada arquivo no top-level de `src/lib/`. A coluna `Justificativa` cita `path:linha` apontando para a evidência (import, `process.env`, `Date.now()`, `setInterval`, etc.) em entradas `non-pure` ou `parcial`.
+
+`parcial` = parte do módulo é pura e testável; parte tem efeito (clock, env, I/O).
 
 | Arquivo | Classificação | Justificativa |
 |---|---|---|
-| `src/lib/discover-params.ts` | `pure` | Manipulação de `URLSearchParams ↔ filtros`. Sem rede, sem disco. Candidato a round-trip. |
-| `src/lib/booking-slots.ts` | `pure` | Geração de slots de agendamento a partir de `(janela, duração, intervalo)`. Sem efeitos. |
-| `src/lib/time-utils.ts` | `pure` | Formatação e parsing de tempo. Candidato a round-trip. |
-| `src/lib/money.ts` | `pure` | Conversão centavos ↔ string formatada. Candidato a round-trip. |
-| `src/lib/whatsapp-booking.ts` | `pure` | Constrói URL de booking a partir de payload. Round-trip condicional à existência de função inversa. |
-| `src/lib/utils.ts` | `pure` (provável) | Helpers genéricos (`cn`/`clsx`-style). Validar caso a caso na Tarefa 3.1. |
-| `src/lib/constants.ts` | `pure` | Constantes. Raramente vale teste, exceto se houver derivação computada. |
-| `src/lib/auth.ts` | `non-pure` | NextAuth + Prisma. Fora desta fase; entra em fase que tocar a superfície. |
-| `src/lib/prisma.ts` | `non-pure` | Singleton de cliente Prisma. Fora. |
-| `src/lib/queries.ts` | `non-pure` | Acesso direto ao Prisma. Fora desta fase; testes nascem em `fase-3-backend`. |
-| `src/lib/mercadopago.ts` | `non-pure` | SDK externo (HTTP). Fora. |
-| `src/lib/email.ts` | `non-pure` | Envio efetivo de email. Fora. |
-| `src/lib/email-templates.ts` | `parcial` | Templates podem ter parte pura (renderização de string a partir de input); validar na Tarefa 3.1 e, se houver parte testável, decidir se entra nesta fase ou vira `OutOfScopeFinding`. |
+| `src/lib/auth.ts` | `non-pure` | NextAuth + Prisma + bcrypt em `src/lib/auth.ts:1-5`; lê `process.env.NODE_ENV` em `:7` e `process.env.AUTH_URL` em `:14`; `throw` em module-load em `:15` se `AUTH_URL` ausente em produção. Fora desta fase. |
+| `src/lib/booking-slots.ts` | `parcial` | Puros: `getWindowForWeekday`, `generateHalfHourStarts`, `filterStartsForDuration`, `resolveDurationOptions`, `calendarMonthCells`, `computeEndTimeLabel`. Não-puros (clock): `isDateBeforeToday` em `src/lib/booking-slots.ts:90-94` chama `startOfTodayLocal()`; `isDateSelectable` em `:96-102` deriva via `isDateBeforeToday`. Import `type` de `@prisma/client` em `:1` é apenas tipo, sem efeito em runtime. |
+| `src/lib/constants.ts` | `pure` | Apenas `as const` exports literais (`PLAN_PRICES`, `MAX_UPLOAD_BYTES`, `DAYS_PT`, etc.); nenhuma derivação computada, nenhum `process.env`, nenhum import com efeito. Confirmado em `src/lib/constants.ts:1-46`. |
+| `src/lib/discover-params.ts` | `pure` | `parseDiscoverSearchParams` em `src/lib/discover-params.ts:3-41` e `buildDiscoverHref`/`buildDiscoverHrefFromCity` em `:43-66` são determinísticas sobre `Record<string,string>`/`URLSearchParams`. Sem `process.env`, sem I/O. Import de `@/lib/queries` é apenas `type` (`:1`). |
+| `src/lib/email-templates.ts` | `pure` | Todas as exportadas são template-string builders puros: `passwordResetTemplate` (`src/lib/email-templates.ts:24`), `warningTemplate` (`:34`), `suspensionTemplate` (`:55`), `unsuspensionTemplate` (`:74`). Helpers internos `base` (`:1`) e `btn` (`:18`) também puros. Sem `process.env`, sem `Date.now()`, sem I/O. |
+| `src/lib/email.ts` | `non-pure` | `nodemailer.createTransport` em module-load em `src/lib/email.ts:9-19`; lê `process.env.EMAIL_HOST/USER/PASS/PORT/SECURE/FROM` em `:4-6, 12-17, 30`; `console.log` em `:23`; envio efetivo de email via SMTP em `:25-30`. Fora desta fase. |
+| `src/lib/mercadopago.ts` | `non-pure` | Lê `process.env.MERCADOPAGO_ACCESS_TOKEN` em `src/lib/mercadopago.ts:4`; instancia `MercadoPagoConfig` do SDK externo em `:5`; re-export do SDK em `:8`. Fora desta fase. |
+| `src/lib/money.ts` | `pure` | `formatBrl(value: number)` em `src/lib/money.ts:1-7` é determinística (apenas `Intl.NumberFormat`, sem `process.env` nem I/O). **Atenção:** este módulo NÃO contém `brlToCents` nem `centsToBRL` previstos por `design.md > Property 1` — ver §5 abaixo (Property 1 marcada como **não declarável**). |
+| `src/lib/prisma.ts` | `non-pure` | `new PrismaClient(...)` em module-load em `src/lib/prisma.ts:5-9`; mutação de `globalThis` em `:3, 11`; lê `process.env.NODE_ENV` em `:7, 11`. Singleton com efeito global. Fora desta fase. |
+| `src/lib/queries.ts` | `parcial` | Puros: `sortProfileCards` em `src/lib/queries.ts:97-110` e `finalizeDiscoverOrder` em `:114-133` (transformações sobre arrays). Não-puros: import de `prisma` em `:2` e todas as outras funções (`getPlatformStats`, `getCityBySlug`, `listProfilesForCity`, etc.) executam `await prisma.*`. Fora desta fase; testes da camada DB nascem em `fase-3-backend`. |
+| `src/lib/rate-limit-config.ts` | `pure` | `RATE_LIMIT_TABLE` em `src/lib/rate-limit-config.ts:23-37` é constante literal `as const`; `rateLimitConfigFor(endpoint, key)` em `:53-63` constrói objeto fresco a partir da tabela. Sem `process.env`, sem I/O. Apenas `import type` em `:13`. |
+| `src/lib/rate-limit.ts` | `non-pure` | Lê o relógio via `Date.now()` em `src/lib/rate-limit.ts:131, 142, 226, 233`; agenda `setInterval` em module via construtor de `InMemoryRateLimiterStore` em `:121-127`; lê `process.env.NODE_ENV` em `:114`; mantém `Map` mutável interno em `:97`. Singleton lazy `defaultStore` em `:181-188`. Não puro por design (limiter precisa de clock). |
+| `src/lib/time-utils.ts` | `parcial` | Puros: `timeToMinutes` em `src/lib/time-utils.ts:2-8`, `minutesToTime` em `:10-15`, `addMinutesToTime` em `:17-19`, `weekdayFromDate` em `:22-24`, `isSameLocalDay` em `:31-33`, `formatYearMonth` em `:48-50`. Não-puros (clock): `startOfTodayLocal` em `:26-29` chama `new Date()`; `parseMonthParam` em `:35-46` cai em `new Date()` quando o input é inválido/ausente. |
+| `src/lib/utils.ts` | `pure` | `cn(...inputs)` em `src/lib/utils.ts:4-6` é wrapper determinístico sobre `clsx + twMerge` (puros). Sem `process.env`, sem I/O. Confirmado: classificação inicial "provável puro" do `design.md` corrigida para `pure` definitivo. |
+| `src/lib/whatsapp-booking.ts` | `pure` | `buildWhatsAppBookingMessage` em `src/lib/whatsapp-booking.ts:16-41`, `whatsappDigits` em `:43-48`, `buildWhatsAppUrl` em `:50-53` são determinísticas. Sem `process.env`, sem I/O. Import de `@/lib/money` em `:1` traz apenas a função pura `formatBrl`. |
 
-> Os subdiretórios `src/lib/hooks/`, `src/lib/security/`, `src/lib/services/` e o módulo `src/lib/rate-limit.ts` não estão no escopo declarado de Pure_Modules em `requirements.md > Glossary`. Avaliação caso a caso fica para fases consumidoras.
+**Contagem (15 arquivos top-level de `src/lib/`):**
+
+- `pure`: 7 — `constants.ts`, `discover-params.ts`, `email-templates.ts`, `money.ts`, `rate-limit-config.ts`, `utils.ts`, `whatsapp-booking.ts`
+- `parcial`: 3 — `booking-slots.ts`, `queries.ts`, `time-utils.ts`
+- `non-pure`: 5 — `auth.ts`, `email.ts`, `mercadopago.ts`, `prisma.ts`, `rate-limit.ts`
+
+**Correções vs. classificação inicial do `design.md`:**
+
+- `booking-slots.ts`: `pure` → `parcial` (funções `isDateBeforeToday` e `isDateSelectable` leem o relógio).
+- `time-utils.ts`: `pure` → `parcial` (`startOfTodayLocal` e `parseMonthParam` leem o relógio).
+- `email-templates.ts`: `parcial` → `pure` (todas as exportadas são puras; nenhum efeito identificado).
+- `queries.ts`: `non-pure` → `parcial` (`sortProfileCards` e `finalizeDiscoverOrder` são puras).
+- `rate-limit.ts` e `rate-limit-config.ts`: ausentes da tabela original; agora classificados (`non-pure` e `pure` respectivamente).
+- `utils.ts`: "provável puro" → `pure` confirmado.
+
+> Os subdiretórios `src/lib/hooks/`, `src/lib/security/`, `src/lib/services/`, `src/lib/validation/` não estão no escopo desta tarefa (top-level apenas). Avaliação caso a caso fica para fases consumidoras.
 
 ---
 
 ## 5. Pares parse/serialize identificados
 
-> **Preenchida durante a Tarefa 4.1.** Lista esperada (a confirmar lendo cada módulo):
->
-> - `discover-params` — `parseDiscoverParams ↔ serializeDiscoverParams` (URLSearchParams ↔ filtros).
-> - `time-utils` — `parseTime ↔ formatTime` (string ↔ Date, com precisão declarada).
-> - `money` — `brlToCents ↔ centsToBRL` (string formatada ↔ centavos).
-> - `whatsapp-booking` — `parseBookingUrl ↔ buildBookingUrl` se a inversa existir; caso contrário, par marcado como **não declarável** (Property 4 do `design.md` cai).
-> - `booking-slots` — sem par parse/serialize óbvio; cobertura via Properties 5 e 6 (monotonicidade e completude).
->
-> A Tarefa 4.1 substitui esta nota por entradas confirmadas com path:linha.
+Lista confirmada pela Tarefa 4.1 lendo cada módulo classificado como `pure` ou `parcial` na §4. Cada entrada cita as funções com `path:linha` e mapeia à Property correspondente em `design.md > Correctness Properties`. Pares previstos no `design.md` que NÃO existem no código real ficam marcados como **não declarável** com justificativa.
+
+### 5.1 `src/lib/money.ts` — Property 1 (round-trip BRL ↔ centavos)
+
+**Status: não declarável.**
+
+`design.md > Property 1` previa o par `brlToCents ↔ centsToBRL`. Na leitura do módulo (`src/lib/money.ts:1-7`), o único export é `formatBrl(value: number): string` — uma formatação one-way (number em reais inteiros → string `Intl.NumberFormat("pt-BR", { currency: "BRL", maximumFractionDigits: 0 })`). NÃO existe função inversa que parseia a string formatada de volta para número, e NÃO existe representação em centavos no módulo.
+
+**Consequência:** Property 1 do `design.md > Correctness Properties` é **não declarável** com a API atual. A Tarefa 4.2, que prevê `src/lib/money.pbt.ts`, vai precisar ser revista (sem par, sem `.pbt.ts` artificial). A introdução de `brlToCents`/`centsToBRL` é um `OutOfScopeFinding` candidato para `fase-3-backend` (camada financeira) — registrar em `requirements.md > §3` quando a Tarefa 4.2 chegar.
+
+### 5.2 `src/lib/discover-params.ts` — Property 2 (round-trip filtros ↔ URLSearchParams)
+
+**Status: não declarável como round-trip estrito.**
+
+`design.md > Property 2` previa `parseDiscoverParams ↔ serializeDiscoverParams`. Na leitura do módulo:
+
+- `parseDiscoverSearchParams(raw: Record<string, string | string[] | undefined>)` em `src/lib/discover-params.ts:3-41` produz `{ filters, sort, view }`.
+- `buildDiscoverHref(citySlug, next, current?)` em `src/lib/discover-params.ts:43-56` e `buildDiscoverHrefFromCity(citySlug, params?)` em `:59-64` constroem URL strings a partir de `Record<string, string | null | undefined>` ou `Record<string, string>` — **não** a partir de `{ filters, sort, view }`.
+
+Os tipos de entrada/saída não casam: `parse` aceita query params crus e devolve objeto tipado; `build*` aceita um `Record<string, string>` arbitrário e devolve string de URL. Não há um `serializeDiscoverParams(filters, sort, view): URLSearchParams` que seja a inversa direta de `parseDiscoverSearchParams`.
+
+**Consequência:** Property 2 como round-trip estrito **não é declarável**. Propriedades alternativas testáveis (idempotência de `buildDiscoverHref` com inputs `null`/`undefined`/`""` apagando chaves; preservação de chaves não tocadas em `current`) são possíveis mas não estão no Property catalog do `design.md` — adicionar nova propriedade exige aprovação do usuário (fora do escopo desta tarefa). A Tarefa 4.3 vai precisar ser revista.
+
+### 5.3 `src/lib/time-utils.ts` — Property 3 (round-trip tempo)
+
+**Status: declarável com escopo ajustado.**
+
+`design.md > Property 3` previa `parseTime ↔ formatTime` operando em `Date`. Na leitura do módulo, o par real é `string ↔ number` (minutos desde meia-noite), não `string ↔ Date`:
+
+- `timeToMinutes(hhmm: string): number` em `src/lib/time-utils.ts:2-8` — parseia `"HH:MM"` para inteiro 0–1439.
+- `minutesToTime(total: number): string` em `src/lib/time-utils.ts:10-15` — formata inteiro 0–1439 para `"HH:MM"` com zero-pad.
+
+A relação `minutesToTime(timeToMinutes(s)) === normalize(s)` (com `s` casando `^\d{1,2}:\d{2}$`) é um round-trip declarável; `timeToMinutes(minutesToTime(n)) === ((n % 1440) + 1440) % 1440` para todo `n: number` também é declarável.
+
+**Consequência:** Property 3 é declarável **mas com geradores diferentes** dos previstos no `design.md` (gerador inteiro 0–1439 ou string `HH:MM` válida, NÃO `fc.date()`). A Tarefa 4.4 vai precisar ajustar o enunciado e o gerador. As funções com clock (`startOfTodayLocal`, `parseMonthParam` quando input inválido) ficam fora do round-trip.
+
+### 5.4 `src/lib/whatsapp-booking.ts` — Property 4 (round-trip URL de booking)
+
+**Status: não declarável (conforme antecipado pelo `design.md`).**
+
+`design.md > Property 4` é condicional à existência de `parseBookingUrl`. Lendo `src/lib/whatsapp-booking.ts` na íntegra, os exports são apenas:
+
+- `buildWhatsAppBookingMessage(p: WhatsAppBookingPayload): string` em `src/lib/whatsapp-booking.ts:16-41`
+- `whatsappDigits(phone: string | null | undefined): string | null` em `:43-48`
+- `buildWhatsAppUrl(phoneDigits: string, message: string): string` em `:50-53`
+
+Nenhuma função inversa (`parseBookingUrl`, `parseWhatsAppBookingMessage` etc.) existe. A construção é one-way (payload → string de mensagem → URL com `encodeURIComponent`).
+
+**Consequência:** Property 4 é **não declarável** — confirmado em código. A Tarefa 4.5 NÃO produz `src/lib/whatsapp-booking.pbt.ts`; o resultado fica documentado nesta seção, conforme o próprio enunciado da tarefa.
+
+### 5.5 `src/lib/booking-slots.ts` — Properties 5 e 6 (sem par parse/serialize)
+
+**Status: sem par; cobertura via Properties 5/6 (monotonicidade e completude).**
+
+`booking-slots.ts` é uma camada geradora (`generateHalfHourStarts` em `src/lib/booking-slots.ts:21-27`, `filterStartsForDuration` em `:30-38`, `resolveDurationOptions` em `:50-78`, `calendarMonthCells` em `:80-91`), não inversor. Não há par `parse/serialize` aplicável.
+
+**Consequência:** Properties 5 (monotonicidade da sequência de slots) e 6 (completude da cobertura `[início, fim − duração]`) do `design.md > Correctness Properties` cobrem este módulo via invariantes estruturais, não round-trip. Tarefa 4.6 implementa via `fc.assert` sobre janelas geradas, conforme já enunciado.
+
+### 5.6 Outros módulos com partes puras (fora do catálogo de Properties)
+
+Para registro: módulos `pure`/`parcial` que NÃO estão no catálogo de Properties (1–6) do `design.md` e que TAMBÉM não têm pares parse/serialize:
+
+- `src/lib/constants.ts` — apenas constantes literais.
+- `src/lib/email-templates.ts` — quatro builders puros de string HTML (one-way).
+- `src/lib/rate-limit-config.ts` — `rateLimitConfigFor(endpoint, key): RateLimitConfig` é construtor one-way a partir de `RATE_LIMIT_TABLE`.
+- `src/lib/utils.ts` — `cn(...inputs)` é wrapper determinístico (one-way) sobre `clsx + twMerge`.
+- `src/lib/queries.ts > sortProfileCards`/`finalizeDiscoverOrder` — funções puras de ordenação (idempotência declarável, mas fora do catálogo de Properties desta fase).
+
+Nenhum desses entra como `.pbt.ts` nesta fase. Coberturas via `.test.ts` determinísticos ficam a cargo das Tarefas 3.x se aplicável.
+
+### Resumo
+
+| Módulo | Property prevista | Par confirmado? | Status |
+|---|---|---|---|
+| `money.ts` | Property 1 (`brlToCents ↔ centsToBRL`) | Não | **não declarável** — apenas `formatBrl` one-way em `src/lib/money.ts:1-7` |
+| `discover-params.ts` | Property 2 (`parse ↔ serialize`) | Não (assimétrico) | **não declarável como round-trip** — `parse` retorna objeto tipado, `build*` aceita `Record<string,string>` em `src/lib/discover-params.ts:3-64` |
+| `time-utils.ts` | Property 3 (`parseTime ↔ formatTime` sobre `Date`) | Sim com escopo diferente | **declarável** — par real é `timeToMinutes ↔ minutesToTime` (`string ↔ number`) em `src/lib/time-utils.ts:2-15` |
+| `whatsapp-booking.ts` | Property 4 (condicional) | Não | **não declarável** — sem `parseBookingUrl`, conforme `src/lib/whatsapp-booking.ts:16-53` |
+| `booking-slots.ts` | Properties 5/6 (monotonicidade, completude) | N/A (sem par) | **declarável via invariantes**, não round-trip |
 
 ---
 
