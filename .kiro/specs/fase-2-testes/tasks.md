@@ -137,24 +137,24 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Validates: Property 5, Property 6_
 
 - [ ] 5. Cobertura e relatório
-  - [~] 5.1 Rodar `npx vitest --coverage --run` e capturar relatório textual
+  - [x] 5.1 Rodar `npx vitest --coverage --run` e capturar relatório textual
     - Anexar log de saída em `testing-conventions.md > Cobertura inicial medida`
     - Para cada módulo puro abaixo de 80% statements/branches, registrar a contagem real e justificativa, sem bloquear a entrega
     - _Requirements: 3.3, 3.5_
 
-  - [~] 5.2 Documentar como rodar com seed fixa
+  - [x] 5.2 Documentar como rodar com seed fixa
     - Em `testing-conventions.md`, exemplificar `npx vitest --run --seed=<n>` para reprodução de runs PBT
     - Reforçar que persistir contraexemplo é responsabilidade do desenvolvedor (sem lint que bloqueie commit)
     - _Requirements: 5.1, 5.4_
 
 - [ ] 6. Contrato com a CI da Fase 7
-  - [~] 6.1 Validar pré-condições do contrato
+  - [x] 6.1 Validar pré-condições do contrato
     - `npm run test` é executável em ambiente sem banco e sem rede e termina em ≤ 60s
     - `npm run test` falha (código ≠ 0) quando ao menos um teste quebra
     - Em ambiente com `process.env.CI === "true"`, qualquer `.only`/`.skip` sem comentário justificativo faz o test runner sair com erro (a verificação efetiva acontecerá quando a Fase 7 ligar a CI; nesta fase, declarar a expectativa no `testing-conventions.md`)
     - _Requirements: 6.2, 6.3_
 
-  - [~] 6.2 Confirmar inalteração dos scripts pré-existentes
+  - [x] 6.2 Confirmar inalteração dos scripts pré-existentes
     - `npm run dev`, `npm run build`, `npm run lint`, `npm run test:e2e*`, `npm run db:*`, `postinstall` continuam funcionando exatamente como antes
     - Anexar lista de comandos rodados como evidência no PR que entrega esta fase
     - _Requirements: 1.6_

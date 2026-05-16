@@ -217,17 +217,77 @@ describe.each(KNOWN_REGRESSIONS)(
 );
 ```
 
-### Reproduzir uma seed específica
+### Reproduzir uma run com seed fixa
 
-```bash
-npx vitest --run --seed=1742056800123
+Quando um teste em `*.pbt.ts` falha, o fast-check imprime no relatório do Vitest:
+
+- A **seed** usada na run (inteiro de 64 bits).
+- O **path** do shrinker (sequência de passos para minimizar).
+- O **contraexemplo minimizado** (já paraphrased pelo shrinker).
+
+Com `verbose: 2` configurado em `vitest.setup.ts > fc.configureGlobal`, esses três campos saem em todo failure. Exemplo de output (campos relevantes — encurtado):
+
+```text
+Property failed after 1 tests
+{ seed: 1742056800123, path: "0:1:0", endOnFailure: true }
+Counterexample: [99999900]
+Shrunk 0 time(s)
 ```
 
-A seed faz com que os geradores aleatórios de fast-check rodem na mesma sequência da run original. Útil para reproduzir falhas intermitentes localmente antes de persistir o contraexemplo.
+Para **reproduzir essa run**, há três caminhos. Escolha o caminho A para reprodução pontual local, o caminho B para tornar a reprodução permanente em código, ou o caminho C quando precisar fixar a seed para o arquivo inteiro.
 
-### Responsabilidade
+#### Caminho A — passar a seed via `fc.assert` num test isolado
 
-Persistência de contraexemplo é **responsabilidade do desenvolvedor**. Nesta fase NÃO há lint que bloqueie commit por contraexemplo não persistido. Gate automatizado (se vier) entra em `fase-7-dx-infra`.
+Substitua temporariamente o `test.prop` afetado por uma chamada explícita de `fc.assert` com a seed da falha, sem mexer em config global:
+
+```ts
+// src/lib/money.pbt.ts (debug local — não comitar com a seed fixa)
+import { describe, it } from "vitest";
+import { fc } from "@fast-check/vitest";
+import { formatBrl } from "@/lib/money";
+
+describe("money round-trip — debug seed=1742056800123", () => {
+    it("repro counterexample", () => {
+        fc.assert(
+            fc.property(fc.integer({ min: 0, max: 99_999_900 }), (cents) => {
+                // ... mesma propriedade do test.prop original
+            }),
+            { seed: 1742056800123, numRuns: 1, endOnFailure: true },
+        );
+    });
+});
+```
+
+`numRuns: 1` + `endOnFailure: true` força o fast-check a parar exatamente no contraexemplo, evitando shrinking adicional na reprodução.
+
+#### Caminho B — persistir o contraexemplo (preferido)
+
+Reproduzir uma seed é diagnóstico; persistir o contraexemplo é a correção. Promova o caso reproduzido para um `it("regression: ...")` no `*.test.ts` ou para `<modulo>.regressions.ts`, conforme a §3 acima ("Persistência de contraexemplos"). Esse é o caminho que fica no histórico do repo.
+
+#### Caminho C — `fc.configureGlobal({ seed })` no setup file
+
+Para fixar a seed da run inteira (todos os arquivos `*.pbt.ts`), edite **temporariamente** `vitest.setup.ts`:
+
+```ts
+// vitest.setup.ts — uso de debug; reverter antes de comitar
+import { fc } from "@fast-check/vitest";
+
+fc.configureGlobal({
+    verbose: 2,
+    numRuns: 100,
+    seed: 1742056800123, // ⚠️ remover antes do commit
+});
+```
+
+Útil quando a falha só aparece com a sequência exata de geradores produzida pela seed (ex.: arquivo com múltiplos `test.prop` que compartilham state via random). NÃO comitar com `seed` fixo no setup global — Mantém-se aleatório por design (ver `vitest.setup.ts` real e `tasks.md > 1.3`).
+
+#### Sobre `vitest --seed`
+
+`npx vitest --seed=N` existe como flag do Vitest, mas controla apenas o **shuffle de arquivos/testes** quando `test.sequence.shuffle` está ativado. **Não** alimenta a PRNG do fast-check — para reproduzibilidade de geradores property-based use os caminhos A, B ou C acima. Não há variável de ambiente `FC_SEED` reconhecida pelo `@fast-check/vitest` na versão pinada (`0.4.1`).
+
+#### Responsabilidade
+
+Reproduzir uma seed é diagnóstico; persistir o contraexemplo é **responsabilidade do desenvolvedor** (já documentado em "Persistência de contraexemplos" mais acima). Esta seção cobre apenas o passo intermediário — reproduzir o failure localmente antes de promovê-lo a regression case. Nesta fase NÃO há lint que bloqueie commit por contraexemplo não persistido. Gate automatizado (se vier) entra em `fase-7-dx-infra`.
 
 ---
 
@@ -391,7 +451,83 @@ Transformar a meta em gate (failing build quando coverage cair abaixo de 80%) é
 
 ### Cobertura inicial medida
 
-> **Preenchida na Tarefa 5.1.** Conterá log textual de `npx vitest --coverage --run` capturado uma vez ao final da fase, com uma linha por módulo puro indicando statements/branches medidos. Onde a meta não bater, justificativa textual logo abaixo da linha.
+> Preenchido pela Tarefa 5.1. Comando: `npx vitest --coverage --run` na raiz do repo (`c:\Users\edulanzarin\Documents\Dev\privello\`). 13 arquivos de teste, 118 testes, todos passando. Provider: `v8`. O reporter `text` do v8 agrega/trunca nomes longos no terminal (ex.: `lib/email-templates.ts` aparece como `...-templates.ts`); para precisão por arquivo, os números abaixo vêm do reporter `json-summary` (`coverage/coverage-summary.json`).
+
+#### Relatório textual `text` (v8)
+
+```text
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   38.74 |    29.51 |   28.28 |   40.54 |
+ lib               |   35.14 |    31.08 |   34.73 |   35.85 |
+  auth.ts          |       0 |        0 |       0 |       0 | 7-87
+  constants.ts     |       0 |      100 |     100 |       0 | 2-43
+  ...-templates.ts |       0 |        0 |       0 |       0 | 2-77
+  email.ts         |       0 |        0 |       0 |       0 | 3-34
+  mercadopago.ts   |       0 |        0 |       0 |       0 | 4-5
+  prisma.ts        |       0 |        0 |     100 |       0 | 3-11
+  queries.ts       |       0 |        0 |       0 |       0 | 4-644
+  ...mit-config.ts |       0 |      100 |       0 |       0 | 24-64
+  rate-limit.ts    |   65.71 |       60 |   57.14 |   65.71 | ...37,148,162-165
+  utils.ts         |       0 |      100 |       0 |       0 | 5
+ lib/hooks         |       0 |        0 |       0 |       0 |
+  ...escape-key.ts |       0 |        0 |       0 |       0 | 1-21
+  ...ile-upload.ts |       0 |        0 |       0 |       0 | 1-74
+  ...ia-actions.ts |       0 |        0 |       0 |       0 | 1-60
+  ...croll-lock.ts |       0 |        0 |       0 |       0 | 1-17
+ lib/security      |   60.86 |    53.52 |   58.82 |   63.41 |
+  cron-auth.ts     |   81.13 |     73.8 |      80 |    85.1 | ...25-130,140,176
+  dev-auth.ts      |   33.33 |    24.13 |   28.57 |   34.28 | ...18-125,133-138
+ lib/services      |       0 |        0 |       0 |       0 |
+  city.service.ts  |       0 |        0 |       0 |       0 | 7-74
+  media.service.ts |       0 |        0 |       0 |       0 | 8-21
+  ...le.service.ts |       0 |        0 |       0 |       0 | 8-52
+  ...on.service.ts |       0 |      100 |       0 |       0 | 1-21
+ lib/validation    |   67.71 |        0 |       0 |   72.88 |
+  _form-utils.ts   |    2.85 |        0 |       0 |     3.7 | 17-57,72-79
+  auth.schema.ts   |   88.88 |      100 |       0 |   88.88 | 84
+  ...tro.schema.ts |   71.42 |        0 |       0 |   71.42 | 46-47
+  mp.schema.ts     |      75 |        0 |       0 |      75 | 14
+  ...ing.schema.ts |      80 |      100 |       0 |   88.88 | 67
+  ...ngs.schema.ts |   92.85 |        0 |       0 |   92.85 | 15
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 38.74% ( 284/733 )
+Branches     : 29.51% ( 121/410 )
+Functions    : 28.28% ( 43/152 )
+Lines        : 40.54% ( 266/656 )
+================================================================================
+```
+
+#### Por módulo declarado `pure` ou com porções puras na §4
+
+Tabela consolidada com números por arquivo (fonte: `coverage/coverage-summary.json`). Coluna `Status` indica se a meta declarada de 80% statements e 80% branches foi atingida (✅) ou não (⚠️), com justificativa textual onde aplicável.
+
+| Arquivo | Classificação §4 | Stmts | Branches | Funcs | Status |
+|---|---|---|---|---|---|
+| `src/lib/booking-slots.ts` | `parcial` | 100% (49/49) | 100% (17/17) | 100% (13/13) | ✅ partes puras 100% cobertas. As funções com clock (`isDateBeforeToday`, `isDateSelectable`) estão exercitadas via testes determinísticos com `vi.useFakeTimers` em `booking-slots.test.ts` |
+| `src/lib/constants.ts` | `pure` | 0% (0/19) | 100% (0/0) | 100% (0/0) | ⚠️ módulo só exporta literais `as const`; v8 conta cada exporta como statement não-executado. Tarefa 3.7 documentou explicitamente "sem `*.test.ts` nesta fase" — alvo a re-avaliar em fase-7 (gate de coverage) ou ignorar via `coverage.exclude` se ficar ruidoso |
+| `src/lib/discover-params.ts` | `pure` | 100% (26/26) | 100% (34/34) | 100% (4/4) | ✅ |
+| `src/lib/email-templates.ts` | `pure` | 0% (0/8) | 0% (0/10) | 0% (0/6) | ⚠️ não exercitado por nenhum `*.test.ts` nesta fase (não está no catálogo de Properties §5.6, nem entrou nas Tarefas 3.x). Os 4 builders são puros; cobertura é alvo de fase-3 (camada de e-mail) ou de uma tarefa futura desta família |
+| `src/lib/money.ts` | `pure` | 100% (1/1) | 100% (0/0) | 100% (1/1) | ✅ único export `formatBrl` exercitado por `money.test.ts` e `money.pbt.ts` |
+| `src/lib/rate-limit-config.ts` | `pure` | 0% (0/3) | 100% (0/0) | 0% (0/1) | ⚠️ `rateLimitConfigFor` não exercitado por `*.test.ts` nesta fase (não está no catálogo Properties §5.6). Cobertura é alvo de fase-3 ou fase-7 quando a configuração entrar em uso real nos handlers |
+| `src/lib/time-utils.ts` | `parcial` | 100% (24/24) | 100% (15/15) | 100% (8/8) | ✅ partes puras (`timeToMinutes`, `minutesToTime`, `addMinutesToTime`, `weekdayFromDate`, `isSameLocalDay`, `formatYearMonth`) cobertas; partes com clock (`startOfTodayLocal`, `parseMonthParam`) exercidas por `time-utils.test.ts` com fake timers |
+| `src/lib/utils.ts` | `pure` | 0% (0/1) | 100% (0/0) | 0% (0/1) | ⚠️ `cn` não exercitado por `*.test.ts` nesta fase (decisão registrada em §4.1 — testar reproduziria a cobertura própria de `clsx`/`twMerge`). Não há gap funcional |
+| `src/lib/whatsapp-booking.ts` | `pure` | 100% (19/19) | 100% (8/8) | 100% (3/3) | ✅ |
+| `src/lib/queries.ts > sortProfileCards`, `finalizeDiscoverOrder` | `parcial` (puros) | 0% (do arquivo: 0/185) | 0% (0/131) | 0% (0/46) | ⚠️ as duas funções puras citadas em §5.6 não foram exercitadas por testes nesta fase. Out-of-scope explícito (fase-3-backend); todas as outras funções do arquivo dependem de `prisma` e ficam em outra fase |
+| `src/lib/booking-slots.pbt.ts` (módulo de teste) | n/a | n/a | n/a | n/a | n/a — excluído pelo `coverage.exclude` |
+
+##### Resumo da meta de 80%
+
+- **Atingida (✅):** `booking-slots.ts` (porções puras), `discover-params.ts`, `money.ts`, `time-utils.ts`, `whatsapp-booking.ts`. Cinco módulos pure/parcial cumprem 100% statements e 100% branches no escopo testável.
+- **Abaixo da meta (⚠️):** `constants.ts`, `email-templates.ts`, `rate-limit-config.ts`, `utils.ts`, e as funções puras de `queries.ts`. Justificativa registrada por linha. Nenhuma destas é gate nesta fase (fase-2 é declarativa quanto a cobertura — gate efetivo é tarefa de `fase-7-dx-infra`).
+
+##### Módulos `non-pure` (informativo)
+
+`auth.ts`, `email.ts`, `mercadopago.ts`, `prisma.ts`, `rate-limit.ts`, `dev-auth.ts`, `lib/hooks/*`, `lib/services/*` ficam fora do escopo de cobertura desta fase — exigem mocks de infraestrutura ou são hooks de React (fora de Vitest node-only). `rate-limit.ts` aparece com 65.71% por exposição parcial via `rate-limit.pbt.ts` (foco em invariantes de balde token, não em meta de 80%).
 
 ---
 
@@ -453,3 +589,82 @@ A Fase 7 (`fase-7-dx-infra`) é a fase canônica de configuração de DX/lint/CI
 - Notas operacionais (incluindo `tsconfig validation`): `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-2-testes\notes.md` _(produzido pelas tarefas 1.x; este documento já cita a seção `tsconfig validation` na §1)_
 - Plano de tarefas: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-2-testes\tasks.md`
 - Master spec: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\auditoria-geral\requirements.md`
+
+---
+
+## 8. Contrato com a CI da Fase 7
+
+> Produzido pelas Tarefas 6.1 e 6.2. Esta fase **não pluga CI**; declara o contrato que a `fase-7-dx-infra` precisa honrar quando ligar a pipeline. As preconditions abaixo foram verificadas localmente em `c:\Users\edulanzarin\Documents\Dev\privello\` no momento da entrega.
+
+### 8.1 Pré-condições verificadas
+
+#### `npm run test` é executável sem banco e sem rede
+
+`package.json > scripts.test` resolve para `vitest --run`. A entrega da Fase 2 não introduziu qualquer dependência runtime de Postgres, MercadoPago, SMTP ou rede. Os arquivos `*.test.ts`/`*.pbt.ts` em `src/lib/**` executam contra módulos puros (ou com fake timers para porções com clock), conforme classificação em §4.
+
+**Medição da Tarefa 6.1.** Comando: `npx vitest --run` na raiz do repo.
+
+```text
+ RUN  v4.1.6 C:/Users/edulanzarin/Documents/Dev/privello
+
+ Test Files  13 passed (13)
+      Tests  118 passed (118)
+   Start at  01:40:36
+   Duration  4.15s (transform 1.40s, setup 28.26s, import 1.81s, tests 926ms, environment 2ms)
+
+EXIT_CODE=0
+WALL_CLOCK_SECONDS=4.92
+```
+
+- **Wall-clock total** (Get-Date antes/depois): **4.92 s**.
+- **Vitest internal duration**: 4.15 s (test phase 926 ms, setup 28.26 s — o `setup` aqui é tempo de transform/import paralelo do worker pool, não execução serial).
+- **Exit code**: 0 (todos os 118 testes em 13 arquivos passaram).
+- **Meta declarada de ≤ 60 s**: ✅ confortavelmente abaixo (4.92 s « 60 s).
+
+Reservas: medição feita com `node_modules/.cache` aquecido. Em primeira execução pós-`npm install` o tempo de transform pode subir, mas a margem de 12× para o teto de 60 s é segura.
+
+#### `npm run test` retorna ≠ 0 quando algum teste falha
+
+Contrato estrutural do Vitest, alinhado com Jest e demais runners da família CommonJS/ESM. O comando retorna:
+
+- `0` quando todos os testes passam.
+- `1` quando algum `expect` falha, algum `test`/`describe` lança, ou um `*.pbt.ts` falha após shrinking.
+- Códigos não-zero arbitrários quando o runner falha em carregar (config inválida, módulo não encontrado, etc.).
+
+Citação: documentação oficial do Vitest sobre exit codes — comportamento idêntico ao default do `vitest run`/`vitest --run`. Esta fase não verifica empiricamente um failure-on-purpose (não há `it.skip` ou caso quebrado proposital introduzido); o contrato é declarativo.
+
+#### Comportamento esperado com `process.env.CI === "true"`
+
+Vitest aplica defaults diferentes quando detecta ambiente de CI (via `process.env.CI`):
+
+- **`--allowOnly: false`** por default. Qualquer `it.only(...)` ou `describe.only(...)` deixado no código faz o runner sair com `code 1` em CI, mesmo que os testes filtrados passariam.
+- **`--passWithNoTests: false`** por default. Suite vazia fica falha (relevante quando alguém remove acidentalmente todos os arquivos casados pelo `test.include`).
+- **`--bail`**: não muda em CI (fica off por default).
+
+Esta fase **declara a expectativa**; não verifica empiricamente. A verificação efetiva entra em `fase-7-dx-infra` quando a pipeline rodar com `CI=true` e quando houver gates explícitos para `.only`/`.skip` sem comentário justificativo.
+
+### 8.2 Scripts pré-existentes inalterados
+
+> Tarefa 6.2. Verificação por inspeção de `package.json > scripts` (sem rodar — alguns demandam Playwright browsers, Postgres ou Studio).
+
+Conferido em `c:\Users\edulanzarin\Documents\Dev\privello\package.json`:
+
+| Script | Comando | Status |
+|---|---|---|
+| `dev` | `next dev --hostname 0.0.0.0` | ✅ inalterado |
+| `build` | `prisma generate && next build` | ✅ inalterado |
+| `start` | `next start` | ✅ inalterado |
+| `lint` | `eslint` | ✅ inalterado |
+| `test:e2e` | `playwright test` | ✅ inalterado |
+| `test:e2e:ios` | `playwright test --project=ios-safari` | ✅ inalterado |
+| `test:e2e:desktop` | `playwright test --project=desktop-chrome` | ✅ inalterado |
+| `db:generate` | `prisma generate` | ✅ inalterado |
+| `db:push` | `prisma db push` | ✅ inalterado |
+| `db:migrate` | `prisma migrate dev` | ✅ inalterado |
+| `db:seed` | `prisma db seed` | ✅ inalterado |
+| `db:studio` | `prisma studio` | ✅ inalterado |
+| `postinstall` | `prisma generate` | ✅ inalterado |
+
+Total: 13 scripts pré-existentes confirmados (12 listados como meta na Tarefa 6.2 + `start`, presente nas duas listagens). Nenhum argumento alterado, nenhuma renomeação. Os 3 scripts adicionados pela Tarefa 1.4 (`test`, `test:watch`, `test:run`) coexistem com os 13 acima sem colisão.
+
+**Validação operacional**: nenhum dos scripts pré-existentes foi efetivamente executado nesta tarefa — `dev`/`build` exigem Next 16 + Prisma client gerado, `test:e2e*` exigem Playwright browsers + servidor up, e os `db:*` exigem Postgres acessível. A entrega desta fase não toca código de aplicação (ver `requirements.md > Non-Goals`), portanto a inalteração dos scripts é garantida por não-modificação do `package.json` além das adições de seção `test*`.
