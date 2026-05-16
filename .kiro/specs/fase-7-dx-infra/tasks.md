@@ -270,14 +270,14 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Confirmar regra: ADRs novos a partir desta fase obrigam substituir prosa em `design.md` futuros (`design.md` referencia o ADR, não duplica)
     - _Requirements: 6.7_
 
-- [ ] 8. Wave Changelog
-  - [ ] 8.1 Criar `CHANGELOG.md` na raiz
+- [x] 8. Wave Changelog
+  - [x] 8.1 Criar `CHANGELOG.md` na raiz
     - Criar `c:\Users\edulanzarin\Documents\Dev\privello\CHANGELOG.md`
     - Cabeçalho com nota sobre Keep a Changelog v1.1.0 e SemVer 2.0 (links para versões pt-BR)
     - Seção `[Unreleased]` no topo
     - _Requirements: 7.2, 7.3, 7.4_
 
-  - [ ] 8.2 Popular seção `[Unreleased]` cobrindo fases 1–4 + 7
+  - [x] 8.2 Popular seção `[Unreleased]` cobrindo fases 1–4 + 7
     - Subseção `Added`: CI pipeline, docs/env.md, docs/docker.md, docs/adr/, CHANGELOG.md (esta fase); camada de services 9 entries (fase-3); Vitest 4.1.6 + fast-check 4.8.0 + `@fast-check/vitest` 0.4.1, 172 testes (fase-2/3/4); tokens semânticos `--privello-warning`/`--privello-danger`/`--privello-blue`, escala tipográfica explícita (fase-4); primitivos `Dropdown` e `useFocusTrap` (fase-4); CSP Report-Only e HSTS (fase-1); rate limiting login/upload/wa-click/comments/stories (fase-1); validação Zod em Server Actions e API Routes (fase-1); `/api/dev/*` autenticado e `/api/cron/*` por header (fase-1); whitelist de hosts em `images.remotePatterns` (fase-1); `.env.example` com 16 variáveis (fase-1); lint anti-regressão `no-restricted-syntax` (fase-4)
     - Subseção `Changed`: `src/lib/queries.ts` refatorado para híbrido (fase-3); `src/lib/auth.ts` guard `AUTH_URL` em prod (fase-1); `next.config.ts` headers + remotePatterns (fase-1); 24 consumidores migrados queries→services (fase-3); 7 rotas migradas para `revalidate=N` (fase-3); ~50 arquivos migrados para tokens (fase-4)
     - Subseção `Deprecated`: re-exports de `@/lib/queries` (`@deprecated 2026-05-30`)
@@ -287,7 +287,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Cf. esboço completo em `design.md > Components and Interfaces > 5`
     - _Requirements: 7.5_
 
-  - [ ] 8.3 Declarar regra de manutenção
+  - [x] 8.3 Declarar regra de manutenção
     - Adicionar nota no topo do `CHANGELOG.md` ou em `dx-conventions.md > §7 Changelog > Convenção`: "Entradas futuras acompanham o commit que entrega a mudança — não há tarefa de 'atualizar changelog' separada"
     - Confirmar Non-Goal: automação de geração (release-please, semantic-release, changesets) está fora desta fase
     - _Requirements: 7.6, 7.7_
