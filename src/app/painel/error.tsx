@@ -1,5 +1,7 @@
 "use client";
 
+import { ErrorState } from "@/components/ui/error-state";
+
 export default function PainelError({
     error,
     reset,
@@ -8,19 +10,12 @@ export default function PainelError({
     reset: () => void;
 }) {
     return (
-        <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
-            <div className="text-center">
-                <p className="text-lg font-medium text-foreground">Erro no painel</p>
-                <p className="mt-1 text-base text-muted">
-                    Não foi possível carregar esta página. Tente novamente.
-                </p>
-            </div>
-            <button
-                onClick={reset}
-                className="rounded-lg bg-foreground px-5 py-2.5 text-base font-medium text-white transition-opacity hover:opacity-90"
-            >
-                Tentar novamente
-            </button>
-        </div>
+        <ErrorState
+            variant="page"
+            title="Erro no painel"
+            description="Não foi possível carregar esta página. Tente novamente."
+            onRetry={reset}
+            digest={error.digest}
+        />
     );
 }

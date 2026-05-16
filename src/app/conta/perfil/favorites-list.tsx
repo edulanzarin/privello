@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, MapPin, Star } from "lucide-react";
 import { formatBrl } from "@/lib/money";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Favorite = {
   profile: {
@@ -32,19 +33,12 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
 
   if (favorites.length === 0) {
     return (
-      <div className="rounded-2xl border border-black/[0.06] bg-white px-6 py-14 text-center shadow-sm">
-        <Heart className="mx-auto h-10 w-10 text-muted" strokeWidth={1} />
-        <p className="mt-4 text-xl font-semibold">Nenhum perfil curtido ainda.</p>
-        <p className="mt-2 text-md text-muted">
-          Explore acompanhantes e curta os perfis que te interessam.
-        </p>
-        <Link
-          href="/buscar"
-          className="mt-6 inline-block rounded-full bg-coral px-6 py-2.5 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
-        >
-          Explorar perfis
-        </Link>
-      </div>
+      <EmptyState
+        title="Nenhum perfil curtido ainda"
+        description="Explore acompanhantes e curta os perfis que te interessam."
+        icon={<Heart className="h-10 w-10" strokeWidth={1} />}
+        action={{ label: "Explorar perfis", href: "/buscar" }}
+      />
     );
   }
 

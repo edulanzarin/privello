@@ -11,6 +11,7 @@ import { setCoverPhoto, removePhoto } from "@/app/_actions/onboarding";
 import { useToast } from "@/components/ui/toast";
 import { Switch } from "@/components/ui/switch";
 import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
@@ -233,10 +234,11 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
         {/* Grid — always 3 columns */}
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <ImagePlus className="h-10 w-10 text-muted" strokeWidth={1} />
-            <p className="text-sm text-muted">Nenhum item aqui ainda.</p>
-          </div>
+          <EmptyState
+            title="Nenhum item aqui ainda"
+            description="Adicione fotos ou vídeos no painel à direita."
+            icon={<ImagePlus className="h-10 w-10" strokeWidth={1} />}
+          />
         ) : (
           <>
             <div className="grid grid-cols-3 gap-2">

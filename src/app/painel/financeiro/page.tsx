@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { StatCard } from "@/components/ui/stat-card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 32 (financeiro do provider).
 export const dynamic = "force-dynamic";
@@ -169,9 +170,12 @@ export default async function PainelFinanceiroPage() {
           <p className="text-xs text-muted">Passe o mouse para editar ou excluir</p>
         </div>
         {rows.length === 0 ? (
-          <p className="px-5 py-10 text-center text-md text-muted">
-            Nenhum registro este mês. Use o formulário acima para registrar um encontro.
-          </p>
+          <div className="px-5 py-6">
+            <EmptyState
+              title="Nenhum registro este mês"
+              description="Use o formulário acima para registrar um encontro."
+            />
+          </div>
         ) : (
           <FinancialTable rows={rows} />
         )}

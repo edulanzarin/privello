@@ -99,33 +99,33 @@ Este documento materializa o Requirement 1 do `requirements.md` deste spec-filho
 
 Todos os Route Handlers seguem o mesmo padrão: categoria `route_handler`, `loading: nao_aplicavel`, `error: nao_aplicavel`, justificativa única "Route Handler — fallback via JSON com status apropriado".
 
-| caminho |
-|---|
-| `src/app/api/auth/[...nextauth]/route.ts` |
-| `src/app/api/cadastro/iniciar/route.ts` |
-| `src/app/api/cadastro/verificar/route.ts` |
-| `src/app/api/cities/route.ts` |
-| `src/app/api/cities/[slug]/bairros/route.ts` |
-| `src/app/api/cron/expire-plans/route.ts` |
-| `src/app/api/cron/reset-hot/route.ts` |
-| `src/app/api/dev/activate-plans/route.ts` |
-| `src/app/api/dev/reset/route.ts` |
-| `src/app/api/media/comment/route.ts` |
-| `src/app/api/media/like/route.ts` |
-| `src/app/api/mp/checkout/route.ts` |
-| `src/app/api/mp/webhook/route.ts` |
-| `src/app/api/profiles/check/route.ts` |
-| `src/app/api/profiles/section/route.ts` |
-| `src/app/api/provider/heartbeat/route.ts` |
-| `src/app/api/reels/route.ts` |
-| `src/app/api/review/route.ts` |
-| `src/app/api/stories/like/route.ts` |
-| `src/app/api/stories/view/route.ts` |
-| `src/app/api/top-cities/route.ts` |
-| `src/app/api/upload/route.ts` |
-| `src/app/api/upload/verification/route.ts` |
-| `src/app/api/upload-audio/route.ts` |
-| `src/app/api/wa-click/route.ts` |
+| caminho | categoria | loading | error | justificativa |
+|---|---|---|---|---|
+| `src/app/api/auth/[...nextauth]/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cadastro/iniciar/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cadastro/verificar/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cities/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cities/[slug]/bairros/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cron/expire-plans/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/cron/reset-hot/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/dev/activate-plans/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/dev/reset/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/media/comment/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/media/like/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/mp/checkout/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/mp/webhook/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/profiles/check/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/profiles/section/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/provider/heartbeat/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/reels/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/review/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/stories/like/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/stories/view/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/top-cities/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/upload/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/upload/verification/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/upload-audio/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
+| `src/app/api/wa-click/route.ts` | `route_handler` | nao_aplicavel | nao_aplicavel | Route Handler — fallback via JSON com status apropriado |
 
 ### Contagens agregadas (validação)
 
@@ -146,7 +146,10 @@ Detalhe: `loading: existente` em `src/app/painel/loading.tsx` (refactor para ske
 
 | caminho | motivo |
 |---|---|
-| (preenchido durante a Wave 3) | |
+| `src/app/cidades/page.tsx:34-37` | item de lista único dentro de tabela complexa; markup inline vermelho/erro contextual; migrar adicionaria ruído visual |
+| `src/app/admin/moderacao/page.tsx:292-298` | célula de tabela com `<td colSpan={6}>`; `<EmptyState>` quebraria o layout `<table>` |
+| `src/app/p/[slug]/page.tsx:469-471` | `<p>` curto dentro de section "Avaliações"; `<EmptyState>` (com card+padding) seria desproporcional |
+| `src/app/conta/onboarding/perfil/perfil-form.tsx:205-208` | UI do form (não é "lista vazia" canônica); aviso de validação inline |
 
 ---
 

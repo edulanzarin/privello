@@ -3,6 +3,7 @@ import { Star, MessageSquare, TrendingUp } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 31 (avaliações recebidas).
 export const dynamic = "force-dynamic";
@@ -113,13 +114,11 @@ export default async function PainelAvaliacoesPage() {
 
       {/* Reviews list */}
       {reviews.length === 0 ? (
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-10 text-center">
-          <MessageSquare className="mx-auto h-8 w-8 text-muted/40" strokeWidth={1.5} />
-          <p className="mt-3 text-md font-semibold">Nenhuma avaliação ainda</p>
-          <p className="mt-1 text-base text-muted">
-            As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil.
-          </p>
-        </div>
+        <EmptyState
+          title="Nenhuma avaliação ainda"
+          description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil."
+          icon={<MessageSquare className="h-10 w-10" strokeWidth={1.5} />}
+        />
       ) : (
         <div className="space-y-3">
           <p className="text-base font-medium text-muted">

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { BuscarForm } from "./buscar-form";
 import { searchProfilesGlobal } from "@/lib/services";
 import { MapPin, BadgeCheck } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // Cache strategy: revalidate=120 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 4.
@@ -53,13 +54,11 @@ export default async function BuscarPage({ searchParams }: PageProps) {
             </form>
 
             {results.length === 0 ? (
-              <div className="py-12 text-center">
-                <p className="text-md text-muted">Nenhum perfil encontrado para &ldquo;{q}&rdquo;.</p>
-                <p className="mt-2 text-base text-muted">
-                  Tente um nome diferente ou{" "}
-                  <Link href="/buscar" className="text-blue hover:underline">busque por cidade</Link>.
-                </p>
-              </div>
+              <EmptyState
+                title={`Nenhum perfil encontrado para "${q}"`}
+                description="Tente um nome diferente ou busque por cidade."
+                action={{ label: "Limpar filtros", href: "/buscar" }}
+              />
             ) : (
               <div className="space-y-2">
                 <p className="text-sm text-muted">{results.length} perfil{results.length !== 1 ? "s" : ""} encontrado{results.length !== 1 ? "s" : ""}</p>

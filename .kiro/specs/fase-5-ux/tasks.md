@@ -60,7 +60,7 @@ Restrições importantes:
     - Identificar o subconjunto `loading: criar` que precisa de novo arquivo (estimativa: ≥ 25 rotas, dado que apenas 4 existem hoje)
     - _Requirements: 1.4, 1.5_
 
-- [ ] 3. Wave EmptyState primitive
+- [x] 3. Wave EmptyState primitive
   - [x] 3.1 Criar `src/components/ui/empty-state.tsx`
     - Implementar `<EmptyState>` com props `title`, `description?`, `icon?`, `action?`, `className?` conforme assinatura em `design.md > Components and Interfaces > 4`
     - Suportar `action.href` (renderiza `<Link>`), `action.onClick` (renderiza `<button>`), e ambos (prefere `href`, `onClick` como handler complementar)
@@ -75,32 +75,32 @@ Restrições importantes:
     - `action.href` + `action.onClick`: `<Link>` é preferido, `onClick` é handler complementar
     - _Requirements: 4.2, 4.3_
 
-  - [ ] 3.3 Aplicar `<EmptyState>` em `src/app/buscar/page.tsx:55-60` (busca vazia)
+  - [x] 3.3 Aplicar `<EmptyState>` em `src/app/buscar/page.tsx:55-60` (busca vazia)
     - Substituir markup inline por `<EmptyState title="Nenhum perfil encontrado" description="..." action={{ label: "Limpar filtros", onClick: ... }} />`
     - Validar visualmente
     - _Requirements: 4.4_
 
-  - [ ] 3.4 Aplicar `<EmptyState>` em `src/app/conta/perfil/favorites-list.tsx:36-42` (favoritos)
+  - [x] 3.4 Aplicar `<EmptyState>` em `src/app/conta/perfil/favorites-list.tsx:36-42` (favoritos)
     - Substituir markup inline por `<EmptyState title="Nenhum perfil curtido ainda" description="Explore acompanhantes e curta os perfis que te interessam." icon={Heart} action={{ label: "Explorar", href: "/buscar" }} />`
     - _Requirements: 4.4_
 
-  - [ ] 3.5 Aplicar `<EmptyState>` em `src/app/painel/financeiro/page.tsx:171-175` (histórico/financeiro)
+  - [x] 3.5 Aplicar `<EmptyState>` em `src/app/painel/financeiro/page.tsx:171-175` (histórico/financeiro)
     - Substituir markup inline por `<EmptyState title="Nenhum registro este mês" description="Use o formulário acima para registrar um encontro." />` (sem CTA — formulário já está acima)
     - _Requirements: 4.4_
 
-  - [ ] 3.6 Aplicar `<EmptyState>` em `src/app/painel/avaliacoes/page.tsx:115-122` (avaliações)
+  - [x] 3.6 Aplicar `<EmptyState>` em `src/app/painel/avaliacoes/page.tsx:115-122` (avaliações)
     - Substituir markup inline por `<EmptyState title="Nenhuma avaliação ainda" description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil." icon={MessageSquare} />`
     - _Requirements: 4.4_
 
-  - [ ] 3.7 Aplicar `<EmptyState>` em `src/app/painel/midias/midias-manager.tsx:235-240` (mídias do provider)
+  - [x] 3.7 Aplicar `<EmptyState>` em `src/app/painel/midias/midias-manager.tsx:235-240` (mídias do provider)
     - Substituir markup inline por `<EmptyState title="Nenhum item aqui ainda" description="..." icon={ImagePlus} action={{ label: "Adicionar mídia", onClick: ... }} />`
     - _Requirements: 4.4_
 
-  - [ ] 3.8 Aplicar `<EmptyState>` em `src/app/admin/suporte/page.tsx:78-81` (suporte admin)
+  - [x] 3.8 Aplicar `<EmptyState>` em `src/app/admin/suporte/page.tsx:78-81` (suporte admin)
     - Substituir markup inline por `<EmptyState title="Nenhum chamado pendente" />`
     - _Requirements: 4.4_
 
-  - [ ] 3.9 Migrar listas vazias adicionais quando trivial
+  - [x] 3.9 Migrar listas vazias adicionais quando trivial
     - Para cada um destes sites, decidir se migra para `<EmptyState>` ou registra em `inventario-rotas.md > Listas vazias não migradas`:
       - `src/app/em-alta/page.tsx:49-55`
       - `src/app/em-destaque/page.tsx:40-46`
@@ -112,7 +112,7 @@ Restrições importantes:
     - Nota: sites com lógica embutida não-trivial podem permanecer como inline e ficam fora do escopo
     - _Requirements: 4.5_
 
-- [ ] 4. Wave Loading state primitive
+- [x] 4. Wave Loading state primitive
   - [x] 4.1 Criar `src/components/ui/loading-skeleton.tsx`
     - Exportar `<LoadingSkeleton>` com prop `variant: "card" | "list" | "detail" | "form" | "gallery" | "text-block"`, `count?: number`, `className?: string`, `ariaLabel?: string` (default "Carregando...")
     - Cada variante implementa estrutura específica (cf. `design.md > Components and Interfaces > 2`)
@@ -126,12 +126,12 @@ Restrições importantes:
     - `className` é mesclado no container raiz (via `cn`)
     - _Requirements: 2.1, 2.2_
 
-  - [ ] 4.3 Refatorar `src/app/painel/loading.tsx`
+  - [x] 4.3 Refatorar `src/app/painel/loading.tsx`
     - Substituir spinner genérico (`<div className="...animate-spin..." />`) por `<LoadingSkeleton variant="form" ariaLabel="Carregando painel" />`
     - Validar visualmente que a tela não regrediu
     - _Requirements: 2.4_
 
-  - [ ] 4.4 Wave A — criar `loading.tsx` em rotas autenticadas do painel (Requirement 1.4)
+  - [x] 4.4 Wave A — criar `loading.tsx` em rotas autenticadas do painel (Requirement 1.4)
     - Para cada rota classificada como `tela_autenticada` + `loading: criar` no inventário:
       - `src/app/painel/midias/loading.tsx` → `variant="gallery"`
       - `src/app/painel/perfil/loading.tsx` → `variant="form"`
@@ -146,7 +146,7 @@ Restrições importantes:
     - Cada arquivo mínimo: `export default function PainelXxxLoading() { return <LoadingSkeleton variant="..." ariaLabel="Carregando ..." />; }`
     - _Requirements: 2.5, 1.4_
 
-  - [ ] 4.5 Wave B — criar `loading.tsx` em rotas autenticadas de `/conta`
+  - [x] 4.5 Wave B — criar `loading.tsx` em rotas autenticadas de `/conta`
     - Para cada rota classificada como `tela_autenticada` + `loading: criar`:
       - `src/app/conta/perfil/loading.tsx` → `variant="form"`
       - `src/app/conta/verificacao/loading.tsx` → `variant="form"`
@@ -156,7 +156,7 @@ Restrições importantes:
       - `src/app/conta/onboarding/publicar/loading.tsx` → `variant="card"`
     - _Requirements: 2.5, 1.4_
 
-  - [ ] 4.6 Wave C — criar `loading.tsx` em listagens públicas / formulários
+  - [x] 4.6 Wave C — criar `loading.tsx` em listagens públicas / formulários
     - Para cada rota classificada como `listagem_publica` ou `formulario` + `loading: criar`:
       - `src/app/em-alta/loading.tsx` → `variant="card"`
       - `src/app/em-destaque/loading.tsx` → `variant="card"`
@@ -172,7 +172,7 @@ Restrições importantes:
       - `src/app/solicitar/[slug]/loading.tsx` → `variant="form"`
     - _Requirements: 2.5, 1.4_
 
-  - [ ] 4.7 Wave D — criar `loading.tsx` em rotas de admin
+  - [x] 4.7 Wave D — criar `loading.tsx` em rotas de admin
     - Para cada rota classificada como `tela_autenticada` (admin) + `loading: criar`:
       - `src/app/admin/loading.tsx` → `variant="list"`
       - `src/app/admin/perfis/loading.tsx` → `variant="list"`
@@ -185,13 +185,13 @@ Restrições importantes:
       - `src/app/admin/cidades/loading.tsx` → `variant="list"`
     - _Requirements: 2.5, 1.4_
 
-  - [ ] 4.8 Validar Property 2 (cobertura de loading)
+  - [x] 4.8 Validar Property 2 (cobertura de loading)
     - Após Waves 4.4–4.7, rodar parser que valida cobertura conforme `design.md > Correctness Properties > Property 2`
     - Implementação: `*.test.ts` em `.kiro/specs/fase-5-ux/` ou em `src/app/` que parsa `inventario-rotas.md`, filtra linhas com `loading: criar`, e valida `existsSync` + `readFileSync().includes("LoadingSkeleton")`
     - _Requirements: 2.5, 1.4_
     - _Validates: Property 2 (parcial — `loading.tsx`)_
 
-- [ ] 5. Wave Error boundary primitive
+- [x] 5. Wave Error boundary primitive
   - [x] 5.1 Criar `src/components/ui/error-state.tsx`
     - Exportar `<ErrorState>` com props `title`, `description?`, `onRetry`, `homeHref?`, `variant?: "inline" | "page"`, `digest?`, `className?`
     - `role="alert"` quando `variant === "page"`, `role="status"` quando `variant === "inline"`
@@ -209,14 +209,14 @@ Restrições importantes:
     - `digest` aparece apenas quando `variant === "page"`
     - _Requirements: 3.2, 3.6_
 
-  - [ ] 5.3 Refatorar os 4 `error.tsx` existentes
+  - [x] 5.3 Refatorar os 4 `error.tsx` existentes
     - `src/app/error.tsx` → `<ErrorState variant="page" title="Algo deu errado" description="Ocorreu um erro inesperado. Tente novamente." onRetry={reset} digest={error.digest} />`
     - `src/app/painel/error.tsx` → `<ErrorState variant="page" title="Erro no painel" description="Não foi possível carregar esta página. Tente novamente." onRetry={reset} />`
     - `src/app/descobrir/[citySlug]/error.tsx` → `<ErrorState variant="page" title="Erro ao carregar" description="Não foi possível carregar os perfis desta cidade." onRetry={reset} />`
     - `src/app/p/[slug]/error.tsx` → `<ErrorState variant="page" title="Perfil indisponível" description="Não foi possível carregar este perfil." onRetry={reset} homeHref="/" />`
     - _Requirements: 3.3, 3.4_
 
-  - [ ] 5.4 Wave A — criar `error.tsx` em rotas com `loading.tsx` recém-criado (Wave 4)
+  - [x] 5.4 Wave A — criar `error.tsx` em rotas com `loading.tsx` recém-criado (Wave 4)
     - Para cada rota classificada como `error: criar` no inventário (espelha as rotas com `loading: criar` da Wave 4):
       - `src/app/painel/{midias,perfil,plano,reels,stories,suporte,valores,disponibilidade,avaliacoes}/error.tsx`
       - `src/app/painel/suporte/[id]/error.tsx`
@@ -229,7 +229,7 @@ Restrições importantes:
     - Cada arquivo mínimo: `"use client"; export default function XxxError({ error, reset }) { return <ErrorState variant="page" title="Erro ao carregar" onRetry={reset} digest={error.digest} />; }`
     - _Requirements: 3.3, 1.5_
 
-  - [ ] 5.5 Validar Property 2 (cobertura de error)
+  - [x] 5.5 Validar Property 2 (cobertura de error)
     - Estender o parser de 4.8 para validar `error.tsx`
     - Filtrar linhas com `error: criar`, validar `existsSync` + `readFileSync().includes("ErrorState")`
     - _Requirements: 3.3, 1.5_

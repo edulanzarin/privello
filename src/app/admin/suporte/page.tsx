@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 41 (admin lista tickets).
 export const dynamic = "force-dynamic";
@@ -76,7 +77,9 @@ export default async function AdminSuportePage() {
           </p>
         </div>
         {tickets.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-muted">Nenhum chamado pendente.</p>
+          <div className="px-4 py-6">
+            <EmptyState title="Nenhum chamado pendente" />
+          </div>
         ) : (
           tickets.map((t) => <TicketRow key={t.id} t={t} />)
         )}

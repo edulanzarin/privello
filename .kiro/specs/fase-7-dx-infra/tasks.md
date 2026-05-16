@@ -17,14 +17,14 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
 
 ## Tasks
 
-- [ ] 1. Validar §4 AGENTS_Rule e baseline
-  - [ ] 1.1 Confirmar §4 AGENTS_Rule = `n/a`
+- [x] 1. Validar §4 AGENTS_Rule e baseline
+  - [x] 1.1 Confirmar §4 AGENTS_Rule = `n/a`
     - Ler `requirements.md > §4` e confirmar que a linha única `> n/a — fase não toca APIs do Next.js.` está presente
     - Confirmar que nenhum dos artefatos produzidos por esta fase toca APIs do Next.js (CI YAML, docs, ADRs, changelog, cleanup TS)
     - Se durante a execução algo exigir tocar API do Next.js, registrar como `OutOfScopeFinding` em §3 (regra dura E5 do master)
     - _Requirements: 9.2_
 
-  - [ ] 1.2 Inventariar baseline real no momento da execução
+  - [x] 1.2 Inventariar baseline real no momento da execução
     - Re-rodar `npm run lint` e capturar contagem atual de problems/errors/warnings (registrar em `dx-conventions.md > §1 > Estado do lint herdado`)
     - Re-rodar `[regex]::Matches` sobre `src/**/*.{ts,tsx}` com pattern `:\s*any\b|\bas\s+any\b|<any>` e capturar count atual de `any` (registrar em `dx-conventions.md > §6 Type-safety baseline`)
     - Confirmar ausência de `.github/workflows/`, `docs/adr/`, `CHANGELOG.md` (`Test-Path` retorna `False`)
@@ -32,21 +32,21 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Listar variáveis em `.env.example` e cruzar com `process.env.X` em `src/**` para identificar variáveis "fantasma"
     - _Requirements: 5.2, 5.3, Item 1 do §2 Revalidação_
 
-  - [ ] 1.3 Criar scaffold de `dx-conventions.md`
+  - [x] 1.3 Criar scaffold de `dx-conventions.md`
     - Criar `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\dx-conventions.md`
     - Seções vazias com cabeçalhos: `§1 CI Pipeline`, `§2 Docker doc`, `§3 Env vars doc`, `§4 Queries cleanup`, `§5 ADRs`, `§6 Type-safety baseline`, `§7 Changelog`, `§8 Smoke checks finais`
     - Anexar inventário da Tarefa 1.2 nas seções correspondentes (§1 lint, §6 any)
     - _Requirements: Saída desta fase_
 
 - [ ] 2. Wave CI Pipeline
-  - [ ] 2.1 Decidir versão de Node para a CI
+  - [x] 2.1 Decidir versão de Node para a CI
     - Avaliar declarar `package.json > engines.node` nesta fase OU manter sem declaração e fixar a versão direto no YAML
     - Se declarar: alinhar com versão LTS atual (Node 20 ou Node 22) e usar `node-version-file: 'package.json'` no `actions/setup-node`
     - Se não declarar: fixar `node-version: '20'` (ou outra LTS) no YAML e registrar a justificativa em ADR 0004
     - Registrar a decisão em `dx-conventions.md > §1 CI Pipeline > Versão do Node`
     - _Requirements: 8.3_
 
-  - [ ] 2.2 Decidir tolerância de lint herdado
+  - [x] 2.2 Decidir tolerância de lint herdado
     - Re-rodar `npm run lint` (referência: Tarefa 1.2) e contar errors herdados em arquivos de UX/painel
     - Avaliar 3 opções (cf. `design.md > Components and Interfaces > 1`):
       - **Opção A (bloquear)**: CI vermelha até fase-5 corrigir. Aceitável se houver banda da fase-5 paralela e os errors caírem rapidamente
@@ -55,7 +55,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Tomar a decisão e registrar em `dx-conventions.md > §1 CI Pipeline > Tolerância de lint herdado`
     - _Requirements: 1.5_
 
-  - [ ] 2.3 Criar `.github/workflows/ci.yml`
+  - [x] 2.3 Criar `.github/workflows/ci.yml`
     - Criar diretório `.github/workflows/` na raiz do repositório
     - Criar `ci.yml` conforme esboço de `design.md > Components and Interfaces > 1`:
       - `name: CI`
@@ -65,7 +65,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Aplicar versões de actions estáveis (`@v4` recomendado em 2026 para `checkout` e `setup-node` — confirmar na execução)
     - _Requirements: 1.2, 1.3, 1.4, 1.6, 8.2, 8.4_
 
-  - [ ] 2.4 Validar YAML localmente
+  - [x] 2.4 Validar YAML localmente
     - Validar sintaxe YAML (qualquer parser; PowerShell `ConvertFrom-Yaml` se disponível, ou inspeção manual)
     - Confirmar que o YAML não usa `cd` (proibido por convenção do orquestrador) e que todos os caminhos são relativos ao checkout
     - Confirmar que cada step tem `name` em pt-BR (ou inglês curto idiomático para steps de actions)
@@ -78,13 +78,13 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - _Requirements: 1.7_
 
 - [ ] 3. Wave Docker doc
-  - [ ] 3.1 Decidir localização da Docker doc
+  - [x] 3.1 Decidir localização da Docker doc
     - Avaliar `docs/docker.md` separado vs seção `## Docker (Postgres de dev)` em `README.md`
     - Decisão preferida: `docs/docker.md` (mantém README enxuto)
     - Registrar a decisão em `dx-conventions.md > §2 Docker doc > Localização` e em ADR 0005
     - _Requirements: 2.3_
 
-  - [ ] 3.2 Criar `docs/docker.md`
+  - [x] 3.2 Criar `docs/docker.md`
     - Criar diretório `docs/` na raiz se ainda não existir (decisão consistente com Wave 4 e Wave 7)
     - Criar `docs/docker.md` conforme esboço de `design.md > Components and Interfaces > 2`:
       - Visão geral (compose provê apenas Postgres, NÃO a app)
@@ -96,7 +96,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - **NÃO** modificar `docker-compose.yml` (apenas leitura)
     - _Requirements: 2.2, 2.4_
 
-  - [ ] 3.3 Adicionar link curto no README
+  - [x] 3.3 Adicionar link curto no README
     - Adicionar linha em `README.md` apontando para `docs/docker.md` (ex.: `Para subir o Postgres de dev, ver [docs/docker.md](./docs/docker.md).`)
     - Manter o resto do README inalterado
     - _Requirements: 2.3_
@@ -107,13 +107,13 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - _Requirements: 2.5_
 
 - [ ] 4. Wave Env vars doc
-  - [ ] 4.1 Decidir localização da Env vars doc
+  - [x] 4.1 Decidir localização da Env vars doc
     - Avaliar `docs/env.md` separado vs seção `## Variáveis de ambiente` em `README.md`
     - Decisão preferida: `docs/env.md` (consistente com `docs/docker.md`; mantém escopo claro)
     - Registrar a decisão em `dx-conventions.md > §3 Env vars doc > Localização` e em ADR 0005 (mesmo ADR que cobre a Docker doc)
     - _Requirements: 3.6_
 
-  - [ ] 4.2 Inventariar variáveis fantasma
+  - [x] 4.2 Inventariar variáveis fantasma
     - Re-rodar `grep_search` em `src/**/*.{ts,tsx}` por `process\.env\.[A-Z_][A-Z0-9_]*` e listar todas as variáveis encontradas
     - Cruzar com `.env.example` para identificar as variáveis "fantasma" (lidas pelo código mas não documentadas)
     - Confirmar que pelo menos `NODE_ENV`, `PRISMA_DEBUG_QUERIES`, `NEXTAUTH_URL`, `MP_WEBHOOK_SECRET`, `CI` estão fora do `.env.example`

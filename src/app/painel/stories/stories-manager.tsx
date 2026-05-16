@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Trash2, Eye, Heart, Clock, Plus } from "lucide-react";
 import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useFileUpload } from "@/lib/hooks/use-file-upload";
 import { cn } from "@/lib/utils";
 
@@ -110,10 +111,11 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
         </p>
 
         {activeStories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded border border-dashed border-line py-16 text-center">
-            <ImagePlus className="h-10 w-10 text-muted" strokeWidth={1} />
-            <p className="text-sm text-muted">Nenhum story ativo. Publique um ao lado.</p>
-          </div>
+          <EmptyState
+            title="Nenhum story ativo"
+            description="Publique um story no painel ao lado."
+            icon={<ImagePlus className="h-10 w-10" strokeWidth={1} />}
+          />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {activeStories.map((s) => (

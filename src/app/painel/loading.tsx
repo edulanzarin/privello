@@ -1,7 +1,5 @@
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+
 export default function PainelLoading() {
-    return (
-        <div className="flex min-h-[50vh] items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-        </div>
-    );
+    return <LoadingSkeleton variant="form" ariaLabel="Carregando painel" />;
 }

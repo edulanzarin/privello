@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
 import { getHotProfiles, getHotPeriodStart } from "@/lib/services";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // Cache strategy: revalidate=120 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 6.
@@ -47,19 +48,12 @@ export default async function EmAltaPage() {
 
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           {profiles.length === 0 ? (
-            <div className="py-20 text-center">
-              <TrendingUp className="mx-auto h-10 w-10 text-muted" strokeWidth={1} />
-              <p className="mt-4 font-serif text-2xl">Ainda sem dados esta semana.</p>
-              <p className="mt-2 text-sm text-muted">
-                Visite alguns perfis para começar a gerar o ranking.
-              </p>
-              <Link
-                href="/descobrir/sao-paulo-sp"
-                className="mt-6 inline-block rounded-lg border border-foreground px-6 py-2.5 text-xs font-semibold"
-              >
-                Explorar perfis
-              </Link>
-            </div>
+            <EmptyState
+              title="Ainda sem dados esta semana"
+              description="Visite alguns perfis para começar a gerar o ranking."
+              icon={<TrendingUp className="h-10 w-10" strokeWidth={1} />}
+              action={{ label: "Explorar perfis", href: "/descobrir/sao-paulo-sp" }}
+            />
           ) : (
             <div className="columns-1 gap-6 sm:columns-2 lg:columns-4 [&>*]:mb-6 [&>*]:break-inside-avoid">
               {profiles.map((p) => (

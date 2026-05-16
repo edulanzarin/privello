@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { MediaDeleteBtn, MediaVisibilityBtn } from "@/components/admin/media-actions";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Heart, MessageCircle, Lock, Star, Play, LayoutGrid, List, Eye } from "lucide-react";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 38 (admin moderação de mídias).
@@ -161,7 +162,9 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
       </div>
 
       {media.length === 0 ? (
-        <div className="py-24 text-center text-muted text-sm">Nenhuma mídia encontrada.</div>
+        <div className="py-6">
+          <EmptyState title="Nenhuma mídia encontrada" />
+        </div>
       ) : viewMode === "list" ? (
         /* ── LIST VIEW ── */
         <div className="rounded border border-line bg-white shadow-sm overflow-x-auto">

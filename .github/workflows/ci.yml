@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-test:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+          cache: 'npm'
+
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      - name: Lint (npm run lint)
+        # Tolerância: lint herdado em código de UX/painel pertence à fase-5-ux.
+        # `continue-on-error: true` permite que a CI mostre os errors como sinal
+        # observável sem bloquear o merge. Tipos e testes (steps abaixo) seguem
+        # bloqueantes. Decisão registrada em ADR 0004 e em
+        # .kiro/specs/fase-7-dx-infra/dx-conventions.md > §1.
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Typecheck (npx tsc --noEmit)
+        run: npx tsc --noEmit
+
+      - name: Test (npm run test)
+        run: npm run test
+        env:
+          CI: 'true'
