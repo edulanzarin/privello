@@ -271,6 +271,9 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\ux-premium-polish`
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\final-polish-phase`
 - **agents_rule_areas**: `view-transitions` (avaliação e adoção da API de View Transitions do Next 16 nas rotas onde for aplicável).
+- **state**: `InProgress`
+- **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-5-ux\`
+- **promoted_at**: 2026-05-17
 
 #### Acceptance Criteria
 
@@ -331,6 +334,9 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **out_of_scope**: monitoramento em produção (APM/log shipping), feature flags e blue/green deploy.
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\final-polish-phase`
+- **state**: `InProgress`
+- **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\`
+- **promoted_at**: 2026-05-17
 
 #### Acceptance Criteria
 
