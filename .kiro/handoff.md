@@ -143,7 +143,9 @@ Fases destravadas:
 - **Fase 5 (`fase-5-ux`)**: dependências fase-2 + fase-4 — fase-4 ainda pendente.
 - **Fase 7 (`fase-7-dx-infra`)**: dependências fase-1 + fase-2 + fase-3 — fase-3 ainda pendente.
 
-Recomendação: promover `fase-3-backend` ou `fase-4-design-system` a seguir (independentes entre si).
+Recomendação: promover `fase-3-backend` E/OU `fase-4-design-system` a seguir (independentes entre si, podem rodar em paralelo).
+
+**Prompt pronto para retomar em nova sessão**: `.kiro/NEXT_SESSION_PROMPT.md`. Cole o bloco indicado lá no chat da nova sessão e o agente continua de onde parou.
 
 ## Observações operacionais
 
