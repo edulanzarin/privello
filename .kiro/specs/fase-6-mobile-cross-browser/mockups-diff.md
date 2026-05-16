@@ -325,7 +325,7 @@ A ser anexado: linha de commit + diff resumido.
 
 ### `OutOfScopeFinding` herdado de fase-4
 
-A linha original em `requirements.md > §3` (lightbox responsivo de `media-gallery.tsx:178`) é **absorvida** pela criação do `<MediaLightbox>` + substituição. Atualizar a referência da §3 com `commit_master_id` placeholder `<pendente-fase-6>` (orquestrador resolve depois).
+A linha original em `requirements.md > §3` (lightbox responsivo de `media-gallery.tsx:178`) é **absorvida** pela criação do `<MediaLightbox>` + substituição. Referência da §3 atualizada com `commit_master_id`: `48f7f1a` (criação + substituição) → `75e5473` (entrega completa).
 
 ---
 
@@ -367,7 +367,7 @@ Redesign foi pontual exatamente como autorizado pelo Requirement 7.5. Mudanças 
 
 ### Cross-reference
 
-A linha original em `requirements.md > §3` registrando "Bottom nav mobile redesign herdado de fase-5" é absorvida pelo trabalho desta Wave. Atualizado em §3 (abaixo) com referência ao commit que entrega esta Wave (placeholder `<pendente-fase-6>`).
+A linha original em `requirements.md > §3` registrando "Bottom nav mobile redesign herdado de fase-5" é absorvida pelo trabalho desta Wave. Atualizado em §3 (abaixo) com referência aos commits que entregam esta Wave: `5d61e4f` (44×44 categoria b) + `8cf2a57` (diff visual + bottom-nav redesign) → `75e5473` (entrega completa).
 
 ---
 

@@ -453,7 +453,7 @@ Restrições importantes:
     - Properties 1 e 2 rodam verde
     - _Requirements: 1.6, 2.5, 3.4, 4.5, 5.2, 6.7, 7.3, 7.4, 8.2_
 
-  - [ ] 14.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
+  - [x] 14.2 [orquestrador] Atualizar Phase Card no master `requirements.md`
     - **Esta tarefa é executada pelo orquestrador, não pelo executor da fase**
     - `state: SpawnReady` ou `InProgress` → `state: Done`
     - Adicionar `doneAt` ISO-8601 no formato `YYYY-MM-DDTHH:MM:SSZ`
