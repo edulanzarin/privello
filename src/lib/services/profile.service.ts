@@ -1,3 +1,24 @@
+/**
+ * src/lib/services/profile.service.ts
+ *
+ * Service layer central para a entidade `Profile` (perfis públicos de providers
+ * e seus dados derivados: mídia paginada, reviews, contadores).
+ *
+ * Cobertura:
+ * - `getProfileBySlug` — perfil público completo com paginação cursor-based de mídia
+ *   e batching de reviews (corrige N+1 da pré-auditoria; cf. fase-3-backend EAR 1).
+ * - `getProfileMediaPage` — paginação cursor-based pura (validada pela Property 2).
+ * - Helpers de cursor (`encodeMediaCursor`, `decodeMediaCursor`).
+ * - Listagens para descobrir, em-alta, em-destaque (consumidas via `getOrCreateCityBySlug`).
+ *
+ * Convenções:
+ * - Server-side, lê Prisma direto. Consumidores: Server Components em `/p/[slug]/`, `/descobrir/[citySlug]/`, painel.
+ * - Cursor é base64url de `{ sortOrder, id }` (estável entre requisições).
+ * - Pré-auditoria: a maior parte vivia em `src/lib/queries.ts`. Migrada na fase-3-backend.
+ *
+ * Cf. `.kiro/specs/fase-3-backend/metricas-baseline.md` para benchmarks antes/depois.
+ */
+
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { REVIEWS_PAGE_SIZE } from "@/lib/constants";

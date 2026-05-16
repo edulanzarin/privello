@@ -1,7 +1,32 @@
+/**
+ * src/lib/services/city.service.ts
+ *
+ * Service layer para entidade `City` (cidades onde o Privello opera).
+ *
+ * Cobertura:
+ * - Lookup por slug com fallback (`getCityBySlug`).
+ * - Get-or-create por slug usado em telas de descobrir (`getOrCreateCityBySlug`).
+ * - Listagens públicas e top-N por contagem de perfis.
+ *
+ * Convenções:
+ * - Toda função aqui é server-side (lê Prisma direto). Server Components e Server Actions consomem.
+ * - Slugs são lowercase ASCII com hífen (cf. `prisma/seed.ts`). Sufixo de estado opcional (`-rj`, `-sp`).
+ * - Pré-auditoria: parte dessa lógica vivia em `src/lib/queries.ts`. Migrada na fase-3-backend.
+ */
+
 import { prisma } from "@/lib/prisma";
 
 /**
  * Busca cidade por slug com fallback para slug sem sufixo de estado.
+ *
+ * Tenta primeiro o slug exato; se não encontra e o slug tem múltiplos segmentos,
+ * remove o último segmento (assumido ser o sufixo de UF) e tenta de novo.
+ *
+ * @example
+ *   getCityBySlug("rio-de-janeiro-rj")  // tenta "rio-de-janeiro-rj"; se 404, tenta "rio-de-janeiro"
+ *   getCityBySlug("rio-de-janeiro")     // tenta apenas "rio-de-janeiro"
+ *
+ * @returns A cidade com `districts` carregados (ordem alfabética), ou `null` se nenhuma variante encontrar.
  */
 export async function getCityBySlug(slug: string) {
     const exact = await prisma.city.findUnique({
