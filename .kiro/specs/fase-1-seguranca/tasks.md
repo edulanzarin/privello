@@ -156,7 +156,7 @@ Restrições importantes:
     - Adicionar a chave com comentário descrevendo o uso (URL pública do app em produção)
     - _Requirements: 6.3_
 
-  - [~] 6.3 Criar `nextauth-prod.md` em `.kiro/specs/fase-1-seguranca/`
+  - [x] 6.3 Criar `nextauth-prod.md` em `.kiro/specs/fase-1-seguranca/`
     - Passo a passo de configuração em produção (Vercel/Docker): definir `AUTH_URL`, gerar `AUTH_SECRET`, validar com `curl /api/auth/session`
     - Apontar para o documento a partir do README na entrega da Fase 7 (registrar como dependência cruzada)
     - _Requirements: 6.4_
@@ -183,7 +183,7 @@ Restrições importantes:
     - Modificar qualquer um deles vira `OutOfScopeFinding`
     - _Requirements: 7.5_
 
-  - [~] 7.5 Declarar janela de validação para transição Report-Only → enforcement
+  - [x] 7.5 Declarar janela de validação para transição Report-Only → enforcement
     - Documentar em `nextauth-prod.md` (ou doc dedicado `csp-rollout.md`): janela mínima de 7 dias em produção, critério de transição (zero violações reportadas), procedimento de reversão
     - **NÃO transitar nesta fase** — a fase entrega CSP em modo Report-Only; a transição para `Content-Security-Policy` enforcement é commit posterior, fora do escopo desta entrega imediata
     - _Requirements: 7.3_
