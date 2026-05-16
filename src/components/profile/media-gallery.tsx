@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Lock, Play, X, Heart, MessageCircle, Trash2, Expand, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -127,16 +127,28 @@ function PostModal({
     return () => { window.removeEventListener("keydown", h); document.body.style.overflow = ""; };
   }, [idx, items.length, onClose]);
 
+  const [likePending, startLikeTransition] = useTransition();
+
   async function toggleLike() {
     if (!isClient) return;
+    if (likePending) return;
     const cur = likes[item.id] ?? { count: item.likeCount, liked: item.likedByMe };
     const next = !cur.liked;
+    // Otimismo: aplica imediatamente.
     setLikes((s) => ({ ...s, [item.id]: { count: cur.count + (next ? 1 : -1), liked: next } }));
-    fetch("/api/media/like", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mediaId: item.id, liked: next }),
-    }).catch(() => setLikes((s) => ({ ...s, [item.id]: cur })));
+    startLikeTransition(async () => {
+      try {
+        const res = await fetch("/api/media/like", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mediaId: item.id, liked: next }),
+        });
+        if (!res.ok) throw new Error("like failed");
+      } catch {
+        // Rollback formal ao estado anterior.
+        setLikes((s) => ({ ...s, [item.id]: cur }));
+      }
+    });
   }
 
   async function postComment() {
@@ -336,8 +348,8 @@ function PostModal({
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleLike}
-                disabled={!isClient}
-                className={cn("transition", !isClient && "opacity-40 cursor-not-allowed")}
+                disabled={!isClient || likePending}
+                className={cn("transition", (!isClient || likePending) && "opacity-40 cursor-not-allowed")}
               >
                 <Heart
                   className={cn("h-6 w-6 transition-transform active:scale-125", curLike.liked ? "fill-coral text-coral" : "text-foreground hover:text-muted")}

@@ -109,6 +109,25 @@ const remotePatterns: RemotePattern[] = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.1.93", ...extraOrigins],
+  // AGENTS_Rule (area: view-transitions) — consulta em 2026-05-17:
+  //   - node_modules/next/dist/docs/01-app/02-guides/view-transitions.md
+  //     (guia "View Transitions" — `<ViewTransition>` é fornecido pelo React 19
+  //     e ativado por `experimental.viewTransition: true`. Em Next.js,
+  //     navegações de rota são transitions, então `<ViewTransition>` ativa
+  //     automaticamente em navegação. Padrões: shared element morph, Suspense
+  //     reveal, directional slide via `<Link transitionTypes>`, same-route
+  //     crossfade via `key`. Cobertura `@media (prefers-reduced-motion)`
+  //     documentada literalmente nas linhas finais do guia.)
+  //   - node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/viewTransition.md
+  //     (config "viewTransition" marcada como `version: experimental`.)
+  //
+  // Decisão: ativar a flag uma vez aqui; aplicar `<ViewTransition>` em
+  // sites pontuais (Suspense reveal em /p/[slug], same-route crossfade em
+  // /descobrir/[citySlug], directional slide nos 4 onboarding pages). Cf.
+  // .kiro/specs/fase-5-ux/design.md > Components and Interfaces > 6.
+  experimental: {
+    viewTransition: true,
+  },
   images: {
     remotePatterns,
   },

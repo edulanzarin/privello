@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useTransition } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, X, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -167,30 +167,76 @@ export function StoryBar({
     return () => window.removeEventListener("keydown", onKey);
   }, [activeGroupIdx, closeViewer, goNextStory, goPrevStory]);
 
+  const [likePending, startLikeTransition] = useTransition();
+
   async function toggleLike() {
     if (!activeStory || !isClient) return;
-    const res = await fetch("/api/stories/like", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ storyId: activeStory.id }),
+    if (likePending) return;
+    const groupIdx = activeGroupIdx;
+    const storyIdx = activeStoryIdx;
+    const prevLiked = activeStory.likedByMe;
+    const prevCount = activeStory.likeCount;
+    const nextLiked = !prevLiked;
+    const nextCount = nextLiked ? prevCount + 1 : Math.max(0, prevCount - 1);
+
+    // Otimismo: aplica imediatamente
+    setLocalGroups((prev) =>
+      prev.map((g, gi) =>
+        gi !== groupIdx
+          ? g
+          : {
+            ...g,
+            stories: g.stories.map((s, si) =>
+              si !== storyIdx
+                ? s
+                : { ...s, likedByMe: nextLiked, likeCount: nextCount },
+            ),
+          },
+      ),
+    );
+
+    startLikeTransition(async () => {
+      try {
+        const res = await fetch("/api/stories/like", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ storyId: activeStory.id }),
+        });
+        if (!res.ok) throw new Error("like failed");
+        const { liked } = await res.json();
+        // Reconcilia com o valor confirmado do servidor.
+        setLocalGroups((prev) =>
+          prev.map((g, gi) =>
+            gi !== groupIdx
+              ? g
+              : {
+                ...g,
+                stories: g.stories.map((s, si) =>
+                  si !== storyIdx
+                    ? s
+                    : { ...s, likedByMe: liked, likeCount: liked ? prevCount + 1 : prevCount },
+                ),
+              },
+          ),
+        );
+      } catch {
+        // Rollback ao estado anterior em caso de falha.
+        setLocalGroups((prev) =>
+          prev.map((g, gi) =>
+            gi !== groupIdx
+              ? g
+              : {
+                ...g,
+                stories: g.stories.map((s, si) =>
+                  si !== storyIdx
+                    ? s
+                    : { ...s, likedByMe: prevLiked, likeCount: prevCount },
+                ),
+              },
+          ),
+        );
+      }
     });
-    if (res.ok) {
-      const { liked } = await res.json();
-      setLocalGroups((prev) =>
-        prev.map((g, gi) =>
-          gi !== activeGroupIdx
-            ? g
-            : {
-              ...g,
-              stories: g.stories.map((s, si) =>
-                si !== activeStoryIdx
-                  ? s
-                  : { ...s, likedByMe: liked, likeCount: liked ? s.likeCount + 1 : s.likeCount - 1 },
-              ),
-            },
-        ),
-      );
-    }
   }
 
   if (localGroups.length === 0) return null;
@@ -327,7 +373,8 @@ export function StoryBar({
                 {isClient ? (
                   <button
                     onClick={toggleLike}
-                    className="flex items-center gap-1.5 text-sm text-white"
+                    disabled={likePending}
+                    className="flex items-center gap-1.5 text-sm text-white disabled:opacity-60"
                   >
                     <Heart
                       className={cn(

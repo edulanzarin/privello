@@ -235,7 +235,7 @@ Restrições importantes:
     - _Requirements: 3.3, 1.5_
     - _Validates: Property 2 (completa — `error.tsx`)_
 
-- [ ] 6. Wave UI otimista com rollback
+- [x] 6. Wave UI otimista com rollback
   - [x] 6.1 Criar `src/lib/hooks/use-optimistic-toggle.ts`
     - Implementar `useOptimisticToggle<T>` com `useOptimistic` + `useState` + `useTransition` conforme `design.md > Components and Interfaces > 5`
     - Export retorna `{ value, committed, toggle, pending }`
@@ -258,49 +258,49 @@ Restrições importantes:
     - _Requirements: 5.7_
     - _Validates: Property 1_
 
-  - [ ] 6.4 Refatorar `src/components/profile/favorite-button.tsx`
+  - [x] 6.4 Refatorar `src/components/profile/favorite-button.tsx`
     - Substituir `useState(initialFavorited)` + `useTransition` + `setFavorited` manual por `useOptimisticToggle({ initialValue: initialFavorited, action: async (next) => { const res = await toggleFavorite(profileId); if ('error' in res) throw new Error(res.error); return res.favorited; }, onError: (err) => toast(err.message, "error") })`
     - `disabled={pending}` no botão para evitar dupla submissão
     - _Requirements: 5.3, 5.5, 5.6_
 
-  - [ ] 6.5 Refatorar `src/lib/hooks/use-media-actions.ts`
+  - [x] 6.5 Refatorar `src/lib/hooks/use-media-actions.ts`
     - Substituir fetch direto por wrapper que usa `useOptimisticToggle` para `toggleLike`
     - Preservar API pública do hook (mesmas funções exportadas) para não quebrar consumidores
     - _Requirements: 5.4_
 
-  - [ ] 6.6 Refatorar `src/components/stories/story-bar.tsx:170-180` (`toggleLike`)
+  - [x] 6.6 Refatorar `src/components/stories/story-bar.tsx:170-180` (`toggleLike`)
     - Migrar `toggleLike` para `useOptimisticToggle`
     - Lint herdado em `story-bar.tsx`: corrigir o que sair barato como efeito colateral; deixar o resto para fase-7
     - _Requirements: 5.4, 5.5, 5.6_
 
-  - [ ] 6.7 Refatorar `src/components/reels/reels-feed.tsx:115-130` (`toggleLike`)
+  - [x] 6.7 Refatorar `src/components/reels/reels-feed.tsx:115-130` (`toggleLike`)
     - Migrar `toggleLike` para `useOptimisticToggle`
     - _Requirements: 5.4, 5.5, 5.6_
 
-  - [ ] 6.8 Refatorar `src/components/profile/media-gallery.tsx:130-150` (`toggleLike`)
+  - [x] 6.8 Refatorar `src/components/profile/media-gallery.tsx:130-150` (`toggleLike`)
     - Migrar `toggleLike` para `useOptimisticToggle`
     - Lint herdado em `media-gallery.tsx`: corrigir o que sair barato; resto para fase-7
     - _Requirements: 5.4, 5.5, 5.6_
 
-  - [ ] 6.9 Refatorar `src/components/profile/profile-story-cover.tsx:141-160` (`toggleLike`)
+  - [x] 6.9 Refatorar `src/components/profile/profile-story-cover.tsx:141-160` (`toggleLike`)
     - Migrar `toggleLike` para `useOptimisticToggle`
     - Lint herdado em `profile-story-cover.tsx`: idem
     - _Requirements: 5.4, 5.5, 5.6_
 
-- [ ] 7. Wave View Transitions (com AGENTS_Rule)
-  - [ ] 7.1 Re-validar consulta AGENTS_Rule antes da primeira decisão técnica
+- [x] 7. Wave View Transitions (com AGENTS_Rule)
+  - [x] 7.1 Re-validar consulta AGENTS_Rule antes da primeira decisão técnica
     - Confirmar que `requirements.md > §4` ainda está preenchida (regra dura E5)
     - Caso houver minor do Next entre a redação e esta wave, **adicionar nova linha** na §4 (não sobrescrever)
     - _Requirements: 6.1_
 
-  - [ ] 7.2 Ativar `experimental.viewTransition: true` em `next.config.ts`
+  - [x] 7.2 Ativar `experimental.viewTransition: true` em `next.config.ts`
     - Adicionar `experimental: { viewTransition: true }` (e demais flags se já houver `experimental` block)
     - Comentário inline citando `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/viewTransition.md` + data
     - Rodar `npm run build` e validar exit 0
     - Se build falhar com warning relacionada a `viewTransition`, registrar em `OutOfScopeFinding` e desativar a flag
     - _Requirements: 6.2, 6.6_
 
-  - [ ] 7.3 Adicionar keyframes CSS auxiliares em `src/app/globals.css`
+  - [x] 7.3 Adicionar keyframes CSS auxiliares em `src/app/globals.css`
     - `@keyframes fade`, `@keyframes slide-y`, `@keyframes slide` (com `--slide-offset` variable)
     - `::view-transition-old/new(.slide-down)`, `::view-transition-old/new(.slide-up)` (Suspense reveal)
     - `::view-transition-old/new(.nav-forward)`, `::view-transition-old/new(.nav-back)` (directional slide)
@@ -308,49 +308,49 @@ Restrições importantes:
     - **Zero hex literal** novo no arquivo (cores via tokens existentes)
     - _Requirements: 6.4_
 
-  - [ ] 7.4 Aplicar Suspense reveal em `src/app/p/[slug]/page.tsx`
+  - [x] 7.4 Aplicar Suspense reveal em `src/app/p/[slug]/page.tsx`
     - Refatorar para envolver o conteúdo em `<Suspense fallback={<ViewTransition exit="slide-down"><ProfileDetailSkeleton /></ViewTransition>}>` + `<ViewTransition enter="slide-up" default="none">{conteúdo}</ViewTransition>`
     - Importar `ViewTransition` de `react`
     - Validar manualmente: navegar para um perfil deve mostrar slide-down do skeleton + slide-up do conteúdo
     - _Requirements: 6.3_
 
-  - [ ] 7.5 Aplicar same-route crossfade em `src/app/descobrir/[citySlug]/page.tsx`
+  - [x] 7.5 Aplicar same-route crossfade em `src/app/descobrir/[citySlug]/page.tsx`
     - Envolver o grid em `<ViewTransition key={citySlug} name="discover-grid" share="auto" enter="auto" default="none">{grid}</ViewTransition>`
     - Header e filtros permanecem fora do `<ViewTransition>`
     - Validar manualmente: trocar de cidade deve fazer crossfade no grid
     - _Requirements: 6.3_
 
-  - [ ] 7.6 Criar helper `src/app/conta/onboarding/onboarding-nav.tsx`
+  - [x] 7.6 Criar helper `src/app/conta/onboarding/onboarding-nav.tsx`
     - Exportar `OnboardingNext({ href, children })` (renderiza `<Link transitionTypes={['nav-forward']}>`) e `OnboardingBack({ href, children })` (`'nav-back'`)
     - Helper consumido pelos 4 page.tsx do onboarding
     - _Requirements: 6.3_
 
-  - [ ] 7.7 Aplicar directional slide nos 4 page.tsx do onboarding
+  - [x] 7.7 Aplicar directional slide nos 4 page.tsx do onboarding
     - Para cada `src/app/conta/onboarding/{perfil,fotos,valores,publicar}/page.tsx`, envolver o conteúdo em `<ViewTransition enter={{ 'nav-forward': 'nav-forward', 'nav-back': 'nav-back', default: 'none' }} exit={{ ... }} default="none">{conteúdo}</ViewTransition>`
     - Substituir `<Link>` de "Próximo" por `<OnboardingNext>` e "Voltar" por `<OnboardingBack>` onde aplicável
     - Validar manualmente: avançar entre passos deve fazer slide left, voltar deve fazer slide right
     - _Requirements: 6.3_
 
-  - [ ] 7.8 Confirmar que shared element morph NÃO foi adotado
+  - [x] 7.8 Confirmar que shared element morph NÃO foi adotado
     - Validar via `grep_search` que nenhum `<ViewTransition name="photo-...`>` foi introduzido
     - Registrar em `inventario-rotas.md > Decisões` que shared element morph fica como candidata futura
     - _Requirements: 6.5_
 
-- [ ] 8. Wave prefers-reduced-motion
-  - [ ] 8.1 Adicionar regra global em `src/app/globals.css`
+- [x] 8. Wave prefers-reduced-motion
+  - [x] 8.1 Adicionar regra global em `src/app/globals.css`
     - Adicionar `@media (prefers-reduced-motion: reduce) { ... }` cobrindo:
       - `*, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0.01ms !important; transition-duration: 0.01ms !important; transition-delay: 0.01ms !important; }`
       - `::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) { animation-duration: 0s !important; animation-delay: 0s !important; }`
     - Validar visualmente em `Chrome DevTools > Rendering > Emulate CSS media feature prefers-reduced-motion: reduce`
     - _Requirements: 7.1, 7.2_
 
-  - [ ] 8.2 Confirmar que microinterações novas (Wave 3-7) são cobertas pela regra global
+  - [x] 8.2 Confirmar que microinterações novas (Wave 3-7) são cobertas pela regra global
     - Listar microinterações introduzidas: `<EmptyState>` (sem animação própria — só hover de CTA), `<LoadingSkeleton>` (animate-pulse), `<ErrorState>` (sem animação), `<ViewTransition>` (Wave 7)
     - Confirmar que todas são CSS-side e cobertas pela regra global
     - Não criar regras paralelas isoladas
     - _Requirements: 7.3, 7.5_
 
-  - [ ] 8.3 * Criar teste de Property 3 (`globals-css-reduced-motion.test.ts`)
+  - [x] 8.3 * Criar teste de Property 3 (`globals-css-reduced-motion.test.ts`)
     - Parser textual lê `src/app/globals.css` e valida:
       - `@media (prefers-reduced-motion: reduce)` está presente
       - Bloco contém `*, *::before, *::after` com `animation-duration` e `transition-duration`
@@ -359,35 +359,35 @@ Restrições importantes:
     - _Requirements: 7.4_
     - _Validates: Property 3_
 
-  - [ ] 8.4 Documentar protocolo em `design.md` (já feito) e validar em revisão
+  - [x] 8.4 Documentar protocolo em `design.md` (já feito) e validar em revisão
     - Confirmar que `design.md > Components and Interfaces > 7. Microinteraction com prefers-reduced-motion` documenta:
       - Onde mora a regra global (`src/app/globals.css`)
       - Critério para adicionar nova microinteração (CSS-only > JS-side; usar `useReducedMotion` apenas se necessário)
       - Como validar em ambiente local
     - _Requirements: 7.5_
 
-- [ ] 9. PBTs co-localizados (gate de testes)
-  - [ ] 9.1 * Validar `use-optimistic-toggle.pbt.ts` (Property 1) rodando verde
+- [x] 9. PBTs co-localizados (gate de testes)
+  - [x] 9.1 * Validar `use-optimistic-toggle.pbt.ts` (Property 1) rodando verde
     - `npx vitest --run src/lib/hooks/use-optimistic-toggle.pbt.ts` termina com exit 0
     - Anexar log de saída em `inventario-rotas.md > Smoke checks`
     - Se falhar, persistir contraexemplo conforme `fase-2-testes/testing-conventions.md > §3`
     - _Requirements: 5.7_
     - _Validates: Property 1_
 
-  - [ ] 9.2 Validar Property 2 (cobertura de loading + error) rodando verde
+  - [x] 9.2 Validar Property 2 (cobertura de loading + error) rodando verde
     - `npx vitest --run` no arquivo do parser (4.8 + 5.5)
     - Cada linha do inventário com `loading: criar` ou `error: criar` deve ter arquivo correspondente
     - Anexar log em `inventario-rotas.md > Smoke checks`
     - _Requirements: 1.4, 1.5, 2.5, 3.3_
     - _Validates: Property 2_
 
-  - [ ] 9.3 * Validar Property 3 (`globals-css-reduced-motion.test.ts`) rodando verde
+  - [x] 9.3 * Validar Property 3 (`globals-css-reduced-motion.test.ts`) rodando verde
     - `npx vitest --run` no arquivo do parser (8.3)
     - Anexar log em `inventario-rotas.md > Smoke checks`
     - _Requirements: 7.4_
     - _Validates: Property 3_
 
-  - [ ] 9.4 Validar suite completa de testes não regrediu
+  - [x] 9.4 Validar suite completa de testes não regrediu
     - `npm run test` termina com exit 0 e todos os testes passam
     - Numero de testes deve ser ≥ ao baseline da fase-4 (172 testes em 2026-05-17)
     - _Requirements: 7.4_

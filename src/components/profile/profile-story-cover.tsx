@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { usePathname } from "next/navigation";
 import { Heart, X, Eye, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -138,21 +138,48 @@ export function ProfileStoryCover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, idx]);
 
+  const [likePending, startLikeTransition] = useTransition();
+
   async function toggleLike() {
     if (!isClient || !activeStory) return;
+    if (likePending) return;
     const liked = !activeStory.likedByMe;
     const storyId = activeStory.id;
-    await fetch("/api/stories/like", {
-      method: "POST",
-      body: JSON.stringify({ storyId, liked }),
-      headers: { "Content-Type": "application/json" },
-    }).catch(() => { });
+    const prevLiked = activeStory.likedByMe;
+    const prevCount = activeStory.likeCount;
+    const optimisticIdx = idx;
+
+    // Otimismo: aplica imediatamente.
     setLocalGroup((g) => {
       if (!g) return g;
       const stories = g.stories.map((s, si) =>
-        si !== idx ? s : { ...s, likedByMe: liked, likeCount: liked ? s.likeCount + 1 : s.likeCount - 1 },
+        si !== optimisticIdx
+          ? s
+          : { ...s, likedByMe: liked, likeCount: liked ? s.likeCount + 1 : Math.max(0, s.likeCount - 1) },
       );
       return { ...g, stories };
+    });
+
+    startLikeTransition(async () => {
+      try {
+        const res = await fetch("/api/stories/like", {
+          method: "POST",
+          body: JSON.stringify({ storyId, liked }),
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) throw new Error("like failed");
+      } catch {
+        // Rollback formal ao estado anterior em caso de falha.
+        setLocalGroup((g) => {
+          if (!g) return g;
+          const stories = g.stories.map((s, si) =>
+            si !== optimisticIdx
+              ? s
+              : { ...s, likedByMe: prevLiked, likeCount: prevCount },
+          );
+          return { ...g, stories };
+        });
+      }
     });
   }
 
@@ -262,8 +289,9 @@ export function ProfileStoryCover({
               </span>
               {isClient ? (
                 <button
-                  className="pointer-events-auto flex items-center gap-1.5 text-sm text-white"
+                  className="pointer-events-auto flex items-center gap-1.5 text-sm text-white disabled:opacity-60"
                   onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+                  disabled={likePending}
                 >
                   <Heart className={cn("h-6 w-6 transition", activeStory.likedByMe ? "fill-coral text-coral scale-110" : "text-white/80")} strokeWidth={1.5} />
                   <span className="text-xs text-white/70">{activeStory.likeCount}</span>

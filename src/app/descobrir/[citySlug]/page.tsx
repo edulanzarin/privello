@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
+import { } from "react/canary";
 import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";
 import { CitySessionSaver } from "@/components/discover/city-session-saver";
 import { CitySwitcher } from "@/components/discover/city-switcher";
@@ -352,19 +353,27 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
               <div className="rounded-lg bg-foreground/90 px-4 py-2 text-center text-sm font-medium text-white/90">
                 Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
               </div>
-              {view === "list" ? (
-                <div className="mt-6 space-y-3">
-                  {profiles.map((p) => (
-                    <ProfileListRow key={p.id} profile={p} />
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-6 columns-1 gap-5 sm:columns-2 xl:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
-                  {profiles.map((p) => (
-                    <ProfileCard key={p.id} profile={p} />
-                  ))}
-                </div>
-              )}
+              <ViewTransition
+                key={citySlug}
+                name="discover-grid"
+                share="auto"
+                enter="auto"
+                default="none"
+              >
+                {view === "list" ? (
+                  <div className="mt-6 space-y-3">
+                    {profiles.map((p) => (
+                      <ProfileListRow key={p.id} profile={p} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-6 columns-1 gap-5 sm:columns-2 xl:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
+                    {profiles.map((p) => (
+                      <ProfileCard key={p.id} profile={p} />
+                    ))}
+                  </div>
+                )}
+              </ViewTransition>
             </div>
           </div>
         )}

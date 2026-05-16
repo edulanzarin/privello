@@ -7,16 +7,23 @@ type UseMediaActionsOptions = {
     userId?: string;
 };
 
+export type ToggleLikeResult = { liked: boolean; count: number };
+
 /**
  * Hook para ações de mídia (like, comentário).
  * Centraliza lógica repetida em media-gallery, reels-feed, etc.
+ *
+ * **fase-5**: API pública preservada (`toggleLike(mediaId)` resolve para
+ * `{ liked, count }` ou `null`). Consumidores aplicam UI otimista via
+ * `useOptimisticToggle` em estado por-mídia (cf. media-gallery, reels-feed,
+ * story-bar, profile-story-cover).
  */
 export function useMediaActions({ userId }: UseMediaActionsOptions = {}) {
     const [loadingLike, setLoadingLike] = useState<string | null>(null);
     const [loadingComment, setLoadingComment] = useState(false);
 
     const toggleLike = useCallback(
-        async (mediaId: string): Promise<{ liked: boolean; count: number } | null> => {
+        async (mediaId: string): Promise<ToggleLikeResult | null> => {
             if (!userId) return null;
             setLoadingLike(mediaId);
             try {
@@ -26,7 +33,7 @@ export function useMediaActions({ userId }: UseMediaActionsOptions = {}) {
                     body: JSON.stringify({ mediaId }),
                 });
                 if (!res.ok) return null;
-                return await res.json();
+                return (await res.json()) as ToggleLikeResult;
             } catch {
                 return null;
             } finally {

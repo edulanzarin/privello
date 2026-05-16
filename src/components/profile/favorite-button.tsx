@@ -1,8 +1,9 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useTransition, useState } from "react";
 import { toggleFavorite } from "@/app/_actions/favorites";
+import { useOptimisticToggle } from "@/lib/hooks/use-optimistic-toggle";
+import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -12,23 +13,34 @@ type Props = {
   className?: string;
 };
 
-export function FavoriteButton({ profileId, initialFavorited, isLoggedIn, className: extraClass }: Props) {
-  const [favorited, setFavorited] = useState(initialFavorited);
-  const [pending, startTransition] = useTransition();
+export function FavoriteButton({
+  profileId,
+  initialFavorited,
+  isLoggedIn,
+  className: extraClass,
+}: Props) {
+  const { toast } = useToast();
+  const { value: favorited, toggle, pending } = useOptimisticToggle<boolean>({
+    initialValue: initialFavorited,
+    action: async (next) => {
+      const res = await toggleFavorite(profileId);
+      if ("error" in res) {
+        if (res.error?.includes("Sessão")) {
+          window.location.href = "/entrar";
+        }
+        throw new Error(res.error ?? "Falha ao atualizar favorito");
+      }
+      return res.favorited ?? next;
+    },
+    onError: (err) => toast(err.message, "error"),
+  });
 
   function handleClick() {
     if (!isLoggedIn) {
       window.location.href = `/entrar?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
-    startTransition(async () => {
-      const res = await toggleFavorite(profileId);
-      if ("error" in res) {
-        if (res.error?.includes("Sessão")) window.location.href = "/entrar";
-        return;
-      }
-      if ("favorited" in res) setFavorited(res.favorited ?? false);
-    });
+    toggle(!favorited);
   }
 
   return (

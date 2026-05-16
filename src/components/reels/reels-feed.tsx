@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SUBSCRIPTION_PRICE_LABEL } from "@/lib/constants";
+import { useOptimisticToggle } from "@/lib/hooks/use-optimistic-toggle";
 
 export type Reel = {
   id: string;
@@ -89,7 +90,27 @@ function ReelPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const [likes, setLikes] = useState(reel.likeCount);
-  const [liked, setLiked] = useState(reel.likedByMe);
+  const initialLiked = reel.likedByMe;
+  const {
+    value: liked,
+    toggle: toggleLikedValue,
+    pending: likePending,
+  } = useOptimisticToggle<boolean>({
+    initialValue: initialLiked,
+    action: async (next) => {
+      const res = await fetch("/api/media/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mediaId: reel.id, liked: next }),
+      });
+      if (!res.ok) throw new Error("like failed");
+      return next;
+    },
+    onError: () => {
+      // Rollback do contador local em caso de falha (a flag liked é revertida pelo hook).
+      setLikes((c) => (liked ? c - 1 : c + 1));
+    },
+  });
   const [commentCount, setCommentCount] = useState(reel.commentCount);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -114,17 +135,10 @@ function ReelPlayer({
 
   async function toggleLike() {
     if (!isClient) return;
+    if (likePending) return;
     const next = !liked;
-    setLiked(next);
     setLikes((c) => c + (next ? 1 : -1));
-    fetch("/api/media/like", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mediaId: reel.id, liked: next }),
-    }).catch(() => {
-      setLiked(!next);
-      setLikes((c) => c + (next ? -1 : 1));
-    });
+    toggleLikedValue(next);
   }
 
   async function openComments() {

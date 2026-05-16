@@ -15,6 +15,9 @@
   --privello-warning-dark: #b36200;
   --privello-accent-purple: #5856d6;
   --privello-whatsapp: #25d366;
+  /* fase-5 — View Transitions: durações declaradas por nome para reuso. */
+  --vt-duration-exit: 150ms;
+  --vt-duration-enter: 210ms;
 }
 
 @theme inline {
@@ -257,4 +260,108 @@ input[type="radio"] {
   background: #ff6600;
   width: 3px;
   height: 3px;
+}
+
+
+/* ── fase-5: View Transitions keyframes + classes ──────────────────────── */
+/* Cf. node_modules/next/dist/docs/01-app/02-guides/view-transitions.md
+   (consulta em 2026-05-17). Suporte baseline; navegadores sem View Transitions
+   API ignoram silenciosamente. Para `prefers-reduced-motion: reduce`, ver bloco
+   no fim deste arquivo. */
+@keyframes vt-fade {
+  from {
+    filter: blur(3px);
+    opacity: 0;
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide-y {
+  from {
+    transform: translateY(10px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes vt-slide-x {
+  from {
+    translate: var(--vt-slide-offset, 0) 0;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+/* Suspense reveal: fallback sai com slide-down + fade reverso; conteúdo entra
+   com slide-up + fade. Usado em /p/[slug]. */
+::view-transition-old(.slide-down) {
+  animation:
+    var(--vt-duration-exit) ease-out both vt-fade reverse,
+    var(--vt-duration-exit) ease-out both vt-slide-y reverse;
+}
+
+::view-transition-new(.slide-up) {
+  animation:
+    var(--vt-duration-enter) ease-in var(--vt-duration-exit) both vt-fade,
+    400ms ease-in both vt-slide-y;
+}
+
+/* Directional slide para o onboarding (4 passos lineares). */
+::view-transition-old(.nav-forward) {
+  --vt-slide-offset: -60px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    400ms ease-in-out both vt-slide-x reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --vt-slide-offset: 60px;
+  animation:
+    210ms ease-out 150ms both vt-fade,
+    400ms ease-in-out both vt-slide-x;
+}
+
+::view-transition-old(.nav-back) {
+  --vt-slide-offset: 60px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    400ms ease-in-out both vt-slide-x reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --vt-slide-offset: -60px;
+  animation:
+    210ms ease-out 150ms both vt-fade,
+    400ms ease-in-out both vt-slide-x;
+}
+
+/* ── fase-5: prefers-reduced-motion (regra global) ─────────────────────── */
+/* Neutraliza animações e transições para usuários com sensibilidade a
+   movimento. Cobre tanto microinterações Tailwind (animate-*, transition-*)
+   quanto View Transitions API. Cf. design.md > Components and Interfaces > 7. */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0.01ms !important;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
