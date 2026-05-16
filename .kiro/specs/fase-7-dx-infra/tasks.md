@@ -142,8 +142,8 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Manter o resto do README inalterado
     - _Requirements: 3.6_
 
-- [ ] 5. Wave Cleanup queries.ts (condicional à janela 2026-06-13)
-  - [ ] 5.1 Verificar se a fase está dentro da janela
+- [ ] 5. Wave Cleanup queries.ts (condicional à janela 2026-06-13) — **PENDENTE até 2026-06-13** (data de execução: 2026-05-16, antes da janela). Ver `dx-conventions.md > §4 Queries cleanup > Status`.
+  - [ ] 5.1 Verificar se a fase está dentro da janela — **DONE: marcada como pendente até 2026-06-13**
     - Confirmar a data atual de execução (`Get-Date` ou similar)
     - Se a data for **antes de 2026-06-13**: marcar Wave 5 inteira como `pendente até 2026-06-13` em `dx-conventions.md > §4 Queries cleanup > Status` e prosseguir para Wave 6 (a fase pode atingir Done com EAR 8.4 marcado como pendente, com nota explícita no Phase Card do master)
     - Se a data for **em ou após 2026-06-13**: prosseguir com 5.2
@@ -186,8 +186,8 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Anexar logs em `dx-conventions.md > §4 Queries cleanup > Smoke checks`
     - _Requirements: 4.5, 4.6_
 
-- [ ] 6. Wave Type-safety baseline
-  - [ ] 6.1 Registrar contagem atual de `any`
+- [x] 6. Wave Type-safety baseline
+  - [x] 6.1 Registrar contagem atual de `any`
     - Re-rodar o comando canônico de `design.md > Components and Interfaces > 7`:
       ```powershell
       $total = 0; Get-ChildItem -Path src -Recurse -Include *.ts, *.tsx -File | ForEach-Object {
@@ -202,20 +202,20 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Registrar data da medição (formato `YYYY-MM-DD`)
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.2 Decidir necessidade de plano de redução
+  - [x] 6.2 Decidir necessidade de plano de redução
     - Se contagem ≤ 5: registrar a contagem e a data; **não** produzir plano formal de redução. EAR 8.5 colapsa
     - Se contagem > 5: produzir tabela `path:linha` de cada ocorrência + meta numérica de redução (ex.: 50% até X, 100% até Y) + critério de aceite por arquivo (substituição por tipo concreto, `unknown` + narrowing, ou `@ts-expect-error` justificado)
     - Registrar a decisão (com ou sem plano) em `dx-conventions.md > §6 Type-safety baseline > Decisão`
     - _Requirements: 5.4, 5.5_
 
-  - [ ] 6.3 Confirmar `tsconfig.json > strict: true`
+  - [x] 6.3 Confirmar `tsconfig.json > strict: true`
     - Confirmar leitura de `tsconfig.json:5` (`"strict": true`) — pré-condição para que count de `any` seja confiável
     - **NÃO** alterar `tsconfig.json` nesta fase
     - Registrar a confirmação em `dx-conventions.md > §6 Type-safety baseline > Pré-condições`
     - _Requirements: 5.6_
 
-- [ ] 7. Wave ADRs convention
-  - [ ] 7.1 Criar `docs/adr/` e modelo `0001-template.md`
+- [x] 7. Wave ADRs convention
+  - [x] 7.1 Criar `docs/adr/` e modelo `0001-template.md`
     - Criar diretório `docs/adr/`
     - Criar `docs/adr/0001-template.md` em pt-BR conforme esboço de `design.md > Components and Interfaces > 4`:
       - Cabeçalho `# ADR NNNN — <título curto>`
@@ -223,12 +223,12 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
       - Seções: `Contexto`, `Decisão`, `Consequências` (Positivas/Negativas/Neutras), `Referências`
     - _Requirements: 6.2, 6.3, 6.4_
 
-  - [ ] 7.2 Documentar regras de numeração e status
+  - [x] 7.2 Documentar regras de numeração e status
     - No `0001-template.md`, adicionar comentário ou seção `Notas para uso` explicando: numeração sequencial sem reuso, 4 dígitos, status `Substituído por NNNN` quando ADR é substituído (não deletado)
     - Registrar essas regras também em `dx-conventions.md > §5 ADRs > Convenção`
     - _Requirements: 6.5_
 
-  - [ ] 7.3 Criar ADR 0002 — Vitest + fast-check
+  - [x] 7.3 Criar ADR 0002 — Vitest + fast-check
     - Criar `docs/adr/0002-vitest-fast-check.md`
     - Status: `Aceito`. Data: `2026-03-14` (data original da decisão na fase-2)
     - Contexto: zero testes unitários antes; precisa de runner ESM-first com baixa configuração; fase-2 do master spec
@@ -237,7 +237,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Referências: `c:/.../fase-2-testes/design.md > Decisões de design importantes`, `c:/.../fase-2-testes/testing-conventions.md`
     - _Requirements: 6.6_
 
-  - [ ] 7.4 Criar ADR 0003 — `queries.ts` em estado híbrido
+  - [x] 7.4 Criar ADR 0003 — `queries.ts` em estado híbrido
     - Criar `docs/adr/0003-queries-ts-deprecated.md`
     - Status: `Aceito (revisão em 2026-06-13)`. Data: `2026-05-17`
     - Contexto: 27 funções migradas para `services/`; helpers `sortProfileCards`/`finalizeDiscoverOrder`/`profileCardInclude`/`ProfileCardPayload` permanecem como oráculo da Property 1
@@ -247,7 +247,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - **Atualizar este ADR após Wave 5** (Opção A escolhida → status `Substituído por <novo>`; Opção B escolhida → status `Aceito (revisão em <nova data>)`)
     - _Requirements: 6.6, 4.3_
 
-  - [ ] 7.5 Criar ADR 0004 — Pipeline de CI
+  - [x] 7.5 Criar ADR 0004 — Pipeline de CI
     - Criar `docs/adr/0004-ci-pipeline.md`
     - Status: `Aceito`. Data: `<data da execução desta fase>`
     - Contexto: `.github/workflows/` ausente antes desta fase; lint herdado tem ~20–28 errors em código de UX/painel pertencente à fase-5
@@ -256,7 +256,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Referências: `c:/.../fase-7-dx-infra/requirements.md > Requirement 1.5`, `c:/.../handoff.md > Smoke checks finais`, `c:/.../fase-2-testes/testing-conventions.md > §8`, `c:/.../fase-4-design-system/tokens.md > Contrato com a CI da Fase 7`
     - _Requirements: 6.6, 1.5_
 
-  - [ ] 7.6 Criar ADR 0005 — Localização de docs
+  - [x] 7.6 Criar ADR 0005 — Localização de docs
     - Criar `docs/adr/0005-env-doc-localizacao.md`
     - Status: `Aceito`. Data: `<data da execução desta fase>`
     - Contexto: precisa de localização única para `docs/env.md` e `docs/docker.md`; alternativa é seção em `README.md`
@@ -265,7 +265,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Referências: `c:/.../fase-7-dx-infra/requirements.md > Requirement 2.3, 3.6`
     - _Requirements: 6.6_
 
-  - [ ] 7.7 Listar ADRs criados em `dx-conventions.md`
+  - [x] 7.7 Listar ADRs criados em `dx-conventions.md`
     - Em `dx-conventions.md > §5 ADRs > Lista`, registrar tabela com `NNNN | Título | Status | Data` para cada ADR criado (0001 template + 0002, 0003, 0004, 0005)
     - Confirmar regra: ADRs novos a partir desta fase obrigam substituir prosa em `design.md` futuros (`design.md` referencia o ADR, não duplica)
     - _Requirements: 6.7_
