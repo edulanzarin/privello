@@ -1,3 +1,24 @@
+/**
+ * Route Handler — Início do cadastro pago de provider.
+ *
+ * Endpoint: `POST /api/cadastro/iniciar`
+ *
+ * Recebe os dados de cadastro de uma acompanhante (provider), armazena tudo
+ * em `PendingRegistration` (TTL 24h) e cria uma `Preference` no MercadoPago
+ * para cobrar o plano escolhido. O usuário só é efetivamente criado quando
+ * o pagamento é aprovado e processado pelo webhook `/api/mp/webhook`.
+ *
+ * Convenções:
+ * - Autenticação: público (cadastro de novo usuário).
+ * - Rate limit: n/a (gateado pelo fluxo de pagamento — só cria pendência).
+ * - Validação Zod: `SignupBodySchema` em `src/lib/validation/cadastro.schema.ts`.
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1 (`/api/cadastro/iniciar`).
+ * - src/lib/validation/cadastro.schema.ts — schema do body.
+ * - src/app/api/mp/webhook/route.ts — consome `pending_id` para finalizar o
+ *   cadastro quando o pagamento é aprovado.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -21,6 +42,41 @@ const PLAN_LABELS: Record<string, string> = {
   PREMIUM: "Plano Premium · R$189/mês",
 };
 
+/**
+ * Cria a pendência de cadastro e retorna a URL de checkout do MercadoPago.
+ *
+ * Body esperado (validado por `SignupBodySchema`):
+ *   - `email` (string, required): e-mail único do futuro provider.
+ *   - `password` (string, required, min 8): hash gerado em servidor antes de
+ *     persistir; o original não é guardado.
+ *   - `slug` (string, required, regex slug): handle público único.
+ *   - `displayName`, `age`, `bio`, `citySlug`, `cityQuery` (required): dados
+ *     do perfil.
+ *   - `tagline`, `whatsapp`, `heightCm`, `dressSize`, `hair`, `eyes`,
+ *     `languages`, `paymentMethods` (optional).
+ *   - `servesMen`/`servesWomen`/`servesCouples`/`hasOwnPlace`/`homeVisit`/
+ *     `travelsNational`/`travelsInternational` (boolean, required): toggles de
+ *     atendimento.
+ *   - `durations` (array, required): opções de duração; **deve incluir** uma
+ *     entry `minutes === 60` com `priceBrl ≥ 50`.
+ *   - `tier` (enum `"ESSENCIAL" | "DESTAQUE" | "PREMIUM"`, required): plano a
+ *     ser cobrado.
+ *
+ * @returns
+ *   - 200: `{ url }` com o `init_point` da Preference.
+ *   - 400: validation error (`flatten()`) ou ausência de duração de 1h.
+ *   - 409: `{ error }` quando e-mail ou slug já estão em uso.
+ *   - 503: `{ error }` quando o cliente MercadoPago não está configurado.
+ *
+ * Side effects:
+ * - DB: cria `PendingRegistration` com TTL de 24h carregando o `passwordHash`.
+ * - MercadoPago: cria uma `Preference` com `external_reference` no formato
+ *   `registration|<pendingId>|<slug>|<tier>` e `notification_url` apontando
+ *   para `/api/mp/webhook`.
+ *
+ * @see .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1
+ * @see src/app/api/mp/webhook/route.ts (finaliza o cadastro)
+ */
 export async function POST(req: NextRequest) {
   const raw = await req.json();
   const result = SignupBodySchema.safeParse(raw);

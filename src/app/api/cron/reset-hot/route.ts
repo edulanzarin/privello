@@ -1,3 +1,25 @@
+/**
+ * Route Handler — Job semanal de reset do período "hot".
+ *
+ * Endpoint: `GET /api/cron/reset-hot`
+ *
+ * Reseta `viewsCurrentPeriod` de todos os profiles e atualiza
+ * `HotPeriodConfig.startedAt` para o instante da execução. Deve ser invocado
+ * toda segunda-feira às 00:00 BRT por um scheduler externo (Vercel Cron,
+ * GitHub Actions, cron-job.org).
+ *
+ * Convenções:
+ * - Autenticação: cron secret via `verifyCronSecret` — aceita
+ *   `Authorization: Bearer <CRON_SECRET>`, `X-Cron-Secret: <CRON_SECRET>` e,
+ *   em janela de transição, `?secret=<CRON_SECRET>` (deprecated).
+ * - Rate limit: n/a (gateado pelo segredo).
+ * - Validação Zod: n/a (sem body/query do usuário).
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.2 (`/api/cron/reset-hot`).
+ * - src/lib/security/cron-auth.ts — verificação do segredo.
+ * - .kiro/specs/fase-1-seguranca/requirements.md > Requirement 2.
+ */
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
@@ -32,14 +54,21 @@ import { verifyCronSecret } from "@/lib/security/cron-auth";
 const transitionEndsAt = new Date("2026-06-15T00:00:00Z");
 
 /**
- * GET /api/cron/reset-hot
+ * Reseta o período "hot" semanal: zera `viewsCurrentPeriod` de todos os
+ * profiles e atualiza `HotPeriodConfig.startedAt`.
  *
- * Resets `viewsCurrentPeriod` for all profiles and updates `HotPeriodConfig`.
- * Should be called every Monday at 00:00 (BRT) by an external cron service
- * (Vercel Cron, GitHub Actions, cron-job.org).
+ * Body/query: nenhum (auth via header).
  *
- * Auth: see `verifyCronSecret`. On failure, responds 401 with no body
- * (per cron-auth contract).
+ * @returns
+ *   - 200: `{ ok: true, profilesReset: number, resetAt: ISO8601 }`.
+ *   - 401: cron secret inválido/ausente (sem body — contrato cron-auth).
+ *
+ * Side effects:
+ * - DB: `Profile.updateMany` → `viewsCurrentPeriod = 0` para todos os perfis.
+ * - DB: `HotPeriodConfig.upsert({ id: "hot" })` → `startedAt = new Date()`.
+ *
+ * @see .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.2
+ * @see src/lib/security/cron-auth.ts
  */
 export async function GET(req: Request) {
   const auth = verifyCronSecret(req, { transitionEndsAt });

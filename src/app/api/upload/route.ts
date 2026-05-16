@@ -1,3 +1,33 @@
+/**
+ * Route Handler — Upload de mídia (foto/vídeo) do provider.
+ *
+ * Endpoint: `POST /api/upload`
+ *
+ * Recebe um `File` em `multipart/form-data` e salva em
+ * `public/uploads/<profileId>/`. Para mídias normais (`mediaType` `IMAGE`/
+ * `VIDEO`), também cria a `Media` no banco; para `REEL` ou `purpose === "story"`
+ * só devolve a URL — o caller (action `createReel` / `createStory`) cria o
+ * registro DB para evitar duplicidade.
+ *
+ * **Atenção:** uploads em filesystem local (`public/uploads`) não funcionam
+ * em deploy serverless. Migração para storage externo (Vercel Blob/R2/S3)
+ * está documentada em `docs/deploy-vercel.md` como bloqueante para
+ * produção real.
+ *
+ * Convenções:
+ * - Autenticação: sessão NextAuth válida.
+ * - Rate limit: `upload` (20 req / 1h por `userId`) via
+ *   `rateLimitConfigFor("upload", userId)`.
+ * - Validação Zod: `UploadBodySchema` em `src/lib/validation/upload.schema.ts`.
+ *   MIME e tamanho são checados manualmente no handler (per spec — Zod só
+ *   verifica `instanceof File`).
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1 (`/api/upload`).
+ * - .kiro/specs/fase-1-seguranca/rate-limits.md §"Tabela canônica" (linha
+ *   `/api/upload`).
+ * - docs/deploy-vercel.md — followup de storage externo.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
@@ -12,6 +42,38 @@ const VIDEO_MAX = 200 * 1024 * 1024; // 200 MB
 const ALLOWED_IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
 
+/**
+ * Recebe `multipart/form-data`, persiste o arquivo em disco e (quando
+ * aplicável) cria a `Media` correspondente.
+ *
+ * Body esperado (`UploadBodySchema`):
+ *   - `file` (File, required): JPG/PNG/WebP/GIF (≤8 MB) ou
+ *     MP4/WebM/QuickTime (≤200 MB).
+ *   - `isPublic` (boolean, optional, default `true`).
+ *   - `caption` (string, optional, trim, max 500 chars).
+ *   - `mediaType` (enum `"IMAGE" | "VIDEO" | "REEL"`, optional, default
+ *     `IMAGE`).
+ *   - `purpose` (enum `"" | "story"`, optional): quando `"story"`, pula a
+ *     criação da `Media`.
+ *
+ * @returns
+ *   - 200 (REEL/story): `{ ok: true, url }` — caller cria a `Media`.
+ *   - 200 (image/video normal): `{ ok: true, media: Media }`.
+ *   - 400: validation error (`flatten()`), MIME inválido ou arquivo > limite.
+ *   - 401: não autenticado.
+ *   - 404: profile não encontrado para o user.
+ *   - 413: `Content-Length` ultrapassa o teto absoluto (200 MB + 1 KB).
+ *   - 429: rate limited (`Retry-After` header + log de auditoria).
+ *
+ * Side effects:
+ * - FS: `public/uploads/<profileId>/<timestamp>-<rand>.<ext>`.
+ * - DB: `Media.create` (somente quando `mediaType !== "REEL"` e
+ *   `purpose !== "story"`); a primeira foto pública pelo perfil é marcada
+ *   como `isCover`.
+ * - Log: linha estruturada `{ ts, endpoint, key, retryAfter }` em rate-limit hit.
+ *
+ * @see .kiro/specs/fase-1-seguranca/rate-limits.md (`upload`)
+ */
 export async function POST(req: NextRequest) {
   // Rejeitar requests com Content-Length absurdo antes de processar o body
   const contentLength = parseInt(req.headers.get("content-length") ?? "0");

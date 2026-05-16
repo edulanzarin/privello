@@ -1,3 +1,40 @@
+/**
+ * Route Handler — Webhook do MercadoPago.
+ *
+ * Endpoint: `POST /api/mp/webhook`
+ *
+ * Recebe notificações de pagamento do MercadoPago e atualiza o estado interno
+ * do app de acordo com o `metadata.type` da Preference originadora:
+ *
+ *   - `registration` — finaliza um cadastro pendente: cria `User` (PROVIDER)
+ *     + `Profile` + `ProfileDurationOption` a partir de uma
+ *     `PendingRegistration` armazenada por `/api/cadastro/iniciar`.
+ *   - `subscription` — ativa/renova `Subscription` do cliente (cancelando a
+ *     anterior se houver), com expiração em `now + PLAN_DURATION_MS`.
+ *   - `plan` + `tier` — atualiza `Profile.planTier` e `planExpiresAt` do
+ *     provider para o tier comprado.
+ *   - `boost` — define `Profile.featuredUntil = now + BOOST_DURATION_MS`.
+ *
+ * Idempotência: garantida por (a) `pendingRegistration.delete` após criar o
+ * provider e checagem de e-mail já existente; (b)
+ * `subscription.findUnique({ mpPaymentId })` para evitar reprocessar pagamentos.
+ *
+ * Convenções:
+ * - Autenticação: HMAC-SHA256 do MercadoPago — header `x-signature` validado
+ *   contra o manifest `id:<dataId>;request-id:<xRequestId>;ts:<ts>;` com
+ *   `MP_WEBHOOK_SECRET`. Em dev (sem `MP_WEBHOOK_SECRET`), aceita sem
+ *   verificação para facilitar testes locais.
+ * - Rate limit: n/a (gateado pela assinatura HMAC).
+ * - Validação Zod: n/a — body é controlado pela API do MercadoPago e
+ *   validado por assinatura. Eventual schema fica como melhoria futura
+ *   (ver `endpoints-zod.md §4.2`).
+ *
+ * Cross-refs:
+ * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.2 (`/api/mp/webhook`).
+ * - src/app/api/mp/checkout/route.ts — origem das `Preference`.
+ * - src/app/api/cadastro/iniciar/route.ts — origem das `PendingRegistration`.
+ * - src/lib/constants.ts — `PLAN_DURATION_MS`, `BOOST_DURATION_MS`.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
@@ -47,6 +84,33 @@ function verifyMPSignature(req: NextRequest, rawBody: string): boolean {
   }
 }
 
+/**
+ * Processa notificações de pagamento e atualiza estado interno conforme o
+ * `metadata.type` (`registration`, `subscription`, `plan`, `boost`).
+ *
+ * Body esperado: payload nativo do MercadoPago — `{ type: "payment",
+ * data: { id: string } }` (assinado por HMAC).
+ *
+ * @returns
+ *   - 200: `{ ok: true }` em qualquer caminho de sucesso ou no-op (incluindo
+ *     pagamentos não-`approved` e duplicados — idempotência).
+ *   - 400: `metadata.user_id` ou `metadata.pending_id` ausente quando
+ *     necessário, ou `tier` inválido.
+ *   - 401: assinatura HMAC inválida.
+ *   - 500: falha ao buscar pagamento no MP ou erro de DB.
+ *
+ * Side effects:
+ * - DB: cria `User` + `Profile` + `ProfileDurationOption` (registration).
+ * - DB: `Subscription.create` (+ cancela anteriores em `$transaction`).
+ * - DB: `Profile.updateMany` para `planTier`/`planExpiresAt` (plan) ou
+ *   `featuredUntil` (boost).
+ * - DB: deleta `PendingRegistration` após sucesso.
+ * - MercadoPago: faz lookup `Payment.get(data.id)` para validar status.
+ *
+ * @see .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.2
+ * @see src/app/api/mp/checkout/route.ts
+ * @see src/app/api/cadastro/iniciar/route.ts
+ */
 export async function POST(req: NextRequest) {
   const client = getMPClient();
   if (!client) return NextResponse.json({ ok: true });
