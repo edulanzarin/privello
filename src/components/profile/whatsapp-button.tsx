@@ -4,7 +4,7 @@ import { MessageCircle } from "lucide-react";
 
 export function WhatsAppButton({
   phone,
-  profileId,
+  profileId: _profileId,
   className,
 }: {
   phone: string | null;
@@ -13,7 +13,7 @@ export function WhatsAppButton({
 }) {
   const digits = phone?.replace(/\D/g, "") ?? "";
 
-  function handleClick() {}
+  function handleClick() { }
 
   if (!digits) return null;
 

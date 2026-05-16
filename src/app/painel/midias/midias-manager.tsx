@@ -62,13 +62,15 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
   // Upload panel state
   const [uploading, setUploading] = useState(false);
-  const [mediaType, setMediaType] = useState("IMAGE");
   const [uploadPublic, setUploadPublic] = useState(true);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Reset paginação e fecha lightbox quando filtros mudam. setState em effect é
+  // o padrão idiomático para "side effects de mudança de prop derivada".
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven reset
   useEffect(() => { setVisible(PAGE_SIZE); setLightbox(null); }, [visTab, typeTab]);
 
   const sortedPublic = sortMedia(publicMedia.filter((m) => m.mediaType !== "REEL"));
@@ -85,7 +87,9 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
 
   // Lightbox
   const closeLb = useCallback(() => setLightbox(null), []);
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- filtered.length é estável dentro de uma render; React Compiler avisa porque filtered é re-criado, mas o uso aqui é correto
   const prevLb = useCallback(() => setLightbox((i) => (i === null || i === 0 ? filtered.length - 1 : i - 1)), [filtered.length]);
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- ver comment acima
   const nextLb = useCallback(() => setLightbox((i) => (i === null ? 0 : (i + 1) % filtered.length)), [filtered.length]);
 
   useEffect(() => {
@@ -308,6 +312,7 @@ export function MidiasManager({ publicMedia, privateMedia, privateCount, profile
                 {pendingFiles[i]?.type.startsWith("video") ? (
                   <video src={src} className="h-full w-full object-cover" muted playsInline />
                 ) : (
+                  // eslint-disable-next-line @next/next/no-img-element -- preview de upload local (blob URL); next/image exige domain whitelist e não funciona com objectURL
                   <img src={src} alt="" className="h-full w-full object-cover" />
                 )}
                 <button

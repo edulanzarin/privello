@@ -44,12 +44,11 @@ function mockMatchMedia(matches: boolean) {
 function renderLightbox(open: boolean, child: React.ReactNode) {
     act(() => {
         root!.render(
-            // eslint-disable-next-line react/no-children-prop -- types do MediaLightbox exigem children como prop nomeada; createElement com 3 args nao casa
-            createElement(MediaLightbox, {
-                open,
-                onClose: () => { },
-                children: child,
-            }),
+            createElement(
+                MediaLightbox,
+                { open, onClose: () => { } },
+                child,
+            ),
         );
     });
 }

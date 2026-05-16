@@ -80,6 +80,8 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
   const PAGE_SIZE = 20;
 
   const now = new Date();
+  // Page é dinâmica (`force-dynamic`); snapshot do timestamp para uso no JSX.
+  const nowMs = now.getTime();
   const days30 = new Date(now); days30.setDate(days30.getDate() - 30);
   const weeks8 = new Date(now); weeks8.setDate(weeks8.getDate() - 56);
 
@@ -265,8 +267,8 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                 key={key}
                 href={buildQueueHref({ status: key, p: "1" })}
                 className={`rounded px-2.5 py-1 text-xs font-semibold transition ${statusFilter === key
-                    ? "bg-foreground text-white"
-                    : "bg-line text-muted hover:bg-line/70 hover:text-foreground"
+                  ? "bg-foreground text-white"
+                  : "bg-line text-muted hover:bg-line/70 hover:text-foreground"
                   }`}
               >
                 {label}
@@ -298,7 +300,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
               ) : (
                 queueRows.map((row) => {
                   const thumb = row.profile.media[0]?.url;
-                  const waitMin = Math.max(1, Math.floor((Date.now() - row.waitingSince.getTime()) / 60000));
+                  const waitMin = Math.max(1, Math.floor((nowMs - row.waitingSince.getTime()) / 60000));
                   const waitLabel = waitMin < 60
                     ? `${waitMin}m`
                     : waitMin < 1440

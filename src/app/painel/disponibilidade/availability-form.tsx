@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { cn } from "@/lib/utils";
 import { saveAvailabilityWindows } from "@/app/painel/_actions/provider-settings";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

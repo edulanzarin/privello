@@ -1,19 +1,20 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { CheckCircle, Loader2, Clock } from "lucide-react";
 
 function SucessoContent() {
   const params = useSearchParams();
-  const router = useRouter();
   const slug = params.get("s");
 
   const [status, setStatus] = useState<"waiting" | "ready" | "timeout">("waiting");
-  const [attempts, setAttempts] = useState(0);
+  const [, setAttempts] = useState(0);
 
   useEffect(() => {
+    // Sem slug = pagamento já confirmado externamente; pular polling.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- early-return baseado em prop
     if (!slug) { setStatus("ready"); return; }
 
     let cancelled = false;

@@ -8,7 +8,6 @@ import { createStory, deleteStory } from "@/app/_actions/stories";
 import { useToast } from "@/components/ui/toast";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useFileUpload } from "@/lib/hooks/use-file-upload";
-import { cn } from "@/lib/utils";
 
 type Story = {
   id: string;

@@ -21,10 +21,6 @@ const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferênc
 
 type DurationKey = typeof DURATIONS[number]["key"];
 
-const MINUTES_MAP: Record<DurationKey, number> = {
-  "30min": 30, "1h": 60, "2h": 120, "3h": 180, "4h": 240, "overnight": 720, "travel": 1440,
-};
-
 type DurationOption = { minutes: number; priceBrl: number };
 type Profile = {
   priceHour: number;
@@ -94,7 +90,6 @@ export function ValoresForm({ profile }: { profile: Profile }) {
     });
   }
 
-  const sel = "w-full rounded-lg border border-black/10 bg-white px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer disabled:bg-black/[0.03] disabled:text-muted";
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">

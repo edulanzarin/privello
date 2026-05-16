@@ -10,13 +10,18 @@ export default async function PainelPerfilPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
+  // Janela de stories ativos: últimos 24h. Page é dinâmica (`force-dynamic`),
+  // então `Date.now()` por request é comportamento intencional.
+  // eslint-disable-next-line react-hooks/purity -- intencional em RSC dinâmica
+  const stories24hWindow = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
     include: {
       city: true,
       media: { orderBy: { sortOrder: "asc" } },
       stories: {
-        where: { expiresAt: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+        where: { expiresAt: { gt: stories24hWindow } },
         include: { _count: { select: { views: true, likes: true } } },
         orderBy: { createdAt: "desc" },
         take: 20,

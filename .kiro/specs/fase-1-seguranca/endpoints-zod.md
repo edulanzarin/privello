@@ -25,7 +25,7 @@ Varredura rodada em `2026-03-14` contra a árvore atual. Caminhos abaixo são `p
 | Route Handlers em `src/app/api/**` | 24 (arquivos) |
 | Hosts externos `img-src` (Imagens externas) | 4 |
 
-Server Actions sem input externo (não recebem `FormData` nem argumentos validáveis e portanto não precisam de schema): `logoutAction`, `getClientFavorites`, `publishProfile`, `createSubscriptionAction`, `getVerificationStatus`, `useFreeBoost` (6 no total).
+Server Actions sem input externo (não recebem `FormData` nem argumentos validáveis e portanto não precisam de schema): `logoutAction`, `getClientFavorites`, `publishProfile`, `createSubscriptionAction`, `getVerificationStatus`, `claimFreeBoost` (6 no total).
 
 Route Handlers sem input externo (apenas autenticação por sessão/header, sem body/query): `GET /api/cities`, `GET /api/top-cities`, `POST /api/provider/heartbeat`, `DELETE /api/upload-audio` (4 no total).
 
@@ -155,7 +155,7 @@ Route Handlers sem input externo (apenas autenticação por sessão/header, sem 
 | `deleteFinancialRecord` | `src/app/painel/_actions/provider-settings.ts:130` | `FormData` { `recordId` } | `DeleteFinancialRecordSchema` { `recordId`: cuid } | `{ error, issues }` |
 | `changeHandle` | `src/app/painel/_actions/provider-settings.ts:142` | `FormData` { `handle` (regex `^[a-z0-9_-]{3,30}$` após strip de `@`) } | `ChangeHandleSchema` { `handle`: transform para lowercase, regex `^[a-z0-9_-]{3,30}$` } | `{ error, issues }` |
 | `addFinancialRecord` | `src/app/painel/_actions/provider-settings.ts:160` | `FormData` { `clientLabel`, `durationLabel`, `locationLabel`, `paymentLabel`, `amountBrl` (number), `isNoShow?`, `notes?` } | `AddFinancialRecordSchema` (mesmos campos do update sem `recordId` + `notes`: trim max 2000 nullable) | `{ error, issues }` |
-| `useFreeBoost` | `src/app/painel/_actions/provider-settings.ts:191` | sem input | _N/A_ | _N/A_ |
+| `claimFreeBoost` | `src/app/painel/_actions/provider-settings.ts:191` | sem input | _N/A_ | _N/A_ |
 | `devActivatePlan` | `src/app/painel/_actions/provider-settings.ts:213` | `FormData` { `tier` ∈ `["ESSENCIAL", "DESTAQUE", "PREMIUM"]` } — gateado por `NODE_ENV !== "production"` | `DevActivatePlanSchema` { `tier`: enum `["ESSENCIAL", "DESTAQUE", "PREMIUM"]` } | `{ error, issues }` |
 
 ---

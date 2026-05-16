@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, AtSign, Mic, X, Play, Pause, Square, Upload } from "lucide-react";
@@ -58,11 +57,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [uploading, setUploading] = useState(false);
   const [selectedCitySlug, setSelectedCitySlug] = useState(citySlug);
   const [selectedCityLabel, setSelectedCityLabel] = useState(cityName);
-  const publicRef = useRef<HTMLInputElement>(null);
-  const privateRef = useRef<HTMLInputElement>(null);
   const [handleValue, setHandleValue] = useState(profile.slug ?? "");
   const [handleError, setHandleError] = useState<string | null>(null);
   const [handlePending, startHandleTransition] = useTransition();
@@ -116,31 +112,10 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
   const toggleLang = (v: string) =>
     setSelectedLangs((p) => p.includes(v) ? p.filter((l) => l !== v) : [...p, v]);
 
-  const publicPhotos = profile.media.filter((m) => m.isPublic);
-  const privatePhotos = profile.media.filter((m) => !m.isPublic);
-
-  const { upload: uploadPhoto } = useFileUpload({
-    endpoint: "/api/upload",
-    onError: (msg) => toast(msg, "error"),
-  });
   const { upload: uploadAudioFile } = useFileUpload({
     endpoint: "/api/upload-audio",
     onError: (msg) => toast(msg, "error"),
   });
-
-  async function uploadFiles(files: FileList | null, isPublic: boolean) {
-    if (!files?.length) return;
-    setUploading(true);
-    for (const file of Array.from(files)) {
-      const data = await uploadPhoto(file, { isPublic: String(isPublic) });
-      if (!data) {
-        break;
-      }
-    }
-    setUploading(false);
-    toast("Foto adicionada.");
-    router.refresh();
-  }
 
   async function uploadAudio(file: File) {
     setAudioUploading(true);
@@ -239,7 +214,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   onClick={() => {
                     const a = pendingPreviewRef.current;
                     if (!a) return;
-                    a.paused ? a.play() : a.pause();
+                    if (a.paused) a.play(); else a.pause();
                   }}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-white shadow-sm transition hover:brightness-110 active:scale-95"
                 >

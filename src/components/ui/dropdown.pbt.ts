@@ -49,17 +49,14 @@ function build({ controlled, defaultOpen }: Config) {
                 }
                 externalState!.open = next;
             },
-            children: [
-                createElement(DropdownTrigger, { key: "trg", className: "trigger", children: "open" }),
-                createElement(DropdownContent, {
-                    key: "cnt",
-                    children: [
-                        createElement(DropdownItem, { key: "a", children: "a" }),
-                        createElement(DropdownItem, { key: "b", children: "b" }),
-                    ],
-                }),
-            ],
         },
+        createElement(DropdownTrigger, { key: "trg", className: "trigger" }, "open"),
+        createElement(
+            DropdownContent,
+            { key: "cnt" },
+            createElement(DropdownItem, { key: "a" }, "a"),
+            createElement(DropdownItem, { key: "b" }, "b"),
+        ),
     );
 }
 
@@ -190,15 +187,14 @@ describe("Dropdown — Property 4 (roundtrip Tab com trapFocus=true)", () => {
     function buildN(n: number) {
         const items: ReturnType<typeof createElement>[] = [];
         for (let i = 0; i < n; i++) {
-            items.push(createElement(DropdownItem, { key: `it-${i}`, children: `it-${i}` }));
+            items.push(createElement(DropdownItem, { key: `it-${i}` }, `it-${i}`));
         }
-        return createElement(Dropdown, {
-            defaultOpen: true,
-            children: [
-                createElement(DropdownTrigger, { key: "trg", className: "trigger", children: "open" }),
-                createElement(DropdownContent, { key: "cnt", trapFocus: true, children: items }),
-            ],
-        });
+        return createElement(
+            Dropdown,
+            { defaultOpen: true },
+            createElement(DropdownTrigger, { key: "trg", className: "trigger" }, "open"),
+            createElement(DropdownContent, { key: "cnt", trapFocus: true }, ...items),
+        );
     }
 
     function pressTabIntegrated(shift = false) {

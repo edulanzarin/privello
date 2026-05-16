@@ -18,7 +18,14 @@ import { useEscapeKey } from "@/lib/hooks/use-escape-key";
 import { useFocusTrap } from "@/lib/hooks/use-focus-trap";
 
 export type DropdownProps = {
-    children: ReactNode;
+    /**
+     * Conteúdo do dropdown (`<DropdownTrigger>` + `<DropdownContent>`).
+     *
+     * Marcado como opcional para suportar `createElement(Dropdown, props, ...children)`
+     * onde TypeScript não infere children dos argumentos posicionais. Em uso normal
+     * via JSX (`<Dropdown>...</Dropdown>`), children sempre é passado.
+     */
+    children?: ReactNode;
     /** Estado controlado externamente. */
     open?: boolean;
     /** Estado inicial quando não controlado. Ignorado se `open` é definido. */
@@ -28,14 +35,16 @@ export type DropdownProps = {
 };
 
 export type DropdownTriggerProps = {
-    children: ReactNode;
+    /** Conteúdo do trigger. Opcional para suportar `createElement(Trigger, props, ...children)`. */
+    children?: ReactNode;
     /** Renderiza o filho como trigger sem wrapper. Padrão: false. */
     asChild?: boolean;
     className?: string;
 };
 
 export type DropdownContentProps = {
-    children: ReactNode;
+    /** Itens do menu (`<DropdownItem>`). Opcional para suportar `createElement(Content, props, ...children)`. */
+    children?: ReactNode;
     className?: string;
     /** Alinhamento horizontal relativo ao trigger. */
     align?: "start" | "center" | "end";

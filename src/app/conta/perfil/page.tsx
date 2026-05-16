@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Heart, LogOut, Crown, Lock, Eye, Calendar, Settings } from "lucide-react";
+import { Heart, LogOut, Crown, Lock, Eye, Calendar } from "lucide-react";
 import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +10,6 @@ import { isSubscriber } from "@/lib/services";
 import { FavoritesList } from "./favorites-list";
 import { ClientAvatarUpload } from "./client-avatar-upload";
 import { ClientProfileEdit } from "./client-profile-edit";
-import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/ui/stat-card";

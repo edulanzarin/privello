@@ -23,7 +23,7 @@ export function ProfileStoryCover({
   storyGroup,
   coverUrl,
   displayName,
-  planBadge,
+  planBadge: _planBadge,
   isClient,
 }: {
   storyGroup: StoryGroup | null;
@@ -72,10 +72,14 @@ export function ProfileStoryCover({
     if (idx > 0) setIdx((i) => i - 1);
   }, [idx]);
 
+  // Sync de stories vistas a partir do sessionStorage. Padrão idiomático para
+  // browser API → state. setState aqui é mount-time; rerender extra é aceitável
+  // (mostra estado já visto antes de fetch novo).
   useEffect(() => {
     try {
       const seen = new Set<string>(JSON.parse(sessionStorage.getItem("prv_seen") ?? "[]"));
       if (!seen.size || !localGroup) return;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- browser API → state sync
       setLocalGroup((g) => {
         if (!g) return g;
         const stories = g.stories.map((s) => seen.has(s.id) ? { ...s, seenByMe: true } : s);
@@ -85,9 +89,12 @@ export function ProfileStoryCover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Story viewer: progress bar do timer + marcação como vista quando abre.
+  // setProgress(0) e setLocalGroup são intencionais ao trocar de story.
   useEffect(() => {
     if (!open) return;
     stopTimers();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset progress ao abrir
     setProgress(0);
     startRef.current = Date.now();
     function tick() {
@@ -123,6 +130,7 @@ export function ProfileStoryCover({
       sessionStorage.setItem("prv_seen", JSON.stringify([...seen]));
     } catch { /* ignore */ }
     const storyId = activeStory.id;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- marca story como vista no client
     setLocalGroup((g) => {
       if (!g) return g;
       const stories = g.stories.map((s) => s.id === storyId ? { ...s, seenByMe: true } : s);

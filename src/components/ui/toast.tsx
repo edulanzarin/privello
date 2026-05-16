@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { CheckCircle, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ type ToastType = "success" | "error";
 type Toast = { id: number; message: string; type: ToastType };
 
 type ToastCtx = { toast: (message: string, type?: ToastType) => void };
-const ToastContext = createContext<ToastCtx>({ toast: () => {} });
+const ToastContext = createContext<ToastCtx>({ toast: () => { } });
 
 export function useToast() {
   return useContext(ToastContext);
@@ -16,10 +16,13 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  let counter = 0;
+  // Counter persistente entre renders. `useRef` em vez de `let counter = 0`
+  // (que era resetado em todo render, gerando IDs colididos quando dois toasts
+  // abriam simultaneamente). Ref muta sem causar re-render — comportamento desejado.
+  const counterRef = useRef(0);
 
   const toast = useCallback((message: string, type: ToastType = "success") => {
-    const id = ++counter;
+    const id = ++counterRef.current;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
   }, []);

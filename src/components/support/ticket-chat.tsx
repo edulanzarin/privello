@@ -18,7 +18,7 @@ export function TicketChat({
   ticketId,
   messages: initial,
   isClosed,
-  currentUserId,
+  currentUserId: _currentUserId,
 }: {
   ticketId: string;
   messages: Message[];

@@ -14,6 +14,31 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
   ]),
 
+  // ── Cleanup pós-auditoria — convenção `_` para variáveis intencionais ──────
+  // Permite que parâmetros, args destruturados e variáveis locais prefixados
+  // com `_` sejam ignorados pelo `no-unused-vars`. É a convenção idiomática
+  // em TypeScript/ESLint para sinalizar "não usado de propósito" sem desativar
+  // a regra inteira (ex.: props pública mantida por compatibilidade, argumentos
+  // de callback que não consumimos, retornos de useTransition ignorando o `pending`).
+  // Mantemos severity como `warn` (alinhado ao baseline pré-fase-7) porque a CI
+  // tolera lint warnings via Opção B (`continue-on-error: true`).
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          args: "all",
+          argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
+
   // ── Fase 4 — Lint anti-regressão de tokens semânticos e escala tipográfica ──
   // Documentação: .kiro/specs/fase-4-design-system/tokens.md > Lint anti-regressão.
   // Esta regra impede a reintrodução de hex literais (`#rrggbb`, `#rgb`) e classes

@@ -40,6 +40,7 @@ export function StoryBar({
     try {
       const seen = new Set<string>(JSON.parse(sessionStorage.getItem("prv_seen") ?? "[]"));
       if (seen.size === 0) return;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-time browser API → state
       setLocalGroups((prev) =>
         prev.map((g) => {
           const stories = g.stories.map((s) => seen.has(s.id) ? { ...s, seenByMe: true } : s);
@@ -47,7 +48,6 @@ export function StoryBar({
         }),
       );
     } catch { /* ignore */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -105,6 +105,7 @@ export function StoryBar({
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearTimeout(timerRef.current);
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset progress ao trocar de story
     setProgress(0);
     startTimeRef.current = Date.now();
 
@@ -135,6 +136,7 @@ export function StoryBar({
       sessionStorage.setItem("prv_seen", JSON.stringify([...seen]));
     } catch { /* ignore */ }
     // Always update local state
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- marca story atual como vista
     setLocalGroups((prev) =>
       prev.map((g, gi) => {
         if (gi !== activeGroupIdx) return g;

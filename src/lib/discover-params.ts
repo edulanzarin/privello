@@ -20,7 +20,6 @@ export function parseDiscoverSearchParams(raw: Record<string, string | string[] 
     genderRaw === "garotos" || genderRaw === "casais" ? genderRaw : undefined;
 
   const searchRaw = get("q")?.trim();
-  const districtRaw = get("bairro")?.trim();
 
   const filters: DiscoverFilters = {
     gender,

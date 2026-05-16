@@ -109,7 +109,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabKey>("fotos");
   const [uploading, setUploading] = useState(false);
-  const [storyPending, startStoryTransition] = useTransition();
+  const [storyPending, _startStoryTransition] = useTransition();
   const { upload } = useFileUpload({
     endpoint: "/api/upload",
     onError: (msg) => toast(msg, "error"),
@@ -266,6 +266,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
                           {isVideo(s.mediaUrl) ? (
                             <video src={s.mediaUrl} className="h-full w-full object-cover" muted playsInline />
                           ) : (
+                            // eslint-disable-next-line @next/next/no-img-element -- thumbnail de story em painel; next/image exigiria domain whitelist por usuário
                             <img src={s.mediaUrl} alt="" className="h-full w-full object-cover" />
                           )}
                           <div className="absolute inset-x-0 bottom-0 bg-black/60 px-1.5 py-1 text-2xs text-white/80">

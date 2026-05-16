@@ -8,7 +8,14 @@ import { cn } from "@/lib/utils";
 export interface MediaLightboxProps {
     open: boolean;
     onClose: () => void;
-    children: ReactNode;
+    /**
+     * Conteúdo do lightbox (mídia + controles).
+     *
+     * Marcado como opcional para suportar `createElement(MediaLightbox, props, ...children)`
+     * em testes onde TypeScript não infere children dos argumentos posicionais. Em uso
+     * normal via JSX (`<MediaLightbox>...</MediaLightbox>`), children sempre é passado.
+     */
+    children?: ReactNode;
     /** Classe extra encaminhada ao Modal (após `touch-none`). */
     className?: string;
     /** Se true, não fecha ao clicar no backdrop. */

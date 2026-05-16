@@ -72,7 +72,13 @@ export default async function VerificationDetailPage({ params }: PageProps) {
 
   const profile = vc.profile;
   const coverUrl = profile.media[0]?.url ?? null;
-  const waitMin = Math.max(1, Math.floor((Date.now() - vc.waitingSince.getTime()) / 60000));
+  // Page é dinâmica (`force-dynamic`); `Date.now()` aqui é avaliado uma vez por
+  // request, comportamento intencional para calcular "esperando há X minutos".
+  // O React Compiler considera `Date.now()` impura, mas em Server Component dinâmico
+  // o resultado já é "consistente" dentro do request — não há re-render no client.
+  // eslint-disable-next-line react-hooks/purity -- intencional em RSC dinâmica
+  const nowMs = Date.now();
+  const waitMin = Math.max(1, Math.floor((nowMs - vc.waitingSince.getTime()) / 60000));
 
   async function approve() {
     "use server";

@@ -558,6 +558,7 @@ export function ProviderRegisterForm() {
                 onClick={() => document.getElementById("photo-input")?.click()}
               >
                 {photoPreviewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- preview de upload local (blob URL); next/image exige domain whitelist e não funciona com objectURL
                   <img src={photoPreviewUrl} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-muted">

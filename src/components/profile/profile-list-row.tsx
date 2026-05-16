@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, MapPin, Star, Zap } from "lucide-react";
+import { ArrowUpRight, MapPin, Star } from "lucide-react";
 import type { ProfileCardPayload } from "@/lib/services";
 import { formatBrl } from "@/lib/money";
 import { cn } from "@/lib/utils";

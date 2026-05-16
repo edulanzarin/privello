@@ -45,7 +45,7 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
   return (
     <div>
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-        {visible.map(({ profile, createdAt }) => {
+        {visible.map(({ profile }) => {
           const cover = profile.media[0];
           const imageUrl = cover?.url ?? "https://picsum.photos/seed/empty/480/720";
           return (

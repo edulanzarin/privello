@@ -7,7 +7,6 @@ import { createReel, deleteReel, toggleReelPrivacy } from "@/app/_actions/reels"
 import { useToast } from "@/components/ui/toast";
 import { Switch } from "@/components/ui/switch";
 import { useFileUpload } from "@/lib/hooks/use-file-upload";
-import { cn } from "@/lib/utils";
 
 type Reel = { id: string; url: string; caption: string | null; isPublic: boolean };
 

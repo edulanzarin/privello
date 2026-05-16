@@ -8,7 +8,9 @@ type SiteHeaderProps = {
   activeHref?: string;
 };
 
-export async function SiteHeader({ variant = "default", activeHref }: SiteHeaderProps) {
+// `variant` e `activeHref` aceitos para compatibilidade com chamadas existentes (`<SiteHeader activeHref={...} />`).
+// Atualmente o header não aplica visual diferente por variante nem destaque por aba — refactor visual fica fora do escopo da auditoria.
+export async function SiteHeader(_props: SiteHeaderProps = {}) {
   const session = await auth();
 
   let handle: string | null = null;

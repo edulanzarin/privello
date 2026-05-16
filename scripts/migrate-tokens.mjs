@@ -12,7 +12,6 @@
  */
 
 import fs from "node:fs";
-import path from "node:path";
 
 // Mapa de hex → classes alvo (token semântico raiz). Para opacidades, o
 // substituidor usa regex específico abaixo.

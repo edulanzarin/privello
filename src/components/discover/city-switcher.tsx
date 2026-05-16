@@ -37,7 +37,7 @@ export function CitySwitcher({ currentCityName, citySlug }: Props) {
               <div className="flex-1 min-w-0">
                 <CityAutocomplete
                   initialLabel=""
-                  onSelect={(slug, label) => {
+                  onSelect={(slug) => {
                     sessionStorage.setItem(LAST_CITY_KEY, slug);
                     setSearching(false);
                     router.push(`/descobrir/${slug}`);

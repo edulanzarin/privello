@@ -95,10 +95,18 @@ function PostModal({
     setCommentCounts((prev) => prev[m.id] !== undefined ? prev : { ...prev, [m.id]: m.commentCount });
   }, []);
 
+  // Sync state quando a mídia ativa muda (`item.id`). setState em effect é o padrão
+  // idiomático para "inicializar estado derivado de prop quando ela muda" — alternativa
+  // (computar durante render via useMemo) não funciona porque `initItem` precisa
+  // ler estado anterior (`prev`).
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven state sync via initItem
   useEffect(() => { initItem(item); }, [item, initItem]);
 
+  // Fetch de comentários quando a mídia muda. setComments/setLoadingComments aqui são
+  // intencionais: precisa zerar lista anterior antes de buscar a nova.
   useEffect(() => {
     if (!isSubscriber) return; // non-subscribers don't see comments
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset state antes de fetch async
     setComments([]);
     setLoadingComments(true);
     fetch(`/api/media/comment?mediaId=${item.id}`)
@@ -429,7 +437,7 @@ export function MediaGallery({ media, displayName, slug, isClient, isSubscriber,
     setOpenIdx(null);
   }
 
-  function handleItemClick(m: MediaItem, idxInActive: number) {
+  function handleItemClick(_m: MediaItem, idxInActive: number) {
     setOpenIdx(idxInActive);
   }
 

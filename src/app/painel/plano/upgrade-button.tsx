@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { devActivatePlan, useFreeBoost } from "@/app/painel/_actions/provider-settings";
+import { devActivatePlan, claimFreeBoost } from "@/app/painel/_actions/provider-settings";
 
 const IS_DEV = process.env.NODE_ENV !== "production";
 const MP_ENABLED = !!process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
@@ -55,7 +55,7 @@ export function FreeBoostButton() {
 
   function handleClick() {
     startTransition(async () => {
-      await useFreeBoost();
+      await claimFreeBoost();
     });
   }
 

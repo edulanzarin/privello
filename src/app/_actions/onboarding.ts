@@ -197,7 +197,8 @@ export async function saveOnboardingValores(formData: FormData) {
 }
 
 // ── Step 4: Publicar ──────────────────────────────────────────────────────────
-export async function publishProfile(_?: FormData): Promise<void> {
+// Aceita FormData implicitamente (via `<form action={...}>`) mas não consome — só checa estado da DB.
+export async function publishProfile(): Promise<void> {
   const profile = await getProviderProfile();
 
   if (!profile.bio || profile.priceHour < 1) {

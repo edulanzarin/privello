@@ -16,7 +16,7 @@ type Props = {
  */
 export function SaveForm({ action, children, successMessage = "Salvo com sucesso.", className }: Props) {
   const { toast } = useToast();
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

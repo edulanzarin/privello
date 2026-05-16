@@ -1,6 +1,5 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 import { MapPin, Star, ShieldCheck, Video, Clock3, Lock, Eye } from "lucide-react";
@@ -129,7 +128,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const cover = allMedia.find((m) => m.isCover && m.isPublic) ?? allMedia.find((m) => m.isPublic) ?? allMedia[0];
 
   const memberLabel = profile.memberSince.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
-  const monthsVerified = Math.max(0, Math.floor((Date.now() - profile.memberSince.getTime()) / (30.44 * 86400000)));
+  // Page é dinâmica (`force-dynamic`); `Date.now()` aqui é avaliado uma vez por
+  // request para "membro há X meses". Comportamento intencional em RSC.
+  // eslint-disable-next-line react-hooks/purity -- intencional em RSC dinâmica
+  const renderTimeMs = Date.now();
+  const monthsVerified = Math.max(0, Math.floor((renderTimeMs - profile.memberSince.getTime()) / (30.44 * 86400000)));
 
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
   const planBadge = isBoosted

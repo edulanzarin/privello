@@ -8,8 +8,13 @@ const AGE_KEY = "privello:age_ok";
 export function AgeGate() {
   const [show, setShow] = useState(false);
 
+  // Mount-time check: leitura de localStorage que decide se o gate deve aparecer.
+  // setState dentro de useEffect síncrono é o padrão idiomático para "ler API
+  // do browser uma vez ao montar". Não pode rodar durante render (SSR não tem
+  // localStorage) nem em event handler (não há evento de mount).
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-time browser API check
       if (!localStorage.getItem(AGE_KEY)) setShow(true);
     } catch {
       // localStorage blocked (private mode etc.) — don't block

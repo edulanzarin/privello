@@ -218,7 +218,7 @@ export async function addFinancialRecord(formData: FormData) {
 }
 
 // ── Boost grátis para Premium (1x por mês) ────────────────────────────────────
-export async function useFreeBoost() {
+export async function claimFreeBoost() {
   const profile = await getSessionProfile();
 
   const now = new Date();
