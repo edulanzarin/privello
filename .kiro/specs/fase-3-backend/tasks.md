@@ -362,7 +362,7 @@ Restrições importantes:
     - **DONE**: `npm run build` exit 0; count = **71 rotas** (idêntico ao baseline fase-1 em 2026-05-16).
     - _Requirements: 2.3, 3.1, 7.1_
 
-- [ ] 11. Saída desta fase
+- [x] 11. Saída desta fase
   - [x] 11.1 Validar saída
     - Todos os 8 Requirements de `requirements.md` têm evidência (path:linha de código, log de teste, ou link de PR/commit) anexada
     - `metricas-baseline.md` cobre as 5 seções (cabeçalho, metodologia, inventário 43 rotas, métricas antes/depois, decisões)
