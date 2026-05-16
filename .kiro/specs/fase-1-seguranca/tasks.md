@@ -56,7 +56,7 @@ Restrições importantes:
     - _Requirements: 2.1_
 
 - [ ] 3. Whitelist de `images.remotePatterns`
-  - [-] 3.1 Inventariar hosts efetivamente usados pelo app
+  - [x] 3.1 Inventariar hosts efetivamente usados pelo app
     - Buscar em `src/**` por `<Image src="https://...` e por strings `https://` que terminem em domínios externos
     - Listar hosts encontrados em `endpoints-zod.md` (seção dedicada "Imagens externas") com ocorrência (path:linha)
     - _Requirements: 3.2_
@@ -88,7 +88,7 @@ Restrições importantes:
     - Re-export nomeado em `index.ts`
     - _Requirements: 4.4_
 
-  - [~] 4.3 Inventariar Public_Input_Endpoints em `endpoints-zod.md`
+  - [x] 4.3 Inventariar Public_Input_Endpoints em `endpoints-zod.md`
     - Listar todas as Server Actions em `src/app/_actions/**` e `src/app/painel/_actions/**`
     - Listar todos os Route Handlers em `src/app/api/**` que recebem body ou query parametrizada
     - Para cada um, registrar (path do arquivo, função/handler, schema aplicado, formato do erro)
