@@ -26,13 +26,13 @@ Para o estado completo, ler primeiro `c:\Users\edulanzarin\Documents\Dev\privell
 
 Estes itens estão registrados mas **não bloqueiam novos ciclos** — podem ser executados quando convier:
 
-1. **`git push origin master`** — push manual da branch `master`. Após push, capturar o link da run da CI no GitHub Actions e anexar em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-7-dx-infra\dx-conventions.md > §1 CI Pipeline > Primeira run` (fecha Tarefa 2.5 da fase-7).
-2. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar `docs/adr/0003-queries-ts-deprecated.md` conforme escolha.
-3. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
-4. **Smokes browser real da fase-6** (cabeçalhos preparados em `.kiro/specs/fase-6-mobile-cross-browser/mockups-diff.md`):
+1. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar `docs/adr/0003-queries-ts-deprecated.md` conforme escolha.
+2. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
+3. **Smokes browser real da fase-6** (cabeçalhos preparados em `.kiro/specs/fase-6-mobile-cross-browser/mockups-diff.md`):
    - Teclado virtual (login, cadastro, comentário, suporte) em iOS Safari + Android Chrome reais
    - Gestos (pinch em lightbox/story viewer, overscroll em reels-feed, drawer mobile) em iOS Safari + Android Chrome reais
    - Cross-browser desktop Safari + desktop Edge — 3 telas-âncora (`/`, `/p/[slug]`, `/painel`)
+4. **Refinar URL específica da primeira run da CI** (opcional) — Tarefa 2.5 da fase-7 já fechada com link genérico de Actions; se quiser URL canônica da run específica, abrir <https://github.com/edulanzarin/privello/actions> e copiar do commit `18b2654`.
 
 ## Possíveis próximos ciclos (fora da auditoria atual)
 

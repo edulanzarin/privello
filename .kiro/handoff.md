@@ -25,6 +25,7 @@
 | `npm run build` | ⚠️ falha pré-existente em prerender de `/api/cities` quando DB local não está rodando — **não é regressão** (cf. ADR 0004; CI da fase-7 não roda build) |
 | `npm run lint` | ⚠️ 71 problems (29 errors + 42 warnings). **Idêntico ao baseline pós-fase-5/7 — zero novos erros/warnings introduzidos pela fase-6.** Tolerância de lint herdada via ADR 0004 (Opção B `continue-on-error: true` em CI). |
 | `npm run test:e2e -- --list` | ✅ 4 projects rodáveis (`ios-safari`, `desktop-chrome`, `desktop-firefox`, `android-chrome`) × 15 specs cada, exit 0 |
+| `git push origin master` | ✅ feito pelo usuário em 2026-05-17 (range `b2ac0b8..18b2654`). Primeira run da CI capturada em `dx-conventions.md > §1 CI Pipeline > Primeira run`; **Tarefa 2.5 da fase-7 fechada**. |
 
 ## Entregas concretas
 
@@ -120,10 +121,10 @@ Total: 11 commits desta sessão. Branch `master`, sem push (constraint do usuár
 
 **Followups operacionais (não-bloqueantes — herdados de fases anteriores):**
 
-1. **`git push`** quando o usuário quiser publicar — push manual da branch `master` para `origin`. Se ainda não foi feito desde a fase-6, capturar o link da run da CI no GitHub Actions e anexar em `.kiro/specs/fase-7-dx-infra/dx-conventions.md > §1 CI Pipeline > Primeira run` (fecha Tarefa 2.5 da fase-7 que era pendência operacional).
-2. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar ADR 0003 conforme escolha.
-3. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
-4. **Smokes manuais da fase-6** (teclado virtual, gestos, cross-browser) — cabeçalhos preparados em `mockups-diff.md`. Executar em iOS Safari real + Android Chrome real + desktop Safari + desktop Edge antes de promover release amplo.
+1. **2026-06-13 ou posterior** — executar Wave 5 da fase-7 (Cleanup `src/lib/queries.ts`). Decidir entre Opção A (remoção integral) ou Opção B (manter helpers JUSTIFICADO com nova justificativa). Atualizar ADR 0003 conforme escolha.
+2. **`PRODUCTION_HOSTNAME`** em `.env` real quando o domínio definitivo for confirmado (pendência operacional desde a fase-1).
+3. **Smokes manuais da fase-6** (teclado virtual, gestos, cross-browser) — cabeçalhos preparados em `mockups-diff.md`. Executar em iOS Safari real + Android Chrome real + desktop Safari + desktop Edge antes de promover release amplo.
+4. **Refinar URL específica da primeira run da CI** (opcional) — abrir <https://github.com/edulanzarin/privello/actions>, copiar URL canônica da run no commit `18b2654` e substituir o link genérico em `dx-conventions.md > §1 CI Pipeline > Primeira run`.
 
 **Possíveis próximos ciclos (não pertencem à auditoria atual):**
 

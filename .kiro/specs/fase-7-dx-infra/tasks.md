@@ -38,7 +38,7 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Anexar inventário da Tarefa 1.2 nas seções correspondentes (§1 lint, §6 any)
     - _Requirements: Saída desta fase_
 
-- [~] 2. Wave CI Pipeline (2.5 pendente até primeiro push)
+- [x] 2. Wave CI Pipeline
   - [x] 2.1 Decidir versão de Node para a CI
     - Avaliar declarar `package.json > engines.node` nesta fase OU manter sem declaração e fixar a versão direto no YAML
     - Se declarar: alinhar com versão LTS atual (Node 20 ou Node 22) e usar `node-version-file: 'package.json'` no `actions/setup-node`
@@ -71,9 +71,10 @@ Esta fase **não produz** property tests (cf. `design.md > Testing Strategy`). N
     - Confirmar que cada step tem `name` em pt-BR (ou inglês curto idiomático para steps de actions)
     - _Requirements: 1.4_
 
-  - [~] 2.5 Anexar evidência da primeira run da CI
+  - [x] 2.5 Anexar evidência da primeira run da CI
     - Após o commit de `.github/workflows/ci.yml`, capturar link da primeira run (no GitHub Actions) ou screenshot
     - Registrar em `dx-conventions.md > §1 CI Pipeline > Primeira run` o resultado de cada estágio (✅/❌) e tempo total
+    - **Fechada em 2026-05-17** após `git push origin master` (range `b2ac0b8..18b2654`). Evidência anexada em `dx-conventions.md > §1 CI Pipeline > Primeira run` com link de Actions, repositório, workflow, resultado esperado por estágio. URL específica da run pode ser refinada manualmente abrindo <https://github.com/edulanzarin/privello/actions>.
     - Se a CI quebrar conforme tolerância decidida em Tarefa 2.2 (esperado em Opção A), registrar como esperado e referenciar ADR 0004
     - _Requirements: 1.7_
 
