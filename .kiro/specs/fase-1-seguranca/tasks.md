@@ -30,7 +30,7 @@ Restrições importantes:
     - Mesma substituição da 1.2
     - _Requirements: 1.1_
 
-  - [~] 1.4 Adicionar `DEV_ENDPOINT_TOKEN` ao `.env.example`
+  - [x] 1.4 Adicionar `DEV_ENDPOINT_TOKEN` ao `.env.example`
     - Criar `.env.example` se não existir; adicionar a chave com comentário descrevendo o uso (apenas dev/staging)
     - _Requirements: 1.2_
 
@@ -51,7 +51,7 @@ Restrições importantes:
     - Mesma substituição da 2.2
     - _Requirements: 2.1_
 
-  - [~] 2.4 Atualizar `.env.example` com `CRON_SECRET`
+  - [x] 2.4 Atualizar `.env.example` com `CRON_SECRET`
     - Adicionar a chave com comentário descrevendo o uso (header preferido, query em transição)
     - _Requirements: 2.1_
 
@@ -72,7 +72,7 @@ Restrições importantes:
     - WHERE algum `<Image src>` usar host fora da whitelist, ou (a) adicionar à whitelist com justificativa, ou (b) trocar por host coberto, ou (c) registrar como `OutOfScopeFinding`
     - _Requirements: 3.4_
 
-  - [~] 3.4 Atualizar `.env.example` com `PRODUCTION_HOSTNAME`
+  - [x] 3.4 Atualizar `.env.example` com `PRODUCTION_HOSTNAME`
     - Adicionar a chave com exemplo (`privello.com.br` ou similar)
     - _Requirements: 3.2_
 
@@ -152,7 +152,7 @@ Restrições importantes:
     - Falhar build/start em produção quando `AUTH_URL` não definido
     - _Requirements: 6.2_
 
-  - [~] 6.2 Atualizar `.env.example` com `AUTH_URL`
+  - [x] 6.2 Atualizar `.env.example` com `AUTH_URL`
     - Adicionar a chave com comentário descrevendo o uso (URL pública do app em produção)
     - _Requirements: 6.3_
 
