@@ -306,6 +306,11 @@ Os itens abaixo **não** fazem parte desta auditoria e não devem aparecer em sp
 - **historical_refs**:
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\ux-premium-polish`
   - `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\_archive\final-polish-phase`
+- **agents_rule_areas**: nenhuma (a fase NÃO toca APIs do Next.js)
+- **state**: `InProgress`
+- **child_spec_path**: `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-6-mobile-cross-browser\`
+- **promoted_at**: 2026-05-17
+- **spawn_readiness_note**: Fase folha do grafo (cf. PROMOCAO.md §5). Última fase pendente da auditoria — quando concluir, fecha o ciclo do master `auditoria-geral` (todas as 7 fases `Done`).
 
 #### Acceptance Criteria
 
