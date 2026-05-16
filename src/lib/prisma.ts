@@ -33,7 +33,6 @@ if (debugQueries && !globalForPrisma.__prismaQueryHookInstalled) {
   // @ts-expect-error - $on("query") types vary by Prisma version configuration
   prisma.$on("query", (e: { query: string; duration: number; params?: string }) => {
     const truncated = e.query.replace(/\s+/g, " ").slice(0, 120);
-    // eslint-disable-next-line no-console
     console.log(`[prisma] ${e.duration}ms ${truncated}`);
   });
   globalForPrisma.__prismaQueryHookInstalled = true;

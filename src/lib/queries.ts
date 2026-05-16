@@ -76,6 +76,11 @@ export type {
 // remoção, o teste passa a comparar contra um snapshot estático e este
 // bloco vai embora.
 
+// `profileCardInclude` é apenas semente do tipo `ProfileCardPayload` abaixo —
+// não é referenciada em valor por nenhum runtime, mas o satisfies + GetPayload
+// só funcionam com a constante presente. Suppress lint para a regra
+// `@typescript-eslint/no-unused-vars` neste local específico.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const profileCardInclude = {
   city: { select: { name: true, slug: true } },
   district: { select: { name: true, slug: true } },
