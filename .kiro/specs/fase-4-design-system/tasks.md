@@ -23,29 +23,29 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - Listar paths exatos das 5 implementações inline de Switch, dos 6 modais inline e dos 6 sites de upload sem `useFileUpload`
     - _Requirements: 2.4, 5.5_
 
-- [ ] 2. Tokens semânticos completos
-  - [ ] 2.1 Adicionar `--privello-warning` e `--privello-danger` em `globals.css > :root`
+- [x] 2. Tokens semânticos completos
+  - [x] 2.1 Adicionar `--privello-warning` e `--privello-danger` em `globals.css > :root`
     - `--privello-warning: #ff9500`
     - `--privello-danger: #ff3b30`
     - Preservar todos os tokens existentes (`--privello-cream`, `--privello-ink`, `--privello-muted`, `--privello-line`, `--privello-coral`, `--privello-green`, `--privello-sidebar`, `--privello-blue`)
     - _Requirements: 5.1, 5.7_
 
-  - [ ] 2.2 Mapear `--color-warning`, `--color-danger`, `--color-blue` em `@theme inline`
+  - [x] 2.2 Mapear `--color-warning`, `--color-danger`, `--color-blue` em `@theme inline`
     - Adicionar entradas `--color-warning: var(--privello-warning)`, `--color-danger: var(--privello-danger)`, `--color-blue: var(--privello-blue)` em `@theme inline`
     - Validar que classes utilitárias `bg-warning`, `text-danger`, `border-blue`, `bg-warning/10`, `text-blue/[0.04]` etc. funcionam (Tailwind v4 gera opacidades via syntax `<token>/<percent>`)
     - _Requirements: 5.1, 5.3_
 
-  - [ ] 2.3 Declarar escala tipográfica explícita em `@theme inline`
+  - [x] 2.3 Declarar escala tipográfica explícita em `@theme inline`
     - Adicionar `--text-2xs: 10px`, `--text-xs: 11px`, `--text-sm: 12px`, `--text-base: 13px`, `--text-md: 14px`, `--text-lg: 15px`, `--text-xl: 16px`, `--text-2xl: 18px`, `--text-3xl: 22px`, `--text-4xl: 28px`
     - **Atenção**: `text-sm` deixa de ser 14px (default Tailwind) e passa a ser 12px (alinhado ao spec arquivado §2.1). Esta mudança afeta arquivos que usam `text-sm` hoje contando com 14px — listar e revalidar visualmente caso a caso na Wave 1
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 2.4 Validar build após mudanças em `globals.css`
+  - [x] 2.4 Validar build após mudanças em `globals.css`
     - `npm run build` deve passar sem warning de token desconhecido
     - `npm run lint` ainda pode falhar nos arquivos não-migrados — não é regressão, é esperado durante a execução das ondas
     - _Requirements: 5.1_
 
-  - [ ] 2.5 Produzir `tokens.md` em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-4-design-system\`
+  - [x] 2.5 Produzir `tokens.md` em `c:\Users\edulanzarin\Documents\Dev\privello\.kiro\specs\fase-4-design-system\`
     - Seção "Tokens semânticos": lista com valor base e finalidade (`coral` para brand, `success` para confirmação, `warning` para advertência reversível, `danger` para destrutivo/erro, `blue` para link/info)
     - Seção "Variantes de opacidade": tabela por token mostrando 4%, 6%, 10%, 12%, 20% com ao menos um caso de uso real referenciado por `path:linha` por variante adotada
     - Seção "Escala tipográfica": tabela com `text-2xs` até `text-4xl` mapeada a px

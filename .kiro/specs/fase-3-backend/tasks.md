@@ -65,44 +65,48 @@ Restrições importantes:
     - Registrar em `metricas-baseline.md > Métricas antes/depois` na linha de cada função (coluna "antes")
     - _Requirements: 4.5, 6.3_
 
-- [ ] 3. Wave Cache Components (avaliação e decisão)
-  - [ ] 3.1 Classificar candidatas a `"use cache"` na tabela do inventário
+- [x] 3. Wave Cache Components (avaliação e decisão)
+  - [x] 3.1 Classificar candidatas a `"use cache"` na tabela do inventário
     - Para cada uma das 43 rotas, decidir se é candidata a Cache Components (`"use cache"` + `cacheLife`) ou se vai para `revalidate=N` legado / `dynamic justificado`
     - Critério de candidata: rota pública, conteúdo razoavelmente estável, sem dependência forte de `cookies()`/`headers()` em tempo de request
     - Registrar decisão na coluna "classe alvo" do inventário e justificativa em ≤ 30 palavras
     - _Requirements: 2.2, 3.1_
 
-  - [ ] 3.2 Decidir adoção de `cacheComponents: true` em `next.config.ts`
+  - [x] 3.2 Decidir adoção de `cacheComponents: true` em `next.config.ts`
     - Critério: se ≥ 30% das rotas (≥ 13/43) virarem candidatas a `"use cache"`, recomendar ativação
     - Documentar a decisão em `metricas-baseline.md > Decisões > Cache Components` com: critério aplicado, count efetivo, impactos colaterais (`<Activity>`, remoção dos route segment configs legados em v16.0.0)
     - _Requirements: 2.5, 3.1_
 
-  - [ ] 3.3 Aplicar `cacheComponents: true` se a decisão de 3.2 for "ativar"
+  - [x] 3.3 Aplicar `cacheComponents: true` se a decisão de 3.2 for "ativar"
     - Editar `next.config.ts` adicionando `cacheComponents: true` com comentário inline citando `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/cacheComponents.md` + data
     - Rodar `npm run build` e validar zero erros de tipo
     - Em janela de validação ≥ 7 dias em homologação antes de promover para produção (registrado em `metricas-baseline.md`)
     - Se a decisão for "não ativar", pular para 3.5 e seguir o caminho `revalidate=N`
+    - **PULADA**: decisão 3.2 = "não ativar" (0% candidatas). Caminho legado `revalidate=N` aplicado em 4.1.
     - _Requirements: 2.5, 3.1_
 
-  - [ ] 3.4 Aplicar `"use cache"` + `cacheLife` + `cacheTag` nas rotas candidatas
+  - [x] 3.4 Aplicar `"use cache"` + `cacheLife` + `cacheTag` nas rotas candidatas
     - Para cada rota classificada como `cache-components` no inventário, editar o componente/função:
       - Remover `export const dynamic = "force-dynamic"` (e demais route segment configs legados se `cacheComponents: true`)
       - Adicionar `"use cache"` no topo da função
       - Importar e chamar `cacheLife({ revalidate, expire })` com perfil definido em `metricas-baseline.md > Decisões > Perfis de cacheLife`
       - Adicionar `cacheTag(...)` quando a função for invalidável por evento
     - Rodar `npm run build` após cada wave de rotas correlatas
+    - **PULADA**: 0 rotas classificadas como `cache-components` (decisão 3.2 = não ativar).
     - _Requirements: 3.1, 3.2_
 
-  - [ ] 3.5 Atualizar Server Actions para `revalidateTag`/`revalidatePath`
+  - [x] 3.5 Atualizar Server Actions para `revalidateTag`/`revalidatePath`
     - Para cada `cacheTag` adicionado em 3.4, identificar Server Actions que mutam o dado correspondente em `src/app/_actions/**` e `src/app/painel/_actions/**`
     - Adicionar chamada a `revalidateTag(...)` (ou `revalidatePath(...)`) ao final da Server Action
     - **Não tocar a diretiva `'use server'` do arquivo** (consulta AGENTS_Rule já registrada em `requirements.md > §4`)
+    - **PULADA**: nenhum `cacheTag` adicionado em 3.4. Server Actions inalteradas. (Wave 7.11 confirma a preservação do `'use server'` durante a migração `queries.ts` → services.)
     - _Requirements: 3.3_
 
-  - [ ] 3.6 Capturar métricas depois para rotas com `"use cache"`
+  - [x] 3.6 Capturar métricas depois para rotas com `"use cache"`
     - Mesma metodologia de 2.4: medir count de queries por request e tempo p50 em dev
     - Registrar coluna "depois" em `metricas-baseline.md > Métricas antes/depois` para cada rota afetada
     - Se métrica depois > antes em qualquer rota, **reverter** o commit dessa rota e investigar (regra E1 de `design.md > Error Handling`)
+    - **PULADA**: 0 rotas com `"use cache"` (consequência de 3.3 e 3.4 puladas).
     - _Requirements: 3.4, 6.3_
 
 - [ ] 4. Wave Route Segment Config (rotas que ficam no modelo legado)
