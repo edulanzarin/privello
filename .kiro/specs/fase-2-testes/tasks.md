@@ -110,14 +110,14 @@ Tarefas marcadas com `*` produzem property tests (validam Properties em `design.
     - _Requirements: 4.1, 4.3, 4.5_
     - _Validates: Property 1_
 
-  - [~] 4.3 * Implementar `src/lib/discover-params.pbt.ts` (Property 2)
+  - [x] 4.3 * Implementar `src/lib/discover-params.pbt.ts` (Property 2)
     - Gerador `fc.record(...)` para o conjunto de filtros válidos
     - Propriedade: `parseDiscoverParams(serializeDiscoverParams(f))` é estruturalmente equivalente a `f`
     - Documentar a forma exata da equivalência no comentário do teste
     - _Requirements: 4.1, 4.3_
     - _Validates: Property 2_
 
-  - [~] 4.4 * Implementar `src/lib/time-utils.pbt.ts` (Property 3)
+  - [x] 4.4 * Implementar `src/lib/time-utils.pbt.ts` (Property 3)
     - Gerador `fc.date()` no intervalo do fuso configurado pelo app
     - Propriedade: diferença entre `parseTime(formatTime(d))` e `d` é menor que a precisão declarada de `formatTime`
     - _Requirements: 4.1, 4.3_
