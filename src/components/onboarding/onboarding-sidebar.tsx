@@ -2,14 +2,28 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 const STEPS = [
-  { n: "01", label: "Perfil",    href: "/conta/onboarding/perfil"   },
-  { n: "02", label: "Fotos",     href: "/conta/onboarding/fotos"    },
-  { n: "03", label: "Valores",   href: "/conta/onboarding/valores"  },
-  { n: "04", label: "Publicar",  href: "/conta/onboarding/publicar" },
+  { n: "01", label: "Perfil", href: "/conta/onboarding/perfil" },
+  { n: "02", label: "Fotos", href: "/conta/onboarding/fotos" },
+  { n: "03", label: "Valores", href: "/conta/onboarding/valores" },
+  { n: "04", label: "Publicar", href: "/conta/onboarding/publicar" },
 ];
 
 type Props = { current: "perfil" | "fotos" | "valores" | "publicar" };
 
+/**
+ * Sidebar com timeline de 4 passos (Perfil / Fotos / Valores / Publicar) usada
+ * em todas as páginas do fluxo `/conta/onboarding/*`. Marca passos anteriores
+ * como concluídos (com check) e destaca o atual.
+ *
+ * Props:
+ * - `current` ("perfil" | "fotos" | "valores" | "publicar"): identifica o passo atual da rota.
+ *
+ * Consumidores conhecidos:
+ * - src/app/conta/onboarding/perfil/page.tsx
+ * - src/app/conta/onboarding/valores/page.tsx
+ * - src/app/conta/onboarding/publicar/page.tsx
+ * - src/app/conta/onboarding/fotos/page.tsx (passo 02)
+ */
 export function OnboardingSidebar({ current }: Props) {
   const currentIdx = STEPS.findIndex((s) => s.href.endsWith(current));
 
@@ -23,8 +37,8 @@ export function OnboardingSidebar({ current }: Props) {
         <p className="text-sm text-white/50">~10 minutos.</p>
         <ol className="mt-8 space-y-2 text-sm">
           {STEPS.map((s, i) => {
-            const done    = i < currentIdx;
-            const active  = i === currentIdx;
+            const done = i < currentIdx;
+            const active = i === currentIdx;
             return (
               <li
                 key={s.n}

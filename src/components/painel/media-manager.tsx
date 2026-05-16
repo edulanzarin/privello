@@ -104,6 +104,25 @@ function MediaGrid({
   );
 }
 
+/**
+ * Painel de gestão de mídia com tabs Fotos / Vídeos / Reels / Stories. Cada tab
+ * permite upload, listagem em grid, definir foto de perfil (cover) e remover.
+ *
+ * Props:
+ * - `publicPhotos` (Media[]): mídias públicas (fotos + vídeos + reels) ordenadas pelo backend.
+ * - `privatePhotos` (Media[]): galeria privada (apenas para assinantes verem no perfil público).
+ * - `stories` (Story[]): stories cadastradas (filtradas para mostrar somente ativas, expiresAt > now).
+ * - `canPostStories` (boolean): true para planos Destaque/Premium; false bloqueia tab Stories.
+ *
+ * Consumidores conhecidos:
+ * - src/app/painel/midias/page.tsx (referência canônica)
+ *
+ * Side effects:
+ * - Hook `useFileUpload({ endpoint: "/api/upload" })` para upload via fetch.
+ * - Server actions: `setCoverPhoto`, `removePhoto` (`@/app/_actions/onboarding`),
+ *   `createStory`, `deleteStory` (`@/app/_actions/stories`).
+ * - `router.refresh()` após cada mutação para re-buscar dados RSC.
+ */
 export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStories }: Props) {
   const router = useRouter();
   const { toast } = useToast();

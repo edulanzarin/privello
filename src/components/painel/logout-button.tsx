@@ -4,6 +4,16 @@ import { LogOut } from "lucide-react";
 import { useTransition } from "react";
 import { logoutAction } from "@/app/_actions/logout";
 
+/**
+ * Botão "Sair" compacto (apenas ícone) usado no header do painel mobile e no rodapé
+ * da sidebar desktop. Dispara `logoutAction()` em `useTransition`.
+ *
+ * Consumidores conhecidos:
+ * - src/components/painel/painel-sidebar.tsx (header mobile + rodapé desktop)
+ *
+ * Side effects:
+ * - Server action `logoutAction()` em `src/app/_actions/logout.ts` (encerra sessão NextAuth e redireciona).
+ */
 export function LogoutButton() {
   const [pending, startTransition] = useTransition();
 

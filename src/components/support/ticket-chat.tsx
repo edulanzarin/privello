@@ -14,6 +14,27 @@ type Message = {
   user: { name: string | null };
 };
 
+/**
+ * Chat de ticket de suporte (cliente ↔ admin). Lista mensagens com bolhas
+ * estilo iMessage, permite enviar nova mensagem com Enter (Shift+Enter quebra linha)
+ * e mostra estado "Ticket fechado" quando aplicável.
+ *
+ * Props:
+ * - `ticketId` (string): id do `SupportTicket` para o qual estamos respondendo.
+ * - `messages` (Message[]): lista inicial de mensagens (vinda do RSC).
+ * - `isClosed` (boolean): se o ticket está fechado (esconde input + mostra rodapé estático).
+ * - `currentUserId` (string): id do usuário logado (atualmente usado só para tipo, sem leitura no JSX).
+ *
+ * Consumidores conhecidos:
+ * - src/app/painel/suporte/[id]/page.tsx (provider)
+ * - src/app/admin/suporte/[id]/page.tsx (admin)
+ *
+ * Side effects:
+ * - Server action `replyTicket(ticketId, text)` em `src/app/_actions/support.ts`.
+ * - Atualização otimista local + rollback em caso de erro.
+ * - `router.refresh()` após envio bem-sucedido.
+ * - `bottomRef.scrollIntoView({ behavior: "smooth" })` em cada nova mensagem.
+ */
 export function TicketChat({
   ticketId,
   messages: initial,

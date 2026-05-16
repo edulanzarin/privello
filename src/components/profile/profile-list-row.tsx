@@ -37,6 +37,20 @@ const PLAN_CONFIG = {
   },
 } as const;
 
+/**
+ * Card de perfil em variação "linha horizontal" com foto pequena, dados resumidos
+ * e seta de navegação — usado quando o usuário escolhe view em lista no Discover.
+ *
+ * Props:
+ * - `profile` (ProfileCardPayload): payload do `discover.service` (mesmo tipo do `ProfileCard` em grid).
+ * - `className?` (string): classes Tailwind extras encaminhadas ao link raiz.
+ *
+ * Consumidores conhecidos:
+ * - src/app/descobrir/[citySlug]/page.tsx
+ *
+ * Side effects:
+ * - Renderiza `<Link href="/p/[slug]">` (navegação client-side).
+ */
 export function ProfileListRow({ profile, className }: { profile: ProfileCardPayload; className?: string }) {
   const cover = profile.media.find((m) => m.isCover) ?? profile.media[0];
   const imageUrl = cover?.url ?? "https://picsum.photos/seed/empty/480/720";

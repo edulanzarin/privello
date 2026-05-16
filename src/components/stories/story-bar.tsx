@@ -19,6 +19,26 @@ function timeAgo(iso: string) {
   return "há 1 dia";
 }
 
+/**
+ * Barra horizontal de stories (estilo Instagram/WhatsApp) com viewer fullscreen
+ * que toca cada story por 5s, registra views, marca como visto e permite curtir.
+ *
+ * Renderizada na página `/descobrir/[citySlug]` quando há grupos de stories ativos.
+ *
+ * Props:
+ * - `groups` (StoryGroup[]): grupos de stories agregados por perfil (vem de `listStoriesForCity`).
+ * - `isClient` (boolean): se o visitante está logado (libera curtir e marca view no servidor).
+ *
+ * Consumidores conhecidos:
+ * - src/app/descobrir/[citySlug]/page.tsx
+ *
+ * Side effects:
+ * - `fetch("/api/stories/view", { method: "POST" })` ao abrir cada story.
+ * - `fetch("/api/stories/like", { method: "POST" })` no toggle de curtir.
+ * - `sessionStorage.getItem("prv_seen") / setItem(...)` para persistir stories vistas.
+ * - `requestAnimationFrame` + `setTimeout(STORY_DURATION = 5000)` para a barra de progresso.
+ * - Listener `keydown` global (Esc, ←, →) enquanto o viewer está aberto.
+ */
 export function StoryBar({
   groups,
   isClient,

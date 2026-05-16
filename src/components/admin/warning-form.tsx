@@ -13,6 +13,26 @@ type WarningFormProps = {
   isSuspended: boolean;
 };
 
+/**
+ * Cluster de ações de moderação para um perfil: badge de advertências,
+ * botões "Advertir" / "Suspender" / "Reativar" e modal com `<textarea>`
+ * para motivo. O modal aplica `position` responsivo (bottom-sheet em mobile,
+ * center em desktop) via `useMediaQuery`.
+ *
+ * Props:
+ * - `profileId` (string): id do perfil-alvo.
+ * - `profileName` (string): nome de exibição (usado no header do modal).
+ * - `warningCount` (number): número de advertências atuais (controla badge e label do modal).
+ * - `isSuspended` (boolean): se a conta já está suspensa (alterna botão "Reativar").
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/perfis/page.tsx
+ *
+ * Side effects:
+ * - Server actions `giveWarning`, `suspendProfile`, `unsuspendProfile`
+ *   em `src/app/_actions/admin-moderation.ts`.
+ * - `useMediaQuery("(max-width: 640px)")` para escolher `position` do modal (fase-6).
+ */
 export function WarningForm({ profileId, profileName, warningCount, isSuspended }: WarningFormProps) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"warn" | "suspend">("warn");

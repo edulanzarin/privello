@@ -10,6 +10,22 @@ import { useFileUpload } from "@/lib/hooks/use-file-upload";
 
 type Reel = { id: string; url: string; caption: string | null; isPublic: boolean };
 
+/**
+ * Painel de gestão de reels do provider: grid 9:16 com hover-actions
+ * (toggle privacidade, deletar) e formulário de upload com preview/legenda/switch privacy.
+ *
+ * Props:
+ * - `initialReels` (Reel[]): lista inicial de reels do provider, vinda do RSC.
+ *
+ * Consumidores conhecidos:
+ * - src/app/painel/reels/page.tsx
+ *
+ * Side effects:
+ * - Hook `useFileUpload({ endpoint: "/api/upload", strategy: "xhr" })` — XHR para reportar progresso de upload.
+ * - Server actions: `createReel`, `deleteReel`, `toggleReelPrivacy` (`@/app/_actions/reels`).
+ * - `URL.createObjectURL` / `URL.revokeObjectURL` para preview do vídeo selecionado.
+ * - `router.refresh()` após criar reel.
+ */
 export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
   const [reels, setReels] = useState<Reel[]>(initialReels);
   const [uploading, setUploading] = useState(false);

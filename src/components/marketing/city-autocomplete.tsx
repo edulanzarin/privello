@@ -102,6 +102,31 @@ type Props = {
   compact?: boolean;
 };
 
+/**
+ * Autocomplete de cidades brasileiras combinando cidades já presentes no banco
+ * (via `/api/cities`) com a base completa de municípios do IBGE
+ * (`servicodados.ibge.gov.br`). Cidades locais aparecem primeiro nos resultados.
+ *
+ * Props:
+ * - `onSelect` ((slug: string, label: string) => void): callback ao escolher uma cidade.
+ * - `initialLabel?` (string): texto inicial do input (default `""`).
+ * - `compact?` (boolean): variação compacta sem ícone/label, para usar em barras sticky.
+ *
+ * Consumidores conhecidos:
+ * - src/components/marketing/hero-search-form.tsx
+ * - src/components/discover/city-switcher.tsx
+ * - src/app/buscar/buscar-form.tsx
+ * - src/app/cadastro/acompanhante/provider-register-form.tsx
+ * - src/app/conta/onboarding/perfil/perfil-form.tsx
+ * - src/app/painel/perfil/perfil-editor.tsx
+ *
+ * Side effects:
+ * - `fetch("/api/cities")` no mount para popular cache local de cidades cadastradas.
+ * - `fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome")`
+ *   no mount para popular cache IBGE (chamada externa via HTTPS — acervo público).
+ * - Listeners `mousedown` e `touchstart` global para fechar o dropdown ao clicar fora.
+ * - Debounce de 150ms na busca conforme o usuário digita.
+ */
 export function CityAutocomplete({ onSelect, initialLabel = "", compact = false }: Props) {
   const [query, setQuery] = useState(initialLabel);
   const [results, setResults] = useState<CityResult[]>([]);

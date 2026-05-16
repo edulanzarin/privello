@@ -350,6 +350,31 @@ function ReelPlayer({
   );
 }
 
+/**
+ * Feed vertical (estilo TikTok) de reels com snap-scroll, IntersectionObserver
+ * para autoplay do reel ativo, scroll infinito via cursor e painel de comentários
+ * deslizante.
+ *
+ * Props:
+ * - `initialReels` (Reel[]): primeiros reels carregados pelo RSC.
+ * - `hasMore` (boolean): se há mais reels para carregar.
+ * - `nextCursor` (string | null): cursor para paginação seguinte (`/api/reels?cursor=...`).
+ * - `isClient` (boolean): visitante autenticado (libera curtidas).
+ * - `isSubscriber` (boolean): assinante (libera comentar e desbloqueia reels privados).
+ * - `cityId?` (string): filtra a paginação por cidade.
+ * - `profileId?` (string): filtra a paginação por perfil específico (`/reels/[slug]`).
+ *
+ * Consumidores conhecidos:
+ * - src/app/reels/page.tsx
+ * - src/app/reels/[slug]/page.tsx
+ *
+ * Side effects:
+ * - `fetch("/api/reels?cursor=...")` para paginação infinita via sentinel `IntersectionObserver`.
+ * - `fetch("/api/media/like", ...)` POST para curtir/descurtir cada reel (com rollback).
+ * - `fetch("/api/media/comment", ...)` GET/POST para listar/postar comentários.
+ * - `IntersectionObserver` por item para detectar reel ativo e tocar/pausar `<video>`.
+ * - Container scrollável aplica `snap-y snap-mandatory` + `overscroll-y-contain` (fase-6 gestos).
+ */
 export function ReelsFeed({
   initialReels, hasMore: initialHasMore, nextCursor: initialCursor,
   isClient, isSubscriber, cityId, profileId,

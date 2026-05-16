@@ -14,6 +14,26 @@ type BottomNavProps = {
   providerSlug?: string | null;
 };
 
+/**
+ * Bottom navigation fixo no rodapé (mobile-first) com versões diferentes por
+ * `userRole`: PROVIDER vê apenas Painel + Meu perfil; demais usuários veem
+ * Home / Acompanhantes / Reels / Perfil-ou-Admin. Cada item tem touch target
+ * mínimo 44×44 (Critical Control da fase-6).
+ *
+ * Props:
+ * - `isLoggedIn` (boolean): controla destino e label do item de perfil ("Perfil" vs "Entrar").
+ * - `userRole?` (string): "CLIENT" | "PROVIDER" | "ADMIN" | "MODERATOR".
+ * - `isAdmin?` (boolean): se true, substitui o item de perfil por "Admin → /admin/moderacao".
+ * - `providerSlug?` (string | null): slug do provider para link "Meu perfil → /p/[slug]".
+ *
+ * Consumidores conhecidos:
+ * - src/components/layout/bottom-nav-wrapper.tsx (RSC wrapper único)
+ *
+ * Side effects:
+ * - `sessionStorage.getItem(LAST_CITY_KEY)` para restaurar última cidade no clique
+ *   em "Acompanhantes"; cai em `/buscar` quando não há cidade salva.
+ * - `router.push(...)` para navegação client-side.
+ */
 export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: BottomNavProps) {
   const pathname = usePathname();
   const router = useRouter();

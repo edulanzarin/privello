@@ -3,6 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
 
+/**
+ * Player de áudio completo com barra de progresso clicável e contador `mm:ss / mm:ss`.
+ *
+ * Renderizado na página de perfil público quando o anúncio possui um clipe de voz.
+ *
+ * Props:
+ * - `src` (string): URL absoluta do arquivo de áudio (geralmente `.webm` em `/uploads`).
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ *
+ * Side effects:
+ * - `useEffect` registra listeners `timeupdate`/`loadedmetadata`/`ended` no `<audio>`.
+ * - Clique na barra de progresso ajusta `audio.currentTime` via `getBoundingClientRect`.
+ */
 export function AudioPlayer({ src }: { src: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -12,8 +27,8 @@ export function AudioPlayer({ src }: { src: string }) {
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    const onTime  = () => setProgress(a.currentTime);
-    const onMeta  = () => setDuration(a.duration);
+    const onTime = () => setProgress(a.currentTime);
+    const onMeta = () => setDuration(a.duration);
     const onEnded = () => { setPlaying(false); setProgress(0); };
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("loadedmetadata", onMeta);
@@ -66,7 +81,7 @@ export function AudioPlayer({ src }: { src: string }) {
       >
         {playing
           ? <Pause className="h-4 w-4 fill-white" strokeWidth={0} />
-          : <Play  className="h-4 w-4 fill-white translate-x-[1px]" strokeWidth={0} />
+          : <Play className="h-4 w-4 fill-white translate-x-[1px]" strokeWidth={0} />
         }
       </button>
     </div>

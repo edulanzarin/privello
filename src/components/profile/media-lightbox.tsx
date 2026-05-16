@@ -33,6 +33,16 @@ export interface MediaLightboxProps {
  *
  * Reutiliza Modal+focus trap+scroll lock entregues por fase-4 — sem duplicação.
  *
+ * Props:
+ * - `open` (boolean): controla visibilidade do lightbox.
+ * - `onClose` (() => void): callback quando o usuário fecha (tecla Esc, backdrop, ou botão).
+ * - `children?` (ReactNode): conteúdo (mídia + controles).
+ * - `className?` (string): classes extras encaminhadas ao Modal após `touch-none`.
+ * - `persistent?` (boolean): se true, ignora cliques no backdrop.
+ *
+ * Consumidores conhecidos:
+ * - src/components/profile/media-gallery.tsx (PostModal interno)
+ *
  * Cf. `.kiro/specs/fase-6-mobile-cross-browser/design.md > Components and Interfaces > 7`.
  */
 export function MediaLightbox({

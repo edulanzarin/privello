@@ -5,6 +5,22 @@ type Props = {
   variant: "own-profile" | "other-profile" | "search";
 };
 
+/**
+ * Banner contextual exibido no topo de páginas para sinalizar que o visitante
+ * é um provider e que algumas interações (curtir, ver contato, contar views)
+ * estão restritas.
+ *
+ * Props:
+ * - `variant` ("own-profile" | "other-profile" | "search"):
+ *   - `own-profile`: provider visualizando o próprio perfil (CTA "Ir ao painel").
+ *   - `other-profile`: provider em perfil de outro provider.
+ *   - `search`: provider em listagens/busca.
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ * - src/app/buscar/page.tsx (busca)
+ * - src/app/descobrir/[citySlug]/page.tsx
+ */
 export function ProviderBanner({ variant }: Props) {
   if (variant === "own-profile") {
     return (

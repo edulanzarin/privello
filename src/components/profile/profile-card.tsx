@@ -39,6 +39,26 @@ const PLAN_CONFIG = {
   },
 } as const;
 
+/**
+ * Card de perfil em grid (variação default usada em listagens "Em destaque", "Em alta",
+ * "Descobrir" e seção home), com foto de capa, badges de plano/verificação, preço,
+ * tira de fotos extras e botão de áudio quando disponível.
+ *
+ * Props:
+ * - `profile` (ProfileCardPayload): payload retornado por `discover.service` (tipo Prisma com city/district/media).
+ * - `className?` (string): classes Tailwind extras encaminhadas ao link raiz.
+ * - `storyRing?` ("unseen" | "seen" | "none"): adiciona aro de story por cima do card (default `"none"`).
+ *
+ * Consumidores conhecidos:
+ * - src/app/em-destaque/page.tsx
+ * - src/app/em-alta/page.tsx
+ * - src/app/descobrir/[citySlug]/page.tsx
+ * - src/components/home/profile-section.tsx
+ *
+ * Side effects:
+ * - Renderiza `<Link href="/p/[slug]">` (navegação client-side).
+ * - Componente filho `<AudioPlayButton>` instancia `Audio` no clique (cf. arquivo dele).
+ */
 export function ProfileCard({ profile, className, storyRing = "none" }: ProfileCardProps) {
   const cover = profile.media.find((m) => m.isCover) ?? profile.media[0];
   const imageUrl = cover?.url ?? "https://picsum.photos/seed/empty/480/720";

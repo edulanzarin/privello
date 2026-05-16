@@ -8,13 +8,33 @@ import { logoutAction } from "@/app/_actions/logout";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/admin/moderacao", label: "Moderação",  icon: ShieldCheck },
-  { href: "/admin/suporte",   label: "Suporte",     icon: MessageCircle },
-  { href: "/admin/perfis",    label: "Perfis",      icon: Users },
-  { href: "/admin/midias",    label: "Mídias",      icon: ImageIcon },
-  { href: "/admin/financeiro",label: "Financeiro",  icon: BarChart3 },
+  { href: "/admin/moderacao", label: "Moderação", icon: ShieldCheck },
+  { href: "/admin/suporte", label: "Suporte", icon: MessageCircle },
+  { href: "/admin/perfis", label: "Perfis", icon: Users },
+  { href: "/admin/midias", label: "Mídias", icon: ImageIcon },
+  { href: "/admin/financeiro", label: "Financeiro", icon: BarChart3 },
 ];
 
+/**
+ * Layout/shell compartilhado por todas as páginas admin: header escuro com
+ * nav (Moderação / Suporte / Perfis / Mídias / Financeiro), botão "Sair" e
+ * link para o site público em nova aba. Renderiza `children` na main central.
+ *
+ * Props:
+ * - `children` (ReactNode): conteúdo da página admin a ser renderizado.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ * - src/app/admin/suporte/page.tsx (e /[id])
+ * - src/app/admin/perfis/page.tsx
+ * - src/app/admin/midias/page.tsx
+ * - src/app/admin/financeiro/page.tsx
+ * - src/app/admin/verificacoes/[id]/page.tsx
+ *
+ * Side effects:
+ * - Server action `logoutAction()` no clique em "Sair", seguido de `window.location.href = "/entrar"`.
+ * - `usePathname()` para destacar item de nav ativo.
+ */
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [pending, start] = useTransition();

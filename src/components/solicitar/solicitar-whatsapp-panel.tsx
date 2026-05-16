@@ -28,6 +28,26 @@ type Summary = {
   isOvernight: boolean;
 };
 
+/**
+ * Painel lateral do fluxo `/solicitar/[slug]` com resumo da reserva
+ * (data, horário, duração, local, total) + textarea de observações + CTA
+ * "Marcar no WhatsApp" que abre `wa.me/<digits>` com mensagem pronta gerada
+ * por `buildWhatsAppBookingMessage`.
+ *
+ * Props:
+ * - `profile` (ProfileBits): dados resumidos do perfil-alvo (id, slug, displayName, age, cidade, bairro,
+ *   isOnline, whatsappPhone, imageUrl).
+ * - `summary` (Summary): resumo do agendamento já formatado (dateLabel, startTime, endTime, durationLabel,
+ *   locationLabel, totalBrl, isOvernight).
+ *
+ * Consumidores conhecidos:
+ * - src/app/solicitar/[slug]/page.tsx
+ *
+ * Side effects:
+ * - No clique do CTA, dispara `fetch("/api/wa-click", { method: "POST" })` com `{ profileId, source: "solicitar" }`
+ *   antes do navegador abrir o link `wa.me`.
+ * - Helpers `buildWhatsAppBookingMessage` / `buildWhatsAppUrl` / `whatsappDigits` em `@/lib/whatsapp-booking`.
+ */
 export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileBits; summary: Summary }) {
   const [notes, setNotes] = useState("");
   const digits = whatsappDigits(profile.whatsappPhone);

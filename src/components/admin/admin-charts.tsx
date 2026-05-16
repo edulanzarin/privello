@@ -17,6 +17,15 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
+/**
+ * Gráfico de barras "Novos perfis · 30 dias" usado no painel admin de moderação.
+ *
+ * Props:
+ * - `data` (DayPoint[]): pontos `{ date, count }` agrupados por dia.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ */
 export function ProfilesChart({ data }: { data: DayPoint[] }) {
   return (
     <ChartCard title="Novos perfis · 30 dias">
@@ -35,6 +44,15 @@ export function ProfilesChart({ data }: { data: DayPoint[] }) {
   );
 }
 
+/**
+ * Gráfico de barras "Mídias postadas · 30 dias" usado no painel admin de moderação.
+ *
+ * Props:
+ * - `data` (DayPoint[]): pontos `{ date, count }` agrupados por dia.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ */
 export function MediaChart({ data }: { data: DayPoint[] }) {
   return (
     <ChartCard title="Mídias postadas · 30 dias">
@@ -53,6 +71,15 @@ export function MediaChart({ data }: { data: DayPoint[] }) {
   );
 }
 
+/**
+ * Gráfico de área "Assinaturas ativas · 8 semanas" usado no painel admin de moderação.
+ *
+ * Props:
+ * - `data` (WeekPoint[]): pontos `{ week, count }` agrupados por semana.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ */
 export function SubscriptionsChart({ data }: { data: WeekPoint[] }) {
   return (
     <ChartCard title="Assinaturas ativas · 8 semanas">
@@ -78,6 +105,15 @@ export function SubscriptionsChart({ data }: { data: WeekPoint[] }) {
   );
 }
 
+/**
+ * Gráfico de barras "Reels postados · 30 dias" usado no painel admin de moderação.
+ *
+ * Props:
+ * - `data` (DayPoint[]): pontos `{ date, count }` agrupados por dia.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ */
 export function ReelsChart({ data }: { data: DayPoint[] }) {
   return (
     <ChartCard title="Reels postados · 30 dias">

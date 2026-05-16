@@ -4,6 +4,19 @@ import { useState, useTransition } from "react";
 import { Trash2, Eye, EyeOff } from "lucide-react";
 import { deleteAdminMedia, toggleMediaVisibility } from "@/app/_actions/admin-moderation";
 
+/**
+ * Botão "Apagar" mídia em duas etapas (clique inicial → "Confirmar/Não" inline)
+ * usado no painel admin de mídias.
+ *
+ * Props:
+ * - `mediaId` (string): id da mídia a deletar.
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/midias/page.tsx
+ *
+ * Side effects:
+ * - Server action `deleteAdminMedia(mediaId)` em `src/app/_actions/admin-moderation.ts`.
+ */
 export function MediaDeleteBtn({ mediaId }: { mediaId: string }) {
   const [confirm, setConfirm] = useState(false);
   const [pending, start] = useTransition();
@@ -40,6 +53,19 @@ export function MediaDeleteBtn({ mediaId }: { mediaId: string }) {
   );
 }
 
+/**
+ * Botão "Privar/Publicar" mídia que alterna a visibilidade pública.
+ *
+ * Props:
+ * - `mediaId` (string): id da mídia a togglar.
+ * - `isPublic` (boolean): estado atual (controla label/cor do botão).
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/midias/page.tsx
+ *
+ * Side effects:
+ * - Server action `toggleMediaVisibility(mediaId)` em `src/app/_actions/admin-moderation.ts`.
+ */
 export function MediaVisibilityBtn({ mediaId, isPublic }: { mediaId: string; isPublic: boolean }) {
   const [pending, start] = useTransition();
 
@@ -47,11 +73,10 @@ export function MediaVisibilityBtn({ mediaId, isPublic }: { mediaId: string; isP
     <button
       onClick={() => start(async () => { await toggleMediaVisibility(mediaId); })}
       disabled={pending}
-      className={`flex items-center gap-1 text-2xs font-bold px-2 py-1 border transition disabled:opacity-40 ${
-        isPublic
-          ? "border-line text-muted hover:border-foreground/30 hover:text-foreground"
-          : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-      }`}
+      className={`flex items-center gap-1 text-2xs font-bold px-2 py-1 border transition disabled:opacity-40 ${isPublic
+        ? "border-line text-muted hover:border-foreground/30 hover:text-foreground"
+        : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+        }`}
       title={isPublic ? "Tornar privada" : "Tornar pública"}
     >
       {pending ? "…" : isPublic ? (

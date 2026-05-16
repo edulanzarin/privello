@@ -17,6 +17,22 @@ function displayFromSlug(slug: string, fallback: string): string {
   return `${fallback}, ${uf}`;
 }
 
+/**
+ * Barra sticky logo abaixo do header em `/descobrir/[citySlug]` que mostra a
+ * cidade atual e abre um autocomplete (`<CityAutocomplete>`) ao tocar para
+ * trocar de cidade.
+ *
+ * Props:
+ * - `currentCityName` (string): nome da cidade atual (vem do RSC, `getOrCreateCityBySlug`).
+ * - `citySlug` (string): slug atual usado para inferir UF e persistir no sessionStorage.
+ *
+ * Consumidores conhecidos:
+ * - src/app/descobrir/[citySlug]/page.tsx
+ *
+ * Side effects:
+ * - `sessionStorage.setItem(LAST_CITY_KEY, slug)` quando o usuário escolhe nova cidade.
+ * - `router.push(/descobrir/[slug])` para navegar.
+ */
 export function CitySwitcher({ currentCityName, citySlug }: Props) {
   const router = useRouter();
   const [searching, setSearching] = useState(false);

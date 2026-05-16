@@ -418,6 +418,31 @@ function PostModal({
 }
 
 // ── Main gallery component ───────────────────────────────────────────────────
+/**
+ * Galeria de mídia do perfil público em grid 3 colunas estilo Instagram, com tabs
+ * Fotos/Reels e modal-post (`PostModal`) para visualização ampliada com curtidas e
+ * comentários inline.
+ *
+ * Props:
+ * - `media` (MediaItem[]): lista bruta de mídias do perfil (fotos + vídeos + reels).
+ * - `displayName` (string): nome de exibição usado em alts e header do modal.
+ * - `slug` (string): slug do perfil para construir links e CTAs.
+ * - `isClient` (boolean): true quando o visitante é cliente logado (libera curtidas/comentários).
+ * - `isSubscriber` (boolean): true quando o visitante é assinante (libera comentários e mídia privada).
+ * - `currentUserId?` (string): id do usuário logado (controla botão de deletar próprio comentário).
+ * - `isOwner?` (boolean): true quando o visitante é o dono do perfil (pode deletar qualquer comentário).
+ * - `reelsCount?` (number): contador de reels mostrado no badge da tab; clique direciona a `/reels/[slug]`.
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ *
+ * Side effects:
+ * - `fetch("/api/media/comment", ...)` GET/POST/DELETE para listar/postar/deletar comentários.
+ * - `fetch("/api/media/like", ...)` POST para curtir/descurtir mídia (com rollback em erro).
+ * - `document.body.style.overflow = "hidden"` enquanto o modal está aberto (scroll lock).
+ * - Listener `keydown` global para navegação por teclado (Esc/setas) no modal.
+ * - `router.push("/reels/[slug]")` ao trocar para a tab Reels.
+ */
 export function MediaGallery({ media, displayName, slug, isClient, isSubscriber, currentUserId, isOwner, reelsCount }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<"fotos" | "reels">("fotos");

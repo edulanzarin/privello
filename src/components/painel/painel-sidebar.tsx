@@ -169,6 +169,28 @@ function NavContent({
   );
 }
 
+/**
+ * Sidebar/menu principal do painel do provider, com versão desktop fixa (md+) e drawer mobile.
+ *
+ * Lista de navegação dinâmica conforme o `planTier`: itens "Stories" só liberam para
+ * Destaque/Premium; "Financeiro" só para Premium (badge informa).
+ *
+ * Props:
+ * - `displayName` (string): nome do perfil exibido no rodapé.
+ * - `profileSlug` (string): slug usado em `/p/[slug]` (link "Ver perfil").
+ * - `planTier?` (string): plano atual ("PREMIUM" | "DESTAQUE" | "ESSENCIAL"); controla liberação de itens.
+ * - `hasPlan` (boolean): se possui plano ativo (mostra check verde vs. ponto âmbar).
+ * - `handle?` (string): @handle exibido sob o nome.
+ * - `avatarUrl?` (string | null): avatar mostrado no rodapé.
+ *
+ * Consumidores conhecidos:
+ * - src/app/painel/layout.tsx (renderizado em todas as rotas /painel/*)
+ *
+ * Side effects:
+ * - Server action `logoutAction()` no clique em "Sair" (item "logout" da nav).
+ * - `usePathname()` para destacar item ativo.
+ * - Drawer mobile aplica `overscroll-behavior: contain` (gesto declarado em fase-6 mockups-diff).
+ */
 export function PainelSidebar({
   displayName, profileSlug, planTier, hasPlan, handle, avatarUrl,
 }: {

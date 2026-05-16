@@ -19,6 +19,27 @@ function timeAgo(iso: string) {
   return "há 1 dia";
 }
 
+/**
+ * Capa redonda do perfil público com indicador de stories e viewer fullscreen
+ * (slides com barra de progresso, like otimista e marcação de "vista").
+ *
+ * Props:
+ * - `storyGroup` (StoryGroup | null): grupo de stories ativos do perfil; quando null, renderiza só a capa estática.
+ * - `coverUrl` (string | null): URL da foto de capa (cai em placeholder "Sem foto" quando null).
+ * - `displayName` (string): nome do perfil (alt + header do viewer).
+ * - `planBadge` ({ bg: string; label: string }): atualmente não consumido visualmente — preservado por compatibilidade.
+ * - `isClient` (boolean): true para usuário logado tipo CLIENT (libera curtir story e marca view).
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ *
+ * Side effects:
+ * - `fetch("/api/stories/view", { method: "POST" })` ao abrir cada story.
+ * - `fetch("/api/stories/like", { method: "POST" })` ao curtir/descurtir (com rollback em erro).
+ * - `sessionStorage.getItem("prv_seen") / setItem(...)` para persistir stories vistas localmente.
+ * - `document.body.style.overflow = "hidden"` enquanto o viewer está aberto.
+ * - Listeners `keydown` (Esc, ←, →) e `requestAnimationFrame` para a barra de progresso.
+ */
 export function ProfileStoryCover({
   storyGroup,
   coverUrl,

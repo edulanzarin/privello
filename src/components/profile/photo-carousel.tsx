@@ -13,6 +13,18 @@ type Props = {
   displayName: string;
 };
 
+/**
+ * Carrossel de fotos com foto principal, setas de navegação, contador e tira de
+ * miniaturas com placeholder "+N" para fotos privadas/bloqueadas.
+ *
+ * Props:
+ * - `photos` (Photo[]): lista de fotos públicas a exibir no carrossel.
+ * - `privateCount` (number): quantidade de fotos privadas (renderizadas como teaser bloqueado).
+ * - `displayName` (string): nome usado em `alt` das imagens.
+ *
+ * Consumidores conhecidos:
+ * - Atualmente não importado em nenhum consumer ativo (componente legado mantido como referência).
+ */
 export function PhotoCarousel({ photos, privateCount, displayName }: Props) {
   const [current, setCurrent] = useState(0);
 

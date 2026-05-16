@@ -1,5 +1,22 @@
 "use client";
 
+/**
+ * `<select>` de cidades que submete o formulário de filtros do admin/moderacao
+ * automaticamente ao mudar de opção, preservando os outros filtros (status, q, sort).
+ *
+ * Props:
+ * - `cities` ({ id, name, slug }[]): lista de cidades permitidas no filtro.
+ * - `statusFilter` (string): valor do filtro de status (preservado em hidden quando ≠ "pending").
+ * - `searchQ` (string): query de busca atual (preservada em hidden quando não vazia).
+ * - `sortFilter` (string): ordem atual (preservada em hidden quando ≠ "oldest").
+ * - `cityFilter` (string): slug atual selecionado (default do `<select>`).
+ *
+ * Consumidores conhecidos:
+ * - src/app/admin/moderacao/page.tsx
+ *
+ * Side effects:
+ * - `e.currentTarget.form.submit()` no `onChange` (re-renderiza a página com novo filtro).
+ */
 export function AdminCityFilter({
   cities,
   statusFilter,

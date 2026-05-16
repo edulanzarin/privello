@@ -5,6 +5,19 @@ import { useSearchParams } from "next/navigation";
 import { Grid3X3, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Toggle "grade ↔ lista" da página `/descobrir/[citySlug]`. Renderiza dois
+ * `<Link>` com `?view=grid|list` mantendo os outros search params intactos.
+ *
+ * Props:
+ * - `citySlug` (string): slug da cidade atual usado como base do `href`.
+ *
+ * Consumidores conhecidos:
+ * - src/app/descobrir/[citySlug]/page.tsx
+ *
+ * Side effects:
+ * - `useSearchParams()` para ler/preservar o restante da query string.
+ */
 export function DiscoverViewToggle({ citySlug }: { citySlug: string }) {
   const base = `/descobrir/${citySlug}`;
   const sp = useSearchParams();

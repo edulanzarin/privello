@@ -12,6 +12,23 @@ type Props = {
   viewAllHref: string;
 };
 
+/**
+ * Seção de cards na home (`/`) com paginação cliente "Ver mais" para "Em alta"
+ * ou "Em destaque" (boosted). Renderiza grid masonry de `<ProfileCard>` e
+ * carrega mais perfis via `/api/profiles/section`.
+ *
+ * Props:
+ * - `type` ("hot" | "boosted"): qual seção carregar (passa para a query string).
+ * - `initialProfiles` (ProfileCardPayload[]): primeiros perfis vindos do RSC.
+ * - `initialHasMore` (boolean): se há mais perfis para o "Ver mais".
+ * - `viewAllHref` (string): destino do link "Ver todas →" (`/em-alta` ou `/em-destaque`).
+ *
+ * Consumidores conhecidos:
+ * - src/app/page.tsx (home)
+ *
+ * Side effects:
+ * - `fetch("/api/profiles/section?type=...&offset=...")` no clique de "Ver mais".
+ */
 export function ProfileSection({ type, initialProfiles, initialHasMore, viewAllHref }: Props) {
   const [profiles, setProfiles] = useState(initialProfiles);
   const [hasMore, setHasMore] = useState(initialHasMore);

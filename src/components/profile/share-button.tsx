@@ -3,6 +3,22 @@
 import { Share2, Check } from "lucide-react";
 import { useState } from "react";
 
+/**
+ * Botão "Compartilhar" que usa `navigator.share` quando disponível (mobile)
+ * e cai para `navigator.clipboard.writeText` (com feedback "Copiado!" por 2s)
+ * em desktop.
+ *
+ * Props:
+ * - `displayName` (string): título usado no diálogo nativo de share.
+ * - `slug` (string): slug do perfil para montar `${origin}/p/[slug]`.
+ * - `className?` (string): classes Tailwind extras encaminhadas ao botão.
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ *
+ * Side effects:
+ * - Browser API: `navigator.share`, `navigator.clipboard.writeText`, `window.prompt` (fallback).
+ */
 export function ShareButton({ displayName, slug, className }: { displayName: string; slug: string; className?: string }) {
   const [copied, setCopied] = useState(false);
 

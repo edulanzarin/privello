@@ -1,5 +1,15 @@
 import Link from "next/link";
 
+/**
+ * Rodapé do site público com logo + links rápidos (Planos, Descobrir, Em alta)
+ * + aviso "+18". Estático, sem props nem side effects.
+ *
+ * Consumidores conhecidos:
+ * - src/app/page.tsx
+ * - src/app/p/[slug]/page.tsx
+ * - src/app/descobrir/[citySlug]/page.tsx
+ * - múltiplas outras páginas públicas (em-destaque, em-alta, planos, cidades, conta/perfil etc.)
+ */
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-black/[0.06] bg-white/60 pt-8 pb-4 backdrop-blur-sm">

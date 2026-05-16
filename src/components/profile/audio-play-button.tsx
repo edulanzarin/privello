@@ -4,6 +4,20 @@ import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Botão compacto "Ouça minha voz" que toca/pausa um clipe de áudio inline em cards de perfil.
+ *
+ * Props:
+ * - `src` (string): URL absoluta do arquivo de áudio (geralmente `.webm` em `/uploads`).
+ * - `className?` (string): classes Tailwind extras encaminhadas ao botão.
+ *
+ * Consumidores conhecidos:
+ * - src/components/profile/profile-card.tsx
+ *
+ * Side effects:
+ * - Instancia `new Audio(src)` lazy no primeiro clique e mantém em `useRef`.
+ * - `e.preventDefault()` + `e.stopPropagation()` para não disparar o `<Link>` pai do card.
+ */
 export function AudioPlayButton({ src, className }: { src: string; className?: string }) {
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -22,7 +36,7 @@ export function AudioPlayButton({ src, className }: { src: string; className?: s
       audioRef.current.currentTime = 0;
       setPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {});
+      audioRef.current.play().catch(() => { });
       setPlaying(true);
     }
   }

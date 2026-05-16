@@ -10,6 +10,26 @@ type SiteHeaderProps = {
 
 // `variant` e `activeHref` aceitos para compatibilidade com chamadas existentes (`<SiteHeader activeHref={...} />`).
 // Atualmente o header não aplica visual diferente por variante nem destaque por aba — refactor visual fica fora do escopo da auditoria.
+/**
+ * Header sticky do site público (Server Component): logo "privello." e área
+ * direita com avatar + handle (logado) ou botões "Entrar / Criar conta".
+ * Para PROVIDER, o avatar/handle puxam do `Profile` (com cover); para CLIENT,
+ * puxam do `User`.
+ *
+ * Props:
+ * - `variant?` ("default" | "minimal"): aceito por compatibilidade — sem efeito visual atual.
+ * - `activeHref?` (string): aceito por compatibilidade — sem destaque de aba implementado.
+ *
+ * Consumidores conhecidos:
+ * - src/app/page.tsx
+ * - src/app/p/[slug]/page.tsx
+ * - src/app/descobrir/[citySlug]/page.tsx
+ * - múltiplas outras páginas públicas (em-destaque, em-alta, planos, cidades, conta/perfil, novidades, not-found etc.)
+ *
+ * Side effects:
+ * - `auth()` (NextAuth) lê a sessão atual.
+ * - `prisma.profile.findUnique` ou `prisma.user.findUnique` para handle/avatar.
+ */
 export async function SiteHeader(_props: SiteHeaderProps = {}) {
   const session = await auth();
 

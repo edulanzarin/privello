@@ -13,6 +13,23 @@ type Props = {
   className?: string;
 };
 
+/**
+ * Botão "Curtir / Curtido" com toggle otimista que persiste o favorito do cliente.
+ *
+ * Props:
+ * - `profileId` (string): id do perfil-alvo do favorito.
+ * - `initialFavorited` (boolean): estado inicial vindo do servidor (`getFavoriteStatus`).
+ * - `isLoggedIn` (boolean): se falso, redireciona para `/entrar?callbackUrl=...` no clique.
+ * - `className?` (string): classes Tailwind extras.
+ *
+ * Consumidores conhecidos:
+ * - src/app/p/[slug]/page.tsx
+ *
+ * Side effects:
+ * - Server action `toggleFavorite(profileId)` em `src/app/_actions/favorites.ts`.
+ * - `useOptimisticToggle` aplica/rollback do estado local; toast de erro via `useToast`.
+ * - Redirect via `window.location.href` quando sessão não autenticada.
+ */
 export function FavoriteButton({
   profileId,
   initialFavorited,

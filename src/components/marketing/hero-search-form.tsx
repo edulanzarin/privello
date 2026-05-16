@@ -14,6 +14,18 @@ const GENDER_OPTIONS: GenderOption[] = [
   { value: "casais", label: "Casais" },
 ];
 
+/**
+ * Formulário de busca da home (hero): seletor de cidade via autocomplete IBGE +
+ * `<select>` de gênero + botão "Descobrir". Submete navegando para
+ * `/descobrir/[slug]?genero=...`.
+ *
+ * Consumidores conhecidos:
+ * - src/app/page.tsx (home `/`)
+ *
+ * Side effects:
+ * - `sessionStorage.setItem(LAST_CITY_KEY, slug)` para o bottom-nav restaurar a cidade depois.
+ * - `router.push("/descobrir/[slug]?...")` no submit.
+ */
 export function HeroSearchForm() {
   const router = useRouter();
   const [citySlug, setCitySlug] = useState("");

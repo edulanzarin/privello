@@ -26,6 +26,21 @@ function normalize(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
+/**
+ * Filtro de cidade compacto sobreposto ao header da página de Reels.
+ *
+ * Props:
+ * - `cities` (City[]): lista de cidades com reels disponíveis (vem de `getCitiesWithReels`).
+ * - `currentSlug?` (string): slug ativo (mostra label da cidade no botão; sem ele, mostra "Todas as cidades").
+ *
+ * Consumidores conhecidos:
+ * - src/app/reels/page.tsx
+ *
+ * Side effects:
+ * - `sessionStorage.setItem/removeItem(REELS_CITY_KEY, slug)` para persistir a escolha.
+ * - `router.push("/reels?cidade=...")` para navegar com o novo filtro.
+ * - Listener `mousedown` global para fechar o dropdown ao clicar fora.
+ */
 export function ReelsCityFilter({ cities, currentSlug }: Props) {
   const router = useRouter();
   const currentCity = cities.find((c) => c.slug === currentSlug);
@@ -38,8 +53,8 @@ export function ReelsCityFilter({ cities, currentSlug }: Props) {
   const filtered = query.trim().length === 0
     ? cities
     : cities.filter((c) =>
-        normalize(c.name).includes(normalize(query)),
-      );
+      normalize(c.name).includes(normalize(query)),
+    );
 
   function select(city: City) {
     setQuery("");
