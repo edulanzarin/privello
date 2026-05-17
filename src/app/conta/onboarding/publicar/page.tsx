@@ -1,17 +1,17 @@
 ﻿/**
- * Página RSC — Onboarding passo 04: revisão e publicação do perfil.
+ * Página RSC — Onboarding passo 04: revisão e publicação — Design System v2.
  *
  * Rota: `/conta/onboarding/publicar`.
  * Tipo: Server Component (form de publicação é server action).
  * Auth: acompanhante (PROVIDER) — exige sessão e `Profile` próprio.
  * Cache: `force-dynamic` (lê `auth()` + `Profile`).
  *
- * Checklist de itens obrigatórios + preview do card; o botão de publicar
- * só é habilitado quando todos os itens estão `ok`.
+ * Checklist de itens obrigatórios + preview do card; o botão de publicar só é
+ * habilitado quando todos os itens estão `ok`.
  *
  * Cross-refs:
- * - src/app/_actions/onboarding.ts (publishProfile)
- * - src/components/onboarding/onboarding-sidebar.tsx
+ *  - src/app/_actions/onboarding.ts (publishProfile)
+ *  - src/components/onboarding/onboarding-sidebar.tsx
  */
 import Link from "next/link";
 import Image from "next/image";
@@ -21,11 +21,12 @@ import { CheckCircle, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
-import { OnboardingBack } from "../onboarding-nav";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PriceTag } from "@/components/ui/price-tag";
 import { publishProfile } from "@/app/_actions/onboarding";
-import { formatBrl } from "@/lib/money";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 20 (onboarding/publicar autenticado).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 20.
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPublicarPage() {
@@ -45,11 +46,31 @@ export default async function OnboardingPublicarPage() {
   const cover = profile.media.find((m) => m.isCover) ?? profile.media[0];
 
   const checks = [
-    { label: "Bio preenchida", ok: profile.bio.length > 10, href: "/conta/onboarding/perfil" },
-    { label: "Cidade definida", ok: !!profile.cityId, href: "/conta/onboarding/perfil" },
-    { label: "WhatsApp cadastrado", ok: !!profile.whatsappPhone, href: "/conta/onboarding/perfil" },
-    { label: "Valor por hora", ok: profile.priceHour > 0, href: "/conta/onboarding/valores" },
-    { label: "Foto de perfil definida", ok: hasCoverPhoto, href: "/conta/onboarding/fotos" },
+    {
+      label: "Bio preenchida",
+      ok: profile.bio.length > 10,
+      href: "/conta/onboarding/perfil",
+    },
+    {
+      label: "Cidade definida",
+      ok: !!profile.cityId,
+      href: "/conta/onboarding/perfil",
+    },
+    {
+      label: "WhatsApp cadastrado",
+      ok: !!profile.whatsappPhone,
+      href: "/conta/onboarding/perfil",
+    },
+    {
+      label: "Valor por hora",
+      ok: profile.priceHour > 0,
+      href: "/conta/onboarding/valores",
+    },
+    {
+      label: "Foto de perfil definida",
+      ok: hasCoverPhoto,
+      href: "/conta/onboarding/fotos",
+    },
   ];
 
   const allOk = checks.every((c) => c.ok);
@@ -62,73 +83,121 @@ export default async function OnboardingPublicarPage() {
     >
       <div className="flex min-h-screen flex-col md:flex-row">
         <OnboardingSidebar current="publicar" />
-        <main className="flex-1 bg-background px-6 py-10 md:px-14">
-          <p className="text-xs font-medium text-muted">Passo 04 de 04</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">
-            Publicar perfil<span className="text-coral">.</span>
+        <main className="flex-1 px-6 py-10 md:px-14">
+          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+            Passo 04 de 04
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-[-0.022em] text-ink sm:text-4xl">
+            Publicar perfil<span className="text-rose">.</span>
           </h1>
-          <p className="mt-3 max-w-xl text-sm text-muted">
-            Revise as informações antes de publicar. Você pode editar tudo depois no painel.
+          <p className="mt-3 max-w-xl text-sm text-ink-dim">
+            Revise as informações antes de publicar. Você pode editar tudo
+            depois no painel.
           </p>
 
           <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Checklist */}
             <div className="space-y-3">
-              <p className="text-xs font-medium text-muted">Checklist</p>
+              <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                Checklist
+              </p>
               {checks.map((c) => (
-                <div key={c.label} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white px-4 py-3">
-                  {c.ok
-                    ? <CheckCircle className="h-5 w-5 shrink-0 text-success" strokeWidth={1.5} />
-                    : <AlertCircle className="h-5 w-5 shrink-0 text-coral" strokeWidth={1.5} />
-                  }
-                  <span className={`text-sm ${c.ok ? "" : "text-coral"}`}>{c.label}</span>
+                <Card
+                  key={c.label}
+                  variant="solid"
+                  padding="sm"
+                  className="flex items-center gap-3"
+                >
+                  {c.ok ? (
+                    <CheckCircle
+                      className="h-5 w-5 shrink-0 text-success"
+                      strokeWidth={2}
+                    />
+                  ) : (
+                    <AlertCircle
+                      className="h-5 w-5 shrink-0 text-rose"
+                      strokeWidth={2}
+                    />
+                  )}
+                  <span
+                    className={`text-sm font-medium ${c.ok ? "text-ink" : "text-rose"
+                      }`}
+                  >
+                    {c.label}
+                  </span>
                   {!c.ok && (
-                    <Link href="/conta/onboarding/perfil" className="ml-auto text-xs underline text-muted">
-                      Preencher
+                    <Link
+                      href={c.href}
+                      className="ml-auto text-xs font-semibold text-rose hover:underline"
+                    >
+                      Preencher →
                     </Link>
                   )}
-                </div>
+                </Card>
               ))}
             </div>
 
             {/* Preview card */}
-            <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <p className="text-base font-semibold mb-3">Preview</p>
+            <Card variant="solid" padding="md">
+              <p className="mb-3 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                Preview
+              </p>
               {cover && (
-                <div className="relative aspect-[3/4] w-full bg-line overflow-hidden">
-                  <Image src={cover.url} alt="" fill className="object-cover" sizes="320px" />
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-line">
+                  <Image
+                    src={cover.url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="320px"
+                  />
                 </div>
               )}
               <div className="mt-3">
-                <p className="font-bold">{profile.displayName}, {profile.age}</p>
-                <p className="text-sm text-muted">{profile.city?.name}</p>
+                <p className="text-md font-bold text-ink">
+                  {profile.displayName}
+                  <span className="ml-1 text-sm font-medium text-ink-dim">
+                    {profile.age}
+                  </span>
+                </p>
+                <p className="text-sm text-ink-dim">{profile.city?.name}</p>
                 {profile.priceHour > 0 && (
-                  <p className="mt-1 text-sm font-bold text-coral">{formatBrl(profile.priceHour)} /h</p>
+                  <div className="mt-1.5">
+                    <PriceTag
+                      value={profile.priceHour}
+                      variant="inline"
+                      period="hora"
+                      periodFormat="short"
+                    />
+                  </div>
                 )}
               </div>
-            </div>
+            </Card>
           </div>
 
-          <div className="mt-10 flex items-center justify-between">
-            <OnboardingBack
+          <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button
               href="/conta/onboarding/valores"
-              className="rounded-lg border border-line bg-white px-6 py-3 text-base font-medium hover:bg-line active:scale-[0.97] transition"
+              variant="outline"
+              size="lg"
             >
               ← Voltar
-            </OnboardingBack>
+            </Button>
             <form action={publishProfile}>
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                size="lg"
                 disabled={!allOk}
-                className="rounded-lg bg-coral px-10 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="min-h-[44px] min-w-[240px]"
               >
                 {allOk ? "Publicar perfil" : "Complete os itens acima"}
-              </button>
+              </Button>
             </form>
           </div>
 
           {!allOk && (
-            <p className="mt-4 text-xs text-muted">
+            <p className="mt-4 text-xs text-ink-dim">
               Complete todos os itens do checklist para publicar.
             </p>
           )}

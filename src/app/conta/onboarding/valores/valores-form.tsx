@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 import { saveOnboardingValores } from "@/app/_actions/onboarding";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { ToggleChip } from "@/components/ui/toggle-chip";
 import { cn } from "@/lib/utils";
-
 
 const DURATIONS = [
   { key: "30min", label: "30 min", required: false },
@@ -17,9 +19,15 @@ const DURATIONS = [
   { key: "travel", label: "Diária", required: false },
 ] as const;
 
-const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferência", "Cripto"];
+const PAYMENT_OPTIONS = [
+  "Pix",
+  "Dinheiro",
+  "Cartão de crédito",
+  "Transferência",
+  "Cripto",
+];
 
-type DurationKey = typeof DURATIONS[number]["key"];
+type DurationKey = (typeof DURATIONS)[number]["key"];
 
 type DurationOption = { minutes: number; priceBrl: number };
 type Profile = {
@@ -39,8 +47,8 @@ function initEnabled(profile: Profile): Record<DurationKey, boolean> {
     "2h": byMin.has(120) || !!profile.priceTwoHours,
     "3h": byMin.has(180) || false,
     "4h": byMin.has(240) || false,
-    "overnight": byMin.has(720) || !!profile.priceOvernight,
-    "travel": byMin.has(1440) || !!profile.priceTravelDay,
+    overnight: byMin.has(720) || !!profile.priceOvernight,
+    travel: byMin.has(1440) || !!profile.priceTravelDay,
   };
 }
 
@@ -52,23 +60,40 @@ function initPrices(profile: Profile): Record<DurationKey, number> {
     "2h": byMin.get(120)?.priceBrl || profile.priceTwoHours || 0,
     "3h": byMin.get(180)?.priceBrl || 0,
     "4h": byMin.get(240)?.priceBrl || 0,
-    "overnight": byMin.get(720)?.priceBrl || profile.priceOvernight || 0,
-    "travel": byMin.get(1440)?.priceBrl || profile.priceTravelDay || 0,
+    overnight: byMin.get(720)?.priceBrl || profile.priceOvernight || 0,
+    travel: byMin.get(1440)?.priceBrl || profile.priceTravelDay || 0,
   };
 }
 
+/**
+ * ValoresForm — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/conta/onboarding/valores/valores-form.tsx
+ * Steering: `.kiro/steering/design-system.md` §6 (forms).
+ *
+ * Editor de durações + preços + métodos de pagamento. Reusa primitivos
+ * Card, Button, Switch, Input, ToggleChip.
+ */
 export function ValoresForm({ profile }: { profile: Profile }) {
   const [pending, startTransition] = useTransition();
   const [err, setErr] = useState<string | null>(null);
 
-  const [enabled, setEnabled] = useState<Record<DurationKey, boolean>>(() => initEnabled(profile));
-  const [prices, setPrices] = useState<Record<DurationKey, number>>(() => initPrices(profile));
+  const [enabled, setEnabled] = useState<Record<DurationKey, boolean>>(() =>
+    initEnabled(profile),
+  );
+  const [prices, setPrices] = useState<Record<DurationKey, number>>(() =>
+    initPrices(profile),
+  );
   const [payments, setPayments] = useState<string[]>(() =>
-    profile.paymentMethods ? profile.paymentMethods.split(" · ").map((s) => s.trim()) : []
+    profile.paymentMethods
+      ? profile.paymentMethods.split(" · ").map((s) => s.trim())
+      : [],
   );
 
   function togglePayment(p: string) {
-    setPayments((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+    setPayments((prev) =>
+      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
+    );
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -90,24 +115,26 @@ export function ValoresForm({ profile }: { profile: Profile }) {
     });
   }
 
-
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">
       {err && (
-        <div className="rounded-xl border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">{err}</div>
+        <Card variant="danger-subtle" padding="sm" className="text-sm text-danger">
+          {err}
+        </Card>
       )}
 
       {/* ── Durações e preços ── */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
-        <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-md font-semibold">Durações e valores</p>
-          <p className="mt-1 text-xs text-muted">Ative as durações que você oferece e defina o valor de cada uma.</p>
+      <Card variant="solid" padding="none" className="overflow-hidden">
+        <div className="border-b border-line px-6 py-4">
+          <p className="text-md font-semibold text-ink">Durações e valores</p>
+          <p className="mt-1 text-xs text-ink-dim">
+            Ative as durações que você oferece e defina o valor de cada uma.
+          </p>
         </div>
 
-        <div className="divide-y divide-black/[0.06]">
+        <div className="divide-y divide-line">
           {DURATIONS.map((d) => (
             <div key={d.key} className="flex items-center gap-4 px-6 py-4">
-              {/* Toggle (unificado: visual verde do primitivo Switch) */}
               <Switch
                 checked={!!enabled[d.key]}
                 onChange={(c) =>
@@ -118,69 +145,69 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                 size="md"
               />
 
-              {/* Label */}
-              <span className={cn(
-                "w-20 shrink-0 text-sm font-semibold",
-                !enabled[d.key] && "text-muted",
-              )}>
+              <span
+                className={cn(
+                  "w-20 shrink-0 text-sm font-semibold",
+                  enabled[d.key] ? "text-ink" : "text-ink-dim",
+                )}
+              >
                 {d.label}
-                {d.required && <span className="ml-1 text-coral">*</span>}
+                {d.required && <span className="ml-1 text-rose">*</span>}
               </span>
 
-              {/* Price input */}
-              <div className="relative max-w-[180px]">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">R$</span>
-                <input
+              <div className="max-w-[180px]">
+                <Input
                   type="number"
                   min={50}
                   step={50}
                   disabled={!enabled[d.key]}
                   value={prices[d.key] || ""}
-                  onChange={(e) => setPrices((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setPrices((p) => ({
+                      ...p,
+                      [d.key]: Number(e.target.value),
+                    }))
+                  }
+                  prefix="R$"
                   placeholder="0"
-                  className="w-full rounded-lg border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all disabled:bg-black/[0.03] disabled:text-muted"
                 />
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* ── Formas de pagamento ── */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
-        <div className="border-b border-black/[0.06] px-6 py-4">
-          <p className="text-md font-semibold">Formas de pagamento</p>
+      <Card variant="solid" padding="none" className="overflow-hidden">
+        <div className="border-b border-line px-6 py-4">
+          <p className="text-md font-semibold text-ink">Formas de pagamento</p>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-5">
           {PAYMENT_OPTIONS.map((p) => (
-            <button
+            <ToggleChip
               key={p}
-              type="button"
+              active={payments.includes(p)}
               onClick={() => togglePayment(p)}
-              className={cn(
-                "rounded-md border px-4 py-2 text-sm font-medium transition",
-                payments.includes(p)
-                  ? "border-foreground bg-foreground text-white"
-                  : "border-line bg-white text-muted hover:border-foreground/30",
-              )}
             >
               {p}
-            </button>
+            </ToggleChip>
           ))}
         </div>
-      </div>
+      </Card>
 
       <div className="flex items-center justify-between pt-2">
-        <Link href="/conta/onboarding/fotos" className="rounded-lg border border-line bg-white px-6 py-3 text-base font-medium hover:bg-line active:scale-[0.97] transition">
+        <Button href="/conta/onboarding/fotos" variant="outline" size="lg">
           ← Voltar
-        </Link>
-        <button
+        </Button>
+        <Button
           type="submit"
-          disabled={pending}
-          className="rounded-lg bg-coral px-8 py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
+          variant="primary"
+          size="lg"
+          loading={pending}
+          className="min-h-[44px]"
         >
           {pending ? "Salvando…" : "Continuar →"}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (planos migrada + PriceTag tone="white")
+**Última atualização**: 2026-05-17 (onboarding cliente migrado — 4 steps + verificacao)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -164,7 +164,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
 | `age-gate.tsx` | 🔴 | Modal +18 |
-| `onboarding/onboarding-sidebar.tsx` | 🔴 | Sidebar do onboarding |
+| `onboarding/onboarding-sidebar.tsx` | 🟢 | Sidebar do onboarding |
 | `solicitar/solicitar-whatsapp-panel.tsx` | 🔴 | Painel de solicitação |
 | `support/ticket-chat.tsx` | 🔴 | Chat de suporte |
 
@@ -210,11 +210,11 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Rota | Status v2 |
 |------|-----------|
 | `/conta/perfil` | 🟢 |
-| `/conta/onboarding/perfil` | 🔴 |
-| `/conta/onboarding/fotos` | 🔴 |
-| `/conta/onboarding/valores` | 🔴 |
-| `/conta/onboarding/publicar` | 🔴 |
-| `/conta/verificacao` | 🔴 |
+| `/conta/onboarding/perfil` | 🟢 |
+| `/conta/onboarding/fotos` | 🟢 |
+| `/conta/onboarding/valores` | 🟢 |
+| `/conta/onboarding/publicar` | 🟢 |
+| `/conta/verificacao` | 🟢 |
 
 ### 3.4 Provider logado (`/painel/**`)
 
@@ -286,8 +286,8 @@ Ordem por impacto + dependência:
 4. ~~**`/em-alta`, `/em-destaque`, `/novidades`**~~ ✅ done
 5. ~~**`/entrar` + `/cadastro/**` + `/recuperar-senha/**`**~~ ✅ done
 6. ~~**`/planos`**~~ ✅ done
-7. **`/conta/onboarding/**` + `/conta/verificacao`** — onboarding cliente
-8. `/painel/**` — provider dashboard (precisa do `GlassSidebarShell` antes)
+7. ~~**`/conta/onboarding/**` + `/conta/verificacao`**~~ ✅ done
+8. **`/painel/**`** — provider dashboard (precisa do `GlassSidebarShell` antes)
 9. `/admin/**` — moderação (mais denso, vem por último)
 10. `/reels/**` — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
 11. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
