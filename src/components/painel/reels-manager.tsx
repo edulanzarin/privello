@@ -123,11 +123,11 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
       <div>
         {reels.length === 0 ? (
           <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-black/[0.08] bg-white text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black/[0.04]">
-              <Clapperboard className="h-7 w-7 text-muted" strokeWidth={1.25} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-line/40">
+              <Clapperboard className="h-7 w-7 text-ink-dim" strokeWidth={1.25} />
             </div>
             <p className="text-md font-semibold">Nenhum reel ainda</p>
-            <p className="max-w-xs text-base text-muted">
+            <p className="max-w-xs text-base text-ink-dim">
               Publique vídeos curtos verticais. Reels privados só aparecem para assinantes.
             </p>
           </div>
@@ -168,7 +168,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
                       type="button"
                       onClick={() => handleDelete(reel.id)}
                       disabled={pending}
-                      className="flex items-center gap-1 rounded-full bg-coral/90 px-3 py-1 text-2xs font-medium text-white disabled:opacity-50"
+                      className="flex items-center gap-1 rounded-full bg-rose/90 px-3 py-1 text-2xs font-medium text-white disabled:opacity-50"
                     >
                       <Trash2 className="h-3 w-3" strokeWidth={2} />
                       Remover
@@ -188,10 +188,10 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
       </div>
 
       {/* ── Publish panel ── */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-5 space-y-5 shadow-sm lg:sticky lg:top-24 lg:self-start">
+      <div className="rounded-2xl border border-line bg-white p-5 space-y-5 shadow-sm lg:sticky lg:top-24 lg:self-start">
         <div>
           <p className="text-lg font-semibold">Publicar reel</p>
-          <p className="mt-0.5 text-base text-muted">Vídeo vertical · MP4 ou WebM · máx. 200 MB</p>
+          <p className="mt-0.5 text-base text-ink-dim">Vídeo vertical · MP4 ou WebM · máx. 200 MB</p>
         </div>
 
         {preview ? (
@@ -209,11 +209,11 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/[0.12] py-12 text-muted transition hover:border-coral hover:text-coral"
+            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/[0.12] py-12 text-ink-dim transition hover:border-rose hover:text-rose"
           >
             <Upload className="h-8 w-8" strokeWidth={1.25} />
             <span className="text-md font-semibold">Selecionar vídeo</span>
-            <span className="text-xs text-muted/60">MP4, WebM · máx. 200 MB</span>
+            <span className="text-xs text-ink-dim/60">MP4, WebM · máx. 200 MB</span>
           </button>
         )}
 
@@ -226,7 +226,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
         />
 
         <div>
-          <label className="block text-sm font-medium text-muted mb-1.5">
+          <label className="block text-sm font-medium text-ink-dim mb-1.5">
             Legenda (opcional)
           </label>
           <input
@@ -235,18 +235,18 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
             onChange={(e) => setCaption(e.target.value)}
             maxLength={150}
             placeholder="Uma breve descrição…"
-            className="w-full rounded-lg border border-black/10 px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="w-full rounded-lg border border-line px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
-          <p className="mt-1 text-right text-2xs text-muted">{caption.length}/150</p>
+          <p className="mt-1 text-right text-2xs text-ink-dim">{caption.length}/150</p>
         </div>
 
         {/* Privacy — iOS toggle */}
-        <div className="flex items-center justify-between rounded-lg bg-black/[0.03] px-4 py-3">
+        <div className="flex items-center justify-between rounded-lg bg-line/30 px-4 py-3">
           <div className="flex items-center gap-2.5">
-            {isPrivate ? <Lock className="h-4 w-4 text-muted" strokeWidth={1.5} /> : <Eye className="h-4 w-4 text-muted" strokeWidth={1.5} />}
+            {isPrivate ? <Lock className="h-4 w-4 text-ink-dim" strokeWidth={1.5} /> : <Eye className="h-4 w-4 text-ink-dim" strokeWidth={1.5} />}
             <div>
               <p className="text-base font-medium">{isPrivate ? "Privado" : "Público"}</p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-ink-dim">
                 {isPrivate ? "Só assinantes veem" : "Visível para todos"}
               </p>
             </div>
@@ -260,10 +260,10 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
 
         {uploading && (
           <div>
-            <div className="h-1.5 w-full rounded-full bg-black/[0.06] overflow-hidden">
-              <div className="h-full rounded-full bg-coral transition-all" style={{ width: `${uploadProgress}%` }} />
+            <div className="h-1.5 w-full rounded-full bg-line/50 overflow-hidden">
+              <div className="h-full rounded-full bg-rose transition-all" style={{ width: `${uploadProgress}%` }} />
             </div>
-            <p className="mt-1 text-xs text-muted">Enviando… {uploadProgress}%</p>
+            <p className="mt-1 text-xs text-ink-dim">Enviando… {uploadProgress}%</p>
           </div>
         )}
 
@@ -271,7 +271,7 @@ export function ReelsManager({ initialReels }: { initialReels: Reel[] }) {
           type="button"
           onClick={handlePublish}
           disabled={!selectedFile || uploading || pending}
-          className="w-full rounded-full bg-coral py-3 text-md font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
+          className="w-full rounded-full bg-rose py-3 text-md font-semibold text-white transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">

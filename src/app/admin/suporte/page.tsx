@@ -67,7 +67,7 @@ export default async function AdminSuportePage() {
         href={`/admin/suporte/${t.id}`}
         className={`flex items-start gap-3 border-b border-line last:border-0 px-4 py-3.5 hover:bg-line/40 transition ${dim ? "opacity-60" : ""}`}
       >
-        <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} />
+        <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-ink-dim" strokeWidth={1.5} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold truncate">{t.subject}</p>
@@ -75,14 +75,14 @@ export default async function AdminSuportePage() {
               {statusLabel[t.status] ?? t.status}
             </Badge>
           </div>
-          <p className="text-xs text-muted">{t.user.name} · {t.user.email}</p>
+          <p className="text-xs text-ink-dim">{t.user.name} · {t.user.email}</p>
           {last && (
-            <p className="mt-0.5 text-xs text-muted truncate">
+            <p className="mt-0.5 text-xs text-ink-dim truncate">
               {last.isAdmin ? "Suporte: " : "Usuário: "}{last.text}
             </p>
           )}
         </div>
-        <p className="shrink-0 text-2xs text-muted">{t._count.messages} msg</p>
+        <p className="shrink-0 text-2xs text-ink-dim">{t._count.messages} msg</p>
       </Link>
     );
   }
@@ -93,7 +93,7 @@ export default async function AdminSuportePage() {
 
       <Card variant="solid" padding="none" className="overflow-hidden">
         <div className="border-b border-line px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted">
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-dim">
             Abertos e em andamento ({tickets.length})
           </p>
         </div>
@@ -109,7 +109,7 @@ export default async function AdminSuportePage() {
       {closed.length > 0 && (
         <Card variant="solid" padding="none" className="mt-4 overflow-hidden">
           <div className="border-b border-line px-4 py-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted">Fechados recentes</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-dim">Fechados recentes</p>
           </div>
           {closed.map((t) => <TicketRow key={t.id} t={t as typeof tickets[number]} dim />)}
         </Card>

@@ -285,7 +285,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                 {/* Sort */}
                 <Link
                   href={buildQueueHref({ sort: sortFilter === "oldest" ? "newest" : "oldest", p: "1" })}
-                  className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-xs text-muted hover:border-foreground/30 hover:text-foreground transition"
+                  className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-xs text-ink-dim hover:border-ink/30 hover:text-ink transition"
                 >
                   <Clock className="h-3 w-3" strokeWidth={1.5} />
                   {sortFilter === "oldest" ? "Mais antigos primeiro" : "Mais recentes primeiro"}
@@ -315,7 +315,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
           <tbody>
             {queueRows.length === 0 ? (
               <TR hover={false}>
-                <TD colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
+                <TD colSpan={6} className="px-4 py-10 text-center text-sm text-ink-dim">
                   Nenhum registro encontrado.
                 </TD>
               </TR>
@@ -339,7 +339,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                     </TD>
                     <TD>
                       <p className="font-semibold leading-tight">{row.profile.displayName}, {row.profile.age}</p>
-                      <p className="text-xs text-muted">
+                      <p className="text-xs text-ink-dim">
                         {row.profile.city.name}{row.profile.district ? ` · ${row.profile.district.name}` : ""}
                       </p>
                     </TD>
@@ -359,7 +359,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs text-muted/60">Sem docs</span>
+                        <span className="text-xs text-ink-dim/60">Sem docs</span>
                       )}
                     </TD>
                     <TD>
@@ -367,7 +367,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                         {STATUS_LABELS[row.status] ?? row.status}
                       </Badge>
                     </TD>
-                    <TD className="font-mono text-xs text-muted">{waitLabel}</TD>
+                    <TD className="font-mono text-xs text-ink-dim">{waitLabel}</TD>
                     <TD>
                       <div className="flex items-center justify-end gap-2">
                         {(row.status === "NOVO" || row.status === "REVISAO") && (
@@ -375,14 +375,14 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                         )}
                         <Link
                           href={`/admin/verificacoes/${row.id}`}
-                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-ink-dim hover:border-ink/30 hover:text-ink transition"
                         >
                           Detalhe
                         </Link>
                         <Link
                           href={`/p/${row.profile.slug}`}
                           target="_blank"
-                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-ink-dim hover:border-ink/30 hover:text-ink transition"
                         >
                           Perfil ↗
                         </Link>
@@ -398,7 +398,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
         {/* Pagination */}
         {totalPages > 1 ? (
           <Card variant="solid" padding="none">
-            <div className="flex items-center justify-between px-4 py-3 text-xs text-muted">
+            <div className="flex items-center justify-between px-4 py-3 text-xs text-ink-dim">
               <span>{queueTotal} resultado{queueTotal !== 1 ? "s" : ""}</span>
               <div className="flex gap-1">
                 {pageNum > 1 && (
@@ -415,7 +415,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
                     <Link
                       key={n}
                       href={buildQueueHref({ p: String(n) })}
-                      className={`rounded border px-2.5 py-1 transition ${n === pageNum ? "border-foreground bg-foreground text-white" : "border-line hover:bg-line"}`}
+                      className={`rounded border px-2.5 py-1 transition ${n === pageNum ? "border-ink bg-ink text-white" : "border-line hover:bg-line"}`}
                     >
                       {n}
                     </Link>
@@ -433,7 +433,7 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
           </Card>
         ) : queueRows.length > 0 ? (
           <Card variant="solid" padding="none">
-            <div className="px-4 py-2 text-right text-xs text-muted">
+            <div className="px-4 py-2 text-right text-xs text-ink-dim">
               {queueTotal} resultado{queueTotal !== 1 ? "s" : ""}
             </div>
           </Card>

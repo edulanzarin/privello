@@ -120,9 +120,9 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
         className="w-full max-w-sm bg-white p-6 shadow-xl"
       >
         <h2 className="font-bold text-sm mb-1">
-          {mode === "warn" ? "Advertir" : "Suspender"} — <span className="font-normal text-muted">{profileName}</span>
+          {mode === "warn" ? "Advertir" : "Suspender"} — <span className="font-normal text-ink-dim">{profileName}</span>
         </h2>
-        <p className="text-xs text-muted mb-4">
+        <p className="text-xs text-ink-dim mb-4">
           {mode === "warn"
             ? `Advertência ${warningCount + 1}/3. Ao atingir 3, a conta é suspensa automaticamente.`
             : "A conta será suspensa e o perfil ficará invisível."}
@@ -132,7 +132,7 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
           onChange={(e) => setReason(e.target.value)}
           placeholder={mode === "warn" ? "Motivo da advertência…" : "Motivo da suspensão…"}
           rows={3}
-          className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all resize-none"
+          className="w-full rounded-lg border border-line px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all resize-none"
         />
         {error && <p className="mt-2 text-xs text-danger">{error}</p>}
         <div className="mt-4 flex gap-2 justify-end">

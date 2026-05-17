@@ -94,19 +94,19 @@ function PainelFooter({
   return (
     <div className="mt-auto">
       {/* Plan status */}
-      <div className="mt-4 rounded-lg border border-white/10 p-3">
+      <div className="mt-4 rounded-xl border border-white/10 p-3">
         <div className="flex items-center gap-2">
           {hasPlan ? (
             <CheckCircle2
               className="h-3.5 w-3.5 shrink-0 text-success"
-              strokeWidth={2}
+              strokeWidth={2.4}
             />
           ) : (
-            <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-warning" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
           )}
           <p
             className={cn(
-              "text-sm font-medium",
+              "text-sm font-semibold",
               hasPlan ? "text-success" : "text-warning",
             )}
           >
@@ -117,7 +117,7 @@ function PainelFooter({
         </div>
         <Link
           href="/painel/plano"
-          className="mt-2 block text-xs text-coral/80 transition hover:text-coral"
+          className="mt-2 block text-xs font-medium text-rose/80 transition hover:text-rose"
         >
           {hasPlan ? "Gerenciar plano →" : "Assinar um plano →"}
         </Link>

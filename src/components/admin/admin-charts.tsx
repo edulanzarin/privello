@@ -22,7 +22,7 @@ type WeekPoint = { week: string; count: number };
  *
  * Wrapper canônico para os charts do painel admin. Consome `<Card variant="solid"
  * padding="md">` (rounded-2xl + hairline + sombra suave) e renderiza um título
- * em `text-xs font-medium text-muted` acima do conteúdo.
+ * em `text-xs font-medium text-ink-dim` acima do conteúdo.
  *
  * Quando `isEmpty` é `true`, renderiza `<EmptyState>` no lugar do `children` —
  * fallback determinístico para datasets vazios (ex.: nenhuma criação no período).
@@ -45,7 +45,7 @@ function ChartCard({
 }) {
   return (
     <Card variant="solid" padding="md">
-      <p className="mb-3 text-xs font-medium text-muted">{title}</p>
+      <p className="mb-3 text-xs font-medium text-ink-dim">{title}</p>
       {isEmpty ? (
         <EmptyState title={emptyMessage} className="px-3 py-6" />
       ) : (

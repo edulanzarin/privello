@@ -49,7 +49,7 @@ export default async function PainelPerfilPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Editar perfil</h1>
-        <p className="mt-1 text-md text-muted">
+        <p className="mt-1 text-md text-ink-dim">
           Alterações são salvas imediatamente e refletem no seu anúncio público.
         </p>
       </div>

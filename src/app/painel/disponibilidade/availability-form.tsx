@@ -69,7 +69,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Card variant="solid" padding="none" className="overflow-hidden divide-y divide-black/[0.06]">
+      <Card variant="solid" padding="none" className="overflow-hidden divide-y divide-line">
         {[0, 1, 2, 3, 4, 5, 6].map((wd) => (
           <div key={wd} className="flex items-center gap-4 px-5 py-[14px]">
             <span className="w-[76px] text-md font-semibold">{DAYS[wd]}</span>
@@ -94,7 +94,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
                     options={TIME_OPTS}
                   />
                 </div>
-                <span className="text-base text-muted">–</span>
+                <span className="text-base text-ink-dim">–</span>
                 <div className="w-24">
                   <Select
                     name={`wd_${wd}_end`}
@@ -107,7 +107,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
                 </div>
               </div>
             ) : (
-              <span className="ml-auto text-base text-muted">Fechado</span>
+              <span className="ml-auto text-base text-ink-dim">Fechado</span>
             )}
           </div>
         ))}

@@ -32,7 +32,7 @@ function StarRow({ rating }: { rating: number }) {
           key={n}
           className={cn(
             "h-3.5 w-3.5",
-            n <= rating ? "fill-coral text-coral" : "text-line",
+            n <= rating ? "fill-coral text-rose" : "text-line",
           )}
           strokeWidth={0}
         />
@@ -76,15 +76,15 @@ export default async function PainelAvaliacoesPage() {
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Avaliações</h1>
-        <p className="mt-1 text-md text-muted">
+        <p className="mt-1 text-md text-ink-dim">
           O que os clientes dizem sobre você. Visível para assinantes no seu perfil.
         </p>
       </div>
 
       {/* Summary */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-muted">Média geral</p>
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-xs font-medium text-ink-dim">Média geral</p>
           <p className="mt-2 text-4xl font-bold tabular-nums">
             {profile.ratingAvg > 0 ? profile.ratingAvg.toFixed(1) : "—"}
           </p>
@@ -95,31 +95,31 @@ export default async function PainelAvaliacoesPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-muted">Total</p>
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-xs font-medium text-ink-dim">Total</p>
           <p className="mt-2 text-4xl font-bold tabular-nums">{profile.ratingCount}</p>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-ink-dim">
             avaliação{profile.ratingCount !== 1 ? "ões" : ""}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-muted flex items-center gap-1.5">
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-xs font-medium text-ink-dim flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5" strokeWidth={1.5} />
             Distribuição
           </p>
           <ul className="mt-3 space-y-1.5">
             {dist.map(({ star, count }) => (
               <li key={star} className="flex items-center gap-2 text-xs">
-                <span className="w-4 shrink-0 text-right text-muted">{star}</span>
-                <Star className="h-3 w-3 fill-coral text-coral shrink-0" strokeWidth={0} />
+                <span className="w-4 shrink-0 text-right text-ink-dim">{star}</span>
+                <Star className="h-3 w-3 fill-coral text-rose shrink-0" strokeWidth={0} />
                 <div className="flex-1 h-1.5 rounded-full bg-line overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-coral"
+                    className="h-full rounded-full bg-rose"
                     style={{ width: `${pct(count)}%` }}
                   />
                 </div>
-                <span className="w-5 shrink-0 text-right text-muted">{count}</span>
+                <span className="w-5 shrink-0 text-right text-ink-dim">{count}</span>
               </li>
             ))}
           </ul>
@@ -135,14 +135,14 @@ export default async function PainelAvaliacoesPage() {
         />
       ) : (
         <div className="space-y-3">
-          <p className="text-base font-medium text-muted">
+          <p className="text-base font-medium text-ink-dim">
             {reviews.length} avaliação{reviews.length !== 1 ? "ões" : ""}
           </p>
           {reviews.map((r) => (
-            <article key={r.id} className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <article key={r.id} className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-semibold text-white">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
                     {(r.user.name ?? "?")[0].toUpperCase()}
                   </span>
                   <div>
@@ -151,11 +151,11 @@ export default async function PainelAvaliacoesPage() {
                     </p>
                     <div className="mt-1 flex items-center gap-2">
                       <StarRow rating={r.rating} />
-                      <span className="text-xs text-muted">{ratingLabel(r.rating)}</span>
+                      <span className="text-xs text-ink-dim">{ratingLabel(r.rating)}</span>
                     </div>
                   </div>
                 </div>
-                <time className="shrink-0 text-xs text-muted">
+                <time className="shrink-0 text-xs text-ink-dim">
                   {r.createdAt.toLocaleDateString("pt-BR", {
                     day: "numeric",
                     month: "short",
@@ -164,7 +164,7 @@ export default async function PainelAvaliacoesPage() {
                 </time>
               </div>
               {r.comment && (
-                <blockquote className="mt-4 border-l-2 border-coral/30 pl-4 text-sm italic leading-relaxed text-muted">
+                <blockquote className="mt-4 border-l-2 border-rose/30 pl-4 text-sm italic leading-relaxed text-ink-dim">
                   {r.comment}
                 </blockquote>
               )}

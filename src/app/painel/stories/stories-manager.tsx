@@ -105,7 +105,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
       {/* ── Active stories ── */}
       <div className="space-y-4">
-        <p className="text-xs font-medium text-muted">
+        <p className="text-xs font-medium text-ink-dim">
           Ativos · {activeStories.length}
         </p>
 
@@ -118,7 +118,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {activeStories.map((s) => (
-              <div key={s.id} className="group relative overflow-hidden rounded-xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <div key={s.id} className="group relative overflow-hidden rounded-xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <div className="relative aspect-[9/16]">
                   {s.mediaType === "VIDEO" ? (
                     <video src={s.mediaUrl} className="h-full w-full object-cover" muted playsInline />
@@ -131,7 +131,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-between px-3 py-2 text-xs text-muted">
+                <div className="flex items-center justify-between px-3 py-2 text-xs text-ink-dim">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1">
                       <Eye className="h-3 w-3" strokeWidth={1.5} />
@@ -151,7 +151,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
                   type="button"
                   onClick={() => handleDelete(s.id)}
                   disabled={deletePending}
-                  className="absolute right-2 top-2 rounded bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100 hover:bg-coral/80"
+                  className="absolute right-2 top-2 rounded bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose/80"
                 >
                   <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                 </button>
@@ -162,13 +162,13 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
         {/* Expired */}
         {expiredStories.length > 0 && (
-          <details className="rounded-xl border border-black/[0.06] overflow-hidden">
-            <summary className="cursor-pointer px-4 py-3 text-xs font-medium text-muted">
+          <details className="rounded-xl border border-line overflow-hidden">
+            <summary className="cursor-pointer px-4 py-3 text-xs font-medium text-ink-dim">
               Expirados · {expiredStories.length}
             </summary>
             <div className="grid grid-cols-3 gap-2 p-4 sm:grid-cols-4">
               {expiredStories.slice(0, 8).map((s) => (
-                <div key={s.id} className="relative aspect-[9/16] overflow-hidden rounded-lg border border-black/[0.06] opacity-50 grayscale">
+                <div key={s.id} className="relative aspect-[9/16] overflow-hidden rounded-lg border border-line opacity-50 grayscale">
                   <Image src={s.mediaUrl} alt="" fill className="object-cover" sizes="100px" />
                 </div>
               ))}
@@ -178,9 +178,9 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
       </div>
 
       {/* ── Publish new story ── */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-4 lg:sticky lg:top-24 lg:self-start">
+      <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] space-y-4 lg:sticky lg:top-24 lg:self-start">
         <p className="font-semibold">Publicar story</p>
-        <p className="text-xs text-muted">Foto ou vídeo vertical. Dura 24h. Aparece nas bolinhas da busca.</p>
+        <p className="text-xs text-ink-dim">Foto ou vídeo vertical. Dura 24h. Aparece nas bolinhas da busca.</p>
 
         {/* Preview */}
         {preview ? (
@@ -202,11 +202,11 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line py-12 text-muted hover:border-coral hover:text-coral transition"
+            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line py-12 text-ink-dim hover:border-rose hover:text-rose transition"
           >
             <Plus className="h-8 w-8" strokeWidth={1.25} />
             <span className="text-sm font-semibold">Selecionar foto ou vídeo</span>
-            <span className="text-xs text-muted/60">Vertical (9:16) recomendado</span>
+            <span className="text-xs text-ink-dim/60">Vertical (9:16) recomendado</span>
           </button>
         )}
 
@@ -220,7 +220,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
         {/* Caption */}
         <div>
-          <label className="block text-base font-medium text-foreground mb-1.5">
+          <label className="block text-base font-medium text-ink mb-1.5">
             Texto (opcional)
           </label>
           <input
@@ -228,16 +228,16 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Uma frase sobre o momento..."
             maxLength={150}
-            className="w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
+            className="w-full rounded-lg border border-line px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
           />
-          <p className="mt-1 text-right text-2xs text-muted">{caption.length}/150</p>
+          <p className="mt-1 text-right text-2xs text-ink-dim">{caption.length}/150</p>
         </div>
 
         <button
           type="button"
           onClick={handlePublish}
           disabled={!selectedFile || uploading}
-          className="w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
+          className="w-full rounded-lg bg-rose py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">

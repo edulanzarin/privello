@@ -114,7 +114,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
   return (
     <AdminShell>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-bold text-lg">Perfis <span className="text-muted font-normal text-sm">({total})</span></h1>
+        <h1 className="font-bold text-lg">Perfis <span className="text-ink-dim font-normal text-sm">({total})</span></h1>
         <form method="get" action="/admin/perfis" className="flex flex-wrap items-center gap-2">
           <Input
             name="q"
@@ -171,9 +171,9 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                     <span className="font-semibold">{p.displayName}</span>
                     {p.isVerified && <BadgeCheck className="h-3.5 w-3.5 text-success" strokeWidth={2} />}
                   </div>
-                  <p className="text-xs text-muted">@{p.slug} · {p.user?.email}</p>
+                  <p className="text-xs text-ink-dim">@{p.slug} · {p.user?.email}</p>
                 </TD>
-                <TD className="text-xs text-muted">{p.city.name}</TD>
+                <TD className="text-xs text-ink-dim">{p.city.name}</TD>
                 <TD>
                   <Badge variant={statusToBadgeVariant(p.planTier)} className="uppercase">
                     {p.planTier}
@@ -185,7 +185,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                       <Ban className="h-3 w-3" strokeWidth={2} /> Suspensa
                     </span>
                   ) : (
-                    <span className={`text-xs font-semibold ${p.isOnline ? "text-success" : "text-muted"}`}>
+                    <span className={`text-xs font-semibold ${p.isOnline ? "text-success" : "text-ink-dim"}`}>
                       {p.isOnline ? "● Online" : "○ Offline"}
                     </span>
                   )}
@@ -198,7 +198,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                         type="submit"
                         className={`text-2xs font-bold px-2 py-1 border transition ${p.isVerified
                           ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
-                          : "border-line text-muted hover:border-foreground/30"
+                          : "border-line text-ink-dim hover:border-ink/30"
                           }`}
                       >
                         {p.isVerified ? "✓ Verificada" : "Verificar"}
@@ -223,7 +223,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                         ]}
                         className="w-auto"
                       />
-                      <button type="submit" className="border border-line px-2 py-1 text-2xs font-bold text-muted hover:text-foreground transition">
+                      <button type="submit" className="border border-line px-2 py-1 text-2xs font-bold text-ink-dim hover:text-ink transition">
                         OK
                       </button>
                     </form>
@@ -234,7 +234,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                       warningCount={p._count.warnings}
                       isSuspended={p.isSuspended}
                     />
-                    <Link href={`/p/${p.slug}`} target="_blank" className="text-xs text-muted underline hover:text-foreground">
+                    <Link href={`/p/${p.slug}`} target="_blank" className="text-xs text-ink-dim underline hover:text-ink">
                       ↗
                     </Link>
                   </div>
@@ -249,7 +249,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
         <div className="mt-3 flex justify-end gap-1 text-xs">
           {pageNum > 1 && <Link href={href({ p: String(pageNum - 1) })} className="border border-line px-2.5 py-1 hover:bg-line">←</Link>}
           {Array.from({ length: totalPages }, (_, i) => i + 1).filter((n) => Math.abs(n - pageNum) <= 2).map((n) => (
-            <Link key={n} href={href({ p: String(n) })} className={`border px-2.5 py-1 ${n === pageNum ? "border-foreground bg-foreground text-white" : "border-line hover:bg-line"}`}>{n}</Link>
+            <Link key={n} href={href({ p: String(n) })} className={`border px-2.5 py-1 ${n === pageNum ? "border-ink bg-ink text-white" : "border-line hover:bg-line"}`}>{n}</Link>
           ))}
           {pageNum < totalPages && <Link href={href({ p: String(pageNum + 1) })} className="border border-line px-2.5 py-1 hover:bg-line">→</Link>}
         </div>

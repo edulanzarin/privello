@@ -135,7 +135,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="mb-5">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h1 className="font-bold text-lg">Mídias <span className="text-muted font-normal text-sm">({total.toLocaleString("pt-BR")})</span></h1>
+          <h1 className="font-bold text-lg">Mídias <span className="text-ink-dim font-normal text-sm">({total.toLocaleString("pt-BR")})</span></h1>
 
           {/* View toggle (Tabs pills) */}
           <Tabs
@@ -154,8 +154,8 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
             { label: "Privadas", value: totalPrivate, active: visibF === "private" },
             { label: "Reels", value: totalReels, active: typeF === "REEL" },
           ].map(({ label, value, active }) => (
-            <div key={label} className={`border px-3 py-2 ${active ? "border-foreground bg-foreground text-white" : "border-line bg-white"}`}>
-              <p className={`text-2xs font-bold uppercase tracking-wider ${active ? "text-white/60" : "text-muted"}`}>{label}</p>
+            <div key={label} className={`border px-3 py-2 ${active ? "border-ink bg-ink text-white" : "border-line bg-white"}`}>
+              <p className={`text-2xs font-bold uppercase tracking-wider ${active ? "text-white/60" : "text-ink-dim"}`}>{label}</p>
               <p className="text-xl font-bold mt-0.5">{value.toLocaleString("pt-BR")}</p>
             </div>
           ))}
@@ -168,30 +168,30 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={q}
             placeholder="Perfil ou @handle…"
-            className="rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background w-44 hover:border-black/20 focus:border-blue transition-all"
+            className="rounded-md border border-line px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background w-44 hover:border-black/20 focus:border-rose transition-all"
           />
-          <select name="type" defaultValue={typeF} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue transition-all">
+          <select name="type" defaultValue={typeF} className="rounded-md border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose transition-all">
             <option value="">Todos os tipos</option>
             <option value="IMAGE">Foto</option>
             <option value="VIDEO">Vídeo</option>
             <option value="REEL">Reel</option>
           </select>
-          <select name="visib" defaultValue={visibF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+          <select name="visib" defaultValue={visibF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <option value="">Pública + Privada</option>
             <option value="public">Só públicas</option>
             <option value="private">Só privadas</option>
           </select>
-          <select name="sort" defaultValue={sortF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+          <select name="sort" defaultValue={sortF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <option value="newest">Mais recentes</option>
             <option value="oldest">Mais antigas</option>
             <option value="likes">Mais curtidas</option>
             <option value="comments">Mais comentadas</option>
           </select>
-          <button type="submit" className="bg-foreground px-3 py-1.5 text-xs font-bold text-white">
+          <button type="submit" className="bg-ink px-3 py-1.5 text-xs font-bold text-white">
             Filtrar
           </button>
           {(q || typeF || visibF || sortF !== "newest") && (
-            <Link href="/admin/midias" className="px-3 py-1.5 text-xs border border-line text-muted hover:text-foreground hover:border-foreground/30 transition">
+            <Link href="/admin/midias" className="px-3 py-1.5 text-xs border border-line text-ink-dim hover:text-ink hover:border-ink/30 transition">
               Limpar
             </Link>
           )}
@@ -225,7 +225,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                   <TD>
                     <div className="relative h-14 w-10 overflow-hidden bg-line flex-shrink-0 rounded">
                       {m.mediaType !== "IMAGE" ? (
-                        <div className="flex h-full items-center justify-center bg-foreground text-white/60">
+                        <div className="flex h-full items-center justify-center bg-ink text-white/60">
                           <Play className="h-4 w-4" strokeWidth={1.5} />
                         </div>
                       ) : (
@@ -252,14 +252,14 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                             <BadgeCheck className="h-3 w-3 text-success" strokeWidth={2} aria-label="Verificado" />
                           )}
                         </Link>
-                        <p className="text-2xs text-muted">@{m.profile.slug} · {m.profile.city.name}</p>
+                        <p className="text-2xs text-ink-dim">@{m.profile.slug} · {m.profile.city.name}</p>
                       </div>
                     </div>
                   </TD>
 
                   {/* Tipo */}
                   <TD>
-                    <span className="text-2xs font-bold uppercase tracking-wider text-muted">
+                    <span className="text-2xs font-bold uppercase tracking-wider text-ink-dim">
                       {m.mediaType === "REEL" ? "🎬 Reel" : m.mediaType === "VIDEO" ? "📹 Vídeo" : "🖼 Foto"}
                     </span>
                     {m.isCover && (
@@ -286,14 +286,14 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
 
                   {/* Engajamento */}
                   <TD>
-                    <div className="flex items-center gap-3 text-xs text-muted">
+                    <div className="flex items-center gap-3 text-xs text-ink-dim">
                       <span className="flex items-center gap-1"><Heart className="h-3 w-3" strokeWidth={1.5} />{m._count.likes}</span>
                       <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" strokeWidth={1.5} />{m._count.comments}</span>
                     </div>
                   </TD>
 
                   {/* Data */}
-                  <TD className="text-xs text-muted whitespace-nowrap">
+                  <TD className="text-xs text-ink-dim whitespace-nowrap">
                     {new Date(m.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "2-digit" })}
                   </TD>
 
@@ -305,7 +305,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                       <Link
                         href={m.url}
                         target="_blank"
-                        className="text-2xs border border-line px-2 py-1 text-muted hover:text-foreground transition"
+                        className="text-2xs border border-line px-2 py-1 text-ink-dim hover:text-ink transition"
                       >
                         ↗ Ver
                       </Link>
@@ -326,7 +326,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                 {/* Photo */}
                 <div className="relative aspect-[3/4] bg-line overflow-hidden">
                   {m.mediaType !== "IMAGE" ? (
-                    <div className="flex h-full flex-col items-center justify-center bg-foreground gap-2">
+                    <div className="flex h-full flex-col items-center justify-center bg-ink gap-2">
                       <Play className="h-8 w-8 text-white/50" strokeWidth={1.5} />
                       <span className="text-2xs text-white/40 font-semibold uppercase tracking-wider">{m.mediaType}</span>
                     </div>
@@ -348,7 +348,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                       </span>
                     )}
                     {m.isCover && (
-                      <span className="flex items-center gap-0.5 bg-coral text-white text-2xs font-bold px-1.5 py-0.5 rounded">
+                      <span className="flex items-center gap-0.5 bg-rose text-white text-2xs font-bold px-1.5 py-0.5 rounded">
                         <Star className="h-2.5 w-2.5" strokeWidth={2.5} /> CAPA
                       </span>
                     )}
@@ -377,12 +377,12 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                           <BadgeCheck className="h-3 w-3 text-success" strokeWidth={2} aria-label="Verificado" />
                         )}
                       </Link>
-                      <p className="text-2xs text-muted leading-none mt-0.5">{m.profile.city.name}</p>
+                      <p className="text-2xs text-ink-dim leading-none mt-0.5">{m.profile.city.name}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-2xs text-muted">
+                    <div className="flex items-center gap-2 text-2xs text-ink-dim">
                       <span className="flex items-center gap-0.5">
                         <Heart className="h-2.5 w-2.5" strokeWidth={1.5} />{m._count.likes}
                       </span>
@@ -390,7 +390,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                         <MessageCircle className="h-2.5 w-2.5" strokeWidth={1.5} />{m._count.comments}
                       </span>
                     </div>
-                    <span className="text-2xs text-muted">
+                    <span className="text-2xs text-ink-dim">
                       {new Date(m.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
                     </span>
                   </div>
@@ -404,7 +404,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-5 flex items-center justify-between text-xs">
-          <p className="text-muted">
+          <p className="text-ink-dim">
             Página {pageNum} de {totalPages} · {total.toLocaleString("pt-BR")} mídias
           </p>
           <div className="flex gap-1">
@@ -417,7 +417,7 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                 <Link
                   key={n}
                   href={href({ p: String(n) })}
-                  className={`border px-3 py-1.5 transition ${n === pageNum ? "border-foreground bg-foreground text-white" : "border-line hover:bg-line"}`}
+                  className={`border px-3 py-1.5 transition ${n === pageNum ? "border-ink bg-ink text-white" : "border-line hover:bg-line"}`}
                 >
                   {n}
                 </Link>

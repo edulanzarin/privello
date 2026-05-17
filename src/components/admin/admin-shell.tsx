@@ -132,7 +132,7 @@ export function AdminShell({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen  text-ink">
       <DarkSidebarShell
         logoHref="/admin/moderacao"
         nav={NAV_ADMIN}

@@ -49,11 +49,11 @@ export default async function PainelFinanceiroPage() {
   if (profile.planTier !== "PREMIUM") {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
-        <Diamond className="h-10 w-10 text-coral" strokeWidth={1} />
+        <Diamond className="h-10 w-10 text-rose" strokeWidth={1} />
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Gestão financeira</h1>
-          <p className="mx-auto mt-3 max-w-sm text-md leading-relaxed text-muted">
-            Disponível no plano <strong className="text-foreground">Premium</strong>. Acompanhe faturamento, ticket médio, histórico
+          <p className="mx-auto mt-3 max-w-sm text-md leading-relaxed text-ink-dim">
+            Disponível no plano <strong className="text-ink">Premium</strong>. Acompanhe faturamento, ticket médio, histórico
             completo e registre cada encontro com privacidade total.
           </p>
         </div>
@@ -62,7 +62,7 @@ export default async function PainelFinanceiroPage() {
             Fazer upgrade para Premium
           </Button>
         </Link>
-        <p className="text-sm text-muted">Sem fidelidade. Cancele quando quiser.</p>
+        <p className="text-sm text-ink-dim">Sem fidelidade. Cancele quando quiser.</p>
       </div>
     );
   }
@@ -85,11 +85,11 @@ export default async function PainelFinanceiroPage() {
       {/* Header + form */}
       <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="text-xs font-medium text-muted">Financeiro</p>
+          <p className="text-xs font-medium text-ink-dim">Financeiro</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight capitalize">
             {monthName} {year}
           </h1>
-          <p className="mt-1 text-md text-muted">
+          <p className="mt-1 text-md text-ink-dim">
             {rows.length} {rows.length === 1 ? "registro" : "registros"} · apenas você vê isso
           </p>
         </div>
@@ -181,11 +181,11 @@ export default async function PainelFinanceiroPage() {
 
       {/* Table */}
       <Card variant="solid" padding="none">
-        <div className="border-b border-black/[0.06] px-5 py-4 flex items-center justify-between">
-          <p className="text-xs font-medium text-muted">
+        <div className="border-b border-line px-5 py-4 flex items-center justify-between">
+          <p className="text-xs font-medium text-ink-dim">
             Registros · {rows.length} {rows.length === 1 ? "encontro" : "encontros"} · {formatBrl(total)} total
           </p>
-          <p className="text-xs text-muted">Passe o mouse para editar ou excluir</p>
+          <p className="text-xs text-ink-dim">Passe o mouse para editar ou excluir</p>
         </div>
         {rows.length === 0 ? (
           <div className="px-5 py-6">

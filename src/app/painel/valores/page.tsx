@@ -34,7 +34,7 @@ export default async function PainelValoresPage() {
     <div className="space-y-6 max-w-sm mx-auto">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Valores e durações</h1>
-        <p className="mt-1 text-md text-muted">Ative as durações que você oferece e defina o valor de cada uma.</p>
+        <p className="mt-1 text-md text-ink-dim">Ative as durações que você oferece e defina o valor de cada uma.</p>
       </div>
       <ValoresForm profile={profile} />
     </div>

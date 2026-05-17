@@ -11,7 +11,7 @@
  *   1. Render do título canônico (ex.: "Novos perfis · 30 dias") com data não vazia.
  *   2. Fallback `<EmptyState>` (título "Sem dados no período.") com `data=[]`.
  *   3. Wrapper externo carrega a assinatura visual do `<Card variant="solid">`
- *      (`bg-white` + `rounded-2xl` + `border-black/[0.06]` + `p-5`).
+ *      (`bg-white` + `rounded-2xl` + `border-line` + `p-5`).
  *
  * Por que mockar `recharts`?
  * - jsdom não roda layout, então `ResponsiveContainer` mede 0×0 e emite
@@ -81,7 +81,7 @@ function getWrapperCard(container: HTMLElement): HTMLElement {
 function assertSolidCardSignature(el: HTMLElement) {
     const cls = el.className;
     // v2: variant="solid" usa bg-surface (off-white) + border-line + rounded-2xl.
-    // Foi `bg-white + border-black/[0.06] + rounded-2xl` na v1.
+    // Foi `bg-white + border-line + rounded-2xl` na v1.
     expect(cls).toContain("bg-surface");
     expect(cls).toContain("rounded-2xl");
     expect(cls).toContain("border-line");

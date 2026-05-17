@@ -39,7 +39,7 @@ export function AdminCityFilter({
         name="city"
         defaultValue={cityFilter}
         onChange={(e) => (e.currentTarget.form as HTMLFormElement).submit()}
-        className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue transition-all"
+        className="rounded-md border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose transition-all"
       >
         <option value="">Todas as cidades</option>
         {cities.map((c) => (

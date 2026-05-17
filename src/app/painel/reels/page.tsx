@@ -38,7 +38,7 @@ export default async function PainelReelsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Reels</h1>
-        <p className="mt-1 text-md text-muted">
+        <p className="mt-1 text-md text-ink-dim">
           Vídeos curtos em formato vertical para destacar sua personalidade.
         </p>
       </div>

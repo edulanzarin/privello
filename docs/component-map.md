@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (onboarding cliente migrado — 4 steps + verificacao)
+**Última atualização**: 2026-05-17 (painel migrado: 12 rotas + sidebar + DarkSidebarShell tokens v2)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -111,7 +111,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `bottom-nav.tsx` | 🟢 | `<BottomNav />` | Pill flutuante glass em todos breakpoints, auto-hide quando `body[data-modal-open]` |
 | `bottom-nav-wrapper.tsx` | 🟢 | server wrapper | Headless |
 | 🆕 `auth-shell.tsx` | 🟢 | `<AuthShell footer caption width>` | Shell centralizado para /entrar, /cadastro, /recuperar-senha, /cadastro/sucesso |
-| `dark-sidebar-shell.tsx` | 🔴 | sidebar escura admin/painel | Vai virar `GlassSidebarShell` (steering §13.5) |
+| `dark-sidebar-shell.tsx` | 🟢 | Sidebar ink (preto ameixa) compartilhada por painel + admin. Tokens v2 (rose focus, ink offset). |
 | `provider-banner.tsx` | 🔴 | banner topo p/ providers | Não migrado |
 
 #### `home/` — landing
@@ -132,13 +132,13 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
-| `painel-sidebar.tsx` | 🔴 | Ainda dark v1 |
-| `media-manager.tsx` | 🔴 | Editor de mídia |
-| `reels-manager.tsx` | 🔴 | Editor de reels |
-| `online-toggle.tsx` | 🟡 | Switch de online |
+| `painel-sidebar.tsx` | 🟢 | Sidebar ink (preto ameixa) com nav + status do plano + avatar/logout |
+| `media-manager.tsx` | 🟡 | Editor de mídia (tokens migrados, estrutura mantida) |
+| `reels-manager.tsx` | 🟡 | Editor de reels (tokens migrados, estrutura mantida) |
+| `online-toggle.tsx` | 🟢 | Switch de online (Switch primitive) |
 | `provider-heartbeat.tsx` | ⚪ | Headless |
-| `logout-button.tsx` | 🟡 | Visual ok |
-| `save-form.tsx` | 🟡 | Botão de save sticky |
+| `logout-button.tsx` | 🟢 | Visual ok |
+| `save-form.tsx` | 🟢 | Botão de save sticky |
 
 #### `admin/` — moderação
 
@@ -220,18 +220,18 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Status v2 |
 |------|-----------|
-| `/painel` | 🔴 |
-| `/painel/perfil` | 🔴 |
-| `/painel/midias` | 🔴 |
-| `/painel/reels` | 🔴 |
-| `/painel/stories` | 🔴 |
-| `/painel/valores` | 🔴 |
-| `/painel/disponibilidade` | 🔴 |
-| `/painel/avaliacoes` | 🔴 |
-| `/painel/financeiro` | 🔴 |
-| `/painel/plano` | 🔴 |
-| `/painel/suporte` | 🔴 |
-| `/painel/suporte/[id]` | 🔴 |
+| `/painel` | 🟢 |
+| `/painel/perfil` | 🟢 |
+| `/painel/midias` | 🟢 |
+| `/painel/reels` | 🟢 |
+| `/painel/stories` | 🟢 |
+| `/painel/valores` | 🟢 |
+| `/painel/disponibilidade` | 🟢 |
+| `/painel/avaliacoes` | 🟢 |
+| `/painel/financeiro` | 🟢 |
+| `/painel/plano` | 🟢 |
+| `/painel/suporte` | 🟢 |
+| `/painel/suporte/[id]` | 🟢 |
 
 ### 3.5 Pagamento
 
@@ -287,8 +287,8 @@ Ordem por impacto + dependência:
 5. ~~**`/entrar` + `/cadastro/**` + `/recuperar-senha/**`**~~ ✅ done
 6. ~~**`/planos`**~~ ✅ done
 7. ~~**`/conta/onboarding/**` + `/conta/verificacao`**~~ ✅ done
-8. **`/painel/**`** — provider dashboard (precisa do `GlassSidebarShell` antes)
-9. `/admin/**` — moderação (mais denso, vem por último)
+8. ~~**`/painel/**`**~~ ✅ done (DarkSidebarShell + sidebar + 12 rotas via batch token swap)
+9. **`/admin/**`** — moderação (próximo)
 10. `/reels/**` — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
 11. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
 12. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)

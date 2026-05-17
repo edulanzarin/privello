@@ -161,8 +161,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-md font-semibold">Localização e contato</p>
           <div className="space-y-1.5">
-            <span className="block text-base font-medium text-foreground">Cidade onde atende</span>
-            <div className="rounded-lg border border-black/10 overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-blue focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
+            <span className="block text-base font-medium text-ink">Cidade onde atende</span>
+            <div className="rounded-lg border border-line overflow-hidden shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] focus-within:border-blue focus-within:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all">
               <CityAutocomplete
                 compact
                 initialLabel={cityName}
@@ -203,13 +203,13 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         <Card variant="solid" padding="lg" className="space-y-4">
           <div>
             <p className="text-md font-semibold">Áudio — Ouça minha voz</p>
-            <p className="mt-0.5 text-base text-muted">Aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.</p>
+            <p className="mt-0.5 text-base text-ink-dim">Aparece no seu perfil público. MP3, WAV ou M4A · máx 20 MB.</p>
           </div>
 
           {pendingAudio ? (
             /* ── Preview before upload ── */
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-xl bg-black/[0.03] px-4 py-3">
+              <div className="flex items-center gap-3 rounded-xl bg-line/30 px-4 py-3">
                 <audio ref={pendingPreviewRef} src={pendingAudio.localUrl} />
                 <button
                   type="button"
@@ -218,17 +218,17 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                     if (!a) return;
                     if (a.paused) a.play(); else a.pause();
                   }}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-white shadow-sm transition hover:brightness-110 active:scale-95"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-white shadow-sm transition hover:brightness-110 active:scale-95"
                 >
                   <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
                 </button>
-                <p className="flex-1 text-base text-muted">Ouça antes de confirmar</p>
+                <p className="flex-1 text-base text-ink-dim">Ouça antes de confirmar</p>
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => { URL.revokeObjectURL(pendingAudio.localUrl); setPendingAudio(null); }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-base font-medium text-muted transition hover:bg-black/[0.03] hover:text-foreground"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-line bg-white px-4 py-2.5 text-base font-medium text-ink-dim transition hover:bg-line/30 hover:text-ink"
                 >
                   <X className="h-3.5 w-3.5" strokeWidth={2} /> Descartar
                 </button>
@@ -240,7 +240,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                     URL.revokeObjectURL(pendingAudio.localUrl);
                     setPendingAudio(null);
                   }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-base font-medium text-white transition hover:bg-foreground/80 disabled:opacity-40"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-base font-medium text-white transition hover:bg-ink/80 disabled:opacity-40"
                 >
                   {audioUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   {audioUploading ? "Enviando…" : "Confirmar"}
@@ -249,7 +249,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             </div>
           ) : audioUrl ? (
             /* ── Player ── */
-            <div className="flex items-center gap-3 rounded-xl bg-black/[0.03] px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl bg-line/30 px-4 py-3">
               <audio ref={audioPreviewRef} src={audioUrl} onEnded={() => setAudioPlaying(false)} />
               <button
                 type="button"
@@ -259,18 +259,18 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   if (audioPlaying) { a.pause(); setAudioPlaying(false); }
                   else { a.play(); setAudioPlaying(true); }
                 }}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral text-white shadow-sm transition hover:brightness-110 active:scale-95"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose text-white shadow-sm transition hover:brightness-110 active:scale-95"
               >
                 {audioPlaying
                   ? <Pause className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
                   : <Play className="h-3.5 w-3.5 fill-white translate-x-[1px]" strokeWidth={0} />
                 }
               </button>
-              <p className="flex-1 truncate text-base text-muted">{audioUrl.split("/").pop()}</p>
+              <p className="flex-1 truncate text-base text-ink-dim">{audioUrl.split("/").pop()}</p>
               <button
                 type="button"
                 onClick={removeAudio}
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-muted transition hover:bg-black/10 hover:text-foreground"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-line/50 text-ink-dim transition hover:bg-black/10 hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
@@ -287,39 +287,39 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
 
               {recording ? (
                 /* ── Recording in progress ── */
-                <div className="flex items-center gap-4 rounded-2xl bg-coral/[0.06] border border-coral/15 px-5 py-4">
+                <div className="flex items-center gap-4 rounded-2xl bg-rose/[0.06] border border-rose/15 px-5 py-4">
                   <span className="relative flex h-3 w-3 shrink-0">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-50" />
-                    <span className="relative inline-flex h-3 w-3 rounded-full bg-coral" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose opacity-50" />
+                    <span className="relative inline-flex h-3 w-3 rounded-full bg-rose" />
                   </span>
-                  <span className="flex-1 text-md font-semibold text-coral tabular-nums">
+                  <span className="flex-1 text-md font-semibold text-rose tabular-nums">
                     {Math.floor(recordSecs / 60).toString().padStart(2, "0")}:{(recordSecs % 60).toString().padStart(2, "0")}
                   </span>
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-coral text-white shadow-sm transition hover:brightness-110 active:scale-95"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose text-white shadow-sm transition hover:brightness-110 active:scale-95"
                   >
                     <Square className="h-3.5 w-3.5 fill-white" strokeWidth={0} />
                   </button>
                 </div>
               ) : (
                 /* ── Idle state ── */
-                <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/[0.06] bg-black/[0.02] px-6 py-5">
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-line bg-black/[0.02] px-6 py-5">
                   <button
                     type="button"
                     onClick={startRecording}
                     disabled={audioUploading}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-coral text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:opacity-40"
+                    className="flex h-14 w-14 items-center justify-center rounded-full bg-rose text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:opacity-40"
                   >
                     <Mic className="h-6 w-6" strokeWidth={1.5} />
                   </button>
-                  <p className="text-base font-medium text-foreground">Gravar agora</p>
+                  <p className="text-base font-medium text-ink">Gravar agora</p>
                   <button
                     type="button"
                     onClick={() => audioInputRef.current?.click()}
                     disabled={audioUploading}
-                    className="flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground disabled:opacity-40"
+                    className="flex items-center gap-1.5 text-sm text-ink-dim transition hover:text-ink disabled:opacity-40"
                   >
                     {audioUploading
                       ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -368,7 +368,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             />
           </div>
           <div className="space-y-1.5">
-            <label className="block text-base font-medium text-foreground">Idiomas</label>
+            <label className="block text-base font-medium text-ink">Idiomas</label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGE_OPTIONS.map((lang) => (
                 <button
@@ -376,8 +376,8 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
                   type="button"
                   onClick={() => toggleLang(lang.value)}
                   className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${selectedLangs.includes(lang.value)
-                    ? "border-foreground bg-foreground text-white"
-                    : "border-line bg-white text-muted hover:border-foreground/30"
+                    ? "border-ink bg-ink text-white"
+                    : "border-line bg-white text-ink-dim hover:border-ink/30"
                     }`}
                 >
                   {lang.label}
@@ -391,7 +391,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         <Card variant="solid" padding="lg" className="space-y-5">
           <p className="text-md font-semibold">Atendimento</p>
           <div className="space-y-1.5">
-            <label className="block text-base font-medium text-foreground">Atende a</label>
+            <label className="block text-base font-medium text-ink">Atende a</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "servesMen", label: "Homens", checked: profile.servesMen },
@@ -400,7 +400,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               ].map((o) => (
                 <label
                   key={o.name}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-ink/30 has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-white"
                 >
                   <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />
                   {o.label}
@@ -409,7 +409,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="block text-base font-medium text-foreground">Modalidade</label>
+            <label className="block text-base font-medium text-ink">Modalidade</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { name: "hasOwnPlace", label: "Local próprio", checked: profile.hasOwnPlace },
@@ -419,7 +419,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               ].map((o) => (
                 <label
                   key={o.name}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-foreground/30 has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-white"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm transition hover:border-ink/30 has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-white"
                 >
                   <input type="checkbox" name={o.name} defaultChecked={o.checked} className="hidden" />
                   {o.label}
@@ -430,7 +430,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
         </Card>
 
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted"><span className="text-coral">*</span> obrigatório</p>
+          <p className="text-xs text-ink-dim"><span className="text-rose">*</span> obrigatório</p>
           <Button type="submit" variant="coral" size="lg" disabled={pending}>
             {pending ? "Salvando…" : "Salvar alterações"}
           </Button>
@@ -440,22 +440,22 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
       {/* ── @handle ── */}
       <Card variant="solid" padding="lg" className="space-y-4">
         <div className="flex items-center gap-2">
-          <AtSign className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          <AtSign className="h-4 w-4 text-ink-dim" strokeWidth={1.5} />
           <p className="text-md font-semibold">Seu @handle</p>
         </div>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-ink-dim">
           É o seu endereço único na plataforma. Visível na URL do seu perfil (privello.com/p/<strong>@handle</strong>).
         </p>
-        {handleError && <p className="text-sm text-coral">{handleError}</p>}
+        {handleError && <p className="text-sm text-rose">{handleError}</p>}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">@</span>
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-ink-dim">@</span>
             <input
               value={handleValue}
               onChange={(e) => setHandleValue(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
               placeholder="seuhandle"
               maxLength={30}
-              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+              className="w-full rounded-lg border border-line bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
             />
           </div>
           <Button
@@ -478,7 +478,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
             {handlePending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
           </Button>
         </div>
-        <p className="text-2xs text-muted">
+        <p className="text-2xs text-ink-dim">
           Letras minúsculas, números, _ e - · 3 a 30 caracteres · Link do perfil muda ao trocar
         </p>
       </Card>

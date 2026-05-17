@@ -33,7 +33,7 @@ export function MediaDeleteBtn({ mediaId }: { mediaId: string }) {
         </button>
         <button
           onClick={() => setConfirm(false)}
-          className="text-2xs text-muted hover:text-foreground border border-line px-2 py-1 transition"
+          className="text-2xs text-ink-dim hover:text-ink border border-line px-2 py-1 transition"
         >
           Não
         </button>
@@ -74,7 +74,7 @@ export function MediaVisibilityBtn({ mediaId, isPublic }: { mediaId: string; isP
       onClick={() => start(async () => { await toggleMediaVisibility(mediaId); })}
       disabled={pending}
       className={`flex items-center gap-1 text-2xs font-bold px-2 py-1 border transition disabled:opacity-40 ${isPublic
-        ? "border-line text-muted hover:border-foreground/30 hover:text-foreground"
+        ? "border-line text-ink-dim hover:border-ink/30 hover:text-ink"
         : "border-success/30 bg-success-soft text-success-dark hover:bg-success/15"
         }`}
       title={isPublic ? "Tornar privada" : "Tornar pública"}

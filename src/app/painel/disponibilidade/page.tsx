@@ -35,7 +35,7 @@ export default async function PainelDisponibilidadePage() {
     <div className="space-y-6 max-w-md mx-auto">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Disponibilidade</h1>
-        <p className="mt-1 text-md text-muted">
+        <p className="mt-1 text-md text-ink-dim">
           Defina seus horários por dia da semana.
         </p>
       </div>

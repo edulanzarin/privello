@@ -42,7 +42,7 @@ export default async function PainelLayout({ children }: { children: React.React
   return (
     <ToastProvider>
       <ProviderHeartbeat />
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen text-ink">
         <PainelSidebar
           displayName={displayName}
           profileSlug={profileSlug}

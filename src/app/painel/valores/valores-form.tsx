@@ -82,10 +82,10 @@ export function ValoresForm({ profile }: { profile: Profile }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Durações */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
-        <div className="border-b border-black/[0.06] px-6 py-4">
+      <div className="rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+        <div className="border-b border-line px-6 py-4">
           <p className="text-md font-semibold">Durações e valores</p>
-          <p className="mt-1 text-sm text-muted">Ative as durações que você oferece e defina o valor.</p>
+          <p className="mt-1 text-sm text-ink-dim">Ative as durações que você oferece e defina o valor.</p>
         </div>
         <div className="divide-y divide-black/[0.04]">
           {DURATIONS.map((d) => (
@@ -101,13 +101,13 @@ export function ValoresForm({ profile }: { profile: Profile }) {
               />
               <span className={cn(
                 "w-20 shrink-0 text-md font-medium",
-                !enabled[d.minutes] && "text-muted",
+                !enabled[d.minutes] && "text-ink-dim",
               )}>
                 {d.label}
-                {d.required && <span className="ml-1 text-coral">*</span>}
+                {d.required && <span className="ml-1 text-rose">*</span>}
               </span>
               <div className="relative max-w-[160px]">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-muted">R$</span>
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-ink-dim">R$</span>
                 <input
                   type="number"
                   min={50}
@@ -116,7 +116,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   value={prices[d.minutes] || ""}
                   onChange={(e) => setPrices((p) => ({ ...p, [d.minutes]: Number(e.target.value) }))}
                   placeholder="0"
-                  className="w-full rounded-lg border border-black/10 bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-black/[0.03] disabled:text-muted"
+                  className="w-full rounded-lg border border-line bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-line/30 disabled:text-ink-dim"
                 />
               </div>
             </div>
@@ -125,8 +125,8 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       </div>
 
       {/* Pagamentos */}
-      <div className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
-        <div className="border-b border-black/[0.06] px-6 py-4">
+      <div className="rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+        <div className="border-b border-line px-6 py-4">
           <p className="text-md font-semibold">Formas de pagamento</p>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-5">

@@ -99,7 +99,7 @@ export default async function AdminFinanceiroPage() {
       {/* Lista de assinantes ativos recentes (Req 10.4) */}
       {activeSubscriptions.length > 0 && (
         <section className="mt-5">
-          <h2 className="mb-3 text-2xs font-semibold uppercase tracking-wider text-muted">
+          <h2 className="mb-3 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
             Assinantes ativos recentes
           </h2>
           <Table>
@@ -116,11 +116,11 @@ export default async function AdminFinanceiroPage() {
               {activeSubscriptions.map((s) => (
                 <TR key={s.id}>
                   <TD className="text-xs font-medium">{s.user.name ?? "—"}</TD>
-                  <TD className="text-xs text-muted">{s.user.email}</TD>
+                  <TD className="text-xs text-ink-dim">{s.user.email}</TD>
                   <TD>
                     <Badge variant="success">Ativa</Badge>
                   </TD>
-                  <TD className="text-xs text-muted">
+                  <TD className="text-xs text-ink-dim">
                     {s.expiresAt.toLocaleDateString("pt-BR")}
                   </TD>
                   <TD numeric className="text-xs font-semibold text-success">
@@ -133,7 +133,7 @@ export default async function AdminFinanceiroPage() {
         </section>
       )}
 
-      <p className="mt-6 text-xs text-muted">
+      <p className="mt-6 text-xs text-ink-dim">
         * Valores estimados. Integração com Mercado Pago necessária para dados reais de pagamento.
       </p>
     </AdminShell>

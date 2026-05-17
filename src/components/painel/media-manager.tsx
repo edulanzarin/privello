@@ -56,7 +56,7 @@ function MediaGrid({
   return (
     <div className="space-y-3">
       {isPrivate && (
-        <div className="flex items-center gap-2 text-xs text-muted">
+        <div className="flex items-center gap-2 text-xs text-ink-dim">
           <Lock className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
           <span>Conteúdo explícito permitido. Visível apenas para assinantes da plataforma.</span>
         </div>
@@ -65,7 +65,7 @@ function MediaGrid({
         {items.map((m) => (
           <div key={m.id} className={cn(
             "group relative aspect-square overflow-hidden rounded-xl border-2",
-            m.isCover ? "border-coral" : "border-line",
+            m.isCover ? "border-rose" : "border-line",
           )}>
             {isVideo(m.url, m.mediaType) ? (
               <video src={m.url} className="h-full w-full object-cover" muted playsInline />
@@ -73,17 +73,17 @@ function MediaGrid({
               <Image src={m.url} alt="" fill className="object-cover" sizes="128px" />
             )}
             {m.isCover && (
-              <span className="absolute left-0 top-0 bg-coral px-1.5 py-0.5 text-2xs font-bold uppercase text-white">Perfil</span>
+              <span className="absolute left-0 top-0 bg-rose px-1.5 py-0.5 text-2xs font-bold uppercase text-white">Perfil</span>
             )}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-black/60 opacity-0 transition group-hover:opacity-100">
               {onSetCover && !m.isCover && (
                 <button type="button" onClick={() => onSetCover(m.id)}
-                  className="flex items-center gap-1 rounded bg-coral px-2 py-1 text-2xs font-bold uppercase text-white">
+                  className="flex items-center gap-1 rounded bg-rose px-2 py-1 text-2xs font-bold uppercase text-white">
                   <Star className="h-2.5 w-2.5" /> Perfil
                 </button>
               )}
               <button type="button" onClick={() => onRemove(m.id)}
-                className="flex items-center gap-1 text-2xs text-white/80 hover:text-coral">
+                className="flex items-center gap-1 text-2xs text-white/80 hover:text-rose">
                 <Trash2 className="h-3 w-3" /> Remover
               </button>
             </div>
@@ -93,8 +93,8 @@ function MediaGrid({
           onChange={(e) => onUpload(e.target.files)} />
         <button type="button" onClick={() => ref.current?.click()} disabled={uploading}
           className={cn(
-            "flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-white text-muted transition disabled:opacity-50",
-            isPrivate ? "border-line hover:border-foreground hover:text-foreground" : "border-line hover:border-coral hover:text-coral",
+            "flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-white text-ink-dim transition disabled:opacity-50",
+            isPrivate ? "border-line hover:border-ink hover:text-ink" : "border-line hover:border-rose hover:text-rose",
           )}>
           {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" strokeWidth={1.25} />}
           <span className="text-2xs font-semibold uppercase">{label}</span>
@@ -185,8 +185,8 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
               className={cn(
                 "flex shrink-0 items-center gap-2 px-5 py-3.5 text-xs font-semibold transition",
                 activeTab === t.key
-                  ? "border-b-2 border-coral text-foreground"
-                  : "text-muted hover:text-foreground",
+                  ? "border-b-2 border-rose text-ink"
+                  : "text-ink-dim hover:text-ink",
               )}
             >
               <Icon className="h-4 w-4" strokeWidth={1.5} />
@@ -201,8 +201,8 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {activeTab === "fotos" && (
           <>
             <div>
-              <p className="mb-1 text-xs font-medium text-muted">Fotos públicas · {pubImages.length}</p>
-              <p className="mb-3 text-xs text-coral">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
+              <p className="mb-1 text-xs font-medium text-ink-dim">Fotos públicas · {pubImages.length}</p>
+              <p className="mb-3 text-xs text-rose">Sem nudez explícita. Lingerie e biquíni são permitidos.</p>
               <MediaGrid
                 items={pubImages}
                 onRemove={handleRemove}
@@ -214,7 +214,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
               />
             </div>
             <div className="border-t border-line pt-5">
-              <p className="mb-3 text-xs font-medium text-muted">Galeria privada · {privatePhotos.length}</p>
+              <p className="mb-3 text-xs font-medium text-ink-dim">Galeria privada · {privatePhotos.length}</p>
               <MediaGrid
                 items={privatePhotos}
                 onRemove={handleRemove}
@@ -231,8 +231,8 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {/* ── Vídeos ── */}
         {activeTab === "videos" && (
           <div>
-            <p className="mb-1 text-xs font-medium text-muted">Vídeos públicos · {pubVideos.length}</p>
-            <p className="mb-3 text-xs text-muted">Vídeos curtos do seu perfil. Formatos: MP4, WebM, MOV.</p>
+            <p className="mb-1 text-xs font-medium text-ink-dim">Vídeos públicos · {pubVideos.length}</p>
+            <p className="mb-3 text-xs text-ink-dim">Vídeos curtos do seu perfil. Formatos: MP4, WebM, MOV.</p>
             <MediaGrid
               items={pubVideos}
               onRemove={handleRemove}
@@ -247,8 +247,8 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
         {/* ── Reels ── */}
         {activeTab === "reels" && (
           <div>
-            <p className="mb-1 text-xs font-medium text-muted">Reels · {pubReels.length}</p>
-            <p className="mb-3 text-xs text-muted">Vídeos verticais curtos (até 60s). Aparecem na aba Reels da plataforma.</p>
+            <p className="mb-1 text-xs font-medium text-ink-dim">Reels · {pubReels.length}</p>
+            <p className="mb-3 text-xs text-ink-dim">Vídeos verticais curtos (até 60s). Aparecem na aba Reels da plataforma.</p>
             <MediaGrid
               items={pubReels}
               onRemove={handleRemove}
@@ -266,12 +266,12 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
             {!canPostStories ? (
               <div className="py-8 text-center">
                 <p className="font-semibold">Stories disponíveis no plano Destaque ou Premium.</p>
-                <a href="/painel/plano" className="mt-3 inline-block text-xs text-coral underline">Fazer upgrade</a>
+                <a href="/painel/plano" className="mt-3 inline-block text-xs text-rose underline">Fazer upgrade</a>
               </div>
             ) : (
               <>
                 <div>
-                  <p className="mb-3 text-xs font-medium text-muted">
+                  <p className="mb-3 text-xs font-medium text-ink-dim">
                     Stories ativos · {activeStories.length}
                   </p>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
@@ -294,7 +294,7 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
                           <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition group-hover:opacity-100">
                             <form action={deleteStory}>
                               <input type="hidden" name="storyId" value={s.id} />
-                              <button type="submit" className="flex items-center gap-1 text-2xs text-white/80 hover:text-coral">
+                              <button type="submit" className="flex items-center gap-1 text-2xs text-white/80 hover:text-rose">
                                 <Trash2 className="h-3 w-3" /> Remover
                               </button>
                             </form>
@@ -307,20 +307,20 @@ export function MediaManager({ publicPhotos, privatePhotos, stories, canPostStor
 
                 {/* Post new story */}
                 <div className="border-t border-line pt-5">
-                  <p className="mb-3 text-xs font-medium text-muted">Publicar story</p>
+                  <p className="mb-3 text-xs font-medium text-ink-dim">Publicar story</p>
                   <form action={createStory} className="space-y-3 max-w-sm">
                     <div>
-                      <label className="block text-base font-medium text-foreground mb-1.5">URL da imagem / vídeo</label>
+                      <label className="block text-base font-medium text-ink mb-1.5">URL da imagem / vídeo</label>
                       <input name="mediaUrl" required placeholder="https://..."
-                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
+                        className="w-full rounded-lg border border-line px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <div>
-                      <label className="block text-base font-medium text-foreground mb-1.5">Legenda (opcional)</label>
+                      <label className="block text-base font-medium text-ink mb-1.5">Legenda (opcional)</label>
                       <input name="caption" placeholder="Uma frase..." maxLength={150}
-                        className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
+                        className="w-full rounded-lg border border-line px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all" />
                     </div>
                     <button type="submit" disabled={storyPending}
-                      className="rounded-lg bg-coral px-5 py-2.5 text-base font-semibold text-white hover:brightness-110 active:scale-[0.97] transition disabled:opacity-50">
+                      className="rounded-lg bg-rose px-5 py-2.5 text-base font-semibold text-white hover:brightness-110 active:scale-[0.97] transition disabled:opacity-50">
                       Publicar (24h)
                     </button>
                   </form>

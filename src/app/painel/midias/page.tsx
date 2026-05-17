@@ -47,7 +47,7 @@ export default async function PainelMidiasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Mídias</h1>
-        <p className="mt-1 text-md text-muted">
+        <p className="mt-1 text-md text-ink-dim">
           Gerencie suas fotos, vídeos e reels. A primeira foto pública é a foto de perfil do anúncio.
         </p>
       </div>
