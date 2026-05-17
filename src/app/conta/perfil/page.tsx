@@ -1,5 +1,5 @@
 /**
- * Página RSC — Perfil do cliente logado (favoritos, assinatura, dados).
+ * Página RSC — Perfil do cliente logado — Design System v2 (Tahoe Sensual).
  *
  * Rota: `/conta/perfil`.
  * Tipo: Server Component.
@@ -7,19 +7,24 @@
  *  redirecionado para `/painel`).
  * Cache: `force-dynamic` (lê `auth()` + favoritos + assinatura).
  *
- * Header com avatar e dados, banner de assinatura, stats e lista de
- * `Favorite`s ativos do cliente.
+ * Steering: `.kiro/steering/design-system.md` §5.1 (max-w-4xl reading), §6.
+ *
+ * Estrutura:
+ *  1. Header com avatar + dados + ações (Editar / Sair).
+ *  2. Banner de assinatura (Card variant `success-subtle` quando ativo
+ *     ou `solid` com CTA Assinar quando não).
+ *  3. KPIs: Curtidos / Cidades / Inativos (StatCards 3-col).
+ *  4. Seção "Curtidos" com lista de favoritos.
  *
  * Cross-refs:
- * - src/app/_actions/favorites.ts (getClientFavorites)
- * - src/lib/services/subscription.service.ts (isSubscriber)
- * - src/app/conta/perfil/favorites-list.tsx
- * - src/app/conta/perfil/client-avatar-upload.tsx
- * - src/app/conta/perfil/client-profile-edit.tsx
+ *  - src/app/_actions/favorites.ts (getClientFavorites)
+ *  - src/lib/services/subscription.service.ts (isSubscriber)
+ *  - src/app/conta/perfil/favorites-list.tsx
+ *  - src/app/conta/perfil/client-avatar-upload.tsx
+ *  - src/app/conta/perfil/client-profile-edit.tsx
  */
 import { redirect } from "next/navigation";
-import { Heart, LogOut, Crown, Lock, Eye, Calendar } from "lucide-react";
-import Link from "next/link";
+import { Heart, LogOut, Crown, Lock, Eye, Calendar, MapPin } from "lucide-react";
 import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -31,6 +36,7 @@ import { ClientAvatarUpload } from "./client-avatar-upload";
 import { ClientProfileEdit } from "./client-profile-edit";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/ui/stat-card";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 21 (perfil do cliente logado).
@@ -69,7 +75,10 @@ export default async function ClientPerfilPage() {
   const handle = user?.slug ?? null;
   const activeSub = user?.subscriptions?.[0] ?? null;
   const memberSince = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+    ? new Date(user.createdAt).toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+    })
     : null;
 
   const favoritesForClient = active.map((f) => ({
@@ -92,104 +101,125 @@ export default async function ClientPerfilPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-
-        {/* ── Profile Header ── */}
-        <Card variant="solid" padding="lg" className="relative overflow-hidden">
+        {/* ── Header card ──────────────────────────────────────────── */}
+        <Card variant="solid" padding="lg">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-            {/* Avatar */}
-            <ClientAvatarUpload currentImage={user?.image ?? null} userName={user?.name ?? null} />
+            <ClientAvatarUpload
+              currentImage={user?.image ?? null}
+              userName={user?.name ?? null}
+            />
 
-            {/* Info */}
             <div className="flex-1 text-center sm:text-left">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-                <h1 className="text-3xl font-semibold tracking-tight">
+              <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <h1 className="text-3xl font-bold tracking-[-0.022em] text-ink">
                   {user?.name ?? "Usuário"}
                 </h1>
-                {subscribed && <Badge variant="coral">Assinante</Badge>}
+                {subscribed && (
+                  <Badge variant="rose" className="text-2xs">
+                    <Crown className="h-3 w-3" strokeWidth={2.4} />
+                    Assinante
+                  </Badge>
+                )}
               </div>
               {handle && (
-                <p className="mt-0.5 text-base text-muted">@{handle}</p>
+                <p className="mt-0.5 text-base text-ink-dim">@{handle}</p>
               )}
-              <p className="mt-0.5 text-base text-muted">{session.user.email}</p>
+              <p className="mt-0.5 text-base text-ink-dim">
+                {session.user.email}
+              </p>
               {memberSince && (
-                <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-muted sm:justify-start">
-                  <Calendar className="h-3 w-3" strokeWidth={1.5} />
+                <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-ink-dim sm:justify-start">
+                  <Calendar className="h-3 w-3" strokeWidth={2} />
                   Membro desde {memberSince}
                 </p>
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
               <ClientProfileEdit
                 currentName={user?.name ?? ""}
                 currentSlug={handle ?? ""}
               />
-              <form action={async () => { "use server"; await signOut({ redirectTo: "/entrar" }); }}>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
-                >
-                  <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <form
+                action={async () => {
+                  "use server";
+                  await signOut({ redirectTo: "/entrar" });
+                }}
+              >
+                <Button variant="outline" size="sm" type="submit">
+                  <LogOut className="h-3.5 w-3.5" strokeWidth={2} />
                   Sair
-                </button>
+                </Button>
               </form>
             </div>
           </div>
         </Card>
 
-        {/* ── Subscription status ── */}
+        {/* ── Subscription banner ─────────────────────────────────── */}
         {subscribed && activeSub ? (
-          <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-black/[0.06] bg-white px-5 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-success-dark">
-              <Crown className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+          <Card
+            variant="success-subtle"
+            padding="md"
+            className="mt-4 flex items-center justify-between gap-4"
+          >
+            <div className="flex items-center gap-2 text-success">
+              <Crown className="h-4 w-4 shrink-0" strokeWidth={2.4} />
               <span className="text-base font-semibold">Assinante ativo</span>
             </div>
-            <span className="text-sm text-muted">
+            <span className="text-sm text-ink-dim">
               Renova em{" "}
-              {new Date(activeSub.expiresAt).toLocaleDateString("pt-BR", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
+              <span className="tabular-nums">
+                {new Date(activeSub.expiresAt).toLocaleDateString("pt-BR", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
             </span>
-          </div>
+          </Card>
         ) : (
-          <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-black/[0.06] bg-white px-5 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-muted">
-              <Lock className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-              <span className="text-base">Sem assinatura — fotos privadas e avaliações bloqueadas</span>
+          <Card
+            variant="solid"
+            padding="md"
+            className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-center gap-2 text-ink-dim">
+              <Lock className="h-4 w-4 shrink-0" strokeWidth={2} />
+              <span className="text-base">
+                Sem assinatura — fotos privadas e avaliações bloqueadas
+              </span>
             </div>
-            <Link
-              href="/assinar"
-              className="shrink-0 rounded-full bg-coral px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
-            >
+            <Button href="/assinar" variant="primary" size="sm" className="shrink-0">
               Assinar
-            </Link>
-          </div>
+            </Button>
+          </Card>
         )}
 
-        {/* ── Stats row ── */}
+        {/* ── Stats ────────────────────────────────────────────────── */}
         <div className="mt-6 grid grid-cols-3 gap-3">
           <StatCard label="Curtidos" value={active.length} icon={Heart} />
-          <StatCard label="Cidades" value={cities.length} icon={Eye} />
-          <StatCard label="Inativos" value={inactive} />
+          <StatCard label="Cidades" value={cities.length} icon={MapPin} />
+          <StatCard label="Inativos" value={inactive} icon={Eye} />
         </div>
 
-        {/* ── Favorites section ── */}
+        {/* ── Favoritos ────────────────────────────────────────────── */}
         <section className="mt-10">
-          <div className="flex items-center gap-2 mb-5">
-            <Heart className="h-4 w-4 fill-coral text-coral" strokeWidth={0} />
-            <h2 className="text-sm font-semibold">
-              Curtidos · {active.length}
+          <div className="mb-5 flex items-center gap-2">
+            <Heart className="h-4 w-4 fill-rose text-rose" strokeWidth={0} />
+            <h2 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+              Curtidos · <span className="tabular-nums text-ink">{active.length}</span>
             </h2>
           </div>
 
           <FavoritesList favorites={favoritesForClient} />
 
           {inactive > 0 && (
-            <p className="mt-4 text-xs text-muted">
-              {inactive} perfil{inactive > 1 ? "s" : ""} curtido{inactive > 1 ? "s" : ""} não está{inactive > 1 ? "ão" : ""} mais disponível{inactive > 1 ? "is" : ""}.
+            <p className="mt-4 text-xs text-ink-dim">
+              <span className="tabular-nums">{inactive}</span>{" "}
+              perfil{inactive > 1 ? "s" : ""} curtido
+              {inactive > 1 ? "s" : ""} não está
+              {inactive > 1 ? "ão" : ""} mais disponível
+              {inactive > 1 ? "is" : ""}.
             </p>
           )}
         </section>

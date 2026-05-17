@@ -10,6 +10,15 @@ interface ClientAvatarUploadProps {
     userName: string | null;
 }
 
+/**
+ * ClientAvatarUpload — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/conta/perfil/client-avatar-upload.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.
+ *
+ * Avatar XL com hover-overlay de câmera + spinner durante upload. Usa
+ * `<Avatar>` primitivo com `ringColor="rose"`.
+ */
 export function ClientAvatarUpload({ currentImage, userName }: ClientAvatarUploadProps) {
     const [preview, setPreview] = useState<string | null>(currentImage);
     const [isPending, startTransition] = useTransition();
@@ -34,22 +43,23 @@ export function ClientAvatarUpload({ currentImage, userName }: ClientAvatarUploa
     }
 
     return (
-        <div className="relative group">
+        <div className="group relative">
             <Avatar
                 src={preview}
                 alt={userName ?? "Perfil"}
                 fallback={userName ?? undefined}
                 size="xl"
                 ring
-                ringColor="coral"
+                ringColor="rose"
             />
             <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
                 disabled={isPending}
-                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/40 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50 focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-label="Alterar avatar"
             >
-                <Camera className="h-5 w-5 text-white" strokeWidth={1.5} />
+                <Camera className="h-5 w-5 text-white" strokeWidth={2} />
             </button>
             <input
                 ref={inputRef}
@@ -60,7 +70,7 @@ export function ClientAvatarUpload({ currentImage, userName }: ClientAvatarUploa
             />
             {isPending && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-white/60">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-coral border-t-transparent" />
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-rose border-t-transparent" />
                 </div>
             )}
         </div>

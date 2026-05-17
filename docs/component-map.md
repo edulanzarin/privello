@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (slug refeito completo: cards Tahoe + selos + price-tag primitives)
+**Última atualização**: 2026-05-17 (slug refeito + /conta/perfil migrada)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -207,7 +207,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Status v2 |
 |------|-----------|
-| `/conta/perfil` | 🔴 |
+| `/conta/perfil` | 🟢 |
 | `/conta/onboarding/perfil` | 🔴 |
 | `/conta/onboarding/fotos` | 🔴 |
 | `/conta/onboarding/valores` | 🔴 |
@@ -279,9 +279,9 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 Ordem por impacto + dependência:
 
 1. ~~**`/p/[slug]`**~~ ✅ done
-2. ~~**`MediaGallery` + `media-lightbox` + `photo-carousel`**~~ ✅ done (gallery + lightbox migrados; photo-carousel removido por ausência de consumidores)
-3. **`favorites-list.tsx` + `client-profile-edit.tsx`** — area `/conta/perfil` (cliente logado)
-4. `/em-alta`, `/em-destaque`, `/novidades` — variações de listagem (reusam ProfileCard)
+2. ~~**`MediaGallery` + `media-lightbox` + `photo-carousel`**~~ ✅ done
+3. ~~**`favorites-list.tsx` + `client-profile-edit.tsx` + `/conta/perfil`**~~ ✅ done
+4. **`/em-alta`, `/em-destaque`, `/novidades`** — variações de listagem (reusam ProfileCard)
 5. `/entrar` + `/cadastro/**` — auth (forms padronizados com `Section`+`SwitchRow`)
 6. `/planos` — pricing page (visual editorial)
 7. `/conta/onboarding/**` + `/conta/verificacao` — onboarding cliente

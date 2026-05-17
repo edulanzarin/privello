@@ -13,6 +13,20 @@ interface ClientProfileEditProps {
     currentSlug: string;
 }
 
+/**
+ * ClientProfileEdit — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/conta/perfil/client-profile-edit.tsx
+ * Steering: `.kiro/steering/design-system.md` §6, §13.
+ *
+ * Modal de edição de nome e @ do cliente. Bottom-sheet em mobile,
+ * center em desktop. Trigger é `<Button variant="outline" size="sm">`
+ * com ícone Settings.
+ *
+ * Side effects:
+ *  - Server actions `updateClientNameAction` / `updateClientSlugAction`.
+ *  - `useTransition` pra estado de loading nos botões Salvar.
+ */
 export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEditProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState(currentName);
@@ -20,7 +34,6 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
-    // fase-6: bottom-sheet em mobile (≤ 640px), center em desktop. Cf. mockups-diff.md > §Bottom-sheet decisões.
     const isMobile = useMediaQuery("(max-width: 640px)");
 
     function handleSaveName() {
@@ -49,14 +62,14 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
 
     if (!open) {
         return (
-            <button
-                type="button"
+            <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/30 bg-white/60 px-3 py-2 text-xs font-medium text-muted backdrop-blur-sm transition hover:bg-white/90 hover:text-foreground"
             >
-                <Settings className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <Settings className="h-3.5 w-3.5" strokeWidth={2} />
                 Editar
-            </button>
+            </Button>
         );
     }
 
@@ -65,23 +78,29 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
             open={open}
             onClose={() => setOpen(false)}
             position={isMobile ? "bottom" : "center"}
-            className="w-full max-w-md rounded-2xl border border-white/30 bg-white/90 p-6 shadow-2xl backdrop-blur-xl animate-fade-in"
+            className="w-full max-w-md rounded-2xl border border-line bg-white p-6 shadow-[var(--shadow-lg)] animate-fade-in"
         >
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Editar perfil</h2>
-                <button onClick={() => setOpen(false)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-full p-1.5 hover:bg-line transition" aria-label="Fechar">
-                    <X className="h-4 w-4" strokeWidth={1.5} />
+            <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-lg font-bold tracking-[-0.015em] text-ink">
+                    Editar perfil
+                </h2>
+                <button
+                    onClick={() => setOpen(false)}
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-ink-dim transition-colors hover:bg-line/40 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    aria-label="Fechar"
+                >
+                    <X className="h-4 w-4" strokeWidth={2} />
                 </button>
             </div>
 
             {error && (
-                <div className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
+                <div className="mb-4 rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger">
                     {error}
                 </div>
             )}
             {success && (
-                <div className="mb-4 rounded-xl bg-success/10 px-4 py-3 text-sm text-success flex items-center gap-2">
-                    <Check className="h-4 w-4" strokeWidth={2} />
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-success/30 bg-success-soft px-4 py-3 text-sm text-success">
+                    <Check className="h-4 w-4" strokeWidth={2.4} />
                     {success}
                 </div>
             )}
@@ -97,7 +116,7 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
                         placeholder="Seu nome"
                     />
                     <Button
-                        variant="secondary"
+                        variant="primary"
                         size="sm"
                         onClick={handleSaveName}
                         loading={isPending}
@@ -110,15 +129,17 @@ export function ClientProfileEdit({ currentName, currentSlug }: ClientProfileEdi
                 {/* @ */}
                 <div>
                     <Input
-                        label="@"
-                        hint="Só pode alterar 1x por mês"
+                        label="@perfil"
+                        hint="Só pode alterar 1× por mês"
                         prefix="@"
                         value={slug}
-                        onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                        placeholder="seu-handle"
+                        onChange={(e) =>
+                            setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+                        }
+                        placeholder="seu-perfil"
                     />
                     <Button
-                        variant="secondary"
+                        variant="primary"
                         size="sm"
                         onClick={handleSaveSlug}
                         loading={isPending}
