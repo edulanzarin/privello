@@ -56,8 +56,10 @@ import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { ShareButton } from "@/components/profile/share-button";
 import { WhatsAppButton } from "@/components/profile/whatsapp-button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PriceTag } from "@/components/ui/price-tag";
+import { RatingStars } from "@/components/ui/rating-stars";
 import { SealsList } from "@/components/ui/seals-list";
 import { formatBrl } from "@/lib/money";
 import {
@@ -418,19 +420,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   {!ownerView ? (
                     <>
                       <div className="mt-5 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:max-w-none">
-                        <Link
+                        <Button
                           href={`/solicitar/${profile.slug}`}
-                          className={cn(
-                            "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-semibold text-white",
-                            "bg-rose shadow-[var(--shadow-sm)]",
-                            "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
-                            "hover:brightness-105 active:brightness-95",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                          )}
+                          variant="primary"
+                          size="lg"
+                          className="w-full"
                         >
                           <CalendarClock className="h-4 w-4" strokeWidth={2} />
                           Marcar horário
-                        </Link>
+                        </Button>
                         <WhatsAppButton
                           phone={profile.whatsappPhone}
                           profileId={profile.id}
@@ -453,18 +451,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </>
                   ) : (
                     <div className="mt-5 flex flex-wrap gap-2.5">
-                      <Link
+                      <Button
                         href="/painel/perfil"
-                        className={cn(
-                          "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-2.5 text-base font-medium text-ink",
-                          "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
-                          "hover:bg-line/30",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                        )}
+                        variant="outline"
+                        size="lg"
                       >
                         <Pencil className="h-4 w-4" strokeWidth={2} />
                         Editar perfil
-                      </Link>
+                      </Button>
                       <ShareButton
                         displayName={profile.displayName}
                         slug={profile.slug}
@@ -641,19 +635,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 </ul>
                 {!ownerView && (
                   <div className="mt-6 space-y-3">
-                    <Link
+                    <Button
                       href={`/solicitar/${profile.slug}`}
-                      className={cn(
-                        "flex w-full items-center justify-center gap-2 rounded-xl py-3 text-md font-semibold text-white",
-                        "bg-rose shadow-[var(--shadow-sm)]",
-                        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.98]",
-                        "hover:brightness-105",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      )}
+                      variant="primary"
+                      size="lg"
+                      className="w-full"
                     >
                       <CalendarClock className="h-4 w-4" strokeWidth={2} />
                       Montar horário · WhatsApp
-                    </Link>
+                    </Button>
                     <p className="text-center text-sm leading-relaxed text-ink-dim">
                       Escolha dia, horário e duração. Abrimos o WhatsApp com
                       texto pronto, sem intermediários.
@@ -686,17 +676,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 </h2>
                 {isClientUser && !ownerView && (
                   isSubscriberViewer ? (
-                    <Link
+                    <Button
                       href={`/avaliar/${profile.slug}`}
-                      className={cn(
-                        "shrink-0 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-line bg-white px-4 py-2 text-base font-semibold text-ink",
-                        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
-                        "hover:bg-line/30",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      )}
+                      variant="outline"
+                      size="md"
+                      className="shrink-0"
                     >
                       {userReview ? "Editar avaliação" : "Avaliar"}
-                    </Link>
+                    </Button>
                   ) : (
                     <Link
                       href={`/assinar?from=/p/${profile.slug}`}
@@ -725,12 +712,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                             {r.user.slug ? `@${r.user.slug}` : r.user.name}
                           </p>
                           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-dim">
-                            <span className="text-cream">
-                              {"★".repeat(r.rating)}
-                              <span className="text-line">
-                                {"★".repeat(5 - r.rating)}
-                              </span>
-                            </span>
+                            <RatingStars value={r.rating} size="xs" />
                             <span className="tabular-nums">
                               {r.createdAt.toLocaleDateString("pt-BR")}
                             </span>

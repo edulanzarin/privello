@@ -291,6 +291,7 @@ Antes de criar componente novo, **leia esta tabela**:
 | Tem tile de KPI? | Use `<KPICard>` |
 | Tem lista de selos/atributos sobre uma entidade? | Use `<SealsList>` |
 | Tem exibição de preço (R$ X / período)? | Use `<PriceTag>` |
+| Tem exibição de avaliação por estrelas? | Use `<RatingStars>` |
 | Tem fallback de lista vazia? | Use `<EmptyState>` |
 | Tem foto de perfil em listagem? | Use `<ProfileCard>` (pra criar) |
 | Tem story circle? | Use `<StoryCircle>` |
@@ -310,7 +311,9 @@ Todo componente segue:
 
 ### 6.3 Variantes essenciais por componente
 
-**Button:** `primary` (rose), `secondary` (glass outline), `ghost` (sem fundo), `danger`, `whatsapp`. Sizes `sm`/`md`/`lg`.
+**Button:** `primary` (rose), `secondary` (glass outline), `ghost`, `danger`, `whatsapp`, `outline` (white card + line border). Sizes `sm`/`md`/`lg`.
+
+**Polimorfismo do Button:** passa `href` pra renderizar como `<Link>` do `next/link`. Substitui o anti-padrão antigo de `<Link className="..."` com classes copiadas. Use sempre que tiver um CTA que navega — não escreva markup manual.
 **Card:** `glass` (default agora), `solid` (off-white opaco), `success-subtle`, `warning-subtle`, `danger-subtle`. Padding `none`/`sm`/`md`/`lg`.
 **Badge:** `default`, `rose` (primário), `success`, `warning`, `muted`, `info`, `danger`, `premium` (plum), `boost` (peach), `verified` (cream).
 

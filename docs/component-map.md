@@ -38,7 +38,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 |------------|---------|-----------|--------------------|------------------|
 | Avatar | `ui/avatar.tsx` | 🟢 | `sm`/`md`/`lg`/`xl` | Headers, listas, comments |
 | Badge | `ui/badge.tsx` | 🟢 | `default`, `rose`, `success`, `warning`, `muted`, `info`, `danger`, `premium`, `boost`, `verified` | Status pills (online, verificada, plano) |
-| Button | `ui/button.tsx` | 🟢 | `primary` (rose), `secondary` (glass outline), `ghost`, `danger`, `whatsapp` × `sm`/`md`/`lg` | Toda CTA |
+| Button | `ui/button.tsx` | 🟢 | `primary` (rose), `secondary` (glass outline), `ghost`, `danger`, `whatsapp`, `outline` × `sm`/`md`/`lg`. Polimórfico — passa `href` pra render como `<Link>`. | Toda CTA |
 | Card | `ui/card.tsx` | 🟢 | `glass`, `solid`, `success-subtle`, `warning-subtle`, `danger-subtle` × padding `none`/`sm`/`md`/`lg` | Áreas de conteúdo |
 | Dropdown | `ui/dropdown.tsx` | 🟢 | menus contextuais | City switcher, sort, ações inline |
 | EmptyState | `ui/empty-state.tsx` | 🟢 | `default`, ícone customizável | Listas vazias |
@@ -53,6 +53,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | 🆕 StoryCircle | `ui/story-circle.tsx` | 🟢 | `sm` (48), `md` (62), `lg` (96), `xl` (160/192) | StoryBar, futuras listagens de stories |
 | 🆕 SealsList | `ui/seals-list.tsx` | 🟢 | lista hairline `divide-line` | /p/[slug] (selos verificada/membro/views), reusable em qualquer entidade |
 | 🆕 PriceTag | `ui/price-tag.tsx` | 🟢 | `hero`/`card`/`inline`/`compact` × `rose`/`ink` | /p/[slug] hero, ProfileCard, ProfileListRow, futuras listagens |
+| 🆕 RatingStars | `ui/rating-stars.tsx` | 🟢 | `xs`/`sm`/`md`, value 0–5 | Reviews em /p/[slug] e futuro /avaliar/[slug] e admin |
 | Switch | `ui/switch.tsx` | 🟢 | macOS toggle (bolinha) | Filtros, configurações |
 | Table | `ui/table.tsx` | 🟢 | `Table`/`THead`/`TR`/`TH`/`TD` | Admin, financeiro |
 | Tabs | `ui/tabs.tsx` | 🟢 | `pills`, `underline` | Navegação interna |
