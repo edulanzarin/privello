@@ -367,7 +367,7 @@ function PostModal({
         </div>
 
         {/* ── Info + Comments ────────────────────────────────────── */}
-        <div className="flex w-full flex-col bg-white sm:w-[360px] sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-line">
+        <div className="flex w-full flex-1 flex-col bg-white sm:w-[360px] sm:flex-none sm:shrink-0 sm:overflow-hidden sm:border-l sm:border-line">
           <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:shrink-0">
             <div className="min-w-0 flex-1">
               <Link
