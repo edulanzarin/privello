@@ -69,8 +69,8 @@ export function PerfilForm({ profile, cityName, citySlug }: Props) {
     });
   }
 
-  const inputCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
-  const selectCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer";
+  const inputCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
+  const selectCls = "w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all cursor-pointer";
   const labelCls = "block text-base font-medium text-foreground mb-1.5";
   const sectionCls = "space-y-2";
 

@@ -9,16 +9,26 @@
  * Lista os tickets `OPEN`/`IN_PROGRESS` ordenados pelo mais antigo (FIFO) e
  * mostra os 20 últimos `CLOSED` em uma seção secundária.
  *
+ * Migração para o design system (redesign-macos-system, Requirement 10.5):
+ * - status agora é renderizado via `<Badge variant={statusToBadgeVariant(...)}>`
+ *   (substitui mapa `statusClass` com cores cruas de paleta sky/amber/zinc).
+ * - containers de seção usam `<Card variant="solid" padding="none">`
+ *   (substitui `rounded border border-line bg-white shadow-sm` cru).
+ *
  * Cross-refs:
  * - src/app/admin/layout.tsx
  * - src/components/admin/admin-shell.tsx
  * - src/app/admin/suporte/[id]/page.tsx
+ * - src/lib/ui/status.ts — `statusToBadgeVariant`.
  */
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { statusToBadgeVariant } from "@/lib/ui/status";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 41 (admin lista tickets).
 export const dynamic = "force-dynamic";
@@ -27,11 +37,6 @@ const statusLabel: Record<string, string> = {
   OPEN: "Aberto",
   IN_PROGRESS: "Em andamento",
   CLOSED: "Fechado",
-};
-const statusClass: Record<string, string> = {
-  OPEN: "bg-sky-100 text-sky-900",
-  IN_PROGRESS: "bg-amber-100 text-amber-900",
-  CLOSED: "bg-zinc-100 text-zinc-600",
 };
 
 export default async function AdminSuportePage() {
@@ -60,15 +65,15 @@ export default async function AdminSuportePage() {
     return (
       <Link
         href={`/admin/suporte/${t.id}`}
-        className={`flex items-start gap-3 border-b border-line px-4 py-3.5 hover:bg-line/40 transition ${dim ? "opacity-60" : ""}`}
+        className={`flex items-start gap-3 border-b border-line last:border-0 px-4 py-3.5 hover:bg-line/40 transition ${dim ? "opacity-60" : ""}`}
       >
         <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold truncate">{t.subject}</p>
-            <span className={`shrink-0 rounded px-1.5 py-0.5 text-2xs font-bold uppercase ${statusClass[t.status]}`}>
-              {statusLabel[t.status]}
-            </span>
+            <Badge variant={statusToBadgeVariant(t.status)} className="shrink-0 uppercase text-2xs">
+              {statusLabel[t.status] ?? t.status}
+            </Badge>
           </div>
           <p className="text-xs text-muted">{t.user.name} · {t.user.email}</p>
           {last && (
@@ -86,7 +91,7 @@ export default async function AdminSuportePage() {
     <AdminShell>
       <h1 className="mb-4 font-bold text-lg">Suporte</h1>
 
-      <div className="rounded border border-line bg-white shadow-sm">
+      <Card variant="solid" padding="none" className="overflow-hidden">
         <div className="border-b border-line px-4 py-3">
           <p className="text-xs font-bold uppercase tracking-wider text-muted">
             Abertos e em andamento ({tickets.length})
@@ -99,15 +104,15 @@ export default async function AdminSuportePage() {
         ) : (
           tickets.map((t) => <TicketRow key={t.id} t={t} />)
         )}
-      </div>
+      </Card>
 
       {closed.length > 0 && (
-        <div className="mt-4 rounded border border-line bg-white shadow-sm">
+        <Card variant="solid" padding="none" className="mt-4 overflow-hidden">
           <div className="border-b border-line px-4 py-3">
             <p className="text-xs font-bold uppercase tracking-wider text-muted">Fechados recentes</p>
           </div>
           {closed.map((t) => <TicketRow key={t.id} t={t as typeof tickets[number]} dim />)}
-        </div>
+        </Card>
       )}
     </AdminShell>
   );

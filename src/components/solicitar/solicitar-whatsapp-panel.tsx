@@ -126,7 +126,7 @@ export function SolicitarWhatsAppPanel({ profile, summary }: { profile: ProfileB
         rows={3}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        className="mt-2 w-full rounded-lg border border-black/10 bg-white p-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none"
+        className="mt-2 w-full rounded-lg border border-black/10 bg-white p-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         placeholder="Ex.: primeira vez, preferência de roupa, chegada discreta…"
       />
 

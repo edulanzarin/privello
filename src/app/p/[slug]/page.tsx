@@ -156,7 +156,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
   const planBadge = isBoosted
-    ? { bg: "bg-orange-500", label: "BOOST" }
+    ? { bg: "bg-coral", label: "BOOST" }
     : (PLAN_BADGE[profile.planTier] ?? PLAN_BADGE.ESSENCIAL);
 
   // Verification seals

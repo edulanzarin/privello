@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { registerClientAction } from "@/app/_actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export function ClientRegisterForm() {
   const [error, setError] = useState<string | null>(null);
@@ -35,9 +36,9 @@ export function ClientRegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       {error && (
-        <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-base text-danger">
+        <Card variant="danger-subtle" padding="sm" className="text-base text-danger">
           {error}
-        </div>
+        </Card>
       )}
 
       <Input

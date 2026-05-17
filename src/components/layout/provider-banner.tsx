@@ -40,8 +40,8 @@ export function ProviderBanner({ variant }: Props) {
 
   if (variant === "other-profile") {
     return (
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 text-xs text-amber-700">
+      <div className="border-b border-warning/30 bg-warning-soft px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 text-xs text-warning-dark">
           <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
           <span>Você está navegando como acompanhante — curtidas, contato e visualizações não estão disponíveis.</span>
         </div>
@@ -51,8 +51,8 @@ export function ProviderBanner({ variant }: Props) {
 
   if (variant === "search") {
     return (
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5">
-        <div className="mx-auto flex max-w-6xl items-center gap-2 text-xs text-amber-700">
+      <div className="border-b border-warning/30 bg-warning-soft px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 text-xs text-warning-dark">
           <Eye className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
           <span>Você está navegando como acompanhante — visualizações de outros perfis não são contadas.</span>
         </div>

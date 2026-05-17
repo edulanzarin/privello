@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "check:no-raw-palette": "node scripts/check-no-raw-palette.mjs",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:run": "vitest --run --reporter=verbose",

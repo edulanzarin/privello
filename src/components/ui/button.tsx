@@ -3,6 +3,25 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Primitivo `Button` do design system (macOS Sonoma-inspired).
+ *
+ * Caminho: src/components/ui/button.tsx
+ *
+ * Variantes: `primary` (azul), `secondary` (branco hairline), `ghost`
+ * (transparente), `danger` (vermelho) e `coral` (accent da marca).
+ * Tamanhos: `sm | md | lg` controlam padding, font-size e gap interno.
+ *
+ * Touch target ≥ 44×44 (Requirement 12.1):
+ * - As classes base aplicam `min-h-[44px] min-w-[44px]` em todas as variantes
+ *   e tamanhos. O `inline-flex items-center justify-center` mantém o conteúdo
+ *   visualmente compacto enquanto o hit area atende WCAG 2.5.5.
+ *
+ * Cross-refs:
+ * - .kiro/specs/redesign-macos-system/requirements.md — Requirement 12.1.
+ * - .kiro/specs/redesign-macos-system/design.md — Property 1.
+ */
+
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "coral";
 type ButtonSize = "sm" | "md" | "lg";
 
@@ -38,7 +57,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 disabled={disabled || loading}
                 className={cn(
-                    "inline-flex items-center justify-center font-medium transition-all duration-150",
+                    "inline-flex min-h-[44px] min-w-[44px] items-center justify-center font-medium transition-all duration-150",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     "disabled:pointer-events-none disabled:opacity-40",
                     variantStyles[variant],
                     sizeStyles[size],

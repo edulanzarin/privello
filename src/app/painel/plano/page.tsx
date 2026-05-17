@@ -18,6 +18,7 @@ import { redirect } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Card } from "@/components/ui/card";
 import { UpgradeButton, BoostButton, FreeBoostButton } from "./upgrade-button";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 33 (gestão de plano e boost).
@@ -71,10 +72,10 @@ export default async function PainelPlanoPage() {
             </span>
           </p>
         ) : (
-          <div className="mt-2 flex items-center gap-2 rounded-xl border border-amber-200/60 bg-amber-50 px-4 py-3">
-            <span className="h-2 w-2 rounded-full bg-amber-400 shrink-0" />
-            <p className="text-base text-amber-800 font-medium">Nenhum plano ativo — você não aparece nas buscas.</p>
-          </div>
+          <Card variant="warning-subtle" padding="none" className="mt-2 flex items-center gap-2 px-4 py-3">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-warning" />
+            <p className="text-base font-medium text-warning-dark">Nenhum plano ativo — você não aparece nas buscas.</p>
+          </Card>
         )}
       </div>
 

@@ -392,7 +392,7 @@ function PostModal({
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && postComment()}
                 placeholder="Adicione um comentário…"
                 maxLength={500}
-                className="flex-1 text-md outline-none placeholder:text-muted/60"
+                className="flex-1 text-md outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-muted/60"
               />
               <button onClick={postComment} disabled={!commentText.trim() || posting} className="text-base font-semibold text-blue disabled:opacity-30 transition-opacity">
                 Publicar

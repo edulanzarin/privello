@@ -50,12 +50,11 @@ export default async function PainelLayout({ children }: { children: React.React
           hasPlan={hasPlan}
           handle={profile.slug || undefined}
           avatarUrl={profile.media[0]?.url ?? null}
-        />
-        <div className="pt-14 md:pl-56 md:pt-0">
+        >
           <div className="px-4 py-8 pb-20 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-5xl">{children}</div>
           </div>
-        </div>
+        </PainelSidebar>
       </div>
     </ToastProvider>
   );

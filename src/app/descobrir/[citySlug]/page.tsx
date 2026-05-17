@@ -237,7 +237,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
                   name="q"
                   defaultValue={filters.search ?? ""}
                   placeholder="Nome ou @handle…"
-                  className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+                  className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
                 />
                 <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
                   Ir

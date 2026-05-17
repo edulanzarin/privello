@@ -150,7 +150,10 @@ export function DropdownTrigger({
             aria-haspopup="menu"
             aria-expanded={open}
             onClick={handleClick}
-            className={className}
+            className={cn(
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                className,
+            )}
         >
             {children}
         </button>
@@ -268,6 +271,7 @@ export function DropdownItem({
             onClick={onClick}
             className={cn(
                 "flex w-full items-center px-3 py-2 text-left text-sm transition-colors outline-none",
+                "focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 disabled && "pointer-events-none opacity-40",
                 !disabled && variantClasses[variant],
                 className,

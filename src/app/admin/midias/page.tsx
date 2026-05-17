@@ -9,10 +9,15 @@
  * Listagem em grid/list de todas as mídias da plataforma com filtros por
  * tipo, visibilidade, ordenação e ações rápidas (toggle visibilidade, deletar).
  *
+ * Migrada para os primitivos do design system (Tabs, Table, Badge) conforme
+ * spec `redesign-macos-system` Requirement 10.3 / Task 14.1: zero classes
+ * Tailwind cruas de paleta (zinc/emerald/etc.) na superfície da página.
+ *
  * Cross-refs:
  * - src/app/admin/layout.tsx
  * - src/components/admin/admin-shell.tsx
  * - src/components/admin/media-actions.tsx
+ * - src/components/ui/{table,badge,tabs}.tsx
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +26,18 @@ import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { MediaDeleteBtn, MediaVisibilityBtn } from "@/components/admin/media-actions";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Heart, MessageCircle, Lock, Star, Play, LayoutGrid, List, Eye } from "lucide-react";
+import { Table, THead, TR, TH, TD } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Tabs } from "@/components/ui/tabs";
+import {
+  Heart,
+  MessageCircle,
+  Lock,
+  Star,
+  Play,
+  Eye,
+  BadgeCheck,
+} from "lucide-react";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 38 (admin moderação de mídias).
 export const dynamic = "force-dynamic";
@@ -107,6 +123,13 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
     return `/admin/midias?${p.toString()}`;
   }
 
+  // Tabs do view toggle (grid/list) — primitivo Tabs com modo Link via `href`.
+  const viewTabs = [
+    { key: "grid", label: "Grade", href: href({ view: "grid", p: "1" }) },
+    { key: "list", label: "Lista", href: href({ view: "list", p: "1" }) },
+  ];
+  const activeViewKey = viewMode === "list" ? "list" : "grid";
+
   return (
     <AdminShell>
       {/* Header */}
@@ -114,15 +137,13 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h1 className="font-bold text-lg">Mídias <span className="text-muted font-normal text-sm">({total.toLocaleString("pt-BR")})</span></h1>
 
-          {/* View toggle */}
-          <div className="flex items-center gap-1 border border-line">
-            <Link href={href({ view: "grid", p: "1" })} className={`p-2 transition ${viewMode !== "list" ? "bg-foreground text-white" : "text-muted hover:text-foreground"}`}>
-              <LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </Link>
-            <Link href={href({ view: "list", p: "1" })} className={`p-2 transition ${viewMode === "list" ? "bg-foreground text-white" : "text-muted hover:text-foreground"}`}>
-              <List className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </Link>
-          </div>
+          {/* View toggle (Tabs pills) */}
+          <Tabs
+            items={viewTabs}
+            activeKey={activeViewKey}
+            variant="pills"
+            size="sm"
+          />
         </div>
 
         {/* Stats bar */}
@@ -147,20 +168,20 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={q}
             placeholder="Perfil ou @handle…"
-            className="rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none w-44 hover:border-black/20 focus:border-blue transition-all"
+            className="rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background w-44 hover:border-black/20 focus:border-blue transition-all"
           />
-          <select name="type" defaultValue={typeF} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-blue transition-all">
+          <select name="type" defaultValue={typeF} className="rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue transition-all">
             <option value="">Todos os tipos</option>
             <option value="IMAGE">Foto</option>
             <option value="VIDEO">Vídeo</option>
             <option value="REEL">Reel</option>
           </select>
-          <select name="visib" defaultValue={visibF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <select name="visib" defaultValue={visibF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <option value="">Pública + Privada</option>
             <option value="public">Só públicas</option>
             <option value="private">Só privadas</option>
           </select>
-          <select name="sort" defaultValue={sortF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none">
+          <select name="sort" defaultValue={sortF} className="border border-line bg-white px-2.5 py-1.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <option value="newest">Mais recentes</option>
             <option value="oldest">Mais antigas</option>
             <option value="likes">Mais curtidas</option>
@@ -183,106 +204,118 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
         </div>
       ) : viewMode === "list" ? (
         /* ── LIST VIEW ── */
-        <div className="rounded border border-line bg-white shadow-sm overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line text-2xs font-bold uppercase tracking-wider text-muted bg-zinc-50">
-                <th className="px-3 py-2.5 w-16">Mídia</th>
-                <th className="px-3 py-2.5">Perfil</th>
-                <th className="px-3 py-2.5">Tipo</th>
-                <th className="px-3 py-2.5">Visibilidade</th>
-                <th className="px-3 py-2.5">Engajamento</th>
-                <th className="px-3 py-2.5">Data</th>
-                <th className="px-3 py-2.5 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {media.map((m) => {
-                const cover = m.profile.media[0]?.url;
-                return (
-                  <tr key={m.id} className="border-b border-line last:border-0 hover:bg-zinc-50/60 transition">
-                    {/* Thumbnail */}
-                    <td className="px-3 py-2">
-                      <div className="relative h-14 w-10 overflow-hidden bg-line flex-shrink-0 rounded">
-                        {m.mediaType !== "IMAGE" ? (
-                          <div className="flex h-full items-center justify-center bg-zinc-800 text-white/60">
-                            <Play className="h-4 w-4" strokeWidth={1.5} />
-                          </div>
-                        ) : (
-                          <Image src={m.url} alt="" fill sizes="40px" className="object-cover" />
-                        )}
-                        {!m.isPublic && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                            <Lock className="h-3.5 w-3.5 text-white" strokeWidth={2} />
-                          </div>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Profile */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className="relative h-7 w-6 overflow-hidden rounded bg-line flex-shrink-0">
-                          {cover && <Image src={cover} alt="" fill sizes="24px" className="object-cover" />}
+        <Table minWidth={720}>
+          <THead>
+            <tr>
+              <TH className="w-16">Mídia</TH>
+              <TH>Perfil</TH>
+              <TH>Tipo</TH>
+              <TH>Visibilidade</TH>
+              <TH>Engajamento</TH>
+              <TH>Data</TH>
+              <TH align="right">Ações</TH>
+            </tr>
+          </THead>
+          <tbody>
+            {media.map((m) => {
+              const cover = m.profile.media[0]?.url;
+              return (
+                <TR key={m.id}>
+                  {/* Thumbnail */}
+                  <TD>
+                    <div className="relative h-14 w-10 overflow-hidden bg-line flex-shrink-0 rounded">
+                      {m.mediaType !== "IMAGE" ? (
+                        <div className="flex h-full items-center justify-center bg-foreground text-white/60">
+                          <Play className="h-4 w-4" strokeWidth={1.5} />
                         </div>
-                        <div>
-                          <Link href={`/admin/perfis?q=${m.profile.slug}`} className="font-semibold text-xs hover:underline flex items-center gap-1">
-                            {m.profile.displayName}
-                            {m.profile.isVerified && <span className="text-2xs text-emerald-600 font-bold">✓</span>}
-                          </Link>
-                          <p className="text-2xs text-muted">@{m.profile.slug} · {m.profile.city.name}</p>
+                      ) : (
+                        <Image src={m.url} alt="" fill sizes="40px" className="object-cover" />
+                      )}
+                      {!m.isPublic && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                          <Lock className="h-3.5 w-3.5 text-white" strokeWidth={2} />
                         </div>
+                      )}
+                    </div>
+                  </TD>
+
+                  {/* Profile */}
+                  <TD>
+                    <div className="flex items-center gap-2">
+                      <div className="relative h-7 w-6 overflow-hidden rounded bg-line flex-shrink-0">
+                        {cover && <Image src={cover} alt="" fill sizes="24px" className="object-cover" />}
                       </div>
-                    </td>
-
-                    {/* Tipo */}
-                    <td className="px-3 py-2">
-                      <span className="text-2xs font-bold uppercase tracking-wider text-muted">
-                        {m.mediaType === "REEL" ? "🎬 Reel" : m.mediaType === "VIDEO" ? "📹 Vídeo" : "🖼 Foto"}
-                      </span>
-                      {m.isCover && <span className="ml-1 text-2xs bg-coral/10 text-coral px-1 py-0.5 font-bold">CAPA</span>}
-                    </td>
-
-                    {/* Visibilidade */}
-                    <td className="px-3 py-2">
-                      <span className={`inline-flex items-center gap-1 text-2xs font-bold ${m.isPublic ? "text-emerald-600" : "text-muted"}`}>
-                        {m.isPublic ? <><Eye className="h-3 w-3" /> Pública</> : <><Lock className="h-3 w-3" /> Privada</>}
-                      </span>
-                    </td>
-
-                    {/* Engajamento */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-3 text-xs text-muted">
-                        <span className="flex items-center gap-1"><Heart className="h-3 w-3" strokeWidth={1.5} />{m._count.likes}</span>
-                        <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" strokeWidth={1.5} />{m._count.comments}</span>
-                      </div>
-                    </td>
-
-                    {/* Data */}
-                    <td className="px-3 py-2 text-xs text-muted whitespace-nowrap">
-                      {new Date(m.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "2-digit" })}
-                    </td>
-
-                    {/* Ações */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                        <MediaVisibilityBtn mediaId={m.id} isPublic={m.isPublic} />
-                        <MediaDeleteBtn mediaId={m.id} />
-                        <Link
-                          href={m.url}
-                          target="_blank"
-                          className="text-2xs border border-line px-2 py-1 text-muted hover:text-foreground transition"
-                        >
-                          ↗ Ver
+                      <div>
+                        <Link href={`/admin/perfis?q=${m.profile.slug}`} className="font-semibold text-xs hover:underline flex items-center gap-1">
+                          {m.profile.displayName}
+                          {m.profile.isVerified && (
+                            <BadgeCheck className="h-3 w-3 text-success" strokeWidth={2} aria-label="Verificado" />
+                          )}
                         </Link>
+                        <p className="text-2xs text-muted">@{m.profile.slug} · {m.profile.city.name}</p>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  </TD>
+
+                  {/* Tipo */}
+                  <TD>
+                    <span className="text-2xs font-bold uppercase tracking-wider text-muted">
+                      {m.mediaType === "REEL" ? "🎬 Reel" : m.mediaType === "VIDEO" ? "📹 Vídeo" : "🖼 Foto"}
+                    </span>
+                    {m.isCover && (
+                      <Badge variant="coral" className="ml-1 uppercase tracking-wider">
+                        Capa
+                      </Badge>
+                    )}
+                  </TD>
+
+                  {/* Visibilidade */}
+                  <TD>
+                    {m.isPublic ? (
+                      <Badge variant="success">
+                        <Eye className="h-3 w-3" strokeWidth={2} />
+                        Pública
+                      </Badge>
+                    ) : (
+                      <Badge variant="muted">
+                        <Lock className="h-3 w-3" strokeWidth={2} />
+                        Privada
+                      </Badge>
+                    )}
+                  </TD>
+
+                  {/* Engajamento */}
+                  <TD>
+                    <div className="flex items-center gap-3 text-xs text-muted">
+                      <span className="flex items-center gap-1"><Heart className="h-3 w-3" strokeWidth={1.5} />{m._count.likes}</span>
+                      <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" strokeWidth={1.5} />{m._count.comments}</span>
+                    </div>
+                  </TD>
+
+                  {/* Data */}
+                  <TD className="text-xs text-muted whitespace-nowrap">
+                    {new Date(m.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "2-digit" })}
+                  </TD>
+
+                  {/* Ações */}
+                  <TD align="right">
+                    <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                      <MediaVisibilityBtn mediaId={m.id} isPublic={m.isPublic} />
+                      <MediaDeleteBtn mediaId={m.id} />
+                      <Link
+                        href={m.url}
+                        target="_blank"
+                        className="text-2xs border border-line px-2 py-1 text-muted hover:text-foreground transition"
+                      >
+                        ↗ Ver
+                      </Link>
+                    </div>
+                  </TD>
+                </TR>
+              );
+            })}
+          </tbody>
+        </Table>
       ) : (
         /* ── GRID VIEW ── */
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -291,9 +324,9 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
             return (
               <div key={m.id} className="group border border-line bg-white overflow-hidden">
                 {/* Photo */}
-                <div className="relative aspect-[3/4] bg-zinc-100 overflow-hidden">
+                <div className="relative aspect-[3/4] bg-line overflow-hidden">
                   {m.mediaType !== "IMAGE" ? (
-                    <div className="flex h-full flex-col items-center justify-center bg-zinc-900 gap-2">
+                    <div className="flex h-full flex-col items-center justify-center bg-foreground gap-2">
                       <Play className="h-8 w-8 text-white/50" strokeWidth={1.5} />
                       <span className="text-2xs text-white/40 font-semibold uppercase tracking-wider">{m.mediaType}</span>
                     </div>
@@ -340,7 +373,9 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
                         className="text-xs font-bold hover:underline leading-none truncate flex items-center gap-0.5"
                       >
                         {m.profile.displayName}
-                        {m.profile.isVerified && <span className="text-emerald-600 text-2xs">✓</span>}
+                        {m.profile.isVerified && (
+                          <BadgeCheck className="h-3 w-3 text-success" strokeWidth={2} aria-label="Verificado" />
+                        )}
                       </Link>
                       <p className="text-2xs text-muted leading-none mt-0.5">{m.profile.city.name}</p>
                     </div>
@@ -396,4 +431,3 @@ export default async function AdminMidiasPage({ searchParams }: PageProps) {
     </AdminShell>
   );
 }
-

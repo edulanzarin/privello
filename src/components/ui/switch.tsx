@@ -40,6 +40,7 @@ export function Switch({
             onClick={() => onChange(!checked)}
             className={cn(
                 "flex shrink-0 items-center rounded-full transition-colors duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 s.track,
                 checked ? "bg-success" : "bg-black/[0.09]",
                 disabled && "cursor-not-allowed opacity-50",

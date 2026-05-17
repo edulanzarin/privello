@@ -21,6 +21,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { listFinancialRecordsForMonth } from "@/lib/services";
 import { formatBrl } from "@/lib/money";
+import { Card } from "@/components/ui/card";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 24 (painel home autenticado).
 export const dynamic = "force-dynamic";
@@ -136,49 +137,49 @@ export default async function PainelOverviewPage() {
 
       {/* ── No plan banner ── */}
       {!profile.isSuspended && !hasPlan && (
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-200/60 bg-amber-50 px-5 py-4">
+        <Card variant="warning-subtle" padding="none" className="flex items-center justify-between gap-3 px-5 py-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" strokeWidth={1.5} />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" strokeWidth={1.5} />
             <div>
-              <p className="text-base font-semibold text-amber-800">Perfil desabilitado</p>
-              <p className="mt-0.5 text-sm text-amber-700">
+              <p className="text-base font-semibold text-warning-dark">Perfil desabilitado</p>
+              <p className="mt-0.5 text-sm text-warning-dark/80">
                 Você não aparece nas buscas enquanto não tiver um plano ativo.
               </p>
             </div>
           </div>
-          <a
+          <Link
             href="/painel/plano"
-            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 active:scale-[0.97]"
+            className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Ativar plano
-          </a>
-        </div>
+          </Link>
+        </Card>
       )}
 
       {/* ── Suspension banner ── */}
       {profile.isSuspended && (
-        <div className="flex items-start gap-3 rounded-2xl border border-red-300/50 bg-red-50/80 px-5 py-4 backdrop-blur-sm">
-          <Ban className="h-5 w-5 shrink-0 text-red-600 mt-0.5" strokeWidth={1.5} />
+        <Card variant="danger-subtle" padding="none" className="flex items-start gap-3 px-5 py-4">
+          <Ban className="mt-0.5 h-5 w-5 shrink-0 text-danger" strokeWidth={1.5} />
           <div>
-            <p className="font-bold text-sm text-red-700">Conta suspensa</p>
-            <p className="mt-0.5 text-xs text-red-600 leading-relaxed">
+            <p className="text-sm font-bold text-danger">Conta suspensa</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-danger/80">
               Seu perfil está invisível e inacessível para visitantes.
               {profile.suspensionNote && <> Motivo: <em>{profile.suspensionNote}</em></>}
               {" "}Entre em contato com o suporte para contestar.
             </p>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* ── Warning notice ── */}
       {!profile.isSuspended && profile._count.warnings > 0 && (
-        <div className="flex items-center gap-3 rounded-2xl border border-yellow-300/50 bg-yellow-50/80 px-5 py-3 backdrop-blur-sm">
-          <AlertCircle className="h-4 w-4 shrink-0 text-yellow-600" strokeWidth={1.5} />
-          <p className="text-xs text-yellow-700">
+        <Card variant="warning-subtle" padding="none" className="flex items-center gap-3 px-5 py-3">
+          <AlertCircle className="h-4 w-4 shrink-0 text-warning" strokeWidth={1.5} />
+          <p className="text-xs text-warning-dark">
             Você tem <strong>{profile._count.warnings} advertência{profile._count.warnings !== 1 ? "s" : ""}</strong>.
             {" "}Ao atingir 3, sua conta será suspensa automaticamente.
           </p>
-        </div>
+        </Card>
       )}
 
       {/* ── Incomplete warning ── */}

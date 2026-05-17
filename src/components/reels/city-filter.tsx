@@ -123,7 +123,7 @@ export function ReelsCityFilter({ cities, currentSlug }: Props) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar cidade…"
               autoComplete="off"
-              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"
+              className="w-full bg-transparent text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-white/40"
             />
             {query && (
               <button type="button" onClick={() => setQuery("")}>

@@ -1,27 +1,107 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTransition } from "react";
-import { LogOut, ShieldCheck, MessageCircle, Users, BarChart3, ImageIcon } from "lucide-react";
-import { logoutAction } from "@/app/_actions/logout";
-import { cn } from "@/lib/utils";
+import {
+  ShieldCheck,
+  MessageCircle,
+  Users,
+  BarChart3,
+  ImageIcon,
+  CheckCircle2,
+} from "lucide-react";
 
-const NAV = [
+import { LogoutButton } from "@/components/painel/logout-button";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  DarkSidebarShell,
+  type NavItem,
+} from "@/components/layout/dark-sidebar-shell";
+
+/**
+ * Itens de navegação do admin (`NAV_ADMIN` na linguagem da spec).
+ *
+ * Ordem definida no design (`design.md` §"7. AdminShell"):
+ *   Moderação · Suporte · Perfis · Mídias · Financeiro · Verificações.
+ *
+ * Verificações compartilha rota com `/admin/verificacoes/[id]` — o item raiz
+ * do menu serve como entrada genérica; o detalhe é alcançado via fila de
+ * moderação. Como `DarkSidebarShell.isItemActive` casa por prefixo, qualquer
+ * `/admin/verificacoes/*` mantém o item destacado.
+ */
+const NAV_ADMIN: NavItem[] = [
   { href: "/admin/moderacao", label: "Moderação", icon: ShieldCheck },
   { href: "/admin/suporte", label: "Suporte", icon: MessageCircle },
   { href: "/admin/perfis", label: "Perfis", icon: Users },
   { href: "/admin/midias", label: "Mídias", icon: ImageIcon },
   { href: "/admin/financeiro", label: "Financeiro", icon: BarChart3 },
+  { href: "/admin/verificacoes", label: "Verificações", icon: CheckCircle2 },
 ];
 
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Administrador",
+  MODERATOR: "Moderador",
+};
+
 /**
- * Layout/shell compartilhado por todas as páginas admin: header escuro com
- * nav (Moderação / Suporte / Perfis / Mídias / Financeiro), botão "Sair" e
- * link para o site público em nova aba. Renderiza `children` na main central.
+ * Rodapé compartilhado do shell admin: avatar + nome/role + botão Sair.
  *
- * Props:
- * - `children` (ReactNode): conteúdo da página admin a ser renderizado.
+ * Renderizado em duas posições pelo `DarkSidebarShell` — sidebar desktop e
+ * drawer mobile — usando a mesma instância do prop. `LogoutButton` mantém o
+ * próprio `useTransition`, então cada cópia gerencia o estado pendente.
+ */
+function AdminFooter({
+  displayName,
+  role,
+  handle,
+  avatarUrl,
+}: {
+  displayName: string;
+  role?: string;
+  handle?: string;
+  avatarUrl?: string | null;
+}) {
+  const roleLabel = role ? (ROLE_LABELS[role] ?? role) : "Admin";
+
+  return (
+    <div className="mt-auto">
+      <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-4">
+        <Avatar
+          src={avatarUrl}
+          fallback={displayName}
+          size="sm"
+          className="shrink-0 bg-white/10 text-white/60"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium leading-tight">
+            {displayName}
+          </p>
+          <p className="truncate text-xs text-white/40">
+            {handle ? `@${handle}` : roleLabel}
+          </p>
+        </div>
+        <LogoutButton />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Shell de layout das páginas `/admin/*`.
+ *
+ * Refatorado em 10.1 para consumir `DarkSidebarShell` — o mesmo chrome
+ * compartilhado pelo `/painel` (aside fixo desktop, header mobile, drawer
+ * com overlay backdrop blur, focus rings, `aria-current`, touch targets
+ * ≥ 44×44). Substitui a topbar escura `bg-sidebar` (antes em paleta crua)
+ * da versão anterior, eliminando o drift entre admin e painel sem alterar
+ * a API consumida pelas pages.
+ *
+ * Props (todas opcionais para preservar os call-sites existentes
+ * `<AdminShell>{children}</AdminShell>`):
+ * - `displayName?` (string): nome exibido no rodapé. Default `"Admin"`.
+ * - `role?` (string): `"ADMIN" | "MODERATOR"`; mapeado para "Administrador" / "Moderador". Default `"Admin"`.
+ * - `handle?` (string): @handle exibido sob o nome quando presente.
+ * - `avatarUrl?` (string | null): avatar mostrado no rodapé.
+ * - `children` (React.ReactNode): conteúdo da página renderizado dentro do `<main>`.
  *
  * Consumidores conhecidos:
  * - src/app/admin/moderacao/page.tsx
@@ -32,71 +112,44 @@ const NAV = [
  * - src/app/admin/verificacoes/[id]/page.tsx
  *
  * Side effects:
- * - Server action `logoutAction()` no clique em "Sair", seguido de `window.location.href = "/entrar"`.
- * - `usePathname()` para destacar item de nav ativo.
+ * - Server action `logoutAction()` no clique em "Sair" via `LogoutButton`.
+ * - `usePathname()` para destacar item ativo (delegado ao `DarkSidebarShell`).
+ * - Drawer mobile: overlay com `backdrop-blur` + `overscroll-contain`, gerenciado pelo shell.
  */
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  displayName = "Admin",
+  role,
+  handle,
+  avatarUrl,
+}: {
+  children: React.ReactNode;
+  displayName?: string;
+  role?: string;
+  handle?: string;
+  avatarUrl?: string | null;
+}) {
   const pathname = usePathname();
-  const [pending, start] = useTransition();
-
-  function handleLogout() {
-    start(async () => {
-      await logoutAction();
-      window.location.href = "/entrar";
-    });
-  }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950 text-white">
-        <div className="mx-auto flex h-12 max-w-screen-xl items-center gap-6 px-4 sm:px-6">
-          <Link href="/admin/moderacao" className="mr-2 font-black tracking-tight">
-            privello<span className="text-coral">.</span>
-          </Link>
-
-          <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
-            {NAV.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "flex items-center gap-1.5 whitespace-nowrap rounded px-3 py-1.5 text-xs font-semibold transition",
-                  pathname.startsWith(href)
-                    ? "bg-white/10 text-white"
-                    : "text-white/50 hover:bg-white/5 hover:text-white",
-                )}
-              >
-                <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
-                {label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3 text-xs text-white/40">
-            <Link
-              href="/"
-              target="_blank"
-              className="hidden hover:text-white/70 transition sm:block"
-            >
-              Ver site ↗
-            </Link>
-            <button
-              onClick={handleLogout}
-              disabled={pending}
-              className="flex items-center gap-1.5 text-white/50 hover:text-white transition disabled:opacity-40"
-              title="Sair"
-            >
-              <LogOut className="h-4 w-4" strokeWidth={1.5} />
-              <span className="hidden sm:block">Sair</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-screen-xl px-4 py-6 sm:px-6">
-        {children}
-      </main>
+    <div className="min-h-screen bg-background text-foreground">
+      <DarkSidebarShell
+        logoHref="/admin/moderacao"
+        nav={NAV_ADMIN}
+        pathname={pathname}
+        footer={
+          <AdminFooter
+            displayName={displayName}
+            role={role}
+            handle={handle}
+            avatarUrl={avatarUrl}
+          />
+        }
+      >
+        <main className="mx-auto w-full max-w-screen-xl px-4 py-6 sm:px-6">
+          {children}
+        </main>
+      </DarkSidebarShell>
     </div>
   );
 }

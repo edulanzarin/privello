@@ -317,7 +317,7 @@ function ReelPlayer({
                     onKeyDown={(e) => e.key === "Enter" && postComment()}
                     placeholder="Adicionar comentário…"
                     maxLength={500}
-                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-md outline-none placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
+                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-md outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
                   />
                   <button
                     onClick={postComment}

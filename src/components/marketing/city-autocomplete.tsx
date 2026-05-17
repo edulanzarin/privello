@@ -224,8 +224,8 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
           placeholder={compact ? "Trocar cidade…" : "Ex: São Paulo, SP…"}
           autoComplete="off"
           className={compact
-            ? "w-full border-0 bg-transparent p-0 text-md text-foreground outline-none placeholder:text-muted/60"
-            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium outline-none placeholder:font-normal placeholder:text-muted/60"
+            ? "w-full border-0 bg-transparent p-0 text-md text-foreground outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-muted/60"
+            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-muted/60"
           }
         />
       </span>

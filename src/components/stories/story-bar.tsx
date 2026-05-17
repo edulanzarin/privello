@@ -280,7 +280,7 @@ export function StoryBar({
                     "h-[62px] w-[62px] rounded-full p-[3px]",
                     group.allSeen
                       ? "bg-line"
-                      : "bg-gradient-to-br from-coral via-pink-500 to-orange-400",
+                      : "bg-gradient-to-br from-coral via-coral to-warning",
                   )}
                 >
                   <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white">

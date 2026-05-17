@@ -250,9 +250,9 @@ export function ProviderRegisterForm() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600 animate-fade-in">
+        <Card variant="danger-subtle" padding="sm" className="mb-6 text-sm text-danger animate-fade-in">
           {error}
-        </div>
+        </Card>
       )}
 
       {/* ── Step 1: Identidade ── */}

@@ -152,7 +152,9 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-base text-danger">{error}</div>
+          <Card variant="danger-subtle" padding="none" className="px-4 py-3">
+            <p className="text-base text-danger">{error}</p>
+          </Card>
         )}
 
         {/* ── Localização e contato ── */}
@@ -453,7 +455,7 @@ export function PerfilEditor({ profile, cityName, citySlug }: { profile: Profile
               onChange={(e) => setHandleValue(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
               placeholder="seuhandle"
               maxLength={30}
-              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+              className="w-full rounded-lg border border-black/10 bg-white py-3 pl-7 pr-4 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
             />
           </div>
           <Button

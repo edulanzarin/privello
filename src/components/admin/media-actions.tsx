@@ -75,7 +75,7 @@ export function MediaVisibilityBtn({ mediaId, isPublic }: { mediaId: string; isP
       disabled={pending}
       className={`flex items-center gap-1 text-2xs font-bold px-2 py-1 border transition disabled:opacity-40 ${isPublic
         ? "border-line text-muted hover:border-foreground/30 hover:text-foreground"
-        : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+        : "border-success/30 bg-success-soft text-success-dark hover:bg-success/15"
         }`}
       title={isPublic ? "Tornar privada" : "Tornar pública"}
     >

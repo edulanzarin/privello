@@ -125,7 +125,7 @@ export function TicketChat({
             placeholder="Escreva sua mensagem… (Enter para enviar)"
             rows={2}
             maxLength={2000}
-            className="flex-1 resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="flex-1 resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <button
             onClick={handleSend}

@@ -31,7 +31,7 @@ function originBadge(origin: FinancialOrigin) {
   }
 }
 
-const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
+const inp = "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all";
 const sel = `${inp} cursor-pointer`;
 const lbl = "block text-base font-medium text-foreground mb-1.5";
 

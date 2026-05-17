@@ -2,7 +2,14 @@ import { cn } from "@/lib/utils";
 import type { HTMLAttributes } from "react";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-    variant?: "default" | "glass" | "solid" | "dark";
+    variant?:
+    | "default"
+    | "glass"
+    | "solid"
+    | "dark"
+    | "success-subtle"
+    | "warning-subtle"
+    | "danger-subtle";
     padding?: "none" | "sm" | "md" | "lg";
 }
 
@@ -11,6 +18,12 @@ const variantStyles = {
     glass: "glass-card rounded-2xl",
     solid: "bg-white rounded-2xl border border-black/[0.06] shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_4px_16px_rgba(0,0,0,0.04)]",
     dark: "bg-sidebar text-white rounded-2xl shadow-lg",
+    "success-subtle":
+        "bg-success-soft rounded-2xl border border-success/30 shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_4px_16px_rgba(0,0,0,0.04)]",
+    "warning-subtle":
+        "bg-warning-soft rounded-2xl border border-warning/30 shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_4px_16px_rgba(0,0,0,0.04)]",
+    "danger-subtle":
+        "bg-danger-soft rounded-2xl border border-danger/30 shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_4px_16px_rgba(0,0,0,0.04)]",
 };
 
 const paddingStyles = {

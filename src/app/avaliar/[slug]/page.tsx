@@ -96,7 +96,7 @@ export default function ReviewPage() {
             rows={4}
             maxLength={600}
             placeholder="Conte sua experiência…"
-            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none resize-none"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] transition-shadow focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background resize-none"
           />
           <p className="mt-1 text-right text-xs text-muted">{comment.length}/600</p>
         </div>

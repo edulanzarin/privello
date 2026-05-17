@@ -36,6 +36,16 @@ jobs:
       - name: Typecheck (npx tsc --noEmit)
         run: npx tsc --noEmit
 
+      - name: Raw-palette guard (Property 10 / Req 17)
+        # Bloqueia classes Tailwind de paleta crua (zinc/amber/sky/emerald/...)
+        # fora de `src/components/ui/**` e `src/lib/chart-tokens.ts`, e detecta
+        # `outline: none` / `outline-none` sem `focus-visible:ring` substituto.
+        # Tarefa 23.2 zerou as últimas ocorrências (68 → 0); agora o gate é
+        # bloqueante (`error` mode) — qualquer regressão falha o pipeline.
+        # Decisão registrada em .kiro/specs/redesign-macos-system/requirements.md
+        # > Requirement 17 e tasks.md > tarefa 23.
+        run: node scripts/check-no-raw-palette.mjs
+
       - name: Test (npm run test)
         run: npm run test
         env:

@@ -138,7 +138,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   value={prices[d.key] || ""}
                   onChange={(e) => setPrices((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
                   placeholder="0"
-                  className="w-full rounded-lg border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all disabled:bg-black/[0.03] disabled:text-muted"
+                  className="w-full rounded-lg border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all disabled:bg-black/[0.03] disabled:text-muted"
                 />
               </div>
             </div>

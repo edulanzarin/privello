@@ -6,22 +6,32 @@
  * Auth: admin/moderator (enforço em `src/app/admin/layout.tsx`).
  * Cache: `force-dynamic` (snapshot por request).
  *
- * Renderiza KPIs de MRR estimado, breakdown por plano de acompanhante e lista
- * de assinaturas de clientes ativas/expiradas/canceladas.
+ * Renderiza tiles de MRR estimado e por plano via `KPICard`, contadores de
+ * assinaturas via `KPICard`, e a lista de assinaturas ativas via `Table`
+ * com `TD numeric` nas colunas de valor.
+ *
+ * Spec: .kiro/specs/redesign-macos-system/tasks.md > Task 15.1
+ * (Requirement 10.4 em requirements.md).
  *
  * Cross-refs:
  * - src/app/admin/layout.tsx (gate ADMIN/MODERATOR)
  * - src/components/admin/admin-shell.tsx
+ * - src/components/ui/kpi-card.tsx
+ * - src/components/ui/table.tsx
  * - src/lib/prisma.ts
  */
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { Badge } from "@/components/ui/badge";
+import { KPICard } from "@/components/ui/kpi-card";
+import { Table, THead, TR, TH, TD } from "@/components/ui/table";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 39 (admin financeiro receita por plano).
 export const dynamic = "force-dynamic";
 
 const PLAN_PRICES: Record<string, number> = { ESSENCIAL: 39.90, DESTAQUE: 89, PREMIUM: 189 };
 const PLAN_LABELS: Record<string, string> = { ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" };
+const SUBSCRIBER_PRICE_BRL = 19.90;
 const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export default async function AdminFinanceiroPage() {
@@ -40,82 +50,87 @@ export default async function AdminFinanceiroPage() {
   ]);
 
   const providerMRR = planStats.reduce((sum, g) => sum + g._count * (PLAN_PRICES[g.planTier] ?? 0), 0);
-  const subMRR = activeSubscriptions.length * 19.90;
+  const subMRR = activeSubscriptions.length * SUBSCRIBER_PRICE_BRL;
   const totalMRR = providerMRR + subMRR;
+  const totalProviderProfiles = planStats.reduce((s, g) => s + g._count, 0);
 
   return (
     <AdminShell>
       <h1 className="mb-4 font-bold text-lg">Financeiro</h1>
 
-      {/* MRR Cards */}
+      {/* MRR — tiles agregados (Req 10.4) */}
       <div className="grid gap-3 sm:grid-cols-3">
-        {[
-          { label: "MRR Total estimado", value: fmt(totalMRR), sub: "receita recorrente/mês" },
-          { label: "Planos de acompanhantes", value: fmt(providerMRR), sub: `${planStats.reduce((s, g) => s + g._count, 0)} perfis ativos` },
-          { label: "Assinaturas de clientes", value: fmt(subMRR), sub: `${activeSubscriptions.length} assinantes ativos` },
-        ].map(({ label, value, sub }) => (
-          <div key={label} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
-            <p className="mt-1.5 text-2xl font-bold tabular-nums">{value}</p>
-            <p className="mt-0.5 text-2xs text-muted">{sub}</p>
-          </div>
-        ))}
+        <KPICard
+          label="MRR Total estimado"
+          value={fmt(totalMRR)}
+          subtitle="receita recorrente/mês"
+        />
+        <KPICard
+          label="Planos de acompanhantes"
+          value={fmt(providerMRR)}
+          subtitle={`${totalProviderProfiles} perfis ativos`}
+        />
+        <KPICard
+          label="Assinaturas de clientes"
+          value={fmt(subMRR)}
+          subtitle={`${activeSubscriptions.length} assinantes ativos`}
+        />
       </div>
 
-      {/* Plan breakdown */}
+      {/* Breakdown por plano de acompanhante (Req 10.4) */}
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         {planStats.map((g) => (
-          <div key={g.planTier} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-2xs font-bold uppercase tracking-wider text-muted">
-              {PLAN_LABELS[g.planTier] ?? g.planTier}
-            </p>
-            <p className="mt-1 text-xl font-bold">{g._count} perfis</p>
-            <p className="text-xs text-muted">{fmt(g._count * (PLAN_PRICES[g.planTier] ?? 0))}/mês</p>
-          </div>
+          <KPICard
+            key={g.planTier}
+            label={PLAN_LABELS[g.planTier] ?? g.planTier}
+            value={`${g._count} perfis`}
+            subtitle={`${fmt(g._count * (PLAN_PRICES[g.planTier] ?? 0))}/mês`}
+          />
         ))}
       </div>
 
-      {/* Subscription stats */}
+      {/* Contadores de assinaturas */}
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        {[
-          { label: "Assinantes ativos", value: activeSubscriptions.length },
-          { label: "Expiradas", value: expiredSubs },
-          { label: "Canceladas", value: cancelledSubs },
-        ].map(({ label, value }) => (
-          <div key={label} className="rounded border border-line bg-white p-4 shadow-sm">
-            <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
-            <p className="mt-1 text-xl font-bold">{value}</p>
-          </div>
-        ))}
+        <KPICard label="Assinantes ativos" value={activeSubscriptions.length} />
+        <KPICard label="Expiradas" value={expiredSubs} />
+        <KPICard label="Canceladas" value={cancelledSubs} />
       </div>
 
-      {/* Recent subscribers */}
+      {/* Lista de assinantes ativos recentes (Req 10.4) */}
       {activeSubscriptions.length > 0 && (
-        <div className="mt-5 rounded border border-line bg-white shadow-sm">
-          <div className="border-b border-line px-4 py-3">
-            <p className="text-2xs font-bold uppercase tracking-wider text-muted">Assinantes ativos recentes</p>
-          </div>
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-line text-2xs font-bold uppercase tracking-wider text-muted">
-                <th className="px-4 py-2.5">Usuário</th>
-                <th className="px-4 py-2.5">Email</th>
-                <th className="px-4 py-2.5">Expira em</th>
-                <th className="px-4 py-2.5">Valor</th>
-              </tr>
-            </thead>
+        <section className="mt-5">
+          <h2 className="mb-3 text-2xs font-semibold uppercase tracking-wider text-muted">
+            Assinantes ativos recentes
+          </h2>
+          <Table>
+            <THead>
+              <TR hover={false}>
+                <TH>Usuário</TH>
+                <TH>Email</TH>
+                <TH>Status</TH>
+                <TH>Expira em</TH>
+                <TH align="right">Valor</TH>
+              </TR>
+            </THead>
             <tbody>
               {activeSubscriptions.map((s) => (
-                <tr key={s.id} className="border-b border-line last:border-0 hover:bg-line/20">
-                  <td className="px-4 py-2 text-xs font-medium">{s.user.name ?? "—"}</td>
-                  <td className="px-4 py-2 text-xs text-muted">{s.user.email}</td>
-                  <td className="px-4 py-2 text-xs text-muted">{s.expiresAt.toLocaleDateString("pt-BR")}</td>
-                  <td className="px-4 py-2 text-xs font-semibold text-success">R$ 19,90</td>
-                </tr>
+                <TR key={s.id}>
+                  <TD className="text-xs font-medium">{s.user.name ?? "—"}</TD>
+                  <TD className="text-xs text-muted">{s.user.email}</TD>
+                  <TD>
+                    <Badge variant="success">Ativa</Badge>
+                  </TD>
+                  <TD className="text-xs text-muted">
+                    {s.expiresAt.toLocaleDateString("pt-BR")}
+                  </TD>
+                  <TD numeric className="text-xs font-semibold text-success">
+                    {fmt(SUBSCRIBER_PRICE_BRL)}
+                  </TD>
+                </TR>
               ))}
             </tbody>
-          </table>
-        </div>
+          </Table>
+        </section>
       )}
 
       <p className="mt-6 text-xs text-muted">

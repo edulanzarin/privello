@@ -4,18 +4,63 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   AreaChart, Area, CartesianGrid,
 } from "recharts";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  CHART_AREA_OPACITY,
+  CHART_GRID_STROKE,
+  CHART_PALETTE,
+  CHART_TICK_FILL,
+  CHART_TOOLTIP_STYLE,
+} from "@/lib/chart-tokens";
 
 type DayPoint = { date: string; count: number };
 type WeekPoint = { week: string; count: number };
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+/**
+ * Recipe interna `ChartCard`
+ *
+ * Wrapper canônico para os charts do painel admin. Consome `<Card variant="solid"
+ * padding="md">` (rounded-2xl + hairline + sombra suave) e renderiza um título
+ * em `text-xs font-medium text-muted` acima do conteúdo.
+ *
+ * Quando `isEmpty` é `true`, renderiza `<EmptyState>` no lugar do `children` —
+ * fallback determinístico para datasets vazios (ex.: nenhuma criação no período).
+ *
+ * Cross-refs:
+ * - src/components/ui/card.tsx (variant="solid" padding="md")
+ * - src/components/ui/empty-state.tsx
+ * - .kiro/specs/redesign-macos-system/design.md (seção 9 — ChartCard recipe)
+ */
+function ChartCard({
+  title,
+  isEmpty,
+  emptyMessage = "Sem dados no período.",
+  children,
+}: {
+  title: string;
+  isEmpty?: boolean;
+  emptyMessage?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="rounded border border-line bg-white p-4 shadow-sm">
+    <Card variant="solid" padding="md">
       <p className="mb-3 text-xs font-medium text-muted">{title}</p>
-      {children}
-    </div>
+      {isEmpty ? (
+        <EmptyState title={emptyMessage} className="px-3 py-6" />
+      ) : (
+        children
+      )}
+    </Card>
   );
 }
+
+// Cursor de hover sobre as barras: overlay translúcido neutro (não é cor de
+// série, portanto não consome um token de paleta de chart). Mantido como rgba
+// para não introduzir um token novo só para isso.
+const BAR_HOVER_CURSOR = { fill: "rgba(0, 0, 0, 0.04)" } as const;
+
+const AXIS_TICK = { fontSize: 9, fill: CHART_TICK_FILL } as const;
 
 /**
  * Gráfico de barras "Novos perfis · 30 dias" usado no painel admin de moderação.
@@ -28,16 +73,13 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
  */
 export function ProfilesChart({ data }: { data: DayPoint[] }) {
   return (
-    <ChartCard title="Novos perfis · 30 dias">
+    <ChartCard title="Novos perfis · 30 dias" isEmpty={data.length === 0}>
       <ResponsiveContainer width="100%" height={140}>
         <BarChart data={data} barSize={6}>
-          <XAxis dataKey="date" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
-          <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={20} />
-          <Tooltip
-            contentStyle={{ fontSize: 11, padding: "4px 8px", border: "1px solid #e5e5e3" }}
-            cursor={{ fill: "rgba(0,0,0,0.04)" }}
-          />
-          <Bar dataKey="count" name="Perfis" fill="#1a1a1a" radius={[2, 2, 0, 0]} />
+          <XAxis dataKey="date" tick={AXIS_TICK} tickLine={false} axisLine={false} interval={4} />
+          <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={20} />
+          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} cursor={BAR_HOVER_CURSOR} />
+          <Bar dataKey="count" name="Perfis" fill={CHART_PALETTE.primary} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -55,16 +97,13 @@ export function ProfilesChart({ data }: { data: DayPoint[] }) {
  */
 export function MediaChart({ data }: { data: DayPoint[] }) {
   return (
-    <ChartCard title="Mídias postadas · 30 dias">
+    <ChartCard title="Mídias postadas · 30 dias" isEmpty={data.length === 0}>
       <ResponsiveContainer width="100%" height={140}>
         <BarChart data={data} barSize={6}>
-          <XAxis dataKey="date" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
-          <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={20} />
-          <Tooltip
-            contentStyle={{ fontSize: 11, padding: "4px 8px", border: "1px solid #e5e5e3" }}
-            cursor={{ fill: "rgba(0,0,0,0.04)" }}
-          />
-          <Bar dataKey="count" name="Mídias" fill="#e05c5c" radius={[2, 2, 0, 0]} />
+          <XAxis dataKey="date" tick={AXIS_TICK} tickLine={false} axisLine={false} interval={4} />
+          <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={20} />
+          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} cursor={BAR_HOVER_CURSOR} />
+          <Bar dataKey="count" name="Mídias" fill={CHART_PALETTE.coral} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
@@ -82,21 +121,20 @@ export function MediaChart({ data }: { data: DayPoint[] }) {
  */
 export function SubscriptionsChart({ data }: { data: WeekPoint[] }) {
   return (
-    <ChartCard title="Assinaturas ativas · 8 semanas">
+    <ChartCard title="Assinaturas ativas · 8 semanas" isEmpty={data.length === 0}>
       <ResponsiveContainer width="100%" height={140}>
         <AreaChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e3" />
-          <XAxis dataKey="week" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={20} />
-          <Tooltip
-            contentStyle={{ fontSize: 11, padding: "4px 8px", border: "1px solid #e5e5e3" }}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} />
+          <XAxis dataKey="week" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+          <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={20} />
+          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
           <Area
             type="monotone"
             dataKey="count"
             name="Assinantes"
-            stroke="#1a1a1a"
-            fill="rgba(26,26,26,0.06)"
+            stroke={CHART_PALETTE.primary}
+            fill={CHART_PALETTE.primary}
+            fillOpacity={CHART_AREA_OPACITY}
             strokeWidth={1.5}
           />
         </AreaChart>
@@ -116,16 +154,13 @@ export function SubscriptionsChart({ data }: { data: WeekPoint[] }) {
  */
 export function ReelsChart({ data }: { data: DayPoint[] }) {
   return (
-    <ChartCard title="Reels postados · 30 dias">
+    <ChartCard title="Reels postados · 30 dias" isEmpty={data.length === 0}>
       <ResponsiveContainer width="100%" height={140}>
         <BarChart data={data} barSize={6}>
-          <XAxis dataKey="date" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
-          <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={20} />
-          <Tooltip
-            contentStyle={{ fontSize: 11, padding: "4px 8px", border: "1px solid #e5e5e3" }}
-            cursor={{ fill: "rgba(0,0,0,0.04)" }}
-          />
-          <Bar dataKey="count" name="Reels" fill="#7c6af7" radius={[2, 2, 0, 0]} />
+          <XAxis dataKey="date" tick={AXIS_TICK} tickLine={false} axisLine={false} interval={4} />
+          <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={20} />
+          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} cursor={BAR_HOVER_CURSOR} />
+          <Bar dataKey="count" name="Reels" fill={CHART_PALETTE.purple} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>

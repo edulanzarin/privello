@@ -51,3 +51,4 @@ skills-lock.json
 
 # User uploaded files
 /public/uploads/
+/public/audio/

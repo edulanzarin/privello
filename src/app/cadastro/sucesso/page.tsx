@@ -82,8 +82,8 @@ function SucessoContent() {
   if (status === "timeout") {
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-50">
-          <Clock className="h-8 w-8 text-amber-500" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-warning-soft">
+          <Clock className="h-8 w-8 text-warning" />
         </div>
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
           Pagamento em processamento

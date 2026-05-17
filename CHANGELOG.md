@@ -14,6 +14,54 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Added
 
+- **Tokens de cor "soft"** em `src/app/globals.css`: `--privello-success-soft`,
+  `--privello-warning-soft`, `--privello-danger-soft`, `--privello-info-soft`,
+  `--privello-purple-soft` — backgrounds calmos para banners, badges e cards de
+  estado (redesign-macos-system).
+- **Tokens de chart e elevação** em `src/app/globals.css`: `--privello-chart-grid`
+  (cor canônica para grids de Recharts) e escala `--shadow-hairline`,
+  `--shadow-sm`, `--shadow-md` para sombras consistentes
+  (redesign-macos-system).
+- **Primitivo `Tabs`** (`src/components/ui/tabs.tsx`): variantes `pills` e
+  `underline`, ARIA `tablist`/`tab`/`tabpanel` com `aria-selected` e roving
+  tabindex, suporte a `href` (renderiza `<Link>` com `aria-current="page"`) ou
+  `onChange` (redesign-macos-system).
+- **Primitivo `Table`** (`src/components/ui/table.tsx`): exporta `Table`,
+  `THead`, `TR`, `TH`, `TD`; wrapper com overflow horizontal, hairlines via
+  `border-line`, `<th scope="col">` por padrão e prop `numeric` em `TD` que
+  aplica `tabular-nums text-right` (redesign-macos-system).
+- **Primitivo `KPICard`** (`src/components/ui/kpi-card.tsx`): label, valor com
+  `tabular-nums`, ícone opcional, `subtitle`, `delta` direcional e estado
+  `alert` (aplica `border-warning/40 bg-warning-soft`); aceita `href` para
+  envelopar em `<Link>` com `aria-label` (redesign-macos-system).
+- **Primitivo `DarkSidebarShell`** (`src/components/layout/dark-sidebar-shell.tsx`):
+  chrome compartilhado de sidebar escura para `/admin/*` e `/painel/*` —
+  `<aside>` desktop fixo `w-56`, header `h-14` mobile com drawer e overlay,
+  `aria-current="page"` no item ativo (redesign-macos-system).
+- **Variantes em `Badge`** (`src/components/ui/badge.tsx`): `info`, `danger`,
+  `premium` consumindo os novos tokens soft, mantendo backwards-compatibility
+  das variantes existentes (redesign-macos-system).
+- **Variantes em `Card`** (`src/components/ui/card.tsx`): `success-subtle`,
+  `warning-subtle`, `danger-subtle` para banners de estado calmos
+  (redesign-macos-system).
+- **Util `statusToBadgeVariant`** (`src/lib/ui/status.ts`): mapa canônico
+  `Status → BadgeVariant` (NOVO/OPEN→info, REVISAO/IN_PROGRESS→warning,
+  APROVADO→success, REJEITADO/CLOSED→muted, BANIDO/SUSPENSO→danger,
+  PREMIUM→premium, DESTAQUE→coral, ESSENCIAL→info) com fallback determinístico
+  `"muted"` (redesign-macos-system).
+- **Tokens de chart** (`src/lib/chart-tokens.ts`): `CHART_PALETTE`,
+  `CHART_GRID_STROKE`, `CHART_TICK_FILL`, `CHART_AREA_OPACITY`,
+  `CHART_TOOLTIP_STYLE` apontando para `var(--privello-*)` — fonte única para
+  cores em `admin-charts.tsx` (redesign-macos-system).
+- **Lint guard contra paleta crua** (`scripts/check-no-raw-palette.mjs`): roda
+  em strict mode no CI, bane classes Tailwind de paleta crua
+  (`zinc/amber/sky/emerald/fuchsia/indigo/rose/pink/purple/teal/lime/stone/slate/gray/neutral`)
+  fora de `src/components/ui/**` e `src/lib/chart-tokens.ts`; também detecta
+  `outline: none` sem `focus-visible:ring` substituto
+  (redesign-macos-system).
+- **Documentação `docs/design-system.md`**: referência canônica do design
+  language — princípios, tabela de tokens, guia por componente com do/don't,
+  charts, anti-patterns e notas de a11y (redesign-macos-system).
 - **Seed de produção** (`prisma/seed.production.ts`) — script idempotente
   que popula apenas o catálogo essencial: 27 capitais brasileiras, 1 admin,
   e `HotPeriodConfig`. Nenhum profile/media/review fake é criado (esses
@@ -85,6 +133,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Changed
 
+- **Páginas `/admin/*`** migradas para os primitivos canônicos: KPIs ad-hoc → `KPICard`,
+  tabelas cruas → `Table`, badges hardcoded → `Badge variant={statusToBadgeVariant(...)}`.
+  Atinge `/admin/moderacao`, `/admin/perfis`, `/admin/midias`, `/admin/financeiro`,
+  `/admin/suporte` e `/admin/verificacoes/[id]` (redesign-macos-system).
+- **`AdminShell`** (`src/components/admin/admin-shell.tsx`): topbar `bg-zinc-950`
+  substituída por sidebar lateral via `DarkSidebarShell`, paridade visual com
+  `/painel` (redesign-macos-system).
+- **`PainelSidebar`** refatorado para consumir `DarkSidebarShell`, sem breaking
+  changes em props públicas (redesign-macos-system).
+- **`admin-charts.tsx`** (`src/components/admin/admin-charts.tsx`): zero hex
+  literais — todas as cores de série, grid e tooltip vêm de `chart-tokens`;
+  `ChartCard` interno usa `Card variant="solid" padding="md"` e mostra
+  `EmptyState` quando `data.length === 0` (redesign-macos-system).
+- **Páginas `/painel/*`** (`/painel/page.tsx`, `/painel/plano/page.tsx`,
+  `/painel/perfil/perfil-editor.tsx` e remanescentes): banners de estado migrados
+  para `Card variant="success-subtle" | "warning-subtle" | "danger-subtle"` em
+  vez de classes cruas (redesign-macos-system).
+- **Páginas públicas** (`cadastro/sucesso`, `cadastro/cliente`,
+  `cadastro/acompanhante`, `p/[slug]` BOOST badge): substituídas classes Tailwind
+  cruas por primitivos e tokens semânticos (redesign-macos-system).
 - **5 sites de upload** migrados de `mkdir + writeFile` (filesystem local) para
   `Storage_Module.putObject`: `src/app/api/upload/route.ts`,
   `src/app/api/upload-audio/route.ts`, `src/app/api/upload/verification/route.ts`,

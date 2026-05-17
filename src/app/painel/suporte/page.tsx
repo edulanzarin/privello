@@ -71,7 +71,7 @@ export default async function PainelSuportePage() {
             required
             placeholder="Assunto"
             maxLength={120}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <textarea
             name="text"
@@ -79,7 +79,7 @@ export default async function PainelSuportePage() {
             rows={4}
             placeholder="Descreva o problema ou dúvida…"
             maxLength={2000}
-            className="w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
+            className="w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-md text-foreground shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
           />
           <button
             type="submit"

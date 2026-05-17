@@ -52,6 +52,9 @@ const eslintConfig = defineConfig([
       "src/lib/email-templates.ts",
       // Cores de visualização de dados (recharts) — não pertencem à paleta semântica.
       "src/components/admin/admin-charts.tsx",
+      // Token resolution test holds expected hex literals as oracle values per
+      // redesign-macos-system Requirement 1.6 (Property 9).
+      "src/app/globals.css.test.ts",
     ],
     rules: {
       "no-restricted-syntax": [

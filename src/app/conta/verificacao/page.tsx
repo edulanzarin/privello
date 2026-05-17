@@ -44,7 +44,7 @@ const STEPS = [
     icon: FileText,
     seal: "Identidade verificada",
     sealIcon: BadgeCheck,
-    sealColor: "text-emerald-600",
+    sealColor: "text-success",
     description: "Fotografe a frente e o verso do seu RG ou CNH. O documento precisa estar nítido, sem reflexos ou partes cortadas.",
     fields: [
       { key: "documentFrontUrl" as FieldKey, label: "Frente do documento", hint: "RG ou CNH — foto nítida, sem reflexos.", accept: "image/*" },
@@ -58,7 +58,7 @@ const STEPS = [
     icon: Camera,
     seal: "Identidade verificada",
     sealIcon: BadgeCheck,
-    sealColor: "text-emerald-600",
+    sealColor: "text-success",
     description: "Segure o documento ao lado do rosto, sem cobrir o rosto. Boa iluminação, fundo neutro. Foto frontal.",
     fields: [
       { key: "selfieUrl" as FieldKey, label: "Selfie segurando o documento", hint: "Rosto e documento visíveis ao mesmo tempo.", accept: "image/*" },
@@ -71,7 +71,7 @@ const STEPS = [
     icon: Video,
     seal: "Vídeo verificado",
     sealIcon: Video,
-    sealColor: "text-blue-600",
+    sealColor: "text-blue",
     optional: true,
     description: "Grave um vídeo curto (5–15 s) olhando para a câmera e dizendo: \"Eu, [seu nome], confirmo minha identidade no Privello.\" Adiciona o selo de Vídeo Verificado.",
     fields: [
@@ -100,8 +100,8 @@ function Sidebar({ step }: { step: number }) {
       <div className="mt-10 space-y-3">
         <p className="text-2xs font-semibold uppercase tracking-widest text-white/30">Selos que você recebe</p>
         <div className={cn("flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5 transition-all", step >= 1 ? "opacity-100" : "opacity-40")}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20">
-            <BadgeCheck className="h-4 w-4 text-emerald-400" strokeWidth={2} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success/20">
+            <BadgeCheck className="h-4 w-4 text-success" strokeWidth={2} />
           </div>
           <div>
             <p className="text-sm font-semibold">Identidade verificada</p>
@@ -109,8 +109,8 @@ function Sidebar({ step }: { step: number }) {
           </div>
         </div>
         <div className={cn("flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5 transition-all", step >= 3 ? "opacity-100" : "opacity-40")}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20">
-            <Video className="h-4 w-4 text-blue-400" strokeWidth={2} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue/20">
+            <Video className="h-4 w-4 text-blue" strokeWidth={2} />
           </div>
           <div>
             <p className="text-sm font-semibold">Vídeo verificado</p>
@@ -208,7 +208,7 @@ export default function ContaVerificacaoPage() {
       <div className="flex min-h-screen flex-col md:flex-row">
         <Sidebar step={step} />
         <main className="flex flex-1 flex-col items-center justify-center gap-6 bg-background px-6 py-20 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-success-soft text-success shadow-sm">
             <CheckCircle className="h-10 w-10" strokeWidth={1.5} />
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">Enviado para revisão</h2>
@@ -226,7 +226,7 @@ export default function ContaVerificacaoPage() {
                 Vídeo enviado — selo em análise
               </div>
             )}
-            <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700">
+            <div className="flex items-center gap-2 rounded-full border border-success/30 bg-success-soft px-4 py-2 text-xs font-semibold text-success-dark">
               <BadgeCheck className="h-3.5 w-3.5" strokeWidth={2} />
               Identidade em análise
             </div>
@@ -255,7 +255,7 @@ export default function ContaVerificacaoPage() {
                   onClick={() => setStep(s.id)}
                   className={cn(
                     "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
-                    active ? "bg-foreground text-white shadow-sm" : done ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" : "bg-white text-muted border border-black/[0.06] hover:border-black/[0.12] shadow-sm",
+                    active ? "bg-foreground text-white shadow-sm" : done ? "bg-success-soft text-success-dark border border-success/30 hover:bg-success/15" : "bg-white text-muted border border-black/[0.06] hover:border-black/[0.12] shadow-sm",
                   )}
                 >
                   {done && !active ? <CheckCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} /> : <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />}
@@ -278,7 +278,7 @@ export default function ContaVerificacaoPage() {
               <h2 className="text-xl font-semibold tracking-tight">{currentStep.title}<span className="text-coral">.</span></h2>
               <p className="text-sm text-muted mt-0.5">{currentStep.subtitle}</p>
             </div>
-            <div className={cn("hidden sm:flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-2xs font-semibold", currentStep.id === 3 ? "border-blue-200 bg-blue-50 text-blue-700" : "border-emerald-200 bg-emerald-50 text-emerald-700")}>
+            <div className={cn("hidden sm:flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-2xs font-semibold", currentStep.id === 3 ? "border-blue/30 bg-info-soft text-blue" : "border-success/30 bg-success-soft text-success-dark")}>
               <currentStep.sealIcon className="h-3 w-3" strokeWidth={2} />
               {currentStep.seal}
               {currentStep.optional && <span className="opacity-60 ml-0.5 font-normal">· opcional</span>}
@@ -296,18 +296,18 @@ export default function ContaVerificacaoPage() {
             const error = state?.error;
             const preview = state?.previewObjectUrl;
             return (
-              <div key={field.key} className={cn("relative rounded-2xl border bg-white overflow-hidden shadow-sm transition-all", done ? "border-emerald-300 shadow-emerald-100/50" : error ? "border-coral/50" : "border-black/[0.06]")}>
+              <div key={field.key} className={cn("relative rounded-2xl border bg-white overflow-hidden shadow-sm transition-all", done ? "border-success/40" : error ? "border-coral/50" : "border-black/[0.06]")}>
                 {preview && done && (
-                  <div className="relative h-44 w-full bg-zinc-100">
+                  <div className="relative h-44 w-full bg-line/40">
                     <Image src={preview} alt="" fill className="object-cover" sizes="400px" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-emerald-500 px-2.5 py-1 text-2xs font-bold text-white">
+                    <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-success px-2.5 py-1 text-2xs font-bold text-white">
                       <CheckCircle className="h-3 w-3" strokeWidth={2.5} /> Recebido
                     </span>
                   </div>
                 )}
                 {field.accept.startsWith("video") && done && !preview && (
-                  <div className="h-36 flex items-center justify-center bg-zinc-900 rounded-t-2xl gap-2 text-white/60 text-xs">
+                  <div className="h-36 flex items-center justify-center bg-foreground rounded-t-2xl gap-2 text-white/60 text-xs">
                     <Video className="h-6 w-6" strokeWidth={1.5} /> Vídeo enviado
                   </div>
                 )}
@@ -316,7 +316,7 @@ export default function ContaVerificacaoPage() {
                   <p className="mt-1 text-xs text-muted">{field.hint}</p>
                   {done ? (
                     <div className="mt-4 flex items-center justify-between">
-                      <p className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium"><CheckCircle className="h-3.5 w-3.5" strokeWidth={2} /> Arquivo enviado</p>
+                      <p className="flex items-center gap-1.5 text-sm text-success font-medium"><CheckCircle className="h-3.5 w-3.5" strokeWidth={2} /> Arquivo enviado</p>
                       <button type="button" onClick={() => clearSlot(field.key)} className="rounded-full p-1.5 text-muted hover:bg-black/[0.04] hover:text-coral transition-all"><X className="h-4 w-4" strokeWidth={1.5} /></button>
                     </div>
                   ) : uploading ? (

@@ -14,6 +14,8 @@
  * - src/app/admin/layout.tsx
  * - src/components/admin/admin-shell.tsx
  * - src/app/_actions/verification.ts (approveVerification, rejectVerification)
+ * - .kiro/specs/redesign-macos-system — Requirement 7 (Card variantes subtle)
+ *   e Requirement 10.6 (painéis aprovar/rejeitar via Card subtle + Button).
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -22,6 +24,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { approveVerification, rejectVerification } from "@/app/_actions/verification";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { statusToBadgeVariant } from "@/lib/ui/status";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 40 (admin verificação aprovação humana).
 export const dynamic = "force-dynamic";
@@ -50,20 +57,6 @@ function DocImage({ url, label }: { url: string | null; label: string }) {
         </a>
       )}
     </div>
-  );
-}
-
-function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    NOVO: "bg-sky-100 text-sky-900",
-    REVISAO: "bg-pink-100 text-red-900",
-    APROVADO: "bg-emerald-100 text-emerald-900",
-    REJEITADO: "bg-zinc-200 text-zinc-800",
-  };
-  return (
-    <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase ${map[status] ?? "bg-line text-muted"}`}>
-      {status}
-    </span>
   );
 }
 
@@ -134,7 +127,7 @@ export default async function VerificationDetailPage({ params }: PageProps) {
           </div>
         </div>
         <div className="flex flex-col items-start gap-2 sm:items-end">
-          {statusBadge(vc.status)}
+          <Badge variant={statusToBadgeVariant(vc.status)}>{vc.status}</Badge>
           <p className="text-xs text-muted">Aguardando há {waitMin} min</p>
           <p className="text-xs text-muted">Tipo: {vc.documentType ?? "—"}</p>
         </div>
@@ -169,39 +162,32 @@ export default async function VerificationDetailPage({ params }: PageProps) {
       {vc.status !== "APROVADO" && vc.status !== "REJEITADO" ? (
         <div className="mt-8 grid gap-6 sm:grid-cols-2">
           {/* Approve */}
-          <div className="rounded border border-emerald-200 bg-emerald-50 p-5">
-            <p className="mb-3 font-semibold text-emerald-900">Aprovar verificação</p>
-            <p className="mb-4 text-sm text-emerald-800/70">
+          <Card variant="success-subtle" padding="md">
+            <p className="mb-3 font-semibold text-success">Aprovar verificação</p>
+            <p className="mb-4 text-sm text-muted">
               O perfil será marcado como verificado e o selo aparecerá publicamente.
             </p>
             <form action={approve}>
-              <button
-                type="submit"
-                className="w-full rounded bg-emerald-600 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 transition"
-              >
+              <Button type="submit" variant="primary" className="w-full">
                 Aprovar
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
 
           {/* Reject */}
-          <div className="rounded border border-red-200 bg-red-50 p-5">
-            <p className="mb-3 font-semibold text-red-900">Rejeitar verificação</p>
+          <Card variant="danger-subtle" padding="md">
+            <p className="mb-3 font-semibold text-danger">Rejeitar verificação</p>
             <form action={reject} className="space-y-3">
-              <textarea
+              <Textarea
                 name="note"
                 rows={3}
                 placeholder="Motivo da rejeição (opcional — aparece para o moderador)"
-                className="w-full rounded border border-red-200 bg-white px-3 py-2 text-sm outline-none focus:border-red-400"
               />
-              <button
-                type="submit"
-                className="w-full rounded border border-red-500 py-2.5 text-sm font-bold text-red-700 hover:bg-red-100 transition"
-              >
+              <Button type="submit" variant="danger" className="w-full">
                 Rejeitar
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
         </div>
       ) : (
         <div className="mt-8 rounded border border-line bg-white p-5 text-center">

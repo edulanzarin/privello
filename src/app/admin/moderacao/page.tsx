@@ -10,12 +10,23 @@
  * charts de séries temporais e fila paginada de `VerificationCase` com filtros
  * por status, cidade, busca e ordenação.
  *
+ * Refatorado conforme spec `redesign-macos-system` (Task 12.1):
+ * - 6 KPIs ad-hoc → `<KPICard>`.
+ * - Tabs inline → `<Tabs variant="pills" size="sm">`.
+ * - Tabela queue → `<Table>/<THead>/<TR>/<TH>/<TD>`.
+ * - `STATUS_COLORS` hardcoded → `<Badge variant={statusToBadgeVariant(...)}>`.
+ * - Botão "Buscar" → `<Button size="sm" variant="primary">`.
+ * - `<input>` cru de busca → `<Input>`.
+ * - Removidas todas as classes Tailwind cruas de paleta (zinc/amber/sky/emerald).
+ *
  * Cross-refs:
  * - src/app/admin/layout.tsx
  * - src/components/admin/admin-shell.tsx
  * - src/components/admin/admin-charts.tsx
  * - src/components/admin/quick-actions.tsx
  * - src/components/admin/admin-city-filter.tsx
+ * - src/components/ui/{kpi-card,tabs,table,badge,button,input}.tsx
+ * - src/lib/ui/status.ts (statusToBadgeVariant)
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -25,6 +36,14 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { ProfilesChart, MediaChart, SubscriptionsChart, ReelsChart } from "@/components/admin/admin-charts";
 import { QuickActions } from "@/components/admin/quick-actions";
 import { AdminCityFilter } from "@/components/admin/admin-city-filter";
+import { Card } from "@/components/ui/card";
+import { KPICard } from "@/components/ui/kpi-card";
+import { Tabs, type TabItem } from "@/components/ui/tabs";
+import { Table, THead, TR, TH, TD } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { statusToBadgeVariant } from "@/lib/ui/status";
 import { BadgeCheck, Clock, Users, ShieldCheck, Play, TrendingUp, AlertCircle } from "lucide-react";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 36 (admin moderação tempo real).
@@ -78,13 +97,6 @@ const STATUS_LABELS: Record<string, string> = {
   REVISAO: "Em revisão",
   APROVADO: "Aprovado",
   REJEITADO: "Rejeitado",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  NOVO: "bg-sky-100 text-sky-800",
-  REVISAO: "bg-amber-100 text-amber-800",
-  APROVADO: "bg-emerald-100 text-emerald-800",
-  REJEITADO: "bg-zinc-200 text-zinc-700",
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -203,28 +215,29 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
     { label: "MRR estimado", value: `R$ ${totalMRR.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, icon: Play, sub: "receita recorrente/mês" },
   ];
 
-  const TABS = [
-    { key: "pending", label: "Pendentes" },
-    { key: "all", label: "Todos" },
-    { key: "NOVO", label: "Novos" },
-    { key: "REVISAO", label: "Em revisão" },
-    { key: "APROVADO", label: "Aprovados" },
-    { key: "REJEITADO", label: "Rejeitados" },
+  // Tabs de status — navegação por URL (cada item gera href via buildQueueHref).
+  const tabItems: TabItem[] = [
+    { key: "pending", label: "Pendentes", href: buildQueueHref({ status: "pending", p: "1" }) },
+    { key: "all", label: "Todos", href: buildQueueHref({ status: "all", p: "1" }) },
+    { key: "NOVO", label: "Novos", href: buildQueueHref({ status: "NOVO", p: "1" }) },
+    { key: "REVISAO", label: "Em revisão", href: buildQueueHref({ status: "REVISAO", p: "1" }) },
+    { key: "APROVADO", label: "Aprovados", href: buildQueueHref({ status: "APROVADO", p: "1" }) },
+    { key: "REJEITADO", label: "Rejeitados", href: buildQueueHref({ status: "REJEITADO", p: "1" }) },
   ];
 
   return (
     <AdminShell>
       {/* ── KPI row ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-        {kpis.map(({ label, value, icon: Icon, sub, alert }) => (
-          <div key={label} className={`rounded border bg-white p-3 shadow-sm ${alert ? "border-amber-300" : "border-line"}`}>
-            <div className="flex items-center justify-between">
-              <p className="text-2xs font-bold uppercase tracking-wider text-muted">{label}</p>
-              <Icon className={`h-3.5 w-3.5 ${alert ? "text-amber-500" : "text-muted"}`} strokeWidth={1.5} />
-            </div>
-            <p className="mt-1.5 text-xl font-bold tabular-nums">{value}</p>
-            <p className="mt-0.5 text-2xs text-muted">{sub}</p>
-          </div>
+        {kpis.map(({ label, value, icon, sub, alert }) => (
+          <KPICard
+            key={label}
+            label={label}
+            value={value}
+            icon={icon}
+            subtitle={sub}
+            alert={alert}
+          />
         ))}
       </div>
 
@@ -237,196 +250,194 @@ export default async function AdminModeracaoPage({ searchParams }: PageProps) {
       </div>
 
       {/* ── Verification queue ──────────────────────────────────────────── */}
-      <div className="mt-6 rounded border border-line bg-white shadow-sm">
-        {/* Queue header */}
-        <div className="border-b border-line px-4 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-semibold">Fila de verificação</h2>
-            <div className="flex flex-wrap gap-2">
-              {/* Search */}
-              <form method="get" action="/admin/moderacao" className="flex gap-1.5">
-                {statusFilter !== "pending" && <input type="hidden" name="status" value={statusFilter} />}
-                {cityFilter && <input type="hidden" name="city" value={cityFilter} />}
-                {sortFilter !== "oldest" && <input type="hidden" name="sort" value={sortFilter} />}
-                <input
-                  name="q"
-                  defaultValue={searchQ}
-                  placeholder="Buscar por nome…"
-                  className="w-40 rounded-md border border-black/10 px-2.5 py-1.5 text-xs outline-none hover:border-black/20 focus:border-blue transition-all"
+      <div className="mt-6 space-y-3">
+        {/* Header: título, busca, filtros, tabs */}
+        <Card variant="solid" padding="none">
+          <div className="px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-semibold">Fila de verificação</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Search */}
+                <form method="get" action="/admin/moderacao" className="flex items-center gap-2">
+                  {statusFilter !== "pending" && <input type="hidden" name="status" value={statusFilter} />}
+                  {cityFilter && <input type="hidden" name="city" value={cityFilter} />}
+                  {sortFilter !== "oldest" && <input type="hidden" name="sort" value={sortFilter} />}
+                  <Input
+                    name="q"
+                    defaultValue={searchQ}
+                    placeholder="Buscar por nome…"
+                    className="w-40 px-2.5 py-1.5 text-xs"
+                  />
+                  <Button type="submit" size="sm" variant="primary">
+                    Buscar
+                  </Button>
+                </form>
+
+                {/* City filter */}
+                <AdminCityFilter
+                  cities={cities}
+                  statusFilter={statusFilter}
+                  searchQ={searchQ}
+                  sortFilter={sortFilter}
+                  cityFilter={cityFilter}
                 />
-                <button type="submit" className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition">
-                  Buscar
-                </button>
-              </form>
 
-              {/* City filter */}
-              <AdminCityFilter
-                cities={cities}
-                statusFilter={statusFilter}
-                searchQ={searchQ}
-                sortFilter={sortFilter}
-                cityFilter={cityFilter}
-              />
+                {/* Sort */}
+                <Link
+                  href={buildQueueHref({ sort: sortFilter === "oldest" ? "newest" : "oldest", p: "1" })}
+                  className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-xs text-muted hover:border-foreground/30 hover:text-foreground transition"
+                >
+                  <Clock className="h-3 w-3" strokeWidth={1.5} />
+                  {sortFilter === "oldest" ? "Mais antigos primeiro" : "Mais recentes primeiro"}
+                </Link>
+              </div>
+            </div>
 
-              {/* Sort */}
-              <Link
-                href={buildQueueHref({ sort: sortFilter === "oldest" ? "newest" : "oldest", p: "1" })}
-                className="flex items-center gap-1.5 border border-line px-2.5 py-1.5 text-xs text-muted hover:border-foreground/30 hover:text-foreground transition"
-              >
-                <Clock className="h-3 w-3" strokeWidth={1.5} />
-                {sortFilter === "oldest" ? "Mais antigos primeiro" : "Mais recentes primeiro"}
-              </Link>
+            {/* Status tabs */}
+            <div className="mt-3">
+              <Tabs items={tabItems} activeKey={statusFilter} variant="pills" size="sm" />
             </div>
           </div>
+        </Card>
 
-          {/* Status tabs */}
-          <div className="mt-3 flex flex-wrap gap-1">
-            {TABS.map(({ key, label }) => (
-              <Link
-                key={key}
-                href={buildQueueHref({ status: key, p: "1" })}
-                className={`rounded px-2.5 py-1 text-xs font-semibold transition ${statusFilter === key
-                  ? "bg-foreground text-white"
-                  : "bg-line text-muted hover:bg-line/70 hover:text-foreground"
-                  }`}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* Tabela */}
+        <Table minWidth={700}>
+          <THead>
+            <TR hover={false}>
+              <TH>Foto</TH>
+              <TH>Nome · cidade</TH>
+              <TH>Docs</TH>
+              <TH>Status</TH>
+              <TH>Aguardando</TH>
+              <TH align="right">Ações</TH>
+            </TR>
+          </THead>
+          <tbody>
+            {queueRows.length === 0 ? (
+              <TR hover={false}>
+                <TD colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
+                  Nenhum registro encontrado.
+                </TD>
+              </TR>
+            ) : (
+              queueRows.map((row) => {
+                const thumb = row.profile.media[0]?.url;
+                const waitMin = Math.max(1, Math.floor((nowMs - row.waitingSince.getTime()) / 60000));
+                const waitLabel = waitMin < 60
+                  ? `${waitMin}m`
+                  : waitMin < 1440
+                    ? `${Math.floor(waitMin / 60)}h`
+                    : `${Math.floor(waitMin / 1440)}d`;
+                const hasDocs = !!(row.documentFrontUrl || row.documentBackUrl || row.selfieUrl);
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line text-2xs font-semibold uppercase tracking-wider text-muted">
-                <th className="px-3 py-2.5">Foto</th>
-                <th className="px-3 py-2.5">Nome · cidade</th>
-                <th className="px-3 py-2.5">Docs</th>
-                <th className="px-3 py-2.5">Status</th>
-                <th className="px-3 py-2.5">Aguardando</th>
-                <th className="px-3 py-2.5 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {queueRows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
-                    Nenhum registro encontrado.
-                  </td>
-                </tr>
-              ) : (
-                queueRows.map((row) => {
-                  const thumb = row.profile.media[0]?.url;
-                  const waitMin = Math.max(1, Math.floor((nowMs - row.waitingSince.getTime()) / 60000));
-                  const waitLabel = waitMin < 60
-                    ? `${waitMin}m`
-                    : waitMin < 1440
-                      ? `${Math.floor(waitMin / 60)}h`
-                      : `${Math.floor(waitMin / 1440)}d`;
-                  const hasDocs = !!(row.documentFrontUrl || row.documentBackUrl || row.selfieUrl);
-
-                  return (
-                    <tr key={row.id} className="border-b border-line last:border-0 hover:bg-line/20 transition">
-                      <td className="px-3 py-2">
-                        <div className="relative h-10 w-8 overflow-hidden rounded bg-line">
-                          {thumb && <Image src={thumb} alt="" fill className="object-cover" sizes="32px" />}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2">
-                        <p className="font-semibold leading-tight">{row.profile.displayName}, {row.profile.age}</p>
-                        <p className="text-xs text-muted">
-                          {row.profile.city.name}{row.profile.district ? ` · ${row.profile.district.name}` : ""}
-                        </p>
-                      </td>
-                      <td className="px-3 py-2">
-                        {hasDocs ? (
-                          <div className="flex gap-1">
-                            {[row.documentFrontUrl, row.documentBackUrl, row.selfieUrl].map((url, i) =>
-                              url ? (
-                                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                                  <div className="relative h-8 w-6 overflow-hidden rounded border border-line bg-line">
-                                    <Image src={url} alt="" fill className="object-cover" sizes="24px" />
-                                  </div>
-                                </a>
-                              ) : (
-                                <div key={i} className="h-8 w-6 rounded border border-dashed border-line bg-line/50" />
-                              )
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-muted/60">Sem docs</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase ${STATUS_COLORS[row.status] ?? "bg-line text-muted"}`}>
-                          {STATUS_LABELS[row.status]}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 text-xs font-mono text-muted">{waitLabel}</td>
-                      <td className="px-3 py-2">
-                        <div className="flex items-center justify-end gap-2">
-                          {(row.status === "NOVO" || row.status === "REVISAO") && (
-                            <QuickActions caseId={row.id} />
+                return (
+                  <TR key={row.id}>
+                    <TD>
+                      <div className="relative h-10 w-8 overflow-hidden rounded bg-line">
+                        {thumb && <Image src={thumb} alt="" fill className="object-cover" sizes="32px" />}
+                      </div>
+                    </TD>
+                    <TD>
+                      <p className="font-semibold leading-tight">{row.profile.displayName}, {row.profile.age}</p>
+                      <p className="text-xs text-muted">
+                        {row.profile.city.name}{row.profile.district ? ` · ${row.profile.district.name}` : ""}
+                      </p>
+                    </TD>
+                    <TD>
+                      {hasDocs ? (
+                        <div className="flex gap-1">
+                          {[row.documentFrontUrl, row.documentBackUrl, row.selfieUrl].map((url, i) =>
+                            url ? (
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                                <div className="relative h-8 w-6 overflow-hidden rounded border border-line bg-line">
+                                  <Image src={url} alt="" fill className="object-cover" sizes="24px" />
+                                </div>
+                              </a>
+                            ) : (
+                              <div key={i} className="h-8 w-6 rounded border border-dashed border-line bg-line/50" />
+                            )
                           )}
-                          <Link
-                            href={`/admin/verificacoes/${row.id}`}
-                            className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
-                          >
-                            Detalhe
-                          </Link>
-                          <Link
-                            href={`/p/${row.profile.slug}`}
-                            target="_blank"
-                            className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
-                          >
-                            Perfil ↗
-                          </Link>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                      ) : (
+                        <span className="text-xs text-muted/60">Sem docs</span>
+                      )}
+                    </TD>
+                    <TD>
+                      <Badge variant={statusToBadgeVariant(row.status)}>
+                        {STATUS_LABELS[row.status] ?? row.status}
+                      </Badge>
+                    </TD>
+                    <TD className="font-mono text-xs text-muted">{waitLabel}</TD>
+                    <TD>
+                      <div className="flex items-center justify-end gap-2">
+                        {(row.status === "NOVO" || row.status === "REVISAO") && (
+                          <QuickActions caseId={row.id} />
+                        )}
+                        <Link
+                          href={`/admin/verificacoes/${row.id}`}
+                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                        >
+                          Detalhe
+                        </Link>
+                        <Link
+                          href={`/p/${row.profile.slug}`}
+                          target="_blank"
+                          className="rounded border border-line px-2 py-1 text-2xs font-bold uppercase text-muted hover:border-foreground/30 hover:text-foreground transition"
+                        >
+                          Perfil ↗
+                        </Link>
+                      </div>
+                    </TD>
+                  </TR>
+                );
+              })
+            )}
+          </tbody>
+        </Table>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-line px-4 py-3 text-xs text-muted">
-            <span>{queueTotal} resultado{queueTotal !== 1 ? "s" : ""}</span>
-            <div className="flex gap-1">
-              {pageNum > 1 && (
-                <Link href={buildQueueHref({ p: String(pageNum - 1) })} className="border border-line px-2.5 py-1 hover:bg-line transition">
-                  ←
-                </Link>
-              )}
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .filter((n) => Math.abs(n - pageNum) <= 2)
-                .map((n) => (
+        {totalPages > 1 ? (
+          <Card variant="solid" padding="none">
+            <div className="flex items-center justify-between px-4 py-3 text-xs text-muted">
+              <span>{queueTotal} resultado{queueTotal !== 1 ? "s" : ""}</span>
+              <div className="flex gap-1">
+                {pageNum > 1 && (
                   <Link
-                    key={n}
-                    href={buildQueueHref({ p: String(n) })}
-                    className={`border px-2.5 py-1 transition ${n === pageNum ? "border-foreground bg-foreground text-white" : "border-line hover:bg-line"}`}
+                    href={buildQueueHref({ p: String(pageNum - 1) })}
+                    className="rounded border border-line px-2.5 py-1 hover:bg-line transition"
                   >
-                    {n}
+                    ←
                   </Link>
-                ))}
-              {pageNum < totalPages && (
-                <Link href={buildQueueHref({ p: String(pageNum + 1) })} className="border border-line px-2.5 py-1 hover:bg-line transition">
-                  →
-                </Link>
-              )}
+                )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((n) => Math.abs(n - pageNum) <= 2)
+                  .map((n) => (
+                    <Link
+                      key={n}
+                      href={buildQueueHref({ p: String(n) })}
+                      className={`rounded border px-2.5 py-1 transition ${n === pageNum ? "border-foreground bg-foreground text-white" : "border-line hover:bg-line"}`}
+                    >
+                      {n}
+                    </Link>
+                  ))}
+                {pageNum < totalPages && (
+                  <Link
+                    href={buildQueueHref({ p: String(pageNum + 1) })}
+                    className="rounded border border-line px-2.5 py-1 hover:bg-line transition"
+                  >
+                    →
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        {totalPages <= 1 && queueRows.length > 0 && (
-          <div className="border-t border-line px-4 py-2 text-right text-xs text-muted">
-            {queueTotal} resultado{queueTotal !== 1 ? "s" : ""}
-          </div>
-        )}
+          </Card>
+        ) : queueRows.length > 0 ? (
+          <Card variant="solid" padding="none">
+            <div className="px-4 py-2 text-right text-xs text-muted">
+              {queueTotal} resultado{queueTotal !== 1 ? "s" : ""}
+            </div>
+          </Card>
+        ) : null}
       </div>
     </AdminShell>
   );

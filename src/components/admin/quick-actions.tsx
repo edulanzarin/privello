@@ -41,19 +41,24 @@ export function QuickActions({ caseId }: { caseId: string }) {
     return <span className="text-2xs text-muted">Salvando…</span>;
   }
 
+  // Botões de ação rápida usam tokens do design system (Req 1: success-soft,
+  // danger-soft). Antes consumiam paleta crua `bg-emerald-*` / `bg-red-*`,
+  // bloqueada pelo regression-light de `/admin/moderacao` (Task 12.2).
   return (
     <div className="flex items-center gap-1.5">
       <button
         onClick={approve}
         title="Aprovar"
-        className="flex h-7 w-7 items-center justify-center rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition"
+        aria-label="Aprovar verificação"
+        className="flex h-7 w-7 items-center justify-center rounded bg-success-soft text-success transition hover:bg-success/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
       </button>
       <button
         onClick={reject}
         title="Rejeitar"
-        className="flex h-7 w-7 items-center justify-center rounded bg-red-100 text-red-600 hover:bg-red-200 transition"
+        aria-label="Rejeitar verificação"
+        className="flex h-7 w-7 items-center justify-center rounded bg-danger-soft text-danger transition hover:bg-danger/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <X className="h-3.5 w-3.5" strokeWidth={2.5} />
       </button>
