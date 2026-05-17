@@ -465,6 +465,11 @@ levantada para revisão.
 - Touch target ≥ 44×44 por item. Drop shadow `--shadow-md`.
 - Safe-area aware: `padding-bottom: env(safe-area-inset-bottom)`.
 - Body precisa de `pb-24` no RootLayout pra reservar espaço.
+- **Auto-hide quando há modal aberto**: o wrapper externo recebe atributo
+  `data-bottom-nav`. Toda vez que `useScrollLock` (consumido por `<Modal>`,
+  `<StoryViewer>`, lightboxes) sobe a flag `body[data-modal-open]`, a CSS rule
+  em `globals.css` aplica `opacity: 0; pointer-events: none` na nav. Garante
+  que a pill nunca cubra story viewer ou lightbox de mídia.
 
 ### 13.2 Site header
 

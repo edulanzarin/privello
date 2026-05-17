@@ -349,6 +349,18 @@ input[type="radio"] {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
+   Hide BottomNav while a fullscreen modal is open.
+   `useScrollLock` (lib/hooks/use-scroll-lock.ts) sets `data-modal-open`
+   on <body> while any modal is mounted. The bottom-nav pill (decisão
+   §13.1) deve sumir nesse momento — ela cobriria o conteúdo do viewer
+   (story, lightbox de mídia, comments).
+   ────────────────────────────────────────────────────────────────────────── */
+body[data-modal-open] [data-bottom-nav] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
    Boost fire border — mantido (componente legado de boost ativo).
    Refator de visual virá quando o ProfileCard for refeito.
    ────────────────────────────────────────────────────────────────────────── */

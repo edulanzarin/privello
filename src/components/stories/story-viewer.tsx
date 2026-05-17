@@ -192,7 +192,7 @@ export function StoryViewer({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groupIdx, storyIdx]);
 
-    // Teclado + bloqueio de scroll
+    // Teclado (scroll lock + data-modal-open são gerenciados por Modal/useScrollLock)
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") close();
@@ -200,10 +200,8 @@ export function StoryViewer({
             if (e.key === "ArrowLeft") goPrevStory();
         };
         window.addEventListener("keydown", onKey);
-        document.body.style.overflow = "hidden";
         return () => {
             window.removeEventListener("keydown", onKey);
-            document.body.style.overflow = "";
         };
     }, [close, goNextStory, goPrevStory]);
 
