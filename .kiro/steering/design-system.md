@@ -769,10 +769,11 @@ gritante. v2.6 extrai o shell em `<SearchBar>` + 2 partes (`SearchField`,
 
 - **`<SearchBar>`** — shell glass-panel rounded-2xl, padding 2 mobile / 1.5
   desktop, layout column → row em `md:`. Recebe `onSubmit` e `maxWidth?`
-  (default `"3xl"` ~ 768px — inputs de busca raramente precisam mais).
+  (default `"none"` — herda a largura do container pai). Use `maxWidth="3xl"`
+  ou similar quando a página quiser uma pílula menor centralizada.
   **Centralizado por padrão** (`mx-auto w-full`) para que o cap de largura
-  resulte numa pílula no centro do container pai. Use `maxWidth="none"`
-  pra herdar a largura do container pai.
+  resulte numa pílula no centro do container pai, mesmo quando consumido
+  num container amplo.
 - **`<SearchField>`** — slot tipado com `icon` (lucide), `label?` opcional
   (`text-xs ink-dim`), `divider?` (default true — esconde com `divider={false}`
   no último campo), `className?` (ex.: `md:max-w-[220px]` em campos auxiliares).

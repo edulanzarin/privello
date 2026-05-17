@@ -27,10 +27,10 @@ import { cn } from "@/lib/utils";
  *
  * Convenção de tamanhos:
  *  - SearchBar: padding interno fixo (`p-2 md:p-1.5`).
- *  - **Largura**: cap default `max-w-3xl` (~768px). Inputs de busca raramente
- *    precisam de mais — nomes de cidade/perfil cabem com folga. Ajuste via
- *    prop `maxWidth` (`"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`, `"3xl"`,
- *    `"4xl"`, `"none"`) caso layout específico precise de outra.
+ *  - **Largura**: default `"none"` (herda o container pai — `max-w-7xl` em
+ *    Home e Descobrir hub). Ajuste via prop `maxWidth` (`"sm"`, `"md"`,
+ *    `"lg"`, `"xl"`, `"2xl"`, `"3xl"`, `"4xl"`) caso layout específico
+ *    queira um cap próprio centralizado.
  *  - SearchField: padding interno padrão (`px-3.5 py-2`); rounded-xl em
  *    mobile pra "respirar" como cards individuais empilhados.
  *  - SearchSubmit: rounded-xl com `min-w-[150px]` em desktop pra peso
@@ -54,14 +54,14 @@ export function SearchBar({
     children,
     onSubmit,
     className,
-    maxWidth = "3xl",
+    maxWidth = "none",
 }: {
     children: ReactNode;
     onSubmit?: FormEventHandler<HTMLFormElement>;
     className?: string;
     /**
-     * Cap de largura da barra (default `"3xl"` = ~768px).
-     * Use `"none"` para herdar a largura do container pai.
+     * Cap de largura da barra (default `"none"` = herda largura do container pai).
+     * Use `"3xl"`, `"4xl"` etc. quando a página quiser uma pílula menor centralizada.
      */
     maxWidth?: SearchBarMaxWidth;
 }) {
