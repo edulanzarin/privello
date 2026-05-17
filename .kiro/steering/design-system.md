@@ -312,6 +312,25 @@ Todo componente segue:
 **Card:** `glass` (default agora), `solid` (off-white opaco), `success-subtle`, `warning-subtle`, `danger-subtle`. Padding `none`/`sm`/`md`/`lg`.
 **Badge:** `default`, `rose` (primário), `success`, `warning`, `muted`, `info`, `danger`, `premium` (plum), `boost` (peach), `verified` (cream).
 
+### 6.4 Toggles vs checkboxes — convenção
+
+**Sempre prefira `<Switch>` (toggle macOS, bolinha) em vez de
+`<input type="checkbox">`** para opções binárias on/off em formulários e
+drawers de filtro. Dois motivos:
+
+1. Visual: Switch é a linguagem nativa de iOS/macOS — combina com Tahoe.
+2. Semântico: switch comunica "ligar/desligar uma preferência" melhor que
+   checkbox (que sugere "marcar/desmarcar item de uma lista").
+
+**Use `<input type="checkbox">` apenas quando:**
+- O contexto é claramente uma lista de itens marcáveis (ex.: seleção
+  múltipla em tabela admin).
+- O HTML nativo é exigido (ex.: form sem JS submit).
+
+**Para construir filtros densos (drawer/modal):** use o pattern
+`SwitchRow` que agrupa label + Switch numa linha clicável. Ver
+`src/components/discover/filter-drawer.tsx > SwitchRow` como referência.
+
 ---
 
 ## 7. Fotografia & mídia
@@ -522,3 +541,93 @@ Decisão F1.
   rose.
 - Pílulas top-cidades: `.glass-pill` size sm,
   `bg-line/40 hover:bg-rose-soft`.
+
+---
+
+## 14. Patterns reusáveis para forms densos (drawers, modais)
+
+Forms longos (filtros, configurações, edição de perfil) ficam mais
+escaneáveis quando seguem 3 helpers padrão. Implementação canônica em
+`src/components/discover/filter-drawer.tsx` — copie a estrutura para
+outros forms.
+
+### 14.1 `Section` — agrupador rotulado
+
+Label uppercase pequeno (`text-2xs font-semibold uppercase tracking-wider
+text-ink-dim`) + conteúdo abaixo com `gap-2`. Cria hierarquia visual sem
+borda nem fundo.
+
+```tsx
+<Section label="Preço por hora">
+  <div className="flex gap-2">
+    <Input prefix="R$" placeholder="mín" ... />
+    <Input prefix="R$" placeholder="máx" ... />
+  </div>
+</Section>
+```
+
+### 14.2 `SegmentedButton` — seleção single-choice
+
+Para opções mutuamente exclusivas (Procuro: Garotas/Garotos/Casais; Sort:
+Relevância/Menor preço/Maior preço/Avaliação; View: Grade/Lista). Botões
+em grid `grid-cols-N gap-1.5`, ativo em `border-rose bg-rose-soft
+text-rose`, inativo em `border-line bg-white text-ink-dim`. Touch target
+`min-h-[40px]`.
+
+```tsx
+<div className="grid grid-cols-3 gap-1.5">
+  {OPTIONS.map((opt) => (
+    <SegmentedButton active={value === opt.value} onClick={...}>
+      {opt.label}
+    </SegmentedButton>
+  ))}
+</div>
+```
+
+### 14.3 `SwitchRow` — toggle on/off com label
+
+Para opções binárias (Apenas verificadas, Local próprio, A domicílio,
+Notificações por e-mail, etc.). Label à esquerda, `<Switch>` à direita,
+linha clicável inteira. Dois modos:
+
+- `inline=false` (default): linha standalone com `border-line` + `px-4` +
+  `min-h-[44px]`. Usar quando é um toggle isolado sem grupo.
+- `inline=true`: sem border, `min-h-[40px]`. Usar dentro de uma `Section`
+  pra agrupar múltiplos toggles relacionados (ex.: "Atendimento: Local
+  próprio + A domicílio").
+
+```tsx
+{/* Standalone */}
+<SwitchRow label="Apenas verificadas" checked={x} onChange={setX} />
+
+{/* Agrupado dentro de Section */}
+<Section label="Atendimento">
+  <SwitchRow label="Local próprio" checked={a} onChange={setA} inline />
+  <SwitchRow label="A domicílio" checked={b} onChange={setB} inline />
+</Section>
+```
+
+### 14.4 Quando promover esses helpers
+
+Os 3 helpers vivem hoje **inline em `filter-drawer.tsx`** (escopo local).
+Se aparecerem em ≥ 3 forms diferentes (ex.: configurações de perfil,
+disponibilidade, filtros de admin), promover para
+`src/components/ui/form-helpers.tsx` (novo primitivo). Até lá, copy-paste
+com cross-ref no JSDoc do consumidor.
+
+### 14.5 Filtros aplicados — badge contador
+
+Quando o form é abertura de drawer (não inline), o botão de abertura
+deve mostrar badge com contagem de filtros ativos:
+
+```tsx
+<button>
+  <SlidersHorizontal />
+  Filtros
+  {activeCount > 0 && (
+    <span className="bg-rose text-white text-2xs font-bold tabular-nums rounded-full px-1.5 h-5 min-w-[20px]">
+      {activeCount}
+    </span>
+  )}
+</button>
+```

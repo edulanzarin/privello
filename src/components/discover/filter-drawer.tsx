@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SlidersHorizontal, X, Grid3X3, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 type FilterDrawerProps = {
@@ -39,22 +40,20 @@ const SORT_OPTIONS = [
 ] as const;
 
 /**
- * FilterDrawer — Design System v2.4 (Tahoe Sensual).
+ * FilterDrawer — Design System v2.5 (Tahoe Sensual, denso).
  *
  * Caminho: src/components/discover/filter-drawer.tsx
- * Steering: `.kiro/steering/design-system.md` §13.3.
+ * Steering: `.kiro/steering/design-system.md` §13.3 + §6 (Switch).
  *
- * Botão "Filtros" abre drawer com TUDO (decisão user 2026-05-17 final):
- *  - Procuro (Garotas/Garotos/Casais).
- *  - Apenas verificadas.
- *  - Preço por hora — range.
- *  - Idade — range.
- *  - Atendimento (Local próprio, A domicílio).
- *  - Ordenar (Relevância/Menor preço/Maior preço/Avaliação).
- *  - Visualizar (Grade/Lista).
+ * Drawer flutuante (mobile e desktop) com TODOS os filtros. v2.5:
+ *  - Paddings reduzidos (py-5, gap-4) — mais denso, menos espaço morto.
+ *  - Toggles macOS (Switch primitive) substituem checkboxes em
+ *    "Apenas verificadas" / "Local próprio" / "A domicílio".
+ *  - SegmentedSelect helper (botões pill com selecionado em rose-soft) pra
+ *    Procuro, Ordenar e Visualização.
  *
- * Mobile = bottom-sheet (slide up, pb-28 reserva BottomNav).
- * Desktop = side drawer da direita.
+ * Mobile + desktop: drawer flutuante com pt-20 (header), pb-24 (BottomNav
+ * mobile) ou pb-4 (desktop), px-4 lateral.
  */
 export function FilterDrawer({
     citySlug,
@@ -129,7 +128,6 @@ export function FilterDrawer({
         setHomeVisit(false);
     }
 
-    // Conta filtros ativos pra mostrar badge no botão.
     const activeCount = [
         gender !== "",
         verifiedOnly,
@@ -186,71 +184,50 @@ export function FilterDrawer({
 
                     <aside
                         className={cn(
-                            "relative flex w-full flex-col gap-5 glass-panel",
-                            // Drawer flutuante (mobile e desktop). Wrapper já
-                            // empurra com pt-20 (header) + pb-24 mobile (BottomNav)
-                            // ou pb-4 desktop, e px-4 lateral.
-                            "rounded-3xl px-5 py-6 overflow-y-auto",
+                            "relative flex w-full flex-col gap-4 glass-panel",
+                            "rounded-3xl px-5 py-5 overflow-y-auto",
                             "md:max-w-md md:px-6",
                             "animate-fade-in",
                         )}
                     >
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-bold tracking-tight text-ink">
+                            <h3 className="text-lg font-bold tracking-tight text-ink">
                                 Filtros
                             </h3>
                             <button
                                 type="button"
                                 onClick={() => setOpen(false)}
                                 aria-label="Fechar"
-                                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-ink-dim hover:bg-line/40 hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40"
+                                className="flex h-9 w-9 items-center justify-center rounded-full text-ink-dim hover:bg-line/40 hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40"
                             >
-                                <X className="h-5 w-5" strokeWidth={1.8} />
+                                <X className="h-4 w-4" strokeWidth={2} />
                             </button>
                         </div>
 
-                        {/* Procuro */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Procuro
-                            </p>
-                            <div className="grid grid-cols-3 gap-2">
+                        {/* Procuro — segmented */}
+                        <Section label="Procuro">
+                            <div className="grid grid-cols-3 gap-1.5">
                                 {GENDER_OPTIONS.map((opt) => (
-                                    <button
+                                    <SegmentedButton
                                         key={opt.value || "garotas"}
-                                        type="button"
+                                        active={gender === opt.value}
                                         onClick={() => setGender(opt.value)}
-                                        className={cn(
-                                            "flex min-h-[44px] items-center justify-center rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
-                                            gender === opt.value
-                                                ? "border-rose bg-rose-soft text-rose"
-                                                : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
-                                        )}
                                     >
                                         {opt.label}
-                                    </button>
+                                    </SegmentedButton>
                                 ))}
                             </div>
-                        </div>
+                        </Section>
 
-                        {/* Verificação */}
-                        <div>
-                            <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
-                                <input
-                                    type="checkbox"
-                                    checked={verifiedOnly}
-                                    onChange={(e) => setVerifiedOnly(e.target.checked)}
-                                    className="h-4 w-4"
-                                />
-                                <span className="text-md text-ink">Apenas verificadas</span>
-                            </label>
-                        </div>
+                        {/* Verificadas — switch */}
+                        <SwitchRow
+                            label="Apenas verificadas"
+                            checked={verifiedOnly}
+                            onChange={setVerifiedOnly}
+                        />
 
                         {/* Preço */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Preço por hora
-                            </p>
+                        <Section label="Preço por hora">
                             <div className="flex gap-2">
                                 <Input
                                     type="number"
@@ -269,13 +246,10 @@ export function FilterDrawer({
                                     aria-label="Preço máximo"
                                 />
                             </div>
-                        </div>
+                        </Section>
 
                         {/* Idade */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Idade
-                            </p>
+                        <Section label="Idade">
                             <div className="flex gap-2">
                                 <Input
                                     type="number"
@@ -292,95 +266,60 @@ export function FilterDrawer({
                                     aria-label="Idade máxima"
                                 />
                             </div>
-                        </div>
+                        </Section>
 
-                        {/* Atendimento */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Atendimento
-                            </p>
-                            <div className="flex flex-col gap-2">
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
-                                    <input
-                                        type="checkbox"
-                                        checked={hasOwnPlace}
-                                        onChange={(e) => setHasOwnPlace(e.target.checked)}
-                                        className="h-4 w-4"
-                                    />
-                                    <span className="text-md text-ink">Local próprio</span>
-                                </label>
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
-                                    <input
-                                        type="checkbox"
-                                        checked={homeVisit}
-                                        onChange={(e) => setHomeVisit(e.target.checked)}
-                                        className="h-4 w-4"
-                                    />
-                                    <span className="text-md text-ink">A domicílio</span>
-                                </label>
-                            </div>
-                        </div>
+                        {/* Atendimento — switches */}
+                        <Section label="Atendimento">
+                            <SwitchRow
+                                label="Local próprio"
+                                checked={hasOwnPlace}
+                                onChange={setHasOwnPlace}
+                                inline
+                            />
+                            <SwitchRow
+                                label="A domicílio"
+                                checked={homeVisit}
+                                onChange={setHomeVisit}
+                                inline
+                            />
+                        </Section>
 
-                        {/* Ordenar */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Ordenar por
-                            </p>
-                            <div className="grid grid-cols-2 gap-2">
+                        {/* Ordenar — segmented 2x2 */}
+                        <Section label="Ordenar por">
+                            <div className="grid grid-cols-2 gap-1.5">
                                 {SORT_OPTIONS.map((opt) => (
-                                    <button
+                                    <SegmentedButton
                                         key={opt.value}
-                                        type="button"
+                                        active={sort === opt.value}
                                         onClick={() => setSort(opt.value)}
-                                        className={cn(
-                                            "flex min-h-[44px] items-center justify-center rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
-                                            sort === opt.value
-                                                ? "border-rose bg-rose-soft text-rose"
-                                                : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
-                                        )}
                                     >
                                         {opt.label}
-                                    </button>
+                                    </SegmentedButton>
                                 ))}
                             </div>
-                        </div>
+                        </Section>
 
                         {/* Visualização */}
-                        <div>
-                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                Visualização
-                            </p>
-                            <div className="grid grid-cols-2 gap-2">
-                                <button
-                                    type="button"
+                        <Section label="Visualização">
+                            <div className="grid grid-cols-2 gap-1.5">
+                                <SegmentedButton
+                                    active={view === "grid"}
                                     onClick={() => setView("grid")}
-                                    className={cn(
-                                        "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
-                                        view === "grid"
-                                            ? "border-rose bg-rose-soft text-rose"
-                                            : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
-                                    )}
+                                    icon={<Grid3X3 className="h-3.5 w-3.5" strokeWidth={2} />}
                                 >
-                                    <Grid3X3 className="h-4 w-4" strokeWidth={2} />
                                     Grade
-                                </button>
-                                <button
-                                    type="button"
+                                </SegmentedButton>
+                                <SegmentedButton
+                                    active={view === "list"}
                                     onClick={() => setView("list")}
-                                    className={cn(
-                                        "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
-                                        view === "list"
-                                            ? "border-rose bg-rose-soft text-rose"
-                                            : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
-                                    )}
+                                    icon={<List className="h-3.5 w-3.5" strokeWidth={2} />}
                                 >
-                                    <List className="h-4 w-4" strokeWidth={2} />
                                     Lista
-                                </button>
+                                </SegmentedButton>
                             </div>
-                        </div>
+                        </Section>
 
-                        <div className="mt-auto flex gap-3 pt-4">
+                        <div className="mt-auto flex gap-2 pt-3">
                             <Button
                                 variant="secondary"
                                 onClick={clearAll}
@@ -400,5 +339,82 @@ export function FilterDrawer({
                 </div>
             )}
         </>
+    );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Helpers internos do drawer (não exportados — uso só aqui).
+   ────────────────────────────────────────────────────────────────────────── */
+
+function Section({
+    label,
+    children,
+}: {
+    label: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="flex flex-col gap-2">
+            <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                {label}
+            </p>
+            <div className="flex flex-col gap-2">{children}</div>
+        </div>
+    );
+}
+
+function SegmentedButton({
+    active,
+    onClick,
+    icon,
+    children,
+}: {
+    active: boolean;
+    onClick: () => void;
+    icon?: React.ReactNode;
+    children: React.ReactNode;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cn(
+                "inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-xl border px-3 text-sm font-semibold transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                active
+                    ? "border-rose bg-rose-soft text-rose"
+                    : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
+            )}
+        >
+            {icon}
+            {children}
+        </button>
+    );
+}
+
+function SwitchRow({
+    label,
+    checked,
+    onChange,
+    inline = false,
+}: {
+    label: string;
+    checked: boolean;
+    onChange: (v: boolean) => void;
+    /** inline=true: usa dentro de Section (sem padding extra); false: linha standalone com padding maior. */
+    inline?: boolean;
+}) {
+    return (
+        <label
+            className={cn(
+                "flex cursor-pointer items-center justify-between gap-3",
+                inline
+                    ? "min-h-[40px]"
+                    : "min-h-[44px] rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15",
+            )}
+        >
+            <span className="text-md text-ink">{label}</span>
+            <Switch checked={checked} onChange={onChange} size="md" label={label} />
+        </label>
     );
 }
