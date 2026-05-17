@@ -2,34 +2,28 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Avatar } from "@/components/ui/avatar";
-import { SiteHeaderMobileMenu } from "./site-header-mobile-menu";
 
 type SiteHeaderProps = {
   variant?: "default" | "minimal";
   activeHref?: string;
 };
 
-const NAV_LINKS: { href: string; label: string }[] = [
-  { href: "/buscar", label: "Acompanhantes" },
-  { href: "/reels", label: "Reels" },
-  { href: "/planos", label: "Planos" },
-];
-
 /**
- * Site header — Design System v2.1 (Tahoe Sensual, calibrado).
+ * Site header — Design System v2.2 (Tahoe Sensual, calibrado).
  *
  * Caminho: src/components/layout/site-header.tsx
  * Steering: `.kiro/steering/design-system.md` §13.2.
  *
- * Mobile (`< 768px`): h-14, glass sticky, logo + hambúrguer drawer.
+ * Mobile (`< 768px`): h-14, glass sticky, **apenas logo** centralizado/à esquerda.
+ *   Nav e ações vivem 100% no BottomNav flutuante (decisão user 2026-05-17 —
+ *   hambúrguer drawer foi removido por ser redundante: o item "Entrar" do
+ *   bottom-nav já leva para a página `/entrar` que tem login + criar conta).
+ *
  * Desktop (`≥ 768px`): h-16, glass sticky, logo + ações (Entrar / Criar conta).
+ *   Logged-in: avatar + handle (atalho pra perfil/painel).
  *
- * Nav inline desktop foi REMOVIDA (decisão do user 2026-05-17): a BottomNav
- * pill flutuante é visível em todos breakpoints e cobre Home/Acompanhantes/
- * Reels/Perfil — sem duplicação no header.
- *
- * Logado: avatar + handle (atalho pra perfil/painel).
- * Anônimo: Entrar (ghost) + Criar conta (rose primary).
+ * Nav inline (Acompanhantes/Reels/Planos) também REMOVIDA do desktop —
+ * BottomNav cobre tudo em todos breakpoints.
  *
  * Server Component — busca handle/avatar via auth() + prisma.
  *
@@ -76,25 +70,17 @@ export async function SiteHeader(_props: SiteHeaderProps = {}) {
 
   return (
     <header className="glass sticky top-0 z-40">
-      {/* Mobile bar */}
-      <div className="flex h-14 items-center justify-between px-4 md:hidden">
+      {/* Mobile bar — só logo. Nav + ações vivem no BottomNav. */}
+      <div className="flex h-14 items-center justify-center px-4 md:hidden">
         <Link
           href={isProvider ? "/painel" : "/"}
           className="text-lg font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
         >
           privello<span className="text-rose">.</span>
         </Link>
-        <SiteHeaderMobileMenu
-          isLoggedIn={isLoggedIn}
-          handle={handle}
-          avatarUrl={avatarUrl}
-          userName={userName}
-          profileHref={profileHref}
-          navLinks={NAV_LINKS}
-        />
       </div>
 
-      {/* Desktop bar — só logo + ações (nav vai pra BottomNav) */}
+      {/* Desktop bar — logo + ações (Entrar / Criar conta). */}
       <div className="mx-auto hidden h-16 max-w-7xl items-center justify-between px-6 md:flex lg:px-8">
         <Link
           href={isProvider ? "/painel" : "/"}

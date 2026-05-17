@@ -448,10 +448,13 @@ levantada para revisão.
 
 ### 13.2 Site header
 
-- **Mobile (`< 768px`):** `h-14`, `glass`, sticky-top. Logo `privello.` à
-  esquerda + botão hambúrguer à direita (drawer com Entrar/Criar conta).
+- **Mobile (`< 768px`):** `h-14`, `glass`, sticky-top. **Apenas logo
+  centralizado** — sem hambúrguer, sem nav, sem ações. Decisão user
+  2026-05-17: o BottomNav já cobre todas as ações (Home / Acompanhantes /
+  Reels / Entrar), e o item "Entrar" do bottom-nav leva para `/entrar` que
+  tem login + cadastro. Drawer mobile foi removido por redundância.
 - **Desktop (`≥ 768px`):** `h-16`, `glass`, sticky-top. **Apenas logo +
-  ações** (Entrar / Criar conta) — nav inline foi REMOVIDA (decisão user
+  ações** (Entrar / Criar conta) — nav inline também REMOVIDA (decisão user
   2026-05-17 — BottomNav cobre Acompanhantes/Reels em todos breakpoints).
 
 ### 13.3 Header sticky em Descobrir
