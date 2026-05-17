@@ -30,7 +30,7 @@ export default async function PainelMidiasPage() {
     select: {
       id: true,
       slug: true,
-      media: { orderBy: { sortOrder: "asc" } },
+      media: { orderBy: { sortOrder: "asc"} },
     },
   });
   if (!profile) redirect("/conta/onboarding/perfil");

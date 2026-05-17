@@ -45,7 +45,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
     where: { id },
     include: {
       messages: {
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "asc"},
         include: { user: { select: { name: true } } },
       },
     },
@@ -64,10 +64,8 @@ export default async function TicketDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-4 max-w-xl mx-auto">
       <Link
-        href="/painel/suporte"
-        className="inline-flex items-center gap-1.5 text-base text-muted transition hover:text-foreground"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
+        href="/painel/suporte"className="inline-flex items-center gap-1.5 text-base text-muted transition hover:text-foreground">
+        <ArrowLeft className="h-3.5 w-3.5"strokeWidth={1.5} />
         Todos os chamados
       </Link>
 

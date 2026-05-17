@@ -12,7 +12,7 @@
  * Migração para o design system (redesign-macos-system, Requirement 10.5):
  * - status agora é renderizado via `<Badge variant={statusToBadgeVariant(...)}>`
  *   (substitui mapa `statusClass` com cores cruas de paleta sky/amber/zinc).
- * - containers de seção usam `<Card variant="solid" padding="none">`
+ * - containers de seção usam `<Card variant="solid"padding="none">`
  *   (substitui `rounded border border-line bg-white shadow-sm` cru).
  *
  * Cross-refs:
@@ -42,17 +42,17 @@ const statusLabel: Record<string, string> = {
 export default async function AdminSuportePage() {
   const tickets = await prisma.supportTicket.findMany({
     where: { status: { in: ["OPEN", "IN_PROGRESS"] } },
-    orderBy: { updatedAt: "asc" },
+    orderBy: { updatedAt: "asc"},
     include: {
       user: { select: { name: true, email: true } },
-      messages: { orderBy: { createdAt: "desc" }, take: 1, select: { text: true, isAdmin: true } },
+      messages: { orderBy: { createdAt: "desc"}, take: 1, select: { text: true, isAdmin: true } },
       _count: { select: { messages: true } },
     },
   });
 
   const closed = await prisma.supportTicket.findMany({
-    where: { status: "CLOSED" },
-    orderBy: { updatedAt: "desc" },
+    where: { status: "CLOSED"},
+    orderBy: { updatedAt: "desc"},
     take: 20,
     include: {
       user: { select: { name: true, email: true } },
@@ -61,13 +61,13 @@ export default async function AdminSuportePage() {
   });
 
   function TicketRow({ t, dim = false }: { t: typeof tickets[number]; dim?: boolean }) {
-    const last = "messages" in t ? (t as typeof tickets[number]).messages?.[0] : undefined;
+    const last = "messages"in t ? (t as typeof tickets[number]).messages?.[0] : undefined;
     return (
       <Link
         href={`/admin/suporte/${t.id}`}
-        className={`flex items-start gap-3 border-b border-line last:border-0 px-4 py-3.5 hover:bg-line/40 transition ${dim ? "opacity-60" : ""}`}
+        className={`flex items-start gap-3 border-b border-line last:border-0 px-4 py-3.5 hover:bg-line/40 transition ${dim ? "opacity-60": ""}`}
       >
-        <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-ink-dim" strokeWidth={1.5} />
+        <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-ink-dim"strokeWidth={1.5} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold truncate">{t.subject}</p>
@@ -78,7 +78,7 @@ export default async function AdminSuportePage() {
           <p className="text-xs text-ink-dim">{t.user.name} · {t.user.email}</p>
           {last && (
             <p className="mt-0.5 text-xs text-ink-dim truncate">
-              {last.isAdmin ? "Suporte: " : "Usuário: "}{last.text}
+              {last.isAdmin ? "Suporte: ": "Usuário: "}{last.text}
             </p>
           )}
         </div>
@@ -91,7 +91,7 @@ export default async function AdminSuportePage() {
     <AdminShell>
       <h1 className="mb-4 font-bold text-lg">Suporte</h1>
 
-      <Card variant="solid" padding="none" className="overflow-hidden">
+      <Card variant="solid"padding="none"className="overflow-hidden">
         <div className="border-b border-line px-4 py-3">
           <p className="text-xs font-bold uppercase tracking-wider text-ink-dim">
             Abertos e em andamento ({tickets.length})
@@ -99,7 +99,7 @@ export default async function AdminSuportePage() {
         </div>
         {tickets.length === 0 ? (
           <div className="px-4 py-6">
-            <EmptyState title="Nenhum chamado pendente" />
+            <EmptyState title="Nenhum chamado pendente"/>
           </div>
         ) : (
           tickets.map((t) => <TicketRow key={t.id} t={t} />)
@@ -107,7 +107,7 @@ export default async function AdminSuportePage() {
       </Card>
 
       {closed.length > 0 && (
-        <Card variant="solid" padding="none" className="mt-4 overflow-hidden">
+        <Card variant="solid"padding="none"className="mt-4 overflow-hidden">
           <div className="border-b border-line px-4 py-3">
             <p className="text-xs font-bold uppercase tracking-wider text-ink-dim">Fechados recentes</p>
           </div>

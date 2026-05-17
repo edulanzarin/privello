@@ -42,7 +42,7 @@ const PLAN_LABELS: Record<string, string> = {
  * por conta da página de Plano).
  */
 function buildNav(slug: string, planTier?: string): NavItem[] {
-  const canStories = planTier === "DESTAQUE" || planTier === "PREMIUM";
+  const canStories = planTier === "DESTAQUE"|| planTier === "PREMIUM";
   const items: NavItem[] = [
     { href: "/painel", label: "Visão geral", icon: LayoutDashboard },
     { href: `/p/${slug}`, label: "Ver perfil", icon: User },
@@ -98,16 +98,15 @@ function PainelFooter({
         <div className="flex items-center gap-2">
           {hasPlan ? (
             <CheckCircle2
-              className="h-3.5 w-3.5 shrink-0 text-success"
-              strokeWidth={2.4}
+              className="h-3.5 w-3.5 shrink-0 text-success"strokeWidth={2.4}
             />
           ) : (
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning"/>
           )}
           <p
             className={cn(
-              "text-sm font-semibold",
-              hasPlan ? "text-success" : "text-warning",
+"text-sm font-semibold",
+              hasPlan ? "text-success": "text-warning",
             )}
           >
             {hasPlan
@@ -116,10 +115,8 @@ function PainelFooter({
           </p>
         </div>
         <Link
-          href="/painel/plano"
-          className="mt-2 block text-xs font-medium text-rose/80 transition hover:text-rose"
-        >
-          {hasPlan ? "Gerenciar plano →" : "Assinar um plano →"}
+          href="/painel/plano"className="mt-2 block text-xs font-medium text-rose/80 transition hover:text-rose">
+          {hasPlan ? "Gerenciar plano →": "Assinar um plano →"}
         </Link>
       </div>
 
@@ -127,9 +124,7 @@ function PainelFooter({
         <Avatar
           src={avatarUrl}
           fallback={displayName}
-          size="sm"
-          className="shrink-0 bg-white/10 text-white/60"
-        />
+          size="sm"className="shrink-0 bg-white/10 text-white/60"/>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">
             {displayName}
@@ -159,12 +154,12 @@ function PainelFooter({
  *
  * Lista de navegação dinâmica conforme o `planTier`: Stories só liberam para
  * Destaque/Premium e são incluídas como link visível apenas nesses casos;
- * "Financeiro" mantém badge "Premium" sinalizando o plano necessário.
+ * "Financeiro"mantém badge "Premium"sinalizando o plano necessário.
  *
  * Props:
  * - `displayName` (string): nome do perfil exibido no rodapé.
  * - `profileSlug` (string): slug usado em `/p/[slug]` (link "Ver perfil").
- * - `planTier?` (string): plano atual ("PREMIUM" | "DESTAQUE" | "ESSENCIAL"); controla liberação de Stories.
+ * - `planTier?` (string): plano atual ("PREMIUM"| "DESTAQUE"| "ESSENCIAL"); controla liberação de Stories.
  * - `hasPlan` (boolean): se possui plano ativo (mostra check verde vs. ponto âmbar).
  * - `handle?` (string): @handle exibido sob o nome.
  * - `avatarUrl?` (string | null): avatar mostrado no rodapé.
@@ -174,13 +169,13 @@ function PainelFooter({
  * - src/app/painel/layout.tsx (renderizado em todas as rotas /painel/*)
  *
  * Side effects:
- * - Server action `logoutAction()` no clique em "Sair" (botão do `LogoutButton` no footer).
+ * - Server action `logoutAction()` no clique em "Sair"(botão do `LogoutButton` no footer).
  * - `usePathname()` para destacar item ativo (delegado ao `DarkSidebarShell`).
  * - Drawer mobile: overlay com `backdrop-blur` + `overscroll-contain`, gerenciado pelo shell.
  *
  * Trade-offs aceitos no refactor (vs. versão pré-9.2):
  * - Separadores de seção ("Conteúdo", "Perfil", "Negócio", "Conta") foram removidos: a API do `DarkSidebarShell` mantém a lista de nav focada em links (decisão travada no design).
- * - Item "Stories" não acessível ao plano corrente passa a ser omitido (em vez de renderizado em estado "muted Plus") — usuário descobre o gate via página de Plano.
+ * - Item "Stories"não acessível ao plano corrente passa a ser omitido (em vez de renderizado em estado "muted Plus") — usuário descobre o gate via página de Plano.
  * - Botão de logout compacto que ficava no header mobile foi removido; logout único permanece no rodapé (acessível via drawer).
  */
 export function PainelSidebar({
@@ -205,8 +200,7 @@ export function PainelSidebar({
 
   return (
     <DarkSidebarShell
-      logoHref="/"
-      nav={nav}
+      logoHref="/"nav={nav}
       pathname={pathname}
       footer={
         <PainelFooter

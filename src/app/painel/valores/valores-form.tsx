@@ -53,7 +53,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
     ]))
   );
   const [payments, setPayments] = useState<string[]>(() =>
-    profile.paymentMethods ? profile.paymentMethods.split(" · ").map((s) => s.trim()) : []
+    profile.paymentMethods ? profile.paymentMethods.split("· ").map((s) => s.trim()) : []
   );
 
   function togglePayment(p: string) {
@@ -71,7 +71,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       fd.set(`dur_${idx}_price`, String(prices[d.minutes]));
       idx++;
     });
-    fd.set("paymentMethods", payments.join(" · "));
+    fd.set("paymentMethods", payments.join("· "));
     startTransition(async () => {
       await saveDurationOptions(fd);
       toast("Valores salvos.");
@@ -97,10 +97,9 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   setEnabled((p) => ({ ...p, [d.minutes]: c }))
                 }
                 disabled={d.required}
-                size="md"
-              />
+                size="md"/>
               <span className={cn(
-                "w-20 shrink-0 text-md font-medium",
+"w-20 shrink-0 text-md font-medium",
                 !enabled[d.minutes] && "text-ink-dim",
               )}>
                 {d.label}
@@ -109,15 +108,12 @@ export function ValoresForm({ profile }: { profile: Profile }) {
               <div className="relative max-w-[160px]">
                 <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-ink-dim">R$</span>
                 <input
-                  type="number"
-                  min={50}
+                  type="number"min={50}
                   step={50}
                   disabled={!enabled[d.minutes]}
                   value={prices[d.minutes] || ""}
                   onChange={(e) => setPrices((p) => ({ ...p, [d.minutes]: Number(e.target.value) }))}
-                  placeholder="0"
-                  className="w-full rounded-lg border border-line bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-line/30 disabled:text-ink-dim"
-                />
+                  placeholder="0"className="w-full rounded-lg border border-line bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-line/30 disabled:text-ink-dim"/>
               </div>
             </div>
           ))}
@@ -142,8 +138,8 @@ export function ValoresForm({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      <Button type="submit" variant="coral" size="lg" loading={pending}>
-        {pending ? "Salvando…" : "Salvar valores"}
+      <Button type="submit"variant="coral"size="lg"loading={pending}>
+        {pending ? "Salvando…": "Salvar valores"}
       </Button>
     </form>
   );

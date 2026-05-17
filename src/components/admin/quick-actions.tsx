@@ -6,7 +6,7 @@ import { Check, X } from "lucide-react";
 import { approveVerification, rejectVerification } from "@/app/_actions/verification";
 
 /**
- * Par de botões "Aprovar / Rejeitar" para casos de verificação na fila de moderação.
+ * Par de botões "Aprovar / Rejeitar"para casos de verificação na fila de moderação.
  *
  * Props:
  * - `caseId` (string): id do `VerificationCase` a aprovar/rejeitar.
@@ -48,19 +48,13 @@ export function QuickActions({ caseId }: { caseId: string }) {
     <div className="flex items-center gap-1.5">
       <button
         onClick={approve}
-        title="Aprovar"
-        aria-label="Aprovar verificação"
-        className="flex h-7 w-7 items-center justify-center rounded bg-success-soft text-success transition hover:bg-success/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-        <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+        title="Aprovar"aria-label="Aprovar verificação"className="flex h-7 w-7 items-center justify-center rounded bg-success-soft text-success transition hover:bg-success/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+        <Check className="h-3.5 w-3.5"strokeWidth={2.5} />
       </button>
       <button
         onClick={reject}
-        title="Rejeitar"
-        aria-label="Rejeitar verificação"
-        className="flex h-7 w-7 items-center justify-center rounded bg-danger-soft text-danger transition hover:bg-danger/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-        <X className="h-3.5 w-3.5" strokeWidth={2.5} />
+        title="Rejeitar"aria-label="Rejeitar verificação"className="flex h-7 w-7 items-center justify-center rounded bg-danger-soft text-danger transition hover:bg-danger/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+        <X className="h-3.5 w-3.5"strokeWidth={2.5} />
       </button>
     </div>
   );

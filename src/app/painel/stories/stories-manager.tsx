@@ -62,7 +62,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
     const data = await upload(selectedFile, {
       isPublic: "true",
       purpose: "story",
-      mediaType: isVideo ? "VIDEO" : "IMAGE",
+      mediaType: isVideo ? "VIDEO": "IMAGE",
     });
     if (!data) {
       setUploading(false);
@@ -77,7 +77,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
     const storyFd = new FormData();
     storyFd.set("mediaUrl", mediaUrl);
-    storyFd.set("mediaType", isVideo ? "VIDEO" : "IMAGE");
+    storyFd.set("mediaType", isVideo ? "VIDEO": "IMAGE");
     storyFd.set("caption", caption);
 
     await createStory(storyFd);
@@ -111,19 +111,17 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
         {activeStories.length === 0 ? (
           <EmptyState
-            title="Nenhum story ativo"
-            description="Publique um story no painel ao lado."
-            icon={<ImagePlus className="h-10 w-10" strokeWidth={1} />}
+            title="Nenhum story ativo"description="Publique um story no painel ao lado."icon={<ImagePlus className="h-10 w-10"strokeWidth={1} />}
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {activeStories.map((s) => (
               <div key={s.id} className="group relative overflow-hidden rounded-xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <div className="relative aspect-[9/16]">
-                  {s.mediaType === "VIDEO" ? (
-                    <video src={s.mediaUrl} className="h-full w-full object-cover" muted playsInline />
+                  {s.mediaType === "VIDEO"? (
+                    <video src={s.mediaUrl} className="h-full w-full object-cover"muted playsInline />
                   ) : (
-                    <Image src={s.mediaUrl} alt="" fill className="object-cover" sizes="200px" />
+                    <Image src={s.mediaUrl} alt=""fill className="object-cover"sizes="200px"/>
                   )}
                   {s.caption && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-3 pb-3 pt-8">
@@ -134,26 +132,24 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
                 <div className="flex items-center justify-between px-3 py-2 text-xs text-ink-dim">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" strokeWidth={1.5} />
+                      <Eye className="h-3 w-3"strokeWidth={1.5} />
                       {s._count.views}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Heart className="h-3 w-3" strokeWidth={1.5} />
+                      <Heart className="h-3 w-3"strokeWidth={1.5} />
                       {s._count.likes}
                     </span>
                   </div>
                   <span className="flex items-center gap-1 text-success">
-                    <Clock className="h-3 w-3" strokeWidth={1.5} />
+                    <Clock className="h-3 w-3"strokeWidth={1.5} />
                     {timeLeft(s.expiresAt)}
                   </span>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => handleDelete(s.id)}
+                  type="button"onClick={() => handleDelete(s.id)}
                   disabled={deletePending}
-                  className="absolute right-2 top-2 rounded bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose/80"
-                >
-                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  className="absolute right-2 top-2 rounded bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose/80">
+                  <Trash2 className="h-3.5 w-3.5"strokeWidth={1.5} />
                 </button>
               </div>
             ))}
@@ -169,7 +165,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
             <div className="grid grid-cols-3 gap-2 p-4 sm:grid-cols-4">
               {expiredStories.slice(0, 8).map((s) => (
                 <div key={s.id} className="relative aspect-[9/16] overflow-hidden rounded-lg border border-line opacity-50 grayscale">
-                  <Image src={s.mediaUrl} alt="" fill className="object-cover" sizes="100px" />
+                  <Image src={s.mediaUrl} alt=""fill className="object-cover"sizes="100px"/>
                 </div>
               ))}
             </div>
@@ -186,25 +182,21 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
         {preview ? (
           <div className="relative aspect-[9/16] w-full overflow-hidden bg-line">
             {selectedFile?.type.startsWith("video") ? (
-              <video src={preview} className="h-full w-full object-cover" muted playsInline />
+              <video src={preview} className="h-full w-full object-cover"muted playsInline />
             ) : (
-              <Image src={preview} alt="" fill className="object-cover" sizes="360px" />
+              <Image src={preview} alt=""fill className="object-cover"sizes="360px"/>
             )}
             <button
-              type="button"
-              onClick={() => { setPreview(null); setSelectedFile(null); }}
-              className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-2xs font-semibold text-white hover:bg-black/80"
-            >
+              type="button"onClick={() => { setPreview(null); setSelectedFile(null); }}
+              className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-2xs font-semibold text-white hover:bg-black/80">
               Trocar
             </button>
           </div>
         ) : (
           <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line py-12 text-ink-dim hover:border-rose hover:text-rose transition"
-          >
-            <Plus className="h-8 w-8" strokeWidth={1.25} />
+            type="button"onClick={() => fileRef.current?.click()}
+            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-line py-12 text-ink-dim hover:border-rose hover:text-rose transition">
+            <Plus className="h-8 w-8"strokeWidth={1.25} />
             <span className="text-sm font-semibold">Selecionar foto ou vídeo</span>
             <span className="text-xs text-ink-dim/60">Vertical (9:16) recomendado</span>
           </button>
@@ -212,10 +204,7 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
 
         <input
           ref={fileRef}
-          type="file"
-          accept="image/*,video/*"
-          className="hidden"
-          onChange={handleFileSelect}
+          type="file"accept="image/*,video/*"className="hidden"onChange={handleFileSelect}
         />
 
         {/* Caption */}
@@ -226,22 +215,18 @@ export function StoriesManager({ activeStories, expiredStories }: Props) {
           <input
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            placeholder="Uma frase sobre o momento..."
-            maxLength={150}
-            className="w-full rounded-lg border border-line px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
-          />
+            placeholder="Uma frase sobre o momento..."maxLength={150}
+            className="w-full rounded-lg border border-line px-3 py-2.5 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"/>
           <p className="mt-1 text-right text-2xs text-ink-dim">{caption.length}/150</p>
         </div>
 
         <button
-          type="button"
-          onClick={handlePublish}
+          type="button"onClick={handlePublish}
           disabled={!selectedFile || uploading}
-          className="w-full rounded-lg bg-rose py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40"
-        >
+          className="w-full rounded-lg bg-rose py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-40">
           {uploading ? (
             <span className="flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Publicando…
+              <Loader2 className="h-4 w-4 animate-spin"/> Publicando…
             </span>
           ) : "Publicar story (24h)"}
         </button>

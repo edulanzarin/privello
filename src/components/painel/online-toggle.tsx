@@ -1,5 +1,5 @@
 /**
- * Stub de descontinuação — feature "online status" foi removida.
+ * Stub de descontinuação — feature "online status"foi removida.
  *
  * Mantido apenas como `export {}` para evitar quebras em imports históricos.
  * Sem renderização, sem props, sem consumidores ativos.

@@ -26,7 +26,7 @@ export default async function PainelValoresPage() {
 
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
-    include: { durationOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } } },
+    include: { durationOptions: { where: { active: true }, orderBy: { sortOrder: "asc"} } },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 

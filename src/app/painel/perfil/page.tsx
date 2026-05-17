@@ -34,11 +34,11 @@ export default async function PainelPerfilPage() {
     where: { userId: session.user.id },
     include: {
       city: true,
-      media: { orderBy: { sortOrder: "asc" } },
+      media: { orderBy: { sortOrder: "asc"} },
       stories: {
         where: { expiresAt: { gt: stories24hWindow } },
         include: { _count: { select: { views: true, likes: true } } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "desc"},
         take: 20,
       },
     },

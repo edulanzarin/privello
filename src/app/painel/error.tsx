@@ -11,10 +11,7 @@ export default function PainelError({
 }) {
     return (
         <ErrorState
-            variant="page"
-            title="Erro no painel"
-            description="Não foi possível carregar esta página. Tente novamente."
-            onRetry={reset}
+            variant="page"title="Erro no painel"description="Não foi possível carregar esta página. Tente novamente."onRetry={reset}
             digest={error.digest}
         />
     );

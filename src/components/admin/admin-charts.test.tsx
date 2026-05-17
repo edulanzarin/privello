@@ -69,7 +69,7 @@ const EMPTY_TITLE = "Sem dados no período.";
 
 /**
  * Recupera o wrapper externo (Card) a partir de um nó interno do chart.
- * O `ChartCard` renderiza `<Card variant="solid" padding="md">` na raiz,
+ * O `ChartCard` renderiza `<Card variant="solid"padding="md">` na raiz,
  * então o ancestral mais externo dentro do mountNode é o Card.
  */
 function getWrapperCard(container: HTMLElement): HTMLElement {
@@ -80,12 +80,12 @@ function getWrapperCard(container: HTMLElement): HTMLElement {
 
 function assertSolidCardSignature(el: HTMLElement) {
     const cls = el.className;
-    // v2: variant="solid" usa bg-surface (off-white) + border-line + rounded-2xl.
+    // v2: variant="solid"usa bg-surface (off-white) + border-line + rounded-2xl.
     // Foi `bg-white + border-line + rounded-2xl` na v1.
     expect(cls).toContain("bg-surface");
     expect(cls).toContain("rounded-2xl");
     expect(cls).toContain("border-line");
-    // padding="md" → p-5
+    // padding="md"→ p-5
     expect(cls).toContain("p-5");
 }
 

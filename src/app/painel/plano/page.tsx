@@ -58,7 +58,7 @@ export default async function PainelPlanoPage() {
   const now = new Date();
   const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > now;
   const hasPlan = profile.planExpiresAt != null && new Date(profile.planExpiresAt) > now;
-  const currentName = { ESSENCIAL: "Essencial", DESTAQUE: "Destaque", PREMIUM: "Premium" }[profile.planTier] ?? profile.planTier;
+  const currentName = { ESSENCIAL: "Essencial", DESTAQUE: "Destaque", PREMIUM: "Premium"}[profile.planTier] ?? profile.planTier;
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -66,14 +66,14 @@ export default async function PainelPlanoPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Plano</h1>
         {hasPlan ? (
           <p className="mt-1 text-md text-ink-dim">
-            Plano <span className="font-semibold text-ink">{currentName}</span> ativo até{" "}
+            Plano <span className="font-semibold text-ink">{currentName}</span> ativo até{""}
             <span className="font-semibold text-ink">
-              {new Date(profile.planExpiresAt!).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}
+              {new Date(profile.planExpiresAt!).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric"})}
             </span>
           </p>
         ) : (
-          <Card variant="warning-subtle" padding="none" className="mt-2 flex items-center gap-2 px-4 py-3">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-warning" />
+          <Card variant="warning-subtle"padding="none"className="mt-2 flex items-center gap-2 px-4 py-3">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-warning"/>
             <p className="text-base font-medium text-warning-dark">Nenhum plano ativo — você não aparece nas buscas.</p>
           </Card>
         )}
@@ -81,19 +81,17 @@ export default async function PainelPlanoPage() {
 
       {/* Boost card */}
       <div className={`rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${isBoosted
-        ? "border-warning/25 bg-warning/[0.05]"
-        : "border-line bg-white"
-        }`}>
+        ? "border-warning/25 bg-warning/[0.05]": "border-line bg-white"}`}>
         <div className="flex items-center gap-2">
-          <Zap className={`h-4 w-4 ${isBoosted ? "text-warning" : "text-ink-dim"}`} strokeWidth={1.5} />
+          <Zap className={`h-4 w-4 ${isBoosted ? "text-warning": "text-ink-dim"}`} strokeWidth={1.5} />
           <p className="text-md font-semibold">Boost de 24h</p>
-          {hasPlan && profile.planTier === "PREMIUM" && (
+          {hasPlan && profile.planTier === "PREMIUM"&& (
             <span className="ml-auto rounded-full bg-rose/10 px-2 py-0.5 text-2xs font-semibold text-rose">1 grátis/mês · Premium</span>
           )}
         </div>
         {isBoosted ? (
           <p className="mt-2 text-base text-warning-dark">
-            Boost ativo — expira em{" "}
+            Boost ativo — expira em{""}
             {new Date(profile.featuredUntil!).toLocaleString("pt-BR", {
               day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
             })}
@@ -101,11 +99,11 @@ export default async function PainelPlanoPage() {
         ) : (
           <>
             <p className="mt-1.5 text-base text-ink-dim">
-              Sobe seu perfil ao topo por 24h.{" "}
-              {hasPlan && profile.planTier === "PREMIUM" ? "Grátis para Premium — use 1x por mês." : "R$ 89 por disparo."}
+              Sobe seu perfil ao topo por 24h.{""}
+              {hasPlan && profile.planTier === "PREMIUM"? "Grátis para Premium — use 1x por mês.": "R$ 89 por disparo."}
             </p>
             <div className="mt-3">
-              {hasPlan && profile.planTier === "PREMIUM" ? <FreeBoostButton /> : <BoostButton />}
+              {hasPlan && profile.planTier === "PREMIUM"? <FreeBoostButton /> : <BoostButton />}
             </div>
           </>
         )}
@@ -119,9 +117,7 @@ export default async function PainelPlanoPage() {
             <div
               key={plan.tier}
               className={`relative rounded-2xl border p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition ${isActive
-                ? "border-rose/25 bg-rose/[0.04]"
-                : "border-line bg-white"
-                }`}
+                ? "border-rose/25 bg-rose/[0.04]": "border-line bg-white"}`}
             >
               {isActive && (
                 <span className="mb-3 inline-flex items-center rounded-full bg-rose/10 px-2.5 py-0.5 text-xs font-semibold text-rose">
@@ -136,7 +132,7 @@ export default async function PainelPlanoPage() {
               <ul className="mt-4 space-y-2.5">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-base text-ink-dim">
-                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2.5} />
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success"strokeWidth={2.5} />
                     {f}
                   </li>
                 ))}

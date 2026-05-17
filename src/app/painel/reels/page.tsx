@@ -29,8 +29,8 @@ export default async function PainelReelsPage() {
   if (!profile) redirect("/conta/onboarding/perfil");
 
   const reels = await prisma.media.findMany({
-    where: { profileId: profile.id, mediaType: "REEL" },
-    orderBy: { sortOrder: "asc" },
+    where: { profileId: profile.id, mediaType: "REEL"},
+    orderBy: { sortOrder: "asc"},
     select: { id: true, url: true, caption: true, isPublic: true },
   });
 

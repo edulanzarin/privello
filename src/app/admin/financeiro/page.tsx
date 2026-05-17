@@ -30,9 +30,9 @@ import { Table, THead, TR, TH, TD } from "@/components/ui/table";
 export const dynamic = "force-dynamic";
 
 const PLAN_PRICES: Record<string, number> = { ESSENCIAL: 39.90, DESTAQUE: 89, PREMIUM: 189 };
-const PLAN_LABELS: Record<string, string> = { ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium" };
+const PLAN_LABELS: Record<string, string> = { ESSENCIAL: "Basic", DESTAQUE: "Plus", PREMIUM: "Premium"};
 const SUBSCRIBER_PRICE_BRL = 19.90;
-const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL"});
 
 export default async function AdminFinanceiroPage() {
   const now = new Date();
@@ -41,12 +41,12 @@ export default async function AdminFinanceiroPage() {
     prisma.profile.groupBy({ by: ["planTier"], _count: true }),
     prisma.subscription.findMany({
       where: { status: "ACTIVE", expiresAt: { gt: now } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "desc"},
       take: 50,
       include: { user: { select: { email: true, name: true } } },
     }),
-    prisma.subscription.count({ where: { status: "EXPIRED" } }),
-    prisma.subscription.count({ where: { status: "CANCELLED" } }),
+    prisma.subscription.count({ where: { status: "EXPIRED"} }),
+    prisma.subscription.count({ where: { status: "CANCELLED"} }),
   ]);
 
   const providerMRR = planStats.reduce((sum, g) => sum + g._count * (PLAN_PRICES[g.planTier] ?? 0), 0);
@@ -61,18 +61,14 @@ export default async function AdminFinanceiroPage() {
       {/* MRR — tiles agregados (Req 10.4) */}
       <div className="grid gap-3 sm:grid-cols-3">
         <KPICard
-          label="MRR Total estimado"
-          value={fmt(totalMRR)}
-          subtitle="receita recorrente/mês"
-        />
+          label="MRR Total estimado"value={fmt(totalMRR)}
+          subtitle="receita recorrente/mês"/>
         <KPICard
-          label="Planos de acompanhantes"
-          value={fmt(providerMRR)}
+          label="Planos de acompanhantes"value={fmt(providerMRR)}
           subtitle={`${totalProviderProfiles} perfis ativos`}
         />
         <KPICard
-          label="Assinaturas de clientes"
-          value={fmt(subMRR)}
+          label="Assinaturas de clientes"value={fmt(subMRR)}
           subtitle={`${activeSubscriptions.length} assinantes ativos`}
         />
       </div>
@@ -91,9 +87,9 @@ export default async function AdminFinanceiroPage() {
 
       {/* Contadores de assinaturas */}
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <KPICard label="Assinantes ativos" value={activeSubscriptions.length} />
-        <KPICard label="Expiradas" value={expiredSubs} />
-        <KPICard label="Canceladas" value={cancelledSubs} />
+        <KPICard label="Assinantes ativos"value={activeSubscriptions.length} />
+        <KPICard label="Expiradas"value={expiredSubs} />
+        <KPICard label="Canceladas"value={cancelledSubs} />
       </div>
 
       {/* Lista de assinantes ativos recentes (Req 10.4) */}

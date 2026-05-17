@@ -59,16 +59,16 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
             <th className="px-4 py-3">Pagamento</th>
             <th className="px-4 py-3">Origem</th>
             <th className="px-4 py-3 text-right">Valor</th>
-            <th className="px-4 py-3 w-16" />
+            <th className="px-4 py-3 w-16"/>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <React.Fragment key={r.id}>
-              <tr className={`border-b border-line group transition ${deletingId === r.id ? "opacity-40" : ""}`}>
+              <tr className={`border-b border-line group transition ${deletingId === r.id ? "opacity-40": ""}`}>
                 <td className="px-4 py-3 whitespace-nowrap text-ink-dim">
-                  {r.occurredAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}{" "}
-                  {r.occurredAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  {r.occurredAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short"})}{""}
+                  {r.occurredAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit"})}
                 </td>
                 <td className="px-4 py-3 font-medium">{r.clientLabel}</td>
                 <td className="px-4 py-3 text-ink-dim">{r.durationLabel}</td>
@@ -89,21 +89,15 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      type="button"
-                      title="Editar"
-                      onClick={() => setEditingId(editingId === r.id ? null : r.id)}
-                      className="text-ink-dim hover:text-ink"
-                    >
-                      <Pencil className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      type="button"title="Editar"onClick={() => setEditingId(editingId === r.id ? null : r.id)}
+                      className="text-ink-dim hover:text-ink">
+                      <Pencil className="h-3.5 w-3.5"strokeWidth={1.5} />
                     </button>
                     <button
-                      type="button"
-                      title="Excluir"
-                      onClick={() => handleDelete(r.id)}
+                      type="button"title="Excluir"onClick={() => handleDelete(r.id)}
                       disabled={deletingId === r.id}
-                      className="text-ink-dim hover:text-rose disabled:opacity-30"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      className="text-ink-dim hover:text-rose disabled:opacity-30">
+                      <Trash2 className="h-3.5 w-3.5"strokeWidth={1.5} />
                     </button>
                   </div>
                 </td>
@@ -117,55 +111,50 @@ export function FinancialTable({ rows }: { rows: FinancialRow[] }) {
                         await updateFinancialRecord(fd);
                         setEditingId(null);
                       }}
-                      className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6"
-                    >
-                      <input type="hidden" name="recordId" value={r.id} />
+                      className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+                      <input type="hidden"name="recordId"value={r.id} />
 
                       <div className="col-span-2">
                         <label className={lbl}>Cliente</label>
-                        <input name="clientLabel" defaultValue={r.clientLabel} required className={inp} />
+                        <input name="clientLabel"defaultValue={r.clientLabel} required className={inp} />
                       </div>
                       <div>
                         <label className={lbl}>Valor (R$)</label>
-                        <input name="amountBrl" type="number" defaultValue={r.amountBrl} required min={1} className={inp} />
+                        <input name="amountBrl"type="number"defaultValue={r.amountBrl} required min={1} className={inp} />
                       </div>
                       <div>
                         <label className={lbl}>Duração</label>
-                        <select name="durationLabel" defaultValue={r.durationLabel} className={sel}>
+                        <select name="durationLabel"defaultValue={r.durationLabel} className={sel}>
                           {DURATION_OPTIONS.map((o) => <option key={o}>{o}</option>)}
                         </select>
                       </div>
                       <div>
                         <label className={lbl}>Local</label>
-                        <select name="locationLabel" defaultValue={r.locationLabel} className={sel}>
+                        <select name="locationLabel"defaultValue={r.locationLabel} className={sel}>
                           {LOCATION_OPTIONS.map((o) => <option key={o}>{o}</option>)}
                         </select>
                       </div>
                       <div>
                         <label className={lbl}>Pagamento</label>
-                        <select name="paymentLabel" defaultValue={r.paymentLabel} className={sel}>
+                        <select name="paymentLabel"defaultValue={r.paymentLabel} className={sel}>
                           {PAYMENT_OPTIONS.map((o) => <option key={o}>{o}</option>)}
                         </select>
                       </div>
 
                       <div className="col-span-2 sm:col-span-4 lg:col-span-6 flex items-center justify-between">
                         <label className="flex items-center gap-2 text-sm cursor-pointer">
-                          <input type="checkbox" name="isNoShow" defaultChecked={r.isNoShow} className="h-4 w-4 accent-coral" />
+                          <input type="checkbox"name="isNoShow"defaultChecked={r.isNoShow} className="h-4 w-4 accent-coral"/>
                           No-show
                         </label>
                         <div className="flex gap-2">
                           <button
-                            type="button"
-                            onClick={() => setEditingId(null)}
-                            className="flex items-center gap-1.5 rounded-lg border border-line px-4 py-2 text-xs font-semibold text-ink-dim hover:text-ink transition"
-                          >
-                            <X className="h-3.5 w-3.5" /> Cancelar
+                            type="button"onClick={() => setEditingId(null)}
+                            className="flex items-center gap-1.5 rounded-lg border border-line px-4 py-2 text-xs font-semibold text-ink-dim hover:text-ink transition">
+                            <X className="h-3.5 w-3.5"/> Cancelar
                           </button>
                           <button
-                            type="submit"
-                            className="flex items-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-xs font-semibold text-white hover:bg-ink/80 transition"
-                          >
-                            <Check className="h-3.5 w-3.5" /> Salvar
+                            type="submit"className="flex items-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-xs font-semibold text-white hover:bg-ink/80 transition">
+                            <Check className="h-3.5 w-3.5"/> Salvar
                           </button>
                         </div>
                       </div>

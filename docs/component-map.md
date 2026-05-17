@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (painel migrado: 12 rotas + sidebar + DarkSidebarShell tokens v2)
+**Última atualização**: 2026-05-17 (admin migrado: 7 rotas + admin-shell + componentes; tokens via batch swap + targeted patches)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -144,12 +144,12 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
-| `admin-shell.tsx` | 🔴 | Layout admin |
+| `admin-shell.tsx` | 🟢 | Wrapper de DarkSidebarShell para admin (props: displayName, role, handle, avatarUrl) |
 | `admin-charts.tsx` | 🟡 | Recharts com cores v1 (precisa rever chart-tokens) |
-| `admin-city-filter.tsx` | 🔴 | Filtro de cidade |
-| `media-actions.tsx` | 🔴 | Aprovar/rejeitar |
-| `quick-actions.tsx` | 🔴 | Atalhos |
-| `warning-form.tsx` | 🔴 | Form de warning |
+| `admin-city-filter.tsx` | 🟢 | Filtro de cidade |
+| `media-actions.tsx` | 🟢 | Aprovar/rejeitar |
+| `quick-actions.tsx` | 🟢 | Atalhos |
+| `warning-form.tsx` | 🟢 | Form de warning |
 
 #### `reels/` — vídeos
 
@@ -244,13 +244,13 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Status v2 |
 |------|-----------|
-| `/admin/moderacao` | 🔴 |
-| `/admin/perfis` | 🔴 |
-| `/admin/midias` | 🔴 |
-| `/admin/verificacoes/[id]` | 🔴 |
-| `/admin/financeiro` | 🔴 |
-| `/admin/suporte` | 🔴 |
-| `/admin/suporte/[id]` | 🔴 |
+| `/admin/moderacao` | 🟢 |
+| `/admin/perfis` | 🟢 |
+| `/admin/midias` | 🟢 |
+| `/admin/verificacoes/[id]` | 🟢 |
+| `/admin/financeiro` | 🟢 |
+| `/admin/suporte` | 🟢 |
+| `/admin/suporte/[id]` | 🟢 |
 
 ### 3.7 Erro / sistema
 
@@ -287,9 +287,9 @@ Ordem por impacto + dependência:
 5. ~~**`/entrar` + `/cadastro/**` + `/recuperar-senha/**`**~~ ✅ done
 6. ~~**`/planos`**~~ ✅ done
 7. ~~**`/conta/onboarding/**` + `/conta/verificacao`**~~ ✅ done
-8. ~~**`/painel/**`**~~ ✅ done (DarkSidebarShell + sidebar + 12 rotas via batch token swap)
-9. **`/admin/**`** — moderação (próximo)
-10. `/reels/**` — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
+8. ~~**`/painel/**`**~~ ✅ done
+9. ~~**`/admin/**`**~~ ✅ done
+10. **`/reels/**`** — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
 11. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
 12. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)
 

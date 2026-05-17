@@ -18,7 +18,7 @@
  *
  * Migrado para o design system canônico (Requirement 10.2):
  * - Filtros via `<Input>` e `<Select>`.
- * - Botão "Filtrar" via `<Button>`.
+ * - Botão "Filtrar"via `<Button>`.
  * - Listagem via `<Table>/<THead>/<TR>/<TH>/<TD>`.
  * - Badges de plano via `<Badge>` mapeado por `statusToBadgeVariant`.
  * - Sem classes Tailwind cruas de paleta (zinc/amber/sky/emerald/purple/red).
@@ -58,10 +58,10 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
 
   const where: Prisma.ProfileWhereInput = {};
   if (q) where.OR = [
-    { displayName: { contains: q, mode: "insensitive" } },
-    { slug: { contains: q, mode: "insensitive" } },
+    { displayName: { contains: q, mode: "insensitive"} },
+    { slug: { contains: q, mode: "insensitive"} },
   ];
-  if (planFilter) where.planTier = planFilter as "ESSENCIAL" | "DESTAQUE" | "PREMIUM";
+  if (planFilter) where.planTier = planFilter as "ESSENCIAL"| "DESTAQUE"| "PREMIUM";
   if (verifiedFilter === "1") where.isVerified = true;
   if (verifiedFilter === "0") where.isVerified = false;
   if (cityFilter) where.city = { slug: cityFilter };
@@ -69,7 +69,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
   const [profiles, total, cities] = await Promise.all([
     prisma.profile.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "desc"},
       skip: (pageNum - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       include: {
@@ -80,7 +80,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
       },
     }),
     prisma.profile.count({ where }),
-    prisma.city.findMany({ select: { name: true, slug: true }, orderBy: { name: "asc" } }),
+    prisma.city.findMany({ select: { name: true, slug: true }, orderBy: { name: "asc"} }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -92,22 +92,22 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
     return `/admin/perfis?${p.toString()}`;
   }
 
-  // Opções dos selects de filtro. "Todos / Verificação / Todas as cidades" ficam
+  // Opções dos selects de filtro. "Todos / Verificação / Todas as cidades"ficam
   // como primeira opção com value vazio para preservar o comportamento legado
   // (clear-filter via submit sem valor).
   const planOptions = [
-    { value: "", label: "Todos os planos" },
-    { value: "PREMIUM", label: "Premium" },
-    { value: "DESTAQUE", label: "Plus" },
-    { value: "ESSENCIAL", label: "Basic" },
+    { value: "", label: "Todos os planos"},
+    { value: "PREMIUM", label: "Premium"},
+    { value: "DESTAQUE", label: "Plus"},
+    { value: "ESSENCIAL", label: "Basic"},
   ];
   const verifiedOptions = [
-    { value: "", label: "Verificação" },
-    { value: "1", label: "Verificadas" },
-    { value: "0", label: "Não verificadas" },
+    { value: "", label: "Verificação"},
+    { value: "1", label: "Verificadas"},
+    { value: "0", label: "Não verificadas"},
   ];
   const cityOptions = [
-    { value: "", label: "Todas as cidades" },
+    { value: "", label: "Todas as cidades"},
     ...cities.map((c) => ({ value: c.slug, label: c.name })),
   ];
 
@@ -115,33 +115,23 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
     <AdminShell>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-bold text-lg">Perfis <span className="text-ink-dim font-normal text-sm">({total})</span></h1>
-        <form method="get" action="/admin/perfis" className="flex flex-wrap items-center gap-2">
+        <form method="get"action="/admin/perfis"className="flex flex-wrap items-center gap-2">
           <Input
-            name="q"
-            defaultValue={q}
-            placeholder="Nome ou @handle…"
-            aria-label="Buscar por nome ou @handle"
-            className="w-44"
-          />
+            name="q"defaultValue={q}
+            placeholder="Nome ou @handle…"aria-label="Buscar por nome ou @handle"className="w-44"/>
           <Select
-            name="plan"
-            defaultValue={planFilter}
+            name="plan"defaultValue={planFilter}
             options={planOptions}
-            aria-label="Filtrar por plano"
-          />
+            aria-label="Filtrar por plano"/>
           <Select
-            name="verified"
-            defaultValue={verifiedFilter}
+            name="verified"defaultValue={verifiedFilter}
             options={verifiedOptions}
-            aria-label="Filtrar por verificação"
-          />
+            aria-label="Filtrar por verificação"/>
           <Select
-            name="city"
-            defaultValue={cityFilter}
+            name="city"defaultValue={cityFilter}
             options={cityOptions}
-            aria-label="Filtrar por cidade"
-          />
-          <Button type="submit" size="sm" variant="primary">Filtrar</Button>
+            aria-label="Filtrar por cidade"/>
+          <Button type="submit"size="sm"variant="primary">Filtrar</Button>
         </form>
       </div>
 
@@ -163,13 +153,13 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
               <TR key={p.id}>
                 <TD>
                   <div className="relative h-9 w-7 overflow-hidden rounded bg-line">
-                    {cover && <Image src={cover} alt="" fill className="object-cover" sizes="28px" />}
+                    {cover && <Image src={cover} alt=""fill className="object-cover"sizes="28px"/>}
                   </div>
                 </TD>
                 <TD>
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold">{p.displayName}</span>
-                    {p.isVerified && <BadgeCheck className="h-3.5 w-3.5 text-success" strokeWidth={2} />}
+                    {p.isVerified && <BadgeCheck className="h-3.5 w-3.5 text-success"strokeWidth={2} />}
                   </div>
                   <p className="text-xs text-ink-dim">@{p.slug} · {p.user?.email}</p>
                 </TD>
@@ -182,11 +172,11 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                 <TD>
                   {p.isSuspended ? (
                     <span className="flex items-center gap-1 text-xs font-semibold text-danger">
-                      <Ban className="h-3 w-3" strokeWidth={2} /> Suspensa
+                      <Ban className="h-3 w-3"strokeWidth={2} /> Suspensa
                     </span>
                   ) : (
-                    <span className={`text-xs font-semibold ${p.isOnline ? "text-success" : "text-ink-dim"}`}>
-                      {p.isOnline ? "● Online" : "○ Offline"}
+                    <span className={`text-xs font-semibold ${p.isOnline ? "text-success": "text-ink-dim"}`}>
+                      {p.isOnline ? "● Online": "○ Offline"}
                     </span>
                   )}
                 </TD>
@@ -195,35 +185,28 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                     {/* Toggle verificação */}
                     <form action={adminToggleVerification.bind(null, p.id)}>
                       <button
-                        type="submit"
-                        className={`text-2xs font-bold px-2 py-1 border transition ${p.isVerified
-                          ? "border-success/30 bg-success/10 text-success hover:bg-success/20"
-                          : "border-line text-ink-dim hover:border-ink/30"
-                          }`}
+                        type="submit"className={`text-2xs font-bold px-2 py-1 border transition ${p.isVerified
+                          ? "border-success/30 bg-success/10 text-success hover:bg-success/20": "border-line text-ink-dim hover:border-ink/30"}`}
                       >
-                        {p.isVerified ? "✓ Verificada" : "Verificar"}
+                        {p.isVerified ? "✓ Verificada": "Verificar"}
                       </button>
                     </form>
                     {/* Mudar plano */}
                     <form
                       action={async (fd: FormData) => {
-                        "use server";
+"use server";
                         await adminSetPlan(p.id, fd.get("plan") as string);
                       }}
-                      className="flex items-center gap-1"
-                    >
+                      className="flex items-center gap-1">
                       <Select
-                        name="plan"
-                        defaultValue={p.planTier}
-                        aria-label="Mudar plano do perfil"
-                        options={[
-                          { value: "ESSENCIAL", label: "Basic" },
-                          { value: "DESTAQUE", label: "Plus" },
-                          { value: "PREMIUM", label: "Premium" },
+                        name="plan"defaultValue={p.planTier}
+                        aria-label="Mudar plano do perfil"options={[
+                          { value: "ESSENCIAL", label: "Basic"},
+                          { value: "DESTAQUE", label: "Plus"},
+                          { value: "PREMIUM", label: "Premium"},
                         ]}
-                        className="w-auto"
-                      />
-                      <button type="submit" className="border border-line px-2 py-1 text-2xs font-bold text-ink-dim hover:text-ink transition">
+                        className="w-auto"/>
+                      <button type="submit"className="border border-line px-2 py-1 text-2xs font-bold text-ink-dim hover:text-ink transition">
                         OK
                       </button>
                     </form>
@@ -234,7 +217,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
                       warningCount={p._count.warnings}
                       isSuspended={p.isSuspended}
                     />
-                    <Link href={`/p/${p.slug}`} target="_blank" className="text-xs text-ink-dim underline hover:text-ink">
+                    <Link href={`/p/${p.slug}`} target="_blank"className="text-xs text-ink-dim underline hover:text-ink">
                       ↗
                     </Link>
                   </div>
@@ -249,7 +232,7 @@ export default async function AdminPerfisPage({ searchParams }: PageProps) {
         <div className="mt-3 flex justify-end gap-1 text-xs">
           {pageNum > 1 && <Link href={href({ p: String(pageNum - 1) })} className="border border-line px-2.5 py-1 hover:bg-line">←</Link>}
           {Array.from({ length: totalPages }, (_, i) => i + 1).filter((n) => Math.abs(n - pageNum) <= 2).map((n) => (
-            <Link key={n} href={href({ p: String(n) })} className={`border px-2.5 py-1 ${n === pageNum ? "border-ink bg-ink text-white" : "border-line hover:bg-line"}`}>{n}</Link>
+            <Link key={n} href={href({ p: String(n) })} className={`border px-2.5 py-1 ${n === pageNum ? "border-ink bg-ink text-white": "border-line hover:bg-line"}`}>{n}</Link>
           ))}
           {pageNum < totalPages && <Link href={href({ p: String(pageNum + 1) })} className="border border-line px-2.5 py-1 hover:bg-line">→</Link>}
         </div>

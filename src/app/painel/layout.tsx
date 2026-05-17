@@ -22,7 +22,7 @@ export default async function PainelLayout({ children }: { children: React.React
       planExpiresAt: true,
       media: {
         where: { isPublic: true },
-        orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }],
+        orderBy: [{ isCover: "desc"}, { sortOrder: "asc"}],
         take: 1,
         select: { url: true },
       },

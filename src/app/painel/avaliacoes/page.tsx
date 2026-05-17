@@ -31,8 +31,8 @@ function StarRow({ rating }: { rating: number }) {
         <Star
           key={n}
           className={cn(
-            "h-3.5 w-3.5",
-            n <= rating ? "fill-coral text-rose" : "text-line",
+"h-3.5 w-3.5",
+            n <= rating ? "fill-coral text-rose": "text-line",
           )}
           strokeWidth={0}
         />
@@ -57,7 +57,7 @@ export default async function PainelAvaliacoesPage() {
 
   const reviews = await prisma.review.findMany({
     where: { profileId: profile.id },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc"},
     include: {
       user: { select: { name: true, slug: true } },
     },
@@ -99,24 +99,23 @@ export default async function PainelAvaliacoesPage() {
           <p className="text-xs font-medium text-ink-dim">Total</p>
           <p className="mt-2 text-4xl font-bold tabular-nums">{profile.ratingCount}</p>
           <p className="mt-1 text-xs text-ink-dim">
-            avaliação{profile.ratingCount !== 1 ? "ões" : ""}
+            avaliação{profile.ratingCount !== 1 ? "ões": ""}
           </p>
         </div>
 
         <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-xs font-medium text-ink-dim flex items-center gap-1.5">
-            <TrendingUp className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <TrendingUp className="h-3.5 w-3.5"strokeWidth={1.5} />
             Distribuição
           </p>
           <ul className="mt-3 space-y-1.5">
             {dist.map(({ star, count }) => (
               <li key={star} className="flex items-center gap-2 text-xs">
                 <span className="w-4 shrink-0 text-right text-ink-dim">{star}</span>
-                <Star className="h-3 w-3 fill-coral text-rose shrink-0" strokeWidth={0} />
+                <Star className="h-3 w-3 fill-coral text-rose shrink-0"strokeWidth={0} />
                 <div className="flex-1 h-1.5 rounded-full bg-line overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-rose"
-                    style={{ width: `${pct(count)}%` }}
+                    className="h-full rounded-full bg-rose"style={{ width: `${pct(count)}%` }}
                   />
                 </div>
                 <span className="w-5 shrink-0 text-right text-ink-dim">{count}</span>
@@ -129,14 +128,12 @@ export default async function PainelAvaliacoesPage() {
       {/* Reviews list */}
       {reviews.length === 0 ? (
         <EmptyState
-          title="Nenhuma avaliação ainda"
-          description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil."
-          icon={<MessageSquare className="h-10 w-10" strokeWidth={1.5} />}
+          title="Nenhuma avaliação ainda"description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil."icon={<MessageSquare className="h-10 w-10"strokeWidth={1.5} />}
         />
       ) : (
         <div className="space-y-3">
           <p className="text-base font-medium text-ink-dim">
-            {reviews.length} avaliação{reviews.length !== 1 ? "ões" : ""}
+            {reviews.length} avaliação{reviews.length !== 1 ? "ões": ""}
           </p>
           {reviews.map((r) => (
             <article key={r.id} className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">

@@ -68,9 +68,7 @@ function AdminFooter({
         <Avatar
           src={avatarUrl}
           fallback={displayName}
-          size="sm"
-          className="shrink-0 bg-white/10 text-white/60"
-        />
+          size="sm"className="shrink-0 bg-white/10 text-white/60"/>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">
             {displayName}
@@ -98,7 +96,7 @@ function AdminFooter({
  * Props (todas opcionais para preservar os call-sites existentes
  * `<AdminShell>{children}</AdminShell>`):
  * - `displayName?` (string): nome exibido no rodapé. Default `"Admin"`.
- * - `role?` (string): `"ADMIN" | "MODERATOR"`; mapeado para "Administrador" / "Moderador". Default `"Admin"`.
+ * - `role?` (string): `"ADMIN"| "MODERATOR"`; mapeado para "Administrador"/ "Moderador". Default `"Admin"`.
  * - `handle?` (string): @handle exibido sob o nome quando presente.
  * - `avatarUrl?` (string | null): avatar mostrado no rodapé.
  * - `children` (React.ReactNode): conteúdo da página renderizado dentro do `<main>`.
@@ -112,7 +110,7 @@ function AdminFooter({
  * - src/app/admin/verificacoes/[id]/page.tsx
  *
  * Side effects:
- * - Server action `logoutAction()` no clique em "Sair" via `LogoutButton`.
+ * - Server action `logoutAction()` no clique em "Sair"via `LogoutButton`.
  * - `usePathname()` para destacar item ativo (delegado ao `DarkSidebarShell`).
  * - Drawer mobile: overlay com `backdrop-blur` + `overscroll-contain`, gerenciado pelo shell.
  */
@@ -132,10 +130,9 @@ export function AdminShell({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen  text-ink">
+    <div className="min-h-screen text-ink">
       <DarkSidebarShell
-        logoHref="/admin/moderacao"
-        nav={NAV_ADMIN}
+        logoHref="/admin/moderacao"nav={NAV_ADMIN}
         pathname={pathname}
         footer={
           <AdminFooter

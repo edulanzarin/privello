@@ -42,7 +42,7 @@ export function ProviderBanner({ variant }: Props) {
               aria-hidden
             />
             <span className="truncate">
-              Visualizando seu próprio perfil — visitas não são contadas.
+              Visualizando seu próprio perfil.
             </span>
           </span>
           <Link

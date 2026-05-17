@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { logoutAction } from "@/app/_actions/logout";
 
 /**
- * Botão "Sair" compacto (apenas ícone) usado no header do painel mobile e no rodapé
+ * Botão "Sair"compacto (apenas ícone) usado no header do painel mobile e no rodapé
  * da sidebar desktop. Dispara `logoutAction()` em `useTransition`.
  *
  * Consumidores conhecidos:
@@ -25,13 +25,10 @@ export function LogoutButton() {
 
   return (
     <button
-      type="button"
-      disabled={pending}
-      title="Sair"
-      onClick={handleLogout}
-      className="rounded p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
-    >
-      <LogOut className="h-4 w-4" strokeWidth={1.5} />
+      type="button"disabled={pending}
+      title="Sair"onClick={handleLogout}
+      className="rounded p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white disabled:opacity-50">
+      <LogOut className="h-4 w-4"strokeWidth={1.5} />
     </button>
   );
 }

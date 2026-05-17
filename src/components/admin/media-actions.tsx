@@ -5,7 +5,7 @@ import { Trash2, Eye, EyeOff } from "lucide-react";
 import { deleteAdminMedia, toggleMediaVisibility } from "@/app/_actions/admin-moderation";
 
 /**
- * Botão "Apagar" mídia em duas etapas (clique inicial → "Confirmar/Não" inline)
+ * Botão "Apagar"mídia em duas etapas (clique inicial → "Confirmar/Não"inline)
  * usado no painel admin de mídias.
  *
  * Props:
@@ -27,14 +27,12 @@ export function MediaDeleteBtn({ mediaId }: { mediaId: string }) {
         <button
           onClick={() => start(async () => { await deleteAdminMedia(mediaId); })}
           disabled={pending}
-          className="bg-red-600 text-white text-2xs font-bold px-2 py-1 hover:bg-red-700 transition disabled:opacity-40"
-        >
-          {pending ? "…" : "Confirmar"}
+          className="bg-red-600 text-white text-2xs font-bold px-2 py-1 hover:bg-red-700 transition disabled:opacity-40">
+          {pending ? "…": "Confirmar"}
         </button>
         <button
           onClick={() => setConfirm(false)}
-          className="text-2xs text-ink-dim hover:text-ink border border-line px-2 py-1 transition"
-        >
+          className="text-2xs text-ink-dim hover:text-ink border border-line px-2 py-1 transition">
           Não
         </button>
       </div>
@@ -44,17 +42,15 @@ export function MediaDeleteBtn({ mediaId }: { mediaId: string }) {
   return (
     <button
       onClick={() => setConfirm(true)}
-      className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"
-      title="Apagar mídia"
-    >
-      <Trash2 className="h-3 w-3" strokeWidth={2} />
+      className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"title="Apagar mídia">
+      <Trash2 className="h-3 w-3"strokeWidth={2} />
       Apagar
     </button>
   );
 }
 
 /**
- * Botão "Privar/Publicar" mídia que alterna a visibilidade pública.
+ * Botão "Privar/Publicar"mídia que alterna a visibilidade pública.
  *
  * Props:
  * - `mediaId` (string): id da mídia a togglar.
@@ -74,15 +70,13 @@ export function MediaVisibilityBtn({ mediaId, isPublic }: { mediaId: string; isP
       onClick={() => start(async () => { await toggleMediaVisibility(mediaId); })}
       disabled={pending}
       className={`flex items-center gap-1 text-2xs font-bold px-2 py-1 border transition disabled:opacity-40 ${isPublic
-        ? "border-line text-ink-dim hover:border-ink/30 hover:text-ink"
-        : "border-success/30 bg-success-soft text-success-dark hover:bg-success/15"
-        }`}
-      title={isPublic ? "Tornar privada" : "Tornar pública"}
+        ? "border-line text-ink-dim hover:border-ink/30 hover:text-ink": "border-success/30 bg-success-soft text-success-dark hover:bg-success/15"}`}
+      title={isPublic ? "Tornar privada": "Tornar pública"}
     >
-      {pending ? "…" : isPublic ? (
-        <><EyeOff className="h-3 w-3" strokeWidth={2} /> Privar</>
+      {pending ? "…": isPublic ? (
+        <><EyeOff className="h-3 w-3"strokeWidth={2} /> Privar</>
       ) : (
-        <><Eye className="h-3 w-3" strokeWidth={2} /> Publicar</>
+        <><Eye className="h-3 w-3"strokeWidth={2} /> Publicar</>
       )}
     </button>
   );
