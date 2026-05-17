@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (slug + /buscar consolidada em /descobrir)
+**Última atualização**: 2026-05-17 (slug + galeria + lightbox migrados; photo-carousel deletado)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -81,11 +81,11 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `profile-card.tsx` | 🟢 | `<ProfileCard profile storyRing />` | v2.4 split layout, badges em ambos os cantos (v2.5) |
 | `profile-list-row.tsx` | 🟢 | `<ProfileListRow profile />` | Variação compacta horizontal |
 | `profile-story-cover.tsx` | 🟢 | `<ProfileStoryCover storyGroup coverUrl displayName isClient />` | Capa XL + indicador, delega viewer |
-| `media-gallery.tsx` | 🔴 | grid de mídia + lightbox | Próximo a migrar (parte do `/p/[slug]`) |
-| `media-lightbox.tsx` | 🔴 | overlay de mídia | Vai virar wrapper de `<Modal fullscreen>` |
-| `photo-carousel.tsx` | 🔴 | swipe horizontal de fotos | Mobile do `/p/[slug]` |
+| `media-gallery.tsx` | 🟢 | grid de mídia + lightbox | Tabs Fotos/Reels, PostModal interno reusa `<MediaLightbox>` |
+| `media-lightbox.tsx` | 🟢 | overlay de mídia | Wrapper de `<Modal>` com `position` responsivo (fullscreen mobile / center desktop) |
+| ~~`photo-carousel.tsx`~~ | ❌ | _removed_ | Componente legado sem consumidor — deletado em 2026-05-17 |
 | `audio-player.tsx` | 🟢 | player completo | Card branco border-line, rose accent, play button bg-rose |
-| `audio-play-button.tsx` | 🟡 | botão inline ▶ | Usado em ProfileCard, audio compacto |
+| `audio-play-button.tsx` | 🟢 | botão inline ▶ | Pill rose-soft / bg-rose, usado em ProfileCard |
 | `favorite-button.tsx` | 🟢 | toggle de favoritar | bg-rose quando on, white+border-line quando off |
 | `share-button.tsx` | 🟢 | compartilhar/copiar link | Padrão secondary CTA white+line |
 | `whatsapp-button.tsx` | 🟢 | CTA WhatsApp | bg-whatsapp, alinhado com Button variant whatsapp |
@@ -275,17 +275,18 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 Ordem por impacto + dependência:
 
-1. ~~**`/p/[slug]`**~~ ✅ done (commit pendente)
-2. **`MediaGallery` + `media-lightbox` + `photo-carousel`** — children do slug ainda v1
-3. `/em-alta`, `/em-destaque`, `/novidades` — variações de listagem (reusam ProfileCard)
-4. `/entrar` + `/cadastro/**` — auth (forms padronizados com `Section`+`SwitchRow`)
-5. `/planos` — pricing page (visual editorial)
-6. `/conta/**` — cliente logado (perfil + onboarding + verificação)
-7. `/painel/**` — provider dashboard (precisa do `GlassSidebarShell` antes)
-8. `/admin/**` — moderação (mais denso, vem por último)
-9. `/reels/**` — formato vídeo (overlay scheme custom)
-10. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
-11. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)
+1. ~~**`/p/[slug]`**~~ ✅ done
+2. ~~**`MediaGallery` + `media-lightbox` + `photo-carousel`**~~ ✅ done (gallery + lightbox migrados; photo-carousel removido por ausência de consumidores)
+3. **`favorites-list.tsx` + `client-profile-edit.tsx`** — area `/conta/perfil` (cliente logado)
+4. `/em-alta`, `/em-destaque`, `/novidades` — variações de listagem (reusam ProfileCard)
+5. `/entrar` + `/cadastro/**` — auth (forms padronizados com `Section`+`SwitchRow`)
+6. `/planos` — pricing page (visual editorial)
+7. `/conta/onboarding/**` + `/conta/verificacao` — onboarding cliente
+8. `/painel/**` — provider dashboard (precisa do `GlassSidebarShell` antes)
+9. `/admin/**` — moderação (mais denso, vem por último)
+10. `/reels/**` — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
+11. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
+12. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)
 
 ---
 
