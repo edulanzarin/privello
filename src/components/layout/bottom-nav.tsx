@@ -15,24 +15,32 @@ type BottomNavProps = {
 };
 
 /**
- * Bottom navigation fixo no rodapé (mobile-first) com versões diferentes por
- * `userRole`: PROVIDER vê apenas Painel + Meu perfil; demais usuários veem
- * Home / Acompanhantes / Reels / Perfil-ou-Admin. Cada item tem touch target
- * mínimo 44×44 (Critical Control da fase-6).
+ * Bottom navigation — Design System v2 (Tahoe Sensual).
+ *
+ * Steering: `.kiro/steering/design-system.md` §13.1.
+ *
+ * Pill flutuante com `.glass-pill`, posicionada `fixed bottom-4 left-1/2
+ * -translate-x-1/2`. Não cola no rodapé — flutua a 16px do bottom.
+ * Mobile-only (visível em `< 768px`); desktop usa header.
+ *
+ * Item ativo: `bg-rose-soft text-rose` com pill background.
+ * Item inativo: `text-ink-dim`.
+ * Touch target ≥ 44×44 por item (Req 12.3, WCAG 2.5.5).
+ * Safe-area aware: padding-bottom env() para iPhone notch.
+ *
+ * Versões:
+ *  - PROVIDER: Painel + Meu perfil (2 itens, mais ar entre eles).
+ *  - Demais: Home / Acompanhantes / Reels / Perfil-ou-Admin (4 itens).
  *
  * Props:
- * - `isLoggedIn` (boolean): controla destino e label do item de perfil ("Perfil" vs "Entrar").
- * - `userRole?` (string): "CLIENT" | "PROVIDER" | "ADMIN" | "MODERATOR".
- * - `isAdmin?` (boolean): se true, substitui o item de perfil por "Admin → /admin/moderacao".
- * - `providerSlug?` (string | null): slug do provider para link "Meu perfil → /p/[slug]".
- *
- * Consumidores conhecidos:
- * - src/components/layout/bottom-nav-wrapper.tsx (RSC wrapper único)
+ *  - `isLoggedIn` (boolean): controla destino e label do item de perfil.
+ *  - `userRole?` (string): "CLIENT" | "PROVIDER" | "ADMIN" | "MODERATOR".
+ *  - `isAdmin?` (boolean): substitui Perfil por Admin se true.
+ *  - `providerSlug?` (string | null): slug para "/p/[slug]" do provider.
  *
  * Side effects:
- * - `sessionStorage.getItem(LAST_CITY_KEY)` para restaurar última cidade no clique
- *   em "Acompanhantes"; cai em `/buscar` quando não há cidade salva.
- * - `router.push(...)` para navegação client-side.
+ *  - `sessionStorage.getItem(LAST_CITY_KEY)` ao clicar "Acompanhantes".
+ *  - `router.push(...)` para navegação client-side.
  */
 export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: BottomNavProps) {
   const pathname = usePathname();
@@ -42,7 +50,9 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
 
   function handleAcompanhantes(e: React.MouseEvent) {
     e.preventDefault();
-    const saved = sessionStorage.getItem(LAST_CITY_KEY);
+    const saved = typeof window !== "undefined"
+      ? sessionStorage.getItem(LAST_CITY_KEY)
+      : null;
     if (saved) {
       router.push(`/descobrir/${saved}`);
     } else {
@@ -50,7 +60,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
     }
   }
 
-  // Provider: only Painel + Ver perfil
+  // Provider: only Painel + Meu perfil
   if (isProvider) {
     const profileHref = providerSlug ? `/p/${providerSlug}` : "/painel";
     const providerItems = [
@@ -71,34 +81,15 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
     ];
 
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.08] bg-white">
-        <div className="mx-auto flex h-[52px] max-w-lg items-center justify-around px-2">
-          {providerItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={cn(
-                  "relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-[2px] px-10 py-1 text-2xs font-medium transition-colors",
-                  item.active ? "text-coral" : "text-muted hover:text-foreground",
-                )}
-              >
-                <Icon
-                  className="h-[22px] w-[22px]"
-                  strokeWidth={item.active ? 2.2 : 1.5}
-                  fill={item.active ? "currentColor" : "none"}
-                />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <NavShell>
+        {providerItems.map(({ key, ...item }) => (
+          <NavItem key={key} {...item} />
+        ))}
+      </NavShell>
     );
   }
 
-  // Everyone else: full nav
+  // Everyone else
   const profileHref = isLoggedIn ? "/conta/perfil" : "/entrar";
 
   const items = [
@@ -108,7 +99,6 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
       label: "Home",
       icon: Home,
       active: pathname === "/",
-      onClick: undefined as React.MouseEventHandler | undefined,
     },
     {
       key: "acompanhantes",
@@ -124,7 +114,6 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
       label: "Reels",
       icon: Play,
       active: pathname.startsWith("/reels"),
-      onClick: undefined as React.MouseEventHandler | undefined,
     },
     isAdmin
       ? {
@@ -133,45 +122,79 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
         label: "Admin",
         icon: ShieldCheck,
         active: pathname.startsWith("/admin"),
-        onClick: undefined as React.MouseEventHandler | undefined,
       }
       : {
         key: "perfil",
         href: profileHref,
         label: isLoggedIn ? "Perfil" : "Entrar",
         icon: User,
-        active:
-          pathname.startsWith("/conta") ||
-          pathname === "/entrar",
-        onClick: undefined as React.MouseEventHandler | undefined,
+        active: pathname.startsWith("/conta") || pathname === "/entrar",
       },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.08] bg-white">
-      <div className="mx-auto flex h-[52px] max-w-lg items-center justify-around px-2">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.key}
-              href={item.href}
-              onClick={item.onClick}
-              className={cn(
-                "relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-[2px] px-5 py-1 text-2xs font-medium transition-colors",
-                item.active ? "text-coral" : "text-muted hover:text-foreground",
-              )}
-            >
-              <Icon
-                className="h-[22px] w-[22px]"
-                strokeWidth={item.active ? 2.2 : 1.5}
-                fill={item.active ? "currentColor" : "none"}
-              />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+    <NavShell>
+      {items.map(({ key, ...item }) => (
+        <NavItem key={key} {...item} />
+      ))}
+    </NavShell>
+  );
+}
+
+/**
+ * Shell flutuante glass-pill. Wrapping em <div> externo provê `pb-env()`
+ * pra respeitar safe-area do iPhone. A `<nav>` interna é a pill em si.
+ */
+function NavShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center md:hidden"
+      style={{
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+      }}
+    >
+      <nav
+        className={cn(
+          "glass-pill pointer-events-auto",
+          "flex items-center gap-1 p-1.5",
+          "shadow-[var(--shadow-md)]",
+        )}
+        aria-label="Navegação principal"
+      >
+        {children}
+      </nav>
+    </div>
+  );
+}
+
+type NavItemProps = {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  active: boolean;
+  onClick?: React.MouseEventHandler;
+};
+
+function NavItem({ href, label, icon: Icon, active, onClick }: NavItemProps) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-4 py-1.5 text-2xs font-medium transition-all duration-150 ease-[var(--ease-tahoe)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        active
+          ? "bg-rose-soft text-rose"
+          : "text-ink-dim hover:text-ink active:bg-line/40",
+      )}
+    >
+      <Icon
+        className="h-[20px] w-[20px]"
+        strokeWidth={active ? 2.2 : 1.6}
+        fill={active ? "currentColor" : "none"}
+      />
+      <span className="leading-none">{label}</span>
+    </Link>
   );
 }
