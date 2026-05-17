@@ -289,6 +289,8 @@ Antes de criar componente novo, **leia esta tabela**:
 | Tem aba de navegação? | Use `<Tabs>` |
 | Tem listagem tabular? | Use `<Table>/<THead>/<TR>/<TH>/<TD>` |
 | Tem tile de KPI? | Use `<KPICard>` |
+| Tem lista de selos/atributos sobre uma entidade? | Use `<SealsList>` |
+| Tem exibição de preço (R$ X / período)? | Use `<PriceTag>` |
 | Tem fallback de lista vazia? | Use `<EmptyState>` |
 | Tem foto de perfil em listagem? | Use `<ProfileCard>` (pra criar) |
 | Tem story circle? | Use `<StoryCircle>` |

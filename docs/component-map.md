@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (slug + galeria + lightbox migrados; photo-carousel deletado)
+**Última atualização**: 2026-05-17 (slug refeito completo: cards Tahoe + selos + price-tag primitives)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -51,6 +51,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Select | `ui/select.tsx` | 🟢 | dropdown nativo estilizado | Forms |
 | StatCard | `ui/stat-card.tsx` | 🟢 | variação compacta de KPICard | Painel sidebar |
 | 🆕 StoryCircle | `ui/story-circle.tsx` | 🟢 | `sm` (48), `md` (62), `lg` (96), `xl` (160/192) | StoryBar, futuras listagens de stories |
+| 🆕 SealsList | `ui/seals-list.tsx` | 🟢 | lista hairline `divide-line` | /p/[slug] (selos verificada/membro/views), reusable em qualquer entidade |
+| 🆕 PriceTag | `ui/price-tag.tsx` | 🟢 | `hero`/`card`/`inline`/`compact` × `rose`/`ink` | /p/[slug] hero, ProfileCard, ProfileListRow, futuras listagens |
 | Switch | `ui/switch.tsx` | 🟢 | macOS toggle (bolinha) | Filtros, configurações |
 | Table | `ui/table.tsx` | 🟢 | `Table`/`THead`/`TR`/`TH`/`TD` | Admin, financeiro |
 | Tabs | `ui/tabs.tsx` | 🟢 | `pills`, `underline` | Navegação interna |

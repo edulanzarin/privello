@@ -55,6 +55,10 @@ import { auth } from "@/lib/auth";
 import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { ShareButton } from "@/components/profile/share-button";
 import { WhatsAppButton } from "@/components/profile/whatsapp-button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { PriceTag } from "@/components/ui/price-tag";
+import { SealsList } from "@/components/ui/seals-list";
 import { formatBrl } from "@/lib/money";
 import {
   getProfileBySlug,
@@ -270,29 +274,24 @@ export default async function PublicProfilePage({ params }: PageProps) {
       <ViewTransition enter="slide-up" default="none">
         <main className="min-h-screen pb-28">
           {/* ── Breadcrumb ───────────────────────────────────────────── */}
-          <div className="border-b border-line">
-            <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-ink-dim sm:px-6">
-              <Link
-                href="/descobrir"
-                className="transition-colors hover:text-ink"
-              >
-                Descobrir
-              </Link>
-              <span className="mx-1.5 text-ink-faint">/</span>
-              <Link
-                href={`/descobrir/${profile.city.slug}`}
-                className="transition-colors hover:text-ink"
-              >
-                {profile.city.name}
-              </Link>
-              <span className="mx-1.5 text-ink-faint">/</span>
-              <span className="text-ink">{profile.displayName}</span>
-            </div>
+          <div className="mx-auto max-w-4xl px-4 pt-3 pb-2 text-xs font-medium text-ink-dim sm:px-6">
+            <Link href="/descobrir" className="transition-colors hover:text-ink">
+              Descobrir
+            </Link>
+            <span className="mx-1.5 text-ink-faint">/</span>
+            <Link
+              href={`/descobrir/${profile.city.slug}`}
+              className="transition-colors hover:text-ink"
+            >
+              {profile.city.name}
+            </Link>
+            <span className="mx-1.5 text-ink-faint">/</span>
+            <span className="text-ink">{profile.displayName}</span>
           </div>
 
           {/* ── Hero ─────────────────────────────────────────────────── */}
-          <section className="border-b border-line">
-            <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
+          <section className="pb-10 pt-6 sm:pb-12 sm:pt-8">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-10">
                 {/* Foto + plan badge */}
                 <div className="relative shrink-0">
@@ -325,25 +324,25 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   {/* Status pills */}
                   <div className="mb-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                     {profile.isOnline && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1 text-2xs font-semibold text-success">
+                      <Badge variant="success" className="text-2xs">
                         <span className="relative flex h-1.5 w-1.5">
                           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                           <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
                         </span>
                         Online
-                      </span>
+                      </Badge>
                     )}
                     {profile.isVerified && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-soft px-2.5 py-1 text-2xs font-semibold text-rose">
+                      <Badge variant="rose" className="text-2xs">
                         <ShieldCheck className="h-3 w-3" strokeWidth={2.4} />
                         Verificada
-                      </span>
+                      </Badge>
                     )}
                     {profile.videoVerified && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-info-soft px-2.5 py-1 text-2xs font-semibold text-info">
+                      <Badge variant="info" className="text-2xs">
                         <Video className="h-3 w-3" strokeWidth={2.4} />
                         Vídeo
-                      </span>
+                      </Badge>
                     )}
                   </div>
 
@@ -389,45 +388,30 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                   )}
 
-                  {/* Preço */}
-                  <div className="mt-5 flex items-baseline gap-3">
-                    <span className="text-4xl font-bold tabular-nums text-rose tracking-[-0.02em]">
-                      {formatBrl(profile.priceHour)}
-                    </span>
-                    <span className="text-md text-ink-dim">/ hora</span>
+                  {/* Preço hero */}
+                  <div className="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    <PriceTag
+                      value={profile.priceHour}
+                      variant="hero"
+                      period="hora"
+                    />
                     {profile.priceTwoHours && (
-                      <span className="text-base text-ink-dim">
-                        <span className="tabular-nums">
-                          {formatBrl(profile.priceTwoHours)}
-                        </span>
-                        <span className="ml-0.5 text-xs">/ 2h</span>
-                      </span>
+                      <PriceTag
+                        value={profile.priceTwoHours}
+                        variant="inline"
+                        tone="ink"
+                        period="2h"
+                        periodFormat="short"
+                      />
                     )}
                   </div>
 
                   {/* Selos lista hairline */}
                   {seals.length > 0 && (
-                    <ul className="mt-5 w-full max-w-sm divide-y divide-line rounded-xl border border-line bg-white sm:max-w-none">
-                      {seals.map((s) => (
-                        <li
-                          key={s.label}
-                          className="flex items-center gap-3 px-3.5 py-2.5"
-                        >
-                          <s.Icon
-                            className={cn("h-4 w-4 shrink-0", s.color)}
-                            strokeWidth={2}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <span className="text-sm font-semibold text-ink">
-                              {s.label}
-                            </span>
-                            <span className="ml-1.5 text-xs text-ink-dim">
-                              {s.sub}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <SealsList
+                      seals={seals}
+                      className="mt-5 w-full max-w-sm sm:max-w-none"
+                    />
                   )}
 
                   {/* CTAs */}
@@ -493,7 +477,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           </section>
 
           {/* ── Galeria ──────────────────────────────────────────────── */}
-          <section className="border-b border-line">
+          <section>
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <MediaGallery
                 media={allMedia}
@@ -509,11 +493,12 @@ export default async function PublicProfilePage({ params }: PageProps) {
           </section>
 
           {/* ── Quem sou + Características + Disponibilidade ────────── */}
-          <section className="border-b border-line py-14">
-            <div className="mx-auto grid max-w-4xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-              <div className="space-y-10">
-                <div>
-                  <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
+          <section className="py-14">
+            <div className="mx-auto grid max-w-4xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+              <div className="space-y-8">
+                {/* Quem sou — card glass */}
+                <Card variant="glass" padding="lg">
+                  <h2 className="text-2xl font-bold tracking-[-0.022em] text-ink sm:text-3xl">
                     Quem sou
                   </h2>
                   <div className="mt-4 space-y-3 text-md leading-relaxed text-ink-dim">
@@ -521,14 +506,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
                       <p key={i}>{p}</p>
                     ))}
                   </div>
-                </div>
+                </Card>
 
-                <div className="grid gap-8 sm:grid-cols-2">
-                  <div>
+                {/* Características + Valores — 2 cards solid */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Card variant="solid" padding="lg">
                     <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
                       Características
                     </h3>
-                    <ul className="mt-3 divide-y divide-line border-b border-line">
+                    <ul className="mt-3 divide-y divide-line">
                       {characteristics.map(([k, v]) => (
                         <li
                           key={k}
@@ -539,89 +525,103 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Card>
 
-                  <div>
+                  <Card variant="solid" padding="lg">
                     <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
                       Valores
                     </h3>
-                    <ul className="mt-3 divide-y divide-line border-b border-line">
-                      <li className="flex justify-between py-2.5 text-base">
+                    <ul className="mt-3 divide-y divide-line">
+                      <li className="flex items-baseline justify-between py-2.5 text-base">
                         <span className="text-ink-dim">1 hora</span>
-                        <span className="font-semibold tabular-nums text-rose">
-                          {formatBrl(profile.priceHour)}
-                        </span>
+                        <PriceTag
+                          value={profile.priceHour}
+                          variant="inline"
+                          period="hora"
+                          periodFormat="long"
+                          className="!gap-0"
+                        />
                       </li>
                       {profile.priceTwoHours ? (
-                        <li className="flex justify-between py-2.5 text-base">
+                        <li className="flex items-baseline justify-between py-2.5 text-base">
                           <span className="text-ink-dim">2 horas</span>
-                          <span className="font-semibold tabular-nums text-ink">
-                            {formatBrl(profile.priceTwoHours)}
-                          </span>
+                          <PriceTag
+                            value={profile.priceTwoHours}
+                            variant="inline"
+                            tone="ink"
+                            period="2h"
+                            periodFormat="short"
+                            className="!gap-0"
+                          />
                         </li>
                       ) : null}
                       {profile.priceOvernight ? (
-                        <li className="flex justify-between py-2.5 text-base">
+                        <li className="flex items-baseline justify-between py-2.5 text-base">
                           <span className="text-ink-dim">Pernoite</span>
-                          <span className="font-semibold tabular-nums text-ink">
+                          <span className="font-bold tabular-nums text-ink">
                             {formatBrl(profile.priceOvernight)}
                           </span>
                         </li>
                       ) : null}
                       {profile.priceTravelDay ? (
-                        <li className="flex justify-between py-2.5 text-base">
+                        <li className="flex items-baseline justify-between py-2.5 text-base">
                           <span className="text-ink-dim">Viagem (diária)</span>
-                          <span className="font-semibold tabular-nums text-ink">
+                          <span className="font-bold tabular-nums text-ink">
                             {formatBrl(profile.priceTravelDay)}
                           </span>
                         </li>
                       ) : null}
-                      <li className="flex justify-between py-2.5 text-base">
+                      <li className="flex items-baseline justify-between py-2.5 text-base">
                         <span className="text-ink-dim">Pagamento</span>
                         <span className="font-medium text-ink">
                           {profile.paymentMethods ?? "—"}
                         </span>
                       </li>
                     </ul>
-                  </div>
+                  </Card>
                 </div>
 
-                <div>
+                {/* Atende a — chips usando Badge */}
+                <Card variant="glass" padding="lg">
                   <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
                     Atende a
                   </h3>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {services.map(([label, on]) => (
-                      <span
+                      <Badge
                         key={label}
+                        variant={on ? "dark" : "muted"}
                         className={cn(
-                          "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
-                          on
-                            ? "bg-ink text-white"
-                            : "bg-line/40 text-ink-faint line-through",
+                          "px-3 py-1 text-sm",
+                          !on && "line-through",
                         )}
                       >
                         {label}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
-                </div>
+                </Card>
               </div>
 
-              <div>
-                <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
+              {/* Disponibilidade — card solid sticky em desktop */}
+              <Card
+                variant="solid"
+                padding="lg"
+                className="lg:sticky lg:top-20 lg:self-start"
+              >
+                <h2 className="text-2xl font-bold tracking-[-0.022em] text-ink sm:text-3xl">
                   Esta semana
                 </h2>
-                <ul className="mt-4 divide-y divide-line border-y border-line">
+                <ul className="mt-4 divide-y divide-line">
                   {profile.availabilityRules.map((r) => (
                     <li
                       key={r.id}
                       className="flex items-center justify-between py-2.5 text-base"
                     >
                       <span className="text-ink">
-                        {DAYS_PT[r.weekday]} ·{" "}
+                        {DAYS_PT[r.weekday]}{" "}
                         <span className="tabular-nums text-ink-dim">
-                          {r.startTime} – {r.endTime}
+                          · {r.startTime} – {r.endTime}
                         </span>
                       </span>
                       <span className="text-2xs font-semibold uppercase tracking-wider">
@@ -660,15 +660,15 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </p>
                   </div>
                 )}
-              </div>
+              </Card>
             </div>
           </section>
 
           {/* ── Reviews ──────────────────────────────────────────────── */}
-          <section className="py-14">
+          <section className="border-t border-line py-14">
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
+                <h2 className="text-2xl font-bold tracking-[-0.022em] text-ink sm:text-3xl">
                   {profile.ratingAvg > 0 ? (
                     <>
                       <span className="tabular-nums">
@@ -715,10 +715,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               ) : (
                 <div className="mt-8 grid gap-4 md:grid-cols-3">
                   {profile.reviews.map((r) => (
-                    <article
-                      key={r.id}
-                      className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]"
-                    >
+                    <Card key={r.id} variant="solid" padding="md">
                       <div className="flex items-center gap-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
                           {(r.user.name ?? "?")[0].toUpperCase()}
@@ -760,7 +757,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                           </Link>
                         </div>
                       )}
-                    </article>
+                    </Card>
                   ))}
                 </div>
               )}
