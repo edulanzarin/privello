@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (slug refeito + /conta/perfil migrada)
+**Última atualização**: 2026-05-17 (em-alta + em-destaque + novidades migrados; novo `<ListingHeader>` primitive)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -54,6 +54,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | 🆕 SealsList | `ui/seals-list.tsx` | 🟢 | lista hairline `divide-line` | /p/[slug] (selos verificada/membro/views), reusable em qualquer entidade |
 | 🆕 PriceTag | `ui/price-tag.tsx` | 🟢 | `hero`/`card`/`inline`/`compact` × `rose`/`ink` | /p/[slug] hero, ProfileCard, ProfileListRow, futuras listagens |
 | 🆕 RatingStars | `ui/rating-stars.tsx` | 🟢 | `xs`/`sm`/`md`, value 0–5 | Reviews em /p/[slug] e futuro /avaliar/[slug] e admin |
+| 🆕 ListingHeader | `ui/listing-header.tsx` | 🟢 | eyebrow `rose`/`peach`/`plum`/`info`/`muted` × título Inter Bold | /em-alta, /em-destaque, /novidades. Reusable em qualquer listing cross-city |
 | Switch | `ui/switch.tsx` | 🟢 | macOS toggle (bolinha) | Filtros, configurações |
 | Table | `ui/table.tsx` | 🟢 | `Table`/`THead`/`TR`/`TH`/`TD` | Admin, financeiro |
 | Tabs | `ui/tabs.tsx` | 🟢 | `pills`, `underline` | Navegação interna |
@@ -180,9 +181,9 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | ~~`/buscar`~~ | ~~`app/buscar/`~~ | ❌ | _removed_ | Eliminada em 2026-05-17. 308 redirect para `/descobrir` (preserva `?q=`) |
 | `/cidades` | `app/cidades/page.tsx` | 🔴 | — | Listagem de cidades |
 | `/p/[slug]` | `app/p/[slug]/page.tsx` | 🟢 | _next_ | Hero split + selos hairline + Quem sou/Características/Valores/Atende/Disponibilidade + Reviews em cards |
-| `/em-alta` | `app/em-alta/page.tsx` | 🔴 | — | Ranking semanal |
-| `/em-destaque` | `app/em-destaque/page.tsx` | 🔴 | — | Boost ativo |
-| `/novidades` | `app/novidades/page.tsx` | 🔴 | — | Novos perfis |
+| `/em-alta` | `app/em-alta/page.tsx` | 🟢 | _next_ | Listing v2 — ListingHeader + grid 3-col ProfileCard |
+| `/em-destaque` | `app/em-destaque/page.tsx` | 🟢 | _next_ | Listing v2 — eyebrow peach |
+| `/novidades` | `app/novidades/page.tsx` | 🟢 | _next_ | Reading max-w-3xl, Card glass placeholder |
 | `/reels` | `app/reels/page.tsx` | 🔴 | — | Feed |
 | `/reels/[slug]` | `app/reels/[slug]/page.tsx` | 🔴 | — | Reel individual |
 | `/avaliar/[slug]` | `app/avaliar/[slug]/page.tsx` | 🔴 | — | Form de avaliação |
@@ -281,8 +282,8 @@ Ordem por impacto + dependência:
 1. ~~**`/p/[slug]`**~~ ✅ done
 2. ~~**`MediaGallery` + `media-lightbox` + `photo-carousel`**~~ ✅ done
 3. ~~**`favorites-list.tsx` + `client-profile-edit.tsx` + `/conta/perfil`**~~ ✅ done
-4. **`/em-alta`, `/em-destaque`, `/novidades`** — variações de listagem (reusam ProfileCard)
-5. `/entrar` + `/cadastro/**` — auth (forms padronizados com `Section`+`SwitchRow`)
+4. ~~**`/em-alta`, `/em-destaque`, `/novidades`**~~ ✅ done (novo `<ListingHeader>` extraído)
+5. **`/entrar` + `/cadastro/**`** — auth (forms padronizados com `Section`+`SwitchRow`)
 6. `/planos` — pricing page (visual editorial)
 7. `/conta/onboarding/**` + `/conta/verificacao` — onboarding cliente
 8. `/painel/**` — provider dashboard (precisa do `GlassSidebarShell` antes)

@@ -292,6 +292,7 @@ Antes de criar componente novo, **leia esta tabela**:
 | Tem lista de selos/atributos sobre uma entidade? | Use `<SealsList>` |
 | Tem exibição de preço (R$ X / período)? | Use `<PriceTag>` |
 | Tem exibição de avaliação por estrelas? | Use `<RatingStars>` |
+| Tem cabeçalho de página de listagem (eyebrow + título + subtítulo)? | Use `<ListingHeader>` |
 | Tem fallback de lista vazia? | Use `<EmptyState>` |
 | Tem foto de perfil em listagem? | Use `<ProfileCard>` (pra criar) |
 | Tem story circle? | Use `<StoryCircle>` |
