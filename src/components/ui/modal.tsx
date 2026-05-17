@@ -6,6 +6,25 @@ import { useScrollLock } from "@/lib/hooks/use-scroll-lock";
 import { useEscapeKey } from "@/lib/hooks/use-escape-key";
 import { useFocusTrap } from "@/lib/hooks/use-focus-trap";
 
+/**
+ * Primitivo `Modal` — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/ui/modal.tsx
+ * Steering: `.kiro/steering/design-system.md` §3.6 (glass) + §13.
+ *
+ * Modal genérico com backdrop, Escape key, scroll lock e focus trap
+ * integrado. Substitui implementações duplicadas (lightbox, story viewer,
+ * comments panel, age-gate).
+ *
+ * Backdrop v2: `bg-ink/60 backdrop-blur-md` — overlay ink ameixa com blur
+ * mais agressivo que cobre o ambient gradient sem deixar o gradient brilhar
+ * por trás (anti-pattern em modal cheio).
+ *
+ * Posição:
+ *  - `center` (default): centralizado vertical e horizontal.
+ *  - `bottom`: ancorado no rodapé (BottomSheet em mobile).
+ *  - `fullscreen`: ocupa toda a viewport (lightbox de mídia).
+ */
 type ModalProps = {
     open: boolean;
     onClose: () => void;
@@ -18,13 +37,6 @@ type ModalProps = {
     position?: "center" | "bottom" | "fullscreen";
 };
 
-/**
- * Modal genérico com backdrop, Escape key, scroll lock e focus trap integrado.
- * Substitui as 3+ implementações duplicadas (lightbox, story viewer, comments panel).
- *
- * API pública preservada: `open`, `onClose`, `children`, `className`, `persistent`, `position`.
- * Focus trap ativo automaticamente enquanto `open === true`.
- */
 export function Modal({
     open,
     onClose,
@@ -64,9 +76,9 @@ export function Modal({
                 positionClasses[position],
             )}
         >
-            {/* Backdrop */}
+            {/* Backdrop ink com blur generoso. */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-ink/60 backdrop-blur-md"
                 onClick={handleBackdropClick}
                 aria-hidden="true"
             />

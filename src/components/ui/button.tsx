@@ -4,25 +4,41 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Primitivo `Button` do design system (macOS Sonoma-inspired).
+ * Primitivo `Button` — Design System v2 (Tahoe Sensual).
  *
  * Caminho: src/components/ui/button.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.3 + §13.
  *
- * Variantes: `primary` (azul), `secondary` (branco hairline), `ghost`
- * (transparente), `danger` (vermelho) e `coral` (accent da marca).
- * Tamanhos: `sm | md | lg` controlam padding, font-size e gap interno.
+ * Variantes:
+ *  - `primary`: rose (ação principal). Substitui o azul da v1.
+ *  - `secondary`: glass-pill outline (vidro com borda hairline).
+ *  - `ghost`: transparente, hover aplica fundo `bg-line/40`.
+ *  - `danger`: vermelho semântico.
+ *  - `whatsapp`: verde WhatsApp (CTA exclusiva).
+ *  - `coral`: alias legado de `primary` — preservado para compat com
+ *    chamadas pré-v2 (login, cadastro, painel/financeiro etc.). Novas
+ *    chamadas devem usar `primary`.
  *
- * Touch target ≥ 44×44 (Requirement 12.1):
- * - As classes base aplicam `min-h-[44px] min-w-[44px]` em todas as variantes
- *   e tamanhos. O `inline-flex items-center justify-center` mantém o conteúdo
- *   visualmente compacto enquanto o hit area atende WCAG 2.5.5.
+ * Tamanhos:
+ *  - `sm` (text-sm, rounded-lg, px-3 py-[5px], min 44×44)
+ *  - `md` (text-base, rounded-xl, px-4 py-[7px], min 44×44) — default
+ *  - `lg` (text-md, rounded-xl, px-6 py-[10px], min 44×44)
  *
- * Cross-refs:
- * - .kiro/specs/redesign-macos-system/requirements.md — Requirement 12.1.
- * - .kiro/specs/redesign-macos-system/design.md — Property 1.
+ * Touch target ≥ 44×44 garantido pelas classes base
+ * `min-h-[44px] min-w-[44px]` (Req 12.1, WCAG 2.5.5).
+ *
+ * Focus ring canônico: `ring-rose/40` com offset.
  */
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "coral";
+type ButtonVariant =
+    | "primary"
+    | "secondary"
+    | "ghost"
+    | "danger"
+    | "whatsapp"
+    /** alias legado de `primary` (rose). Mantido para call-sites pré-v2. */
+    | "coral";
+
 type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -32,22 +48,30 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
+    // Rose primário — usa o token. Hover sutil via brilho, active scale.
     primary:
-        "bg-blue text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
+        "bg-rose text-white shadow-[var(--shadow-sm)] hover:brightness-105 active:brightness-95 active:scale-[0.98]",
+    // Glass outline — fundo translúcido, borda hairline. Texto ink.
     secondary:
-        "bg-white border border-black/10 text-foreground shadow-sm hover:bg-black/[0.03] active:bg-black/[0.06] active:scale-[0.98]",
+        "glass-pill text-ink hover:bg-white/70 active:scale-[0.98]",
+    // Ghost — sem fundo, hover aplica leve glass cushion.
     ghost:
-        "text-muted hover:text-foreground hover:bg-black/[0.04] active:bg-black/[0.06]",
+        "text-ink-dim hover:text-ink hover:bg-line/40 active:bg-line/60",
+    // Danger — vermelho semântico, mesmo padrão do primary.
     danger:
-        "bg-danger text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
+        "bg-danger text-white shadow-[var(--shadow-sm)] hover:brightness-105 active:brightness-95 active:scale-[0.98]",
+    // WhatsApp — verde da marca, CTA exclusiva (botão "Conversar no WhatsApp").
+    whatsapp:
+        "bg-whatsapp text-white shadow-[var(--shadow-sm)] hover:brightness-105 active:brightness-95 active:scale-[0.98]",
+    // Alias legado: idêntico a `primary`. Não use em código novo.
     coral:
-        "bg-coral text-white shadow-sm hover:brightness-110 active:brightness-95 active:scale-[0.98]",
+        "bg-rose text-white shadow-[var(--shadow-sm)] hover:brightness-105 active:brightness-95 active:scale-[0.98]",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-    sm: "px-3 py-[5px] text-sm gap-1.5 rounded-md",
-    md: "px-4 py-[7px] text-base gap-2 rounded-lg",
-    lg: "px-6 py-[9px] text-md gap-2 rounded-lg",
+    sm: "px-3 py-[5px] text-sm gap-1.5 rounded-lg",
+    md: "px-4 py-[7px] text-base gap-2 rounded-xl",
+    lg: "px-6 py-[10px] text-md gap-2 rounded-xl",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -57,8 +81,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 disabled={disabled || loading}
                 className={cn(
-                    "inline-flex min-h-[44px] min-w-[44px] items-center justify-center font-medium transition-all duration-150",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "inline-flex min-h-[44px] min-w-[44px] items-center justify-center font-medium",
+                    "transition-all duration-150 ease-[var(--ease-tahoe)]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     "disabled:pointer-events-none disabled:opacity-40",
                     variantStyles[variant],
                     sizeStyles[size],

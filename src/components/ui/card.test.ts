@@ -1,5 +1,19 @@
 // @vitest-environment jsdom
 
+/**
+ * Card — testes (Design System v2 / Tahoe Sensual)
+ *
+ * Steering: `.kiro/steering/design-system.md` §3.6 (glass) + §5.3 (radius).
+ *
+ * Cobertura:
+ *  - Variantes v2: `glass` (default), `solid`, `dark`, `success-subtle`,
+ *    `warning-subtle`, `danger-subtle`. Variant `default` é alias de `glass`.
+ *  - Radius `rounded-3xl` (24px) em todas as variantes (Tahoe generoso).
+ *  - Padding `none`/`sm`/`md`/`lg` mapeados para classes p-*.
+ *  - Props HTML pass-through (className, data-*, aria-*).
+ *  - Sub-componentes (`CardHeader`, `CardTitle`, `CardDescription`).
+ */
+
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createElement } from "react";
 import { act } from "react";
@@ -31,89 +45,68 @@ function render(node: React.ReactNode) {
 }
 
 function getCard(): HTMLDivElement {
-    // Card é o primeiro div renderizado dentro do mountNode.
     const el = mountNode!.firstElementChild as HTMLDivElement | null;
     expect(el).not.toBeNull();
     return el!;
 }
 
-describe("Card — render padrão e variantes legadas", () => {
+describe("Card v2 — variantes base", () => {
     it("sem props usa variant=\"default\" (glass) + padding=\"md\"", () => {
         render(createElement(Card, null, "conteudo"));
         const el = getCard();
-        expect(el.className).toContain("glass-card");
-        expect(el.className).toContain("rounded-2xl");
-        expect(el.className).toContain("p-5"); // padding md
+        expect(el.className).toContain("glass-panel");
+        expect(el.className).toContain("rounded-3xl");
+        expect(el.className).toContain("p-5");
         expect(el.textContent).toContain("conteudo");
     });
 
-    it("variant=\"glass\" aplica glass-card", () => {
+    it("variant=\"glass\" aplica glass-panel + rounded-3xl", () => {
         render(createElement(Card, { variant: "glass" } as CardProps, "x"));
-        expect(getCard().className).toContain("glass-card");
+        const cls = getCard().className;
+        expect(cls).toContain("glass-panel");
+        expect(cls).toContain("rounded-3xl");
     });
 
-    it("variant=\"solid\" aplica bg-white + hairline", () => {
+    it("variant=\"solid\" aplica bg-surface + hairline border-line", () => {
         render(createElement(Card, { variant: "solid" } as CardProps, "x"));
         const cls = getCard().className;
-        expect(cls).toContain("bg-white");
-        expect(cls).toContain("border");
-        expect(cls).toContain("border-black/[0.06]");
-        expect(cls).toContain("rounded-2xl");
+        expect(cls).toContain("bg-surface");
+        expect(cls).toContain("border-line");
+        expect(cls).toContain("rounded-3xl");
     });
 
-    it("variant=\"dark\" aplica bg-sidebar + text-white", () => {
+    it("variant=\"dark\" aplica bg-ink + text-white", () => {
         render(createElement(Card, { variant: "dark" } as CardProps, "x"));
         const cls = getCard().className;
-        expect(cls).toContain("bg-sidebar");
+        expect(cls).toContain("bg-ink");
         expect(cls).toContain("text-white");
-        expect(cls).toContain("shadow-lg");
+        expect(cls).toContain("rounded-3xl");
     });
 });
 
-describe("Card — novas variantes subtle (Fase A / Task 3.3)", () => {
+describe("Card v2 — variantes subtle", () => {
     it("variant=\"success-subtle\" usa bg-success-soft + border-success/30", () => {
-        render(
-            createElement(
-                Card,
-                { variant: "success-subtle" } as CardProps,
-                "ok",
-            ),
-        );
+        render(createElement(Card, { variant: "success-subtle" } as CardProps, "ok"));
         const cls = getCard().className;
         expect(cls).toContain("bg-success-soft");
-        expect(cls).toContain("border");
         expect(cls).toContain("border-success/30");
-        expect(cls).toContain("rounded-2xl");
+        expect(cls).toContain("rounded-3xl");
     });
 
     it("variant=\"warning-subtle\" usa bg-warning-soft + border-warning/30", () => {
-        render(
-            createElement(
-                Card,
-                { variant: "warning-subtle" } as CardProps,
-                "atencao",
-            ),
-        );
+        render(createElement(Card, { variant: "warning-subtle" } as CardProps, "atencao"));
         const cls = getCard().className;
         expect(cls).toContain("bg-warning-soft");
-        expect(cls).toContain("border");
         expect(cls).toContain("border-warning/30");
-        expect(cls).toContain("rounded-2xl");
+        expect(cls).toContain("rounded-3xl");
     });
 
     it("variant=\"danger-subtle\" usa bg-danger-soft + border-danger/30", () => {
-        render(
-            createElement(
-                Card,
-                { variant: "danger-subtle" } as CardProps,
-                "erro",
-            ),
-        );
+        render(createElement(Card, { variant: "danger-subtle" } as CardProps, "erro"));
         const cls = getCard().className;
         expect(cls).toContain("bg-danger-soft");
-        expect(cls).toContain("border");
         expect(cls).toContain("border-danger/30");
-        expect(cls).toContain("rounded-2xl");
+        expect(cls).toContain("rounded-3xl");
     });
 
     it("variantes subtle não vazam classes de glass/dark/solid", () => {
@@ -125,20 +118,17 @@ describe("Card — novas variantes subtle (Fase A / Task 3.3)", () => {
         for (const variant of subtle) {
             render(createElement(Card, { variant } as CardProps, "x"));
             const cls = getCard().className;
-            expect(cls).not.toContain("glass-card");
-            expect(cls).not.toContain("bg-white");
-            expect(cls).not.toContain("bg-sidebar");
+            expect(cls).not.toContain("glass-panel");
+            expect(cls).not.toContain("bg-surface");
+            expect(cls).not.toContain("bg-ink");
         }
     });
 });
 
-describe("Card — padding", () => {
-    it("padding=\"none\" não aplica utilitário p-*", () => {
-        render(
-            createElement(Card, { padding: "none" } as CardProps, "x"),
-        );
-        const cls = getCard().className;
-        expect(cls).not.toMatch(/\bp-\d/);
+describe("Card v2 — padding", () => {
+    it("padding=\"none\" não aplica p-*", () => {
+        render(createElement(Card, { padding: "none" } as CardProps, "x"));
+        expect(getCard().className).not.toMatch(/\bp-\d/);
     });
 
     it("padding=\"sm\" aplica p-4", () => {
@@ -157,15 +147,9 @@ describe("Card — padding", () => {
     });
 });
 
-describe("Card — className custom + props HTML", () => {
+describe("Card v2 — className custom + props HTML", () => {
     it("className custom é mesclado", () => {
-        render(
-            createElement(
-                Card,
-                { className: "marker-custom" } as CardProps,
-                "x",
-            ),
-        );
+        render(createElement(Card, { className: "marker-custom" } as CardProps, "x"));
         expect(getCard().className).toContain("marker-custom");
     });
 
@@ -183,7 +167,7 @@ describe("Card — className custom + props HTML", () => {
     });
 });
 
-describe("Card sub-componentes", () => {
+describe("Card v2 — sub-componentes", () => {
     it("CardHeader renderiza filhos com classe base mb-3", () => {
         render(createElement(CardHeader, null, "header"));
         const header = mountNode!.querySelector("div");
@@ -198,14 +182,15 @@ describe("Card sub-componentes", () => {
         expect(h3).not.toBeNull();
         expect(h3!.className).toContain("text-lg");
         expect(h3!.className).toContain("font-semibold");
+        expect(h3!.className).toContain("text-ink");
         expect(h3!.textContent).toBe("Titulo");
     });
 
-    it("CardDescription renderiza <p> com text-muted", () => {
+    it("CardDescription renderiza <p> com text-ink-dim", () => {
         render(createElement(CardDescription, null, "desc"));
         const p = mountNode!.querySelector("p");
         expect(p).not.toBeNull();
-        expect(p!.className).toContain("text-muted");
+        expect(p!.className).toContain("text-ink-dim");
         expect(p!.textContent).toBe("desc");
     });
 

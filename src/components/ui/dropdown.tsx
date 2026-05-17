@@ -151,7 +151,7 @@ export function DropdownTrigger({
             aria-expanded={open}
             onClick={handleClick}
             className={cn(
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 className,
             )}
         >
@@ -240,7 +240,7 @@ export function DropdownContent({
             ref={contentRef}
             role="menu"
             className={cn(
-                "absolute top-full z-50 mt-1 min-w-[160px] rounded-xl border border-line bg-background py-1 shadow-lg",
+                "glass-panel absolute top-full z-50 mt-2 min-w-[180px] rounded-2xl py-1.5",
                 alignClasses[align],
                 className,
             )}
@@ -259,8 +259,8 @@ export function DropdownItem({
     ...rest
 }: DropdownItemProps) {
     const variantClasses = {
-        default: "hover:bg-black/[0.04] focus:bg-black/[0.04]",
-        danger: "text-danger hover:bg-danger/[0.06] focus:bg-danger/[0.06]",
+        default: "text-ink hover:bg-line/40 focus:bg-line/50",
+        danger: "text-danger hover:bg-danger-soft focus:bg-danger-soft",
     } as const;
 
     return (
@@ -270,8 +270,8 @@ export function DropdownItem({
             disabled={disabled}
             onClick={onClick}
             className={cn(
-                "flex w-full items-center px-3 py-2 text-left text-sm transition-colors outline-none",
-                "focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "flex w-full items-center px-3 py-2 text-left text-sm font-medium transition-colors outline-none",
+                "focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 disabled && "pointer-events-none opacity-40",
                 !disabled && variantClasses[variant],
                 className,

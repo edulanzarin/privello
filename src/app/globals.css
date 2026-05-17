@@ -1,58 +1,134 @@
 @import "tailwindcss";
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Privello — Design System v2 (Tahoe Sensual)
+   Steering: .kiro/steering/design-system.md
+   Conceito: ambient gradient pastel quente + Liquid Glass + Inter only.
+   ────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --privello-cream: #f5f5f7;
-  --privello-ink: #1d1d1f;
-  --privello-muted: #86868b;
-  --privello-line: #d2d2d7;
-  --privello-coral: #ff375f;
-  --privello-green: #30d158;
-  --privello-sidebar: #1d1d1f;
-  --privello-blue: #0a84ff;
-  --privello-warning: #ff9500;
-  --privello-danger: #ff3b30;
-  --privello-success-dark: #248a3d;
-  --privello-warning-dark: #b36200;
-  --privello-accent-purple: #5856d6;
-  --privello-whatsapp: #25d366;
-  /* redesign-macos — superfícies soft para banners/badges de status. */
-  --privello-success-soft: rgba(48, 209, 88, 0.1);
-  --privello-warning-soft: rgba(255, 149, 0, 0.1);
-  --privello-danger-soft: rgba(255, 59, 48, 0.1);
-  --privello-info-soft: rgba(10, 132, 255, 0.1);
-  --privello-purple-soft: rgba(88, 86, 214, 0.1);
-  /* redesign-macos — stroke de grid em charts (mais sutil que --privello-line). */
-  --privello-chart-grid: rgba(0, 0, 0, 0.06);
-  /* redesign-macos — sombras nomeadas (Card, KPICard, glass-card). */
+  /* ── Cor — base ──────────────────────────────────────────────────────── */
+  --ink: #1a1517;
+  --ink-dim: #6b5d63;
+  --ink-faint: #a89ba2;
+  --line: rgba(26, 21, 23, 0.08);
+  --surface-solid: #fdfcfb;
+  /* fundo base do ambient (camada 4 / fallback). */
+  --bg-base: oklch(98% 0.005 60);
+
+  /* ── Cor — accent ────────────────────────────────────────────────────── */
+  --rose: #e85a7a;
+  --peach: #f4a275;
+  --plum: #9c4474;
+  --cream: #f1d9c0;
+
+  /* ── Cor — semântica ─────────────────────────────────────────────────── */
+  --success: #4d9b6e;
+  --warning: #d4905c;
+  --danger: #c94545;
+  --info: #5b8db8;
+  --whatsapp: #25d366;
+
+  /* ── Cor — surfaces soft (banners discretos) ─────────────────────────── */
+  --rose-soft: rgba(232, 90, 122, 0.10);
+  --peach-soft: rgba(244, 162, 117, 0.12);
+  --plum-soft: rgba(156, 68, 116, 0.10);
+  --success-soft: rgba(77, 155, 110, 0.10);
+  --warning-soft: rgba(212, 144, 92, 0.12);
+  --danger-soft: rgba(201, 69, 69, 0.10);
+  --info-soft: rgba(91, 141, 184, 0.10);
+
+  /* ── Sombras nomeadas ────────────────────────────────────────────────── */
   --shadow-hairline: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 0.5px 1px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.06);
-  /* fase-5 — View Transitions: durações declaradas por nome para reuso. */
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.06), 0 24px 48px rgba(0, 0, 0, 0.08);
+  --shadow-glass: inset 0 0.5px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.06);
+
+  /* ── Motion — durações + easing ──────────────────────────────────────── */
+  --ease-tahoe: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-fast: cubic-bezier(0.16, 1, 0.3, 1);
   --vt-duration-exit: 150ms;
   --vt-duration-enter: 210ms;
+
+  /* ──────────────────────────────────────────────────────────────────────
+     Compatibilidade com componentes legados (v1).
+     Mantemos os tokens antigos como alias dos novos enquanto refatoramos
+     os primitivos. Arquivos consumindo `bg-coral`, `text-foreground`,
+     `bg-background`, `border-line`, `text-muted`, `bg-success` etc.
+     continuam funcionando.
+     ────────────────────────────────────────────────────────────────────── */
+  --privello-cream: var(--bg-base);
+  --privello-ink: var(--ink);
+  --privello-muted: var(--ink-dim);
+  --privello-line: var(--line);
+  --privello-coral: var(--rose);
+  --privello-blue: var(--info);
+  --privello-green: var(--success);
+  --privello-warning: var(--warning);
+  --privello-danger: var(--danger);
+  --privello-success-dark: #2f7a52;
+  --privello-warning-dark: #a06a3a;
+  --privello-accent-purple: var(--plum);
+  --privello-whatsapp: var(--whatsapp);
+  --privello-sidebar: var(--ink);
+  --privello-success-soft: var(--success-soft);
+  --privello-warning-soft: var(--warning-soft);
+  --privello-danger-soft: var(--danger-soft);
+  --privello-info-soft: var(--info-soft);
+  --privello-purple-soft: var(--plum-soft);
+  --privello-chart-grid: rgba(26, 21, 23, 0.06);
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Tailwind theme — utility tokens
+   ────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--privello-cream);
-  --color-foreground: var(--privello-ink);
-  --color-muted: var(--privello-muted);
-  --color-line: var(--privello-line);
-  --color-coral: var(--privello-coral);
-  --color-success: var(--privello-green);
+  /* ── Cor — base ──────────────────────────────────────────────────────── */
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-surface: var(--surface-solid);
+  /* alias legados */
+  --color-background: var(--bg-base);
+  --color-foreground: var(--ink);
+  --color-muted: var(--ink-dim);
+  --color-sidebar: var(--ink);
+
+  /* ── Cor — accent ────────────────────────────────────────────────────── */
+  --color-rose: var(--rose);
+  --color-peach: var(--peach);
+  --color-plum: var(--plum);
+  --color-cream: var(--cream);
+  /* alias legado */
+  --color-coral: var(--rose);
+  --color-accent-purple: var(--plum);
+
+  /* ── Cor — semântica ─────────────────────────────────────────────────── */
+  --color-success: var(--success);
   --color-success-dark: var(--privello-success-dark);
+  --color-warning: var(--warning);
   --color-warning-dark: var(--privello-warning-dark);
-  --color-sidebar: var(--privello-sidebar);
-  --color-warning: var(--privello-warning);
-  --color-danger: var(--privello-danger);
-  --color-blue: var(--privello-blue);
-  --color-accent-purple: var(--privello-accent-purple);
-  --color-whatsapp: var(--privello-whatsapp);
-  --color-success-soft: var(--privello-success-soft);
-  --color-warning-soft: var(--privello-warning-soft);
-  --color-danger-soft: var(--privello-danger-soft);
-  --color-info-soft: var(--privello-info-soft);
-  --color-purple-soft: var(--privello-purple-soft);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-blue: var(--info);
+  /* alias legado */
+  --color-whatsapp: var(--whatsapp);
+
+  /* ── Cor — surfaces soft ─────────────────────────────────────────────── */
+  --color-rose-soft: var(--rose-soft);
+  --color-peach-soft: var(--peach-soft);
+  --color-plum-soft: var(--plum-soft);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-info-soft: var(--info-soft);
+  --color-purple-soft: var(--plum-soft);
+  /* alias legado */
   --color-chart-grid: var(--privello-chart-grid);
+
+  /* ── Type scale ──────────────────────────────────────────────────────── */
   --text-2xs: 10px;
   --text-xs: 11px;
   --text-sm: 12px;
@@ -66,47 +142,144 @@
   --text-5xl: 34px;
   --text-6xl: 44px;
   --text-7xl: 56px;
-  --text-8xl: 64px;
+  --text-8xl: 72px;
+
+  /* ── Famílias ────────────────────────────────────────────────────────── */
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-serif: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  /* `--font-display` é alias de --font-sans (Inter-only). Mantido por
+     consistência semântica com componentes legados. */
+  --font-display: var(--font-sans);
+  --font-serif: var(--font-sans);
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Body — ambient gradient global + tipografia base
+   ────────────────────────────────────────────────────────────────────────── */
 body {
-  background: var(--privello-cream);
-  color: var(--privello-ink);
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 800px at 20% 0%, oklch(96% 0.04 25 / 0.55), transparent 60%),
+    radial-gradient(900px 700px at 90% 30%, oklch(95% 0.03 340 / 0.45), transparent 65%),
+    radial-gradient(1000px 600px at 50% 100%, oklch(96% 0.025 50 / 0.40), transparent 70%),
+    var(--bg-base);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern" 1, "liga" 1, "ss01" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "kern" 1, "liga" 1;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.011em;
 }
 
+/* Alias legado: classe `.font-serif` aponta pra Inter (compat com componentes
+   pré-v2 que ainda referenciam). */
 .font-serif {
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: var(--font-sans);
   letter-spacing: -0.022em;
 }
 
-/* ── macOS Glassmorphism (for header only) ───────────────────────────────── */
-.glass {
-  background: #f5f5f7;
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.12);
+/* ──────────────────────────────────────────────────────────────────────────
+   Liquid Glass — surfaces canônicas
+   ────────────────────────────────────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-glass);
 }
 
-.glass-card {
-  background: #ffffff;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
+.glass-pill {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-glass);
+}
+
+/* Strip glass escura para overlay sobre foto (rodapé do ProfileCard). */
+.glass-strip {
+  background: rgba(20, 15, 17, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.glass-elevated {
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
   box-shadow:
-    0 0.5px 1px rgba(0, 0, 0, 0.04),
-    0 4px 16px rgba(0, 0, 0, 0.04);
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.95),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 24px 48px rgba(0, 0, 0, 0.08);
+}
+
+/* Alias legado — antes era `.glass-card`, manter funcionando até refator. */
+.glass-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass {
+  background: rgba(253, 252, 251, 0.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 0.5px solid var(--line);
 }
 
 .glass-dark {
-  background: rgba(29, 29, 31, 0.95);
+  background: rgba(20, 15, 17, 0.85);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ── macOS Scrollbar ─────────────────────────────────────────────────────── */
+/* Mobile: reduz blur por performance. */
+@media (max-width: 768px) {
+
+  .glass-panel,
+  .glass-pill,
+  .glass-card {
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+
+  .glass-elevated {
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+  }
+}
+
+/* Fallback — browsers sem backdrop-filter (Firefox sem feature flag). */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
+  .glass-panel,
+  .glass-pill,
+  .glass-card {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .glass-strip {
+    background: rgba(20, 15, 17, 0.85);
+  }
+
+  .glass {
+    background: rgba(253, 252, 251, 0.96);
+  }
+
+  .glass-dark {
+    background: rgba(20, 15, 17, 0.96);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Scrollbar — Tahoe-style
+   ────────────────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -117,35 +290,38 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(26, 21, 23, 0.15);
   border-radius: 100px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(26, 21, 23, 0.25);
   background-clip: content-box;
 }
 
-/* ── macOS Input global styles ───────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   Form globals
+   ────────────────────────────────────────────────────────────────────────── */
 input::placeholder,
 textarea::placeholder {
-  color: var(--privello-muted);
-  opacity: 0.6;
+  color: var(--ink-dim);
+  opacity: 0.55;
 }
 
 input[type="checkbox"],
 input[type="radio"] {
-  accent-color: var(--privello-coral);
+  accent-color: var(--rose);
 }
 
-/* ── Selection ───────────────────────────────────────────────────────────── */
 ::selection {
-  background: rgba(10, 132, 255, 0.2);
+  background: rgba(232, 90, 122, 0.22);
 }
 
-/* ── Animations ──────────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   Animations — keyframes
+   ────────────────────────────────────────────────────────────────────────── */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -171,14 +347,17 @@ input[type="radio"] {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fade-in 0.3s var(--ease-tahoe);
 }
 
 .animate-scale-in {
-  animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scale-in 0.2s var(--ease-fast);
 }
 
-/* ── Boost fire border animation ─────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────
+   Boost fire border — mantido (componente legado de boost ativo).
+   Refator de visual virá quando o ProfileCard for refeito.
+   ────────────────────────────────────────────────────────────────────────── */
 @property --fire-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -280,12 +459,9 @@ input[type="radio"] {
   height: 3px;
 }
 
-
-/* ── fase-5: View Transitions keyframes + classes ──────────────────────── */
-/* Cf. node_modules/next/dist/docs/01-app/02-guides/view-transitions.md
-   (consulta em 2026-05-17). Suporte baseline; navegadores sem View Transitions
-   API ignoram silenciosamente. Para `prefers-reduced-motion: reduce`, ver bloco
-   no fim deste arquivo. */
+/* ──────────────────────────────────────────────────────────────────────────
+   View Transitions API
+   ────────────────────────────────────────────────────────────────────────── */
 @keyframes vt-fade {
   from {
     filter: blur(3px);
@@ -318,8 +494,6 @@ input[type="radio"] {
   }
 }
 
-/* Suspense reveal: fallback sai com slide-down + fade reverso; conteúdo entra
-   com slide-up + fade. Usado em /p/[slug]. */
 ::view-transition-old(.slide-down) {
   animation:
     var(--vt-duration-exit) ease-out both vt-fade reverse,
@@ -332,7 +506,6 @@ input[type="radio"] {
     400ms ease-in both vt-slide-y;
 }
 
-/* Directional slide para o onboarding (4 passos lineares). */
 ::view-transition-old(.nav-forward) {
   --vt-slide-offset: -60px;
   animation:
@@ -361,10 +534,9 @@ input[type="radio"] {
     400ms ease-in-out both vt-slide-x;
 }
 
-/* ── fase-5: prefers-reduced-motion (regra global) ─────────────────────── */
-/* Neutraliza animações e transições para usuários com sensibilidade a
-   movimento. Cobre tanto microinterações Tailwind (animate-*, transition-*)
-   quanto View Transitions API. Cf. design.md > Components and Interfaces > 7. */
+/* ──────────────────────────────────────────────────────────────────────────
+   prefers-reduced-motion — neutralização global
+   ────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 
   *,

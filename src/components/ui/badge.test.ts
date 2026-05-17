@@ -1,5 +1,13 @@
 // @vitest-environment jsdom
 
+/**
+ * Badge — testes de variant/classes (Design System v2 / Tahoe Sensual).
+ *
+ * Cada entrada de `VARIANT_CLASSES` lista as classes específicas da
+ * variante (sem incluir as classes-base comuns). Snapshot mantém a
+ * expectativa sincronizada com `variantStyles` em `badge.tsx`.
+ */
+
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createElement } from "react";
 import { act } from "react";
@@ -32,25 +40,19 @@ function render(node: React.ReactNode) {
 
 type Variant = NonNullable<BadgeProps["variant"]>;
 
-/**
- * Snapshot canônico de classes por variante. Mantém a expectativa
- * sincronizada com `variantStyles` em `badge.tsx` para que regressões
- * (ex.: alteração acidental de `text-coral` → `text-rose-500`) sejam
- * detectadas pelo teste, não em revisão manual.
- *
- * Cada entrada lista as classes específicas da variante (sem incluir
- * as classes-base comuns a todas as variantes).
- */
 const VARIANT_CLASSES: Record<Variant, readonly string[]> = {
-    default: ["bg-black/[0.06]", "text-foreground"],
-    coral: ["bg-coral/10", "text-coral"],
-    success: ["bg-success/12", "text-success"],
-    warning: ["bg-warning/12", "text-warning"],
-    muted: ["bg-black/[0.04]", "text-muted"],
-    dark: ["bg-foreground", "text-white"],
-    info: ["bg-info-soft", "text-blue"],
+    default: ["bg-line/40", "text-ink"],
+    rose: ["bg-rose-soft", "text-rose"],
+    coral: ["bg-rose-soft", "text-rose"], // alias legado de rose
+    success: ["bg-success-soft", "text-success"],
+    warning: ["bg-warning-soft", "text-warning"],
+    muted: ["bg-line/40", "text-ink-dim"],
+    dark: ["bg-ink", "text-white"],
+    info: ["bg-info-soft", "text-info"],
     danger: ["bg-danger-soft", "text-danger"],
-    premium: ["bg-purple-soft", "text-accent-purple"],
+    premium: ["bg-plum-soft", "text-plum"],
+    boost: ["bg-peach-soft", "text-peach"],
+    verified: ["bg-cream/40", "text-plum", "border", "border-cream/60"],
 };
 
 const BASE_CLASSES = [
@@ -77,7 +79,7 @@ describe("Badge — render por variante", () => {
     });
 
     it("renderiza children dentro do span", () => {
-        render(createElement(Badge, { variant: "coral" }, "Premium"));
+        render(createElement(Badge, { variant: "rose" }, "Premium"));
         const span = mountNode!.querySelector<HTMLSpanElement>("span");
         expect(span!.textContent).toBe("Premium");
     });
@@ -102,140 +104,27 @@ describe("Badge — render por variante", () => {
     }
 });
 
-describe("Badge — snapshot de classes por variante", () => {
-    it("snapshot estável das classes geradas para cada variante", () => {
-        const snapshot: Record<string, string[]> = {};
-        for (const variant of VARIANTS) {
-            // Renderiza isoladamente para evitar interferência entre testes.
+describe("Badge — coral é alias de rose (backwards-compat)", () => {
+    it("coral e rose produzem classes idênticas (ordenadas)", () => {
+        const collect = (variant: "coral" | "rose") => {
             const local = document.createElement("div");
             document.body.appendChild(local);
             const localRoot = createRoot(local);
             act(() => {
                 localRoot.render(
-                    createElement(Badge, { variant }, variant) as React.ReactElement,
+                    createElement(Badge, { variant }, "x") as React.ReactElement,
                 );
             });
-            const span = local.querySelector<HTMLSpanElement>("span");
-            // Ordena para manter snapshot determinístico independente da
-            // ordem de aplicação interna do `cn`/`twMerge`.
-            snapshot[variant] = Array.from(span!.classList).sort();
+            const classes = Array.from(
+                local.querySelector<HTMLSpanElement>("span")!.classList,
+            ).sort();
             act(() => {
                 localRoot.unmount();
             });
             local.remove();
-        }
-        expect(snapshot).toMatchInlineSnapshot(`
-          {
-            "coral": [
-              "bg-coral/10",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-coral",
-              "text-xs",
-            ],
-            "danger": [
-              "bg-danger-soft",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-danger",
-              "text-xs",
-            ],
-            "dark": [
-              "bg-foreground",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-white",
-              "text-xs",
-            ],
-            "default": [
-              "bg-black/[0.06]",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-foreground",
-              "text-xs",
-            ],
-            "info": [
-              "bg-info-soft",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-blue",
-              "text-xs",
-            ],
-            "muted": [
-              "bg-black/[0.04]",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-muted",
-              "text-xs",
-            ],
-            "premium": [
-              "bg-purple-soft",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-accent-purple",
-              "text-xs",
-            ],
-            "success": [
-              "bg-success/12",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-success",
-              "text-xs",
-            ],
-            "warning": [
-              "bg-warning/12",
-              "font-semibold",
-              "gap-1",
-              "inline-flex",
-              "items-center",
-              "px-2",
-              "py-[2px]",
-              "rounded-full",
-              "text-warning",
-              "text-xs",
-            ],
-          }
-        `);
+            return classes;
+        };
+        expect(collect("coral")).toEqual(collect("rose"));
     });
 });
 

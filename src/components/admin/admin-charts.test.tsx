@@ -80,9 +80,11 @@ function getWrapperCard(container: HTMLElement): HTMLElement {
 
 function assertSolidCardSignature(el: HTMLElement) {
     const cls = el.className;
-    expect(cls).toContain("bg-white");
-    expect(cls).toContain("rounded-2xl");
-    expect(cls).toContain("border-black/[0.06]");
+    // v2: variant="solid" usa bg-surface (off-white) + border-line + rounded-3xl.
+    // Foi `bg-white + border-black/[0.06] + rounded-2xl` na v1.
+    expect(cls).toContain("bg-surface");
+    expect(cls).toContain("rounded-3xl");
+    expect(cls).toContain("border-line");
     // padding="md" → p-5
     expect(cls).toContain("p-5");
 }

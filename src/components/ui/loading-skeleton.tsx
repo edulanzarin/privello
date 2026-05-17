@@ -1,5 +1,24 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * Primitivo `LoadingSkeleton` — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/ui/loading-skeleton.tsx
+ * Steering: `.kiro/steering/design-system.md` §3 + §7 (mídia).
+ *
+ * Skeleton placeholders para diferentes shapes de página. Cor base
+ * `bg-line/60` (hairline + alpha) com `animate-pulse` discreto sobre o
+ * ambient gradient.
+ *
+ * Variantes refletem os arquétipos de tela:
+ *  - `card`: grid de ProfileCard 3:4 (listings, /descobrir, /em-alta).
+ *  - `list`: linhas horizontais (admin lists, suporte).
+ *  - `detail`: skeleton de página de perfil público (foto + meta + bio).
+ *  - `form`: campos empilhados (cadastro, /entrar).
+ *  - `gallery`: grid 1:1 (mídia do perfil).
+ *  - `text-block`: parágrafos (legal, descrição).
+ */
+
 export type LoadingSkeletonVariant =
     | "card"
     | "list"
@@ -26,14 +45,15 @@ const DEFAULT_COUNTS: Record<LoadingSkeletonVariant, number> = {
     "text-block": 3,
 };
 
-const PLACEHOLDER = "animate-pulse rounded-lg bg-black/[0.04]";
+// Placeholder canônico — hairline `bg-line` com pulse discreto.
+const PLACEHOLDER = "animate-pulse rounded-xl bg-line/60";
 
 function CardItem({ index }: { index: number }) {
     return (
         <div className="space-y-2" data-testid={`skeleton-card-${index}`}>
-            <div className={cn(PLACEHOLDER, "aspect-[3/4] rounded-xl")} />
-            <div className={cn(PLACEHOLDER, "h-4 w-24")} />
-            <div className={cn(PLACEHOLDER, "h-3 w-16")} />
+            <div className={cn(PLACEHOLDER, "aspect-[3/4] rounded-3xl")} />
+            <div className={cn(PLACEHOLDER, "h-4 w-24 rounded-md")} />
+            <div className={cn(PLACEHOLDER, "h-3 w-16 rounded-md")} />
         </div>
     );
 }
@@ -41,7 +61,7 @@ function CardItem({ index }: { index: number }) {
 function ListItem({ index }: { index: number }) {
     return (
         <div
-            className={cn(PLACEHOLDER, "h-12 w-full")}
+            className={cn(PLACEHOLDER, "h-14 w-full rounded-2xl")}
             data-testid={`skeleton-list-${index}`}
         />
     );
@@ -50,16 +70,16 @@ function ListItem({ index }: { index: number }) {
 function DetailItem({ index }: { index: number }) {
     return (
         <div className="space-y-4" data-testid={`skeleton-detail-${index}`}>
-            <div className={cn(PLACEHOLDER, "aspect-[4/5] w-full rounded-2xl")} />
+            <div className={cn(PLACEHOLDER, "aspect-[4/5] w-full rounded-3xl")} />
             <div className="space-y-2">
-                <div className={cn(PLACEHOLDER, "h-7 w-40")} />
-                <div className={cn(PLACEHOLDER, "h-4 w-64")} />
-                <div className={cn(PLACEHOLDER, "h-4 w-32")} />
+                <div className={cn(PLACEHOLDER, "h-7 w-40 rounded-md")} />
+                <div className={cn(PLACEHOLDER, "h-4 w-64 rounded-md")} />
+                <div className={cn(PLACEHOLDER, "h-4 w-32 rounded-md")} />
             </div>
             <div className="space-y-1.5">
-                <div className={cn(PLACEHOLDER, "h-3.5 w-full")} />
-                <div className={cn(PLACEHOLDER, "h-3.5 w-full")} />
-                <div className={cn(PLACEHOLDER, "h-3.5 w-3/4")} />
+                <div className={cn(PLACEHOLDER, "h-3.5 w-full rounded-md")} />
+                <div className={cn(PLACEHOLDER, "h-3.5 w-full rounded-md")} />
+                <div className={cn(PLACEHOLDER, "h-3.5 w-3/4 rounded-md")} />
             </div>
         </div>
     );
@@ -68,8 +88,8 @@ function DetailItem({ index }: { index: number }) {
 function FormItem({ index }: { index: number }) {
     return (
         <div className="space-y-2" data-testid={`skeleton-form-${index}`}>
-            <div className={cn(PLACEHOLDER, "h-3 w-24")} />
-            <div className={cn(PLACEHOLDER, "h-10 w-full rounded-xl")} />
+            <div className={cn(PLACEHOLDER, "h-3 w-24 rounded-md")} />
+            <div className={cn(PLACEHOLDER, "h-11 w-full rounded-xl")} />
         </div>
     );
 }
@@ -86,9 +106,9 @@ function GalleryItem({ index }: { index: number }) {
 function TextBlockItem({ index }: { index: number }) {
     return (
         <div className="space-y-1.5" data-testid={`skeleton-text-${index}`}>
-            <div className={cn(PLACEHOLDER, "h-3.5 w-full")} />
-            <div className={cn(PLACEHOLDER, "h-3.5 w-full")} />
-            <div className={cn(PLACEHOLDER, "h-3.5 w-3/4")} />
+            <div className={cn(PLACEHOLDER, "h-3.5 w-full rounded-md")} />
+            <div className={cn(PLACEHOLDER, "h-3.5 w-full rounded-md")} />
+            <div className={cn(PLACEHOLDER, "h-3.5 w-3/4 rounded-md")} />
         </div>
     );
 }
@@ -106,7 +126,7 @@ export function LoadingSkeleton({
 
     switch (variant) {
         case "card":
-            containerClass = "grid grid-cols-2 gap-3 p-4 sm:grid-cols-3";
+            containerClass = "grid grid-cols-1 gap-5 p-4 md:grid-cols-2 lg:grid-cols-3";
             renderItem = (i) => <CardItem key={i} index={i} />;
             break;
         case "list":
@@ -114,11 +134,11 @@ export function LoadingSkeleton({
             renderItem = (i) => <ListItem key={i} index={i} />;
             break;
         case "detail":
-            containerClass = "mx-auto max-w-2xl space-y-4 p-4";
+            containerClass = "mx-auto max-w-4xl space-y-4 p-4";
             renderItem = (i) => <DetailItem key={i} index={i} />;
             break;
         case "form":
-            containerClass = "mx-auto max-w-xl space-y-4 p-4";
+            containerClass = "mx-auto max-w-2xl space-y-4 p-4";
             renderItem = (i) => <FormItem key={i} index={i} />;
             break;
         case "gallery":

@@ -3,6 +3,26 @@
 import { forwardRef, type InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Primitivo `Input` — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/ui/input.tsx
+ * Steering: `.kiro/steering/design-system.md` §3 (cores) + §5.3 (radius).
+ *
+ * Visual:
+ *  - Fundo glass-panel translúcido (rgba branco 0.55 + blur).
+ *  - Borda `border-line` (rgba(26,21,23,0.08)) — hairline.
+ *  - Radius `rounded-xl` (12px).
+ *  - Focus ring rose com offset.
+ *  - Placeholder `text-ink-dim/55`.
+ *  - Erro: borda + ring `danger`.
+ *
+ * Props:
+ *  - `label` (string): renderiza `<label>` associado por id.
+ *  - `hint` (string): copy auxiliar `text-sm text-ink-dim` antes do input.
+ *  - `error` (string): borda danger + mensagem `text-sm text-danger` abaixo.
+ *  - `prefix` (string): ex. "@", "R$" — exibido inline com padding-left ajustado.
+ */
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     hint?: string;
@@ -17,14 +37,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="space-y-1.5">
                 {label && (
-                    <label htmlFor={inputId} className="block text-base font-medium text-foreground">
+                    <label htmlFor={inputId} className="block text-base font-medium text-ink">
                         {label}
                     </label>
                 )}
-                {hint && <p className="text-sm text-muted">{hint}</p>}
+                {hint && <p className="text-sm text-ink-dim">{hint}</p>}
                 <div className="relative">
                     {prefix && (
-                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-muted">
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-ink-dim">
                             {prefix}
                         </span>
                     )}
@@ -32,16 +52,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         id={inputId}
                         className={cn(
-                            "w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md text-foreground",
-                            "shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]",
-                            "transition-all duration-150",
-                            "placeholder:text-muted/60",
-                            "hover:border-black/20",
-                            "focus:border-blue focus:outline-none",
-                            "focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                            "disabled:bg-black/[0.03] disabled:text-muted disabled:cursor-not-allowed",
+                            "w-full rounded-xl border border-line bg-white/55 px-3 py-[9px] text-md text-ink",
+                            "backdrop-blur-md backdrop-saturate-150",
+                            "transition-all duration-150 ease-[var(--ease-tahoe)]",
+                            "placeholder:text-ink-dim/55",
+                            "hover:border-ink/15 hover:bg-white/65",
+                            "focus:outline-none focus:bg-white/75 focus:border-rose/50",
+                            "focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                            "disabled:bg-line/30 disabled:text-ink-dim disabled:cursor-not-allowed",
                             prefix && "pl-7",
-                            error && "border-red-400 focus:border-red-400 focus:shadow-[0_0_0_3px_rgba(255,59,48,0.2)]",
+                            error && "border-danger/50 focus:border-danger focus-visible:ring-danger/40",
                             className,
                         )}
                         {...props}

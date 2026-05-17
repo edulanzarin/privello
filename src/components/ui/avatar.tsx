@@ -1,6 +1,19 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+/**
+ * Primitivo `Avatar` — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/ui/avatar.tsx
+ * Steering: `.kiro/steering/design-system.md` §3 + §7 (mídia).
+ *
+ * Avatar circular com fallback de iniciais. Suporta ring colorido para
+ * indicar estado (online, verificada). Aspect ratio fixo `1/1`.
+ *
+ * Sizes: `xs` 28px → `xl` 96px. Cada size mantém touch-target adequado
+ * quando usado em link clicável (envolva em `<Link>` com padding).
+ */
+
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 export interface AvatarProps {
@@ -10,7 +23,11 @@ export interface AvatarProps {
     fallback?: string;
     className?: string;
     ring?: boolean;
-    ringColor?: "coral" | "success" | "foreground" | "muted";
+    /**
+     * Cor do ring quando `ring={true}`.
+     * `coral` é alias legado de `rose` (compat com call-sites pré-v2).
+     */
+    ringColor?: "rose" | "success" | "ink" | "muted" | "cream" | "coral";
 }
 
 const sizeStyles: Record<AvatarSize, { container: string; text: string; imgSize: number }> = {
@@ -22,20 +39,31 @@ const sizeStyles: Record<AvatarSize, { container: string; text: string; imgSize:
 };
 
 const ringColors = {
-    coral: "ring-coral",
+    rose: "ring-rose",
     success: "ring-success",
-    foreground: "ring-foreground",
+    ink: "ring-ink",
     muted: "ring-line",
+    cream: "ring-cream",
+    /** alias legado de `rose`. Não use em código novo. */
+    coral: "ring-rose",
 };
 
 function getInitials(name?: string | null): string {
     if (!name) return "?";
     const parts = name.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0][0].toUpperCase();
+    if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "?";
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function Avatar({ src, alt, size = "md", fallback, className, ring, ringColor = "coral" }: AvatarProps) {
+export function Avatar({
+    src,
+    alt,
+    size = "md",
+    fallback,
+    className,
+    ring,
+    ringColor = "rose",
+}: AvatarProps) {
     const s = sizeStyles[size];
 
     return (
@@ -56,7 +84,12 @@ export function Avatar({ src, alt, size = "md", fallback, className, ring, ringC
                     className="h-full w-full object-cover"
                 />
             ) : (
-                <div className={cn("flex h-full w-full items-center justify-center bg-foreground/10 font-semibold text-foreground/60", s.text)}>
+                <div
+                    className={cn(
+                        "flex h-full w-full items-center justify-center bg-ink/10 font-semibold text-ink/60",
+                        s.text,
+                    )}
+                >
                     {getInitials(fallback || alt)}
                 </div>
             )}

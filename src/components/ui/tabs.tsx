@@ -6,44 +6,30 @@ import { useRef, type KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Primitivo `Tabs` do design system (macOS Sonoma-inspired).
+ * Primitivo `Tabs` — Design System v2 (Tahoe Sensual).
  *
  * Caminho: src/components/ui/tabs.tsx
+ * Steering: `.kiro/steering/design-system.md` §5.3 + §13.
  *
- * Substitui implementações ad-hoc de tabs/sub-nav espalhadas em
- * `/admin/moderacao`, `/painel/midias` e `media-gallery`. Suporta dois modos
- * de operação:
- *
- * 1. **Navegação por URL** — quando `item.href` está setado e `onChange` é
- *    omitido, cada tab é renderizado como `<Link>` do Next.js. O tab ativo
- *    recebe `aria-current="page"`.
- * 2. **Controlado por estado** — quando `onChange` é provido, cada tab é um
- *    `<button>` que dispara `onChange(key)` no clique ou via teclado
- *    (Enter/Space).
- *
- * Acessibilidade (WAI-ARIA Tabs Pattern, com adaptação para nav por URL):
- * - Container com `role="tablist"`.
- * - Cada tab com `role="tab"` e `aria-selected` (true/false).
- * - Roving tabindex: o tab ativo recebe `tabIndex=0`, os demais `-1`.
- * - Setas ←/→ e Home/End movem foco entre tabs (manual activation).
- * - No modo controlado, Enter/Space ativa o tab focado via `onChange`.
- * - Touch target ≥ 44×44 (`min-h-[44px] min-w-[44px]`) — Req 12.2.
- * - Focus ring `ring-blue/40` consistente com outros primitivos.
+ * Modos:
+ *  1. **URL nav** (default): cada `item.href` vira `<Link>`. Tab ativo
+ *     recebe `aria-current="page"`. `onChange` ausente.
+ *  2. **Controlado**: `onChange(key)` callback. Cada tab é `<button>`.
  *
  * Variantes:
- * - `pills` (default): pílulas arredondadas. Ativo `bg-foreground text-white`,
- *   inativo `text-muted hover:bg-black/[0.04]`.
- * - `underline`: linha de 2px `bg-coral` abaixo do ativo, sem fundo.
+ *  - `pills` (default): pílulas `rounded-full`. Ativo `bg-rose text-white`,
+ *    inativo `text-ink-dim hover:bg-line/40 hover:text-ink`.
+ *  - `underline`: linha 2px `bg-rose` sob o ativo, sem fundo.
  *
- * Cross-refs:
- * - .kiro/specs/redesign-macos-system/design.md — seção "Tabs (novo)".
- * - .kiro/specs/redesign-macos-system/requirements.md — Requirement 4.
+ * Acessibilidade (WAI-ARIA Tabs Pattern):
+ *  - `role="tablist"` no container, `role="tab"` em cada item.
+ *  - `aria-selected` true/false; `aria-current="page"` no link ativo.
+ *  - Roving tabindex (ativo `0`, demais `-1`).
+ *  - Setas ←/→, Home/End movem foco. Enter/Space ativa em modo controlado.
+ *  - Touch target ≥ 44×44 (Req 12.2).
+ *  - Focus ring `ring-rose/40`.
  */
 
-/**
- * Item individual exposto pelo componente. `href` ativa modo Link;
- * `badge` (opcional) renderiza um contador adjacente ao label.
- */
 export type TabItem = {
     key: string;
     label: string;
@@ -56,10 +42,6 @@ export type TabsProps = {
     activeKey: string;
     variant?: "pills" | "underline";
     size?: "sm" | "md";
-    /**
-     * Quando provido, cada tab vira `<button>` e o callback é disparado no
-     * clique e via Enter/Space. Tem precedência sobre `item.href`.
-     */
     onChange?: (key: string) => void;
     className?: string;
 };
@@ -77,13 +59,12 @@ export function Tabs({
     onChange,
     className,
 }: TabsProps) {
-    // Ref array para roving tabindex — focar tab vizinho com setas/Home/End.
     const tabRefs = useRef<Array<HTMLAnchorElement | HTMLButtonElement | null>>([]);
 
     function focusTabAt(index: number) {
         const len = items.length;
         if (len === 0) return;
-        const safe = ((index % len) + len) % len; // wrap-around
+        const safe = ((index % len) + len) % len;
         tabRefs.current[safe]?.focus();
     }
 
@@ -121,7 +102,7 @@ export function Tabs({
             className={cn(
                 "flex flex-wrap",
                 variant === "pills" && "gap-1",
-                variant === "underline" && "gap-0 border-b border-black/[0.06]",
+                variant === "underline" && "gap-0 border-b border-line",
                 className,
             )}
         >
@@ -130,21 +111,22 @@ export function Tabs({
                 const useLink = !!item.href && !onChange;
 
                 const baseClasses = cn(
-                    "relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 font-medium transition-colors duration-150",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 font-medium",
+                    "transition-all duration-150 ease-[var(--ease-tahoe)]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     sizeStyles[size],
                     // Variante pills
-                    variant === "pills" && "rounded-lg",
-                    variant === "pills" && isActive && "bg-foreground text-white",
+                    variant === "pills" && "rounded-full",
+                    variant === "pills" && isActive && "bg-rose text-white shadow-[var(--shadow-sm)]",
                     variant === "pills" &&
                     !isActive &&
-                    "text-muted hover:bg-black/[0.04] hover:text-foreground",
-                    // Variante underline (linha 2px coral sob o ativo)
+                    "text-ink-dim hover:bg-line/40 hover:text-ink",
+                    // Variante underline
                     variant === "underline" && "border-b-2",
-                    variant === "underline" && isActive && "border-coral text-foreground",
+                    variant === "underline" && isActive && "border-rose text-ink",
                     variant === "underline" &&
                     !isActive &&
-                    "border-transparent text-muted hover:text-foreground",
+                    "border-transparent text-ink-dim hover:text-ink",
                 );
 
                 const content = (
@@ -155,8 +137,8 @@ export function Tabs({
                                 className={cn(
                                     "inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-2xs font-semibold tabular-nums",
                                     isActive && variant === "pills"
-                                        ? "bg-white/20 text-white"
-                                        : "bg-black/[0.06] text-muted",
+                                        ? "bg-white/25 text-white"
+                                        : "bg-line/50 text-ink-dim",
                                 )}
                             >
                                 {item.badge}

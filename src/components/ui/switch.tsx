@@ -2,6 +2,19 @@
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Primitivo `Switch` — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/ui/switch.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.
+ *
+ * Toggle de estado on/off. Substitui implementações duplicadas no projeto.
+ *
+ * - `checked=true`: track `bg-rose` (acento da marca, não success — switch
+ *   não é status semântico, é controle de marca/preferência).
+ * - `checked=false`: track `bg-line/80` (hairline neutra com leve alpha).
+ * - Thumb branco com `shadow-sm`, transição smooth tahoe.
+ */
 type SwitchProps = {
     checked: boolean;
     onChange: (checked: boolean) => void;
@@ -11,10 +24,6 @@ type SwitchProps = {
     className?: string;
 };
 
-/**
- * Toggle switch unificado — estilo macOS.
- * Substitui as 4 implementações duplicadas no projeto.
- */
 export function Switch({
     checked,
     onChange,
@@ -39,17 +48,17 @@ export function Switch({
             disabled={disabled}
             onClick={() => onChange(!checked)}
             className={cn(
-                "flex shrink-0 items-center rounded-full transition-colors duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "flex shrink-0 items-center rounded-full transition-colors duration-200 ease-[var(--ease-tahoe)]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 s.track,
-                checked ? "bg-success" : "bg-black/[0.09]",
+                checked ? "bg-rose" : "bg-line/80",
                 disabled && "cursor-not-allowed opacity-50",
                 className,
             )}
         >
             <span
                 className={cn(
-                    "ml-[2px] rounded-full bg-white shadow-sm transition-transform duration-200",
+                    "ml-[2px] rounded-full bg-white shadow-[var(--shadow-sm)] transition-transform duration-200 ease-[var(--ease-tahoe)]",
                     s.thumb,
                     checked && s.translate,
                 )}

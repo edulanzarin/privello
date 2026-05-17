@@ -1,30 +1,22 @@
 /**
- * KPICard — tile de dashboard padronizado
+ * Primitivo `KPICard` — Design System v2 (Tahoe Sensual).
  *
  * Caminho: src/components/ui/kpi-card.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.
  *
- * Substitui as reimplementações inline de "label + value + sub" com
- * `rounded border bg-white shadow-sm` espalhadas em `/admin/moderacao`,
- * `/admin/financeiro` e similares. Compõe `Card variant="solid"` com slots
- * para ícone, subtítulo, indicador de delta, estado de alerta e CTA via
- * `href` (envelopa o tile em `<Link>` do Next.js).
- *
- * Spec: .kiro/specs/redesign-macos-system/design.md > "KPICard (novo)" e
- * Requirement 6 em requirements.md.
+ * Tile de dashboard: label + value + subtitle + delta opcional + alert state.
+ * Compõe `Card variant="solid"` por padrão (off-white opaco, hairline).
+ * Quando `alert={true}`, troca pra `Card variant="warning-subtle"` (override
+ * via classes adicionais — bg + border de warning).
  *
  * Estilo travado:
- * - Container: rounded-2xl, hairline, sombra suave (via `Card variant="solid"`).
- * - Label: `text-2xs font-semibold uppercase tracking-wider text-muted`.
- * - Valor: `text-2xl font-semibold tabular-nums tracking-tight`.
- * - `alert={true}` aplica `border-warning/40 bg-warning-soft` (override) e
- *   o ícone passa a `text-warning`. Caso contrário ícone fica em `text-muted`.
- * - `delta.direction`: `up` → success + TrendingUp; `down` → danger +
- *   TrendingDown; `flat` → muted + Minus.
- * - `href`: envelopa em `<Link>` com `aria-label` combinando label + value.
- *
- * Cross-refs:
- * - src/components/ui/card.tsx (composição base)
- * - src/components/ui/stat-card.tsx (versão antecessora, mais simples)
+ *  - Container: `Card variant="solid" padding="md"` (rounded-3xl, hairline,
+ *    sombra suave).
+ *  - Label: `text-2xs font-semibold uppercase tracking-wider text-ink-dim`.
+ *  - Valor: `text-2xl font-semibold tabular-nums tracking-tight text-ink`.
+ *  - `alert={true}`: `border-warning/40 bg-warning-soft` + ícone `text-warning`.
+ *  - `delta.direction`: `up` → success + TrendingUp; `down` → danger; `flat` → muted + Minus.
+ *  - `href`: envelopa em `<Link>` com `aria-label`.
  */
 
 import Link from "next/link";
@@ -54,7 +46,7 @@ export interface KPICardProps {
 const deltaStyles: Record<KPIDeltaDirection, { icon: LucideIcon; className: string }> = {
     up: { icon: TrendingUp, className: "text-success" },
     down: { icon: TrendingDown, className: "text-danger" },
-    flat: { icon: Minus, className: "text-muted" },
+    flat: { icon: Minus, className: "text-ink-dim" },
 };
 
 export function KPICard({
@@ -67,7 +59,7 @@ export function KPICard({
     href,
     className,
 }: KPICardProps) {
-    const iconColor = alert ? "text-warning" : "text-muted";
+    const iconColor = alert ? "text-warning" : "text-ink-dim";
 
     const tile = (
         <Card
@@ -75,23 +67,23 @@ export function KPICard({
             padding="md"
             className={cn(
                 alert && "border-warning/40 bg-warning-soft",
-                href && "transition-shadow hover:shadow-md",
+                href && "transition-shadow hover:shadow-[var(--shadow-md)]",
                 className,
             )}
         >
             <div className="flex items-start justify-between gap-3">
-                <p className="text-2xs font-semibold uppercase tracking-wider text-muted">
+                <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
                     {label}
                 </p>
                 {Icon ? (
                     <Icon className={cn("h-4 w-4", iconColor)} strokeWidth={1.5} />
                 ) : null}
             </div>
-            <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">
+            <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-ink">
                 {value}
             </p>
             {subtitle ? (
-                <p className="mt-0.5 text-xs text-muted">{subtitle}</p>
+                <p className="mt-0.5 text-xs text-ink-dim">{subtitle}</p>
             ) : null}
             {delta ? <KPIDeltaIndicator delta={delta} /> : null}
         </Card>
@@ -102,7 +94,7 @@ export function KPICard({
             <Link
                 href={href}
                 aria-label={`${label}: ${value}`}
-                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
                 {tile}
             </Link>
