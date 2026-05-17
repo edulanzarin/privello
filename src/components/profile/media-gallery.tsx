@@ -134,7 +134,7 @@ function PostModal({
 
   // Fetch de comentários quando a mídia muda.
   useEffect(() => {
-    if (!isSubscriber) return; // non-subscribers don't see comments
+    if (!isSubscriber && !isOwner) return; // non-subscribers/non-owners não veem comentários
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset state antes de fetch async
     setComments([]);
     setLoadingComments(true);
@@ -142,7 +142,7 @@ function PostModal({
       .then((r) => r.json())
       .then((d) => setComments(d.comments ?? []))
       .finally(() => setLoadingComments(false));
-  }, [item.id, isSubscriber]);
+  }, [item.id, isSubscriber, isOwner]);
 
   useEffect(() => {
     scrollContainerRef.current?.scrollTo({ top: 0 });
@@ -238,6 +238,11 @@ function PostModal({
   };
   const curCommentCount = commentCounts[item.id] ?? item.commentCount;
 
+  // Owner (acompanhante na própria página) sempre vê mídia privada e
+  // comentários, independentemente de assinatura — é o conteúdo dela.
+  const canSeePrivate = isSubscriber || !!isOwner;
+  const canSeeComments = isSubscriber || !!isOwner;
+
   return (
     <MediaLightbox
       open={true}
@@ -280,7 +285,7 @@ function PostModal({
                 playsInline
                 className={cn(
                   "absolute inset-0 h-full w-full object-contain",
-                  !item.isPublic && !isSubscriber && "blur-xl",
+                  !item.isPublic && !canSeePrivate && "blur-xl",
                 )}
               />
               <button
@@ -304,14 +309,14 @@ function PostModal({
               sizes="(min-width:640px) 50vw, 100vw"
               className={cn(
                 "object-contain",
-                !item.isPublic && !isSubscriber && "blur-xl",
+                !item.isPublic && !canSeePrivate && "blur-xl",
               )}
               priority
             />
           )}
 
           {/* Lock overlay */}
-          {!item.isPublic && !isSubscriber && (
+          {!item.isPublic && !canSeePrivate && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50">
               <Lock className="h-8 w-8 text-white" strokeWidth={2} />
               <p className="text-sm font-semibold text-white">
@@ -391,8 +396,8 @@ function PostModal({
               </div>
             )}
 
-            {/* Comments — só assinantes */}
-            {isSubscriber ? (
+            {/* Comments — só assinantes (ou owner) */}
+            {canSeeComments ? (
               loadingComments ? (
                 <p className="py-4 text-center text-xs text-ink-dim">
                   Carregando…
@@ -505,7 +510,7 @@ function PostModal({
             </p>
           </div>
 
-          {isClient && isSubscriber ? (
+          {isClient && canSeeComments ? (
             <div className="sticky bottom-0 flex items-center gap-2 border-t border-line bg-white px-4 py-3 sm:static sm:shrink-0">
               <input
                 value={commentText}
@@ -667,7 +672,9 @@ export function MediaGallery({
           <div className="mt-4 grid grid-cols-3 gap-1 overflow-hidden rounded-2xl">
             {displayed.map((m, i) => {
               const isPrivate = !m.isPublic;
-              const locked = isPrivate && !isSubscriber;
+              // Owner (acompanhante na própria página) vê tudo. Demais: só pública
+              // ou privada se for assinante.
+              const locked = isPrivate && !isSubscriber && !isOwner;
               return (
                 <button
                   key={m.id}
