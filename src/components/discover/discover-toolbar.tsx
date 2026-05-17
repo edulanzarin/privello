@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { CitySwitcher } from "./city-switcher";
 import { DiscoverViewToggle } from "./discover-view-toggle";
@@ -17,26 +17,13 @@ const SORT_OPTIONS = [
     { value: "rating", label: "Melhor avaliação" },
 ] as const;
 
-const QUICK_CHIPS: {
-    key: string;
-    label: string;
-    /** Chave do searchParam toggleável. */
-    paramKey: string;
-    /** Valor que ativa o filtro. */
-    activeValue: string;
-}[] = [
-        { key: "verified", label: "Verificadas", paramKey: "verified", activeValue: "1" },
-        { key: "local", label: "Local próprio", paramKey: "local", activeValue: "1" },
-        { key: "domicilio", label: "A domicílio", paramKey: "domicilio", activeValue: "1" },
-        { key: "garotos", label: "Garotos", paramKey: "genero", activeValue: "garotos" },
-        { key: "casais", label: "Casais", paramKey: "genero", activeValue: "casais" },
-    ];
-
 type DiscoverToolbarProps = {
     citySlug: string;
     cityName: string;
     count: number;
     initialFilters: {
+        gender?: "garotos" | "casais" | undefined;
+        verifiedOnly?: boolean;
         priceMin?: number | null;
         priceMax?: number | null;
         ageMin?: number | null;
@@ -48,20 +35,21 @@ type DiscoverToolbarProps = {
 };
 
 /**
- * DiscoverToolbar — header sticky de Descobrir (Design System v2 / Tahoe).
+ * DiscoverToolbar — header de Descobrir (Design System v2.3 / Tahoe).
  *
  * Caminho: src/components/discover/discover-toolbar.tsx
  * Steering: `.kiro/steering/design-system.md` §13.3.
  *
- * Estrutura (de cima pra baixo):
- *  Linha 1: CitySwitcher (esquerda) + sort dropdown + filtros drawer + view toggle (direita).
- *  Linha 2: chips horizontais sticky (verificadas, local, domicilio, garotos, casais).
- *  Linha 3: active filter pills (visível só quando há filtros aplicados).
+ * Decisão user 2026-05-17: SÓ a cidade é sticky-top. Resto da toolbar
+ * (sort, filtros, view, active pills) scrolla com a página.
  *
- * Tudo dentro de um wrapper `glass border-b border-line sticky top-14 md:top-16`.
+ * Estrutura:
+ *  - Linha 1 (sticky): só CitySwitcher.
+ *  - Linha 2 (rola com scroll): sort dropdown + botão Filtros + view toggle.
+ *  - Linha 3 (rola): active filter pills (visível só quando há filtros aplicados).
  *
- * Mobile: chips com scroll-x (lista horizontal não quebra). Filter drawer
- * abre como bottom-sheet em mobile, side em desktop.
+ * Removidos os "chips rápidos" (Verificadas, Local próprio, etc) — viraram
+ * filtros dentro do drawer "Filtros avançados". Decisão user 2026-05-17.
  */
 export function DiscoverToolbar({
     citySlug,
@@ -75,16 +63,7 @@ export function DiscoverToolbar({
     const currentSort = sp.get("ordem") ?? "relevance";
 
     const [sortOpen, setSortOpen] = useState(false);
-
-    function isChipActive(chip: typeof QUICK_CHIPS[number]): boolean {
-        return sp.get(chip.paramKey) === chip.activeValue;
-    }
-
-    function chipHref(chip: typeof QUICK_CHIPS[number]): string {
-        const next: Record<string, string | null> = {};
-        next[chip.paramKey] = isChipActive(chip) ? null : chip.activeValue;
-        return buildDiscoverHref(citySlug, next, sp);
-    }
+    const [searchingCity, setSearchingCity] = useState(false);
 
     function sortHref(value: string): string {
         return buildDiscoverHref(
@@ -94,7 +73,7 @@ export function DiscoverToolbar({
         );
     }
 
-    // searchParams preservados pelo FilterDrawer (gênero, q, ordem, verified...)
+    // searchParams preservados pelo FilterDrawer (genero, q, verified, etc).
     const preservedParams: Record<string, string> = {};
     sp.forEach((value, key) => {
         if (!["pmin", "pmax", "amin", "amax", "local", "domicilio"].includes(key)) {
@@ -105,16 +84,12 @@ export function DiscoverToolbar({
     const sortLabel = SORT_OPTIONS.find((o) => o.value === currentSort)?.label
         ?? "Relevância";
 
-    const [searchingCity, setSearchingCity] = useState(false);
-
     return (
-        <div className="glass sticky top-14 z-30 border-b border-line md:top-16">
-            <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-                {/* Linha 1: cidade + ações.
-                    Quando searchingCity=true, esconde os outros controles
-                    e CitySwitcher ocupa a largura toda. */}
-                {searchingCity ? (
-                    <div className="w-full">
+        <>
+            {/* ── Bar sticky: SÓ a cidade ────────────────────────────────── */}
+            <div className="glass sticky top-14 z-30 border-b border-line md:top-16">
+                <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                    {searchingCity ? (
                         <CitySwitcher
                             currentCityName={cityName}
                             citySlug={citySlug}
@@ -122,10 +97,8 @@ export function DiscoverToolbar({
                             searching
                             onSearchingChange={setSearchingCity}
                         />
-                    </div>
-                ) : (
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex min-w-0 items-center gap-3">
+                    ) : (
+                        <div className="flex items-center justify-between gap-3">
                             <CitySwitcher
                                 currentCityName={cityName}
                                 citySlug={citySlug}
@@ -140,8 +113,15 @@ export function DiscoverToolbar({
                                 {count === 1 ? "perfil" : "perfis"}
                             </span>
                         </div>
+                    )}
+                </div>
+            </div>
 
-                        <div className="flex items-center gap-2">
+            {/* ── Bar não-sticky: ações + active pills ─────────────────────── */}
+            {!searchingCity && (
+                <div className="border-b border-line bg-background/60">
+                    <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between gap-3">
                             {/* Sort dropdown */}
                             <div className="relative">
                                 <button
@@ -177,9 +157,9 @@ export function DiscoverToolbar({
                                         <ul
                                             role="listbox"
                                             className={cn(
-                                                "absolute right-0 z-50 mt-2 min-w-[200px]",
+                                                "absolute left-0 z-50 mt-2 min-w-[200px]",
                                                 "glass-panel rounded-2xl py-1.5",
-                                                "animate-scale-in origin-top-right",
+                                                "animate-scale-in origin-top-left",
                                             )}
                                         >
                                             {SORT_OPTIONS.map((opt) => {
@@ -211,55 +191,34 @@ export function DiscoverToolbar({
                                 )}
                             </div>
 
-                            <FilterDrawer
-                                citySlug={citySlug}
-                                initial={initialFilters}
-                                preservedParams={preservedParams}
-                            />
+                            <div className="flex items-center gap-2">
+                                <FilterDrawer
+                                    citySlug={citySlug}
+                                    initial={initialFilters}
+                                    preservedParams={preservedParams}
+                                />
 
-                            <DiscoverViewToggle citySlug={citySlug} />
+                                <DiscoverViewToggle citySlug={citySlug} />
+                            </div>
                         </div>
-                    </div>
-                )}
 
-                {/* Linha 2: chips horizontais — escondidos enquanto busca cidade
-                    pra reduzir ruído visual. */}
-                {!searchingCity && (
-                    <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                        <FilterChip
-                            href={`/descobrir/${citySlug}`}
-                            active={QUICK_CHIPS.every((c) => !isChipActive(c)) && !sp.get("q")}
-                            icon={<Search className="h-3 w-3" strokeWidth={2} aria-hidden />}
-                        >
-                            Todos
-                        </FilterChip>
-                        {QUICK_CHIPS.map((chip) => (
-                            <FilterChip
-                                key={chip.key}
-                                href={chipHref(chip)}
-                                active={isChipActive(chip)}
-                            >
-                                {chip.label}
-                            </FilterChip>
-                        ))}
+                        {/* Active filter pills (filtros do drawer aplicados) */}
+                        {activePills.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {activePills.map((pill) => (
+                                    <FilterChip
+                                        key={pill.label}
+                                        href={pill.href}
+                                        removable
+                                    >
+                                        {pill.label}
+                                    </FilterChip>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
-
-                {/* Linha 3: active filter pills (avançados) */}
-                {!searchingCity && activePills.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                        {activePills.map((pill) => (
-                            <FilterChip
-                                key={pill.label}
-                                href={pill.href}
-                                removable
-                            >
-                                {pill.label}
-                            </FilterChip>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
+                </div>
+            )}
+        </>
     );
 }

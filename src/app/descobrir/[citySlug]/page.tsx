@@ -90,8 +90,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   ]);
   const count = profiles.length;
 
-  // Active filter pills (avançados) — chips toggleáveis (Verificadas/Local/etc)
-  // já estão no DiscoverToolbar; aqui ficam só os filtros de range/texto.
+  // Active filter pills — todos os filtros vêm do drawer agora.
   const activePills: { label: string; href: string }[] = [];
   if (filters.gender === "garotos" || filters.gender === "casais") {
     const g = GENDER_OPTIONS.find((o) => o.value === filters.gender);
@@ -100,6 +99,12 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
         label: g.label,
         href: buildDiscoverHref(citySlug, { genero: null }, sp),
       });
+  }
+  if (filters.verifiedOnly) {
+    activePills.push({
+      label: "Verificadas",
+      href: buildDiscoverHref(citySlug, { verified: null }, sp),
+    });
   }
   if (filters.priceMin != null || filters.priceMax != null) {
     activePills.push({
@@ -111,6 +116,18 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     activePills.push({
       label: `${filters.ageMin ?? "—"}–${filters.ageMax ?? "—"} anos`,
       href: buildDiscoverHref(citySlug, { amin: null, amax: null }, sp),
+    });
+  }
+  if (filters.hasOwnPlace) {
+    activePills.push({
+      label: "Local próprio",
+      href: buildDiscoverHref(citySlug, { local: null }, sp),
+    });
+  }
+  if (filters.homeVisit) {
+    activePills.push({
+      label: "A domicílio",
+      href: buildDiscoverHref(citySlug, { domicilio: null }, sp),
     });
   }
   if (filters.search) {
@@ -131,6 +148,8 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           cityName={city.name}
           count={count}
           initialFilters={{
+            gender: filters.gender,
+            verifiedOnly: filters.verifiedOnly,
             priceMin: filters.priceMin,
             priceMax: filters.priceMax,
             ageMin: filters.ageMin,
@@ -222,7 +241,7 @@ function EmptyDiscover({
           )}
           <a
             href="/buscar"
-            className="rounded-full border border-line bg-white/55 px-5 py-2.5 text-base font-medium text-ink backdrop-blur-md transition-all duration-150 hover:bg-white/75 hover:border-ink/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="rounded-full border border-line bg-white px-5 py-2.5 text-base font-medium text-ink transition-all duration-150 hover:bg-line/40 hover:border-ink/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Buscar outra cidade
           </a>

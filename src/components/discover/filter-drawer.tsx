@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 type FilterDrawerProps = {
     citySlug: string;
     initial: {
+        gender?: "garotos" | "casais" | undefined;
+        verifiedOnly?: boolean;
         priceMin?: number | null;
         priceMax?: number | null;
         ageMin?: number | null;
@@ -17,29 +19,37 @@ type FilterDrawerProps = {
         hasOwnPlace?: boolean;
         homeVisit?: boolean;
     };
-    /** searchParams atuais pra preservar `genero`, `q`, `verified`, etc. ao aplicar. */
+    /** searchParams atuais pra preservar `q` e outros não filtráveis aqui. */
     preservedParams: Record<string, string>;
 };
 
+const GENDER_OPTIONS: { value: "" | "garotos" | "casais"; label: string }[] = [
+    { value: "", label: "Garotas" },
+    { value: "garotos", label: "Garotos" },
+    { value: "casais", label: "Casais" },
+];
+
 /**
- * FilterDrawer — Design System v2 (Tahoe Sensual).
+ * FilterDrawer — Design System v2.3 (Tahoe Sensual).
  *
  * Caminho: src/components/discover/filter-drawer.tsx
  * Steering: `.kiro/steering/design-system.md` §13.3.
  *
- * Botão "Filtros" no header sticky de Descobrir abre drawer com filtros
- * avançados (preço, idade, atendimento). Mobile = bottom-sheet (slide up),
- * desktop = side drawer da direita.
+ * Botão "Filtros" abre drawer com TODOS os filtros (decisão user 2026-05-17:
+ * chips rápidos foram removidos da toolbar, tudo vai pro drawer):
+ *  - Procuro (Garotas/Garotos/Casais) — radio.
+ *  - Verificadas — checkbox.
+ *  - Preço por hora — range numérico.
+ *  - Idade — range numérico.
+ *  - Atendimento (Local próprio, A domicílio) — checkboxes.
+ *
+ * Mobile = bottom-sheet (slide up), pb-28 reserva espaço pra BottomNav.
+ * Desktop = side drawer da direita.
  *
  * Acessibilidade:
  *  - role="dialog" aria-modal="true".
  *  - Fecha com Escape e clique no backdrop.
  *  - Touch target ≥ 44×44 nos controles.
- *
- * Comportamento:
- *  - Ao "Aplicar", monta querystring com filtros + preservedParams e
- *    `router.push(/descobrir/[citySlug]?...)`.
- *  - "Limpar" remove todos os filtros avançados, mantém os preservados.
  */
 export function FilterDrawer({
     citySlug,
@@ -49,6 +59,8 @@ export function FilterDrawer({
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
+    const [gender, setGender] = useState<"" | "garotos" | "casais">(initial.gender ?? "");
+    const [verifiedOnly, setVerifiedOnly] = useState(!!initial.verifiedOnly);
     const [priceMin, setPriceMin] = useState(initial.priceMin?.toString() ?? "");
     const [priceMax, setPriceMax] = useState(initial.priceMax?.toString() ?? "");
     const [ageMin, setAgeMin] = useState(initial.ageMin?.toString() ?? "");
@@ -70,6 +82,10 @@ export function FilterDrawer({
         for (const [k, v] of Object.entries(preservedParams)) {
             if (v) sp.set(k, v);
         }
+        if (gender) sp.set("genero", gender);
+        else sp.delete("genero");
+        if (verifiedOnly) sp.set("verified", "1");
+        else sp.delete("verified");
         if (priceMin) sp.set("pmin", priceMin);
         else sp.delete("pmin");
         if (priceMax) sp.set("pmax", priceMax);
@@ -87,7 +103,9 @@ export function FilterDrawer({
         setOpen(false);
     }
 
-    function clearAdvanced() {
+    function clearAll() {
+        setGender("");
+        setVerifiedOnly(false);
         setPriceMin("");
         setPriceMax("");
         setAgeMin("");
@@ -104,7 +122,7 @@ export function FilterDrawer({
                 className={cn(
                     "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2",
                     "text-sm font-medium text-ink-dim",
-                    "border border-line bg-white ",
+                    "border border-line bg-white",
                     "transition-all duration-150 ease-[var(--ease-tahoe)]",
                     "hover:bg-line/40 hover:text-ink hover:border-ink/15",
                     "active:scale-[0.97]",
@@ -120,7 +138,7 @@ export function FilterDrawer({
                     className="fixed inset-0 z-50 flex items-end justify-end md:items-stretch"
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Filtros avançados"
+                    aria-label="Filtros"
                 >
                     <button
                         type="button"
@@ -132,8 +150,7 @@ export function FilterDrawer({
                     <aside
                         className={cn(
                             "relative flex w-full flex-col gap-5 glass-panel",
-                            // Mobile: bottom-sheet — pb extra reserva espaço pra
-                            // BottomNav flutuante (pill em bottom-4 + ~56px).
+                            // Mobile: bottom-sheet — pb-28 reserva espaço pra BottomNav.
                             "rounded-t-3xl rounded-b-none px-5 pt-6 pb-28",
                             "max-h-[85vh] overflow-y-auto",
                             // Desktop: side drawer
@@ -143,8 +160,8 @@ export function FilterDrawer({
                         )}
                     >
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold tracking-tight text-ink">
-                                Filtros avançados
+                            <h3 className="text-xl font-bold tracking-tight text-ink">
+                                Filtros
                             </h3>
                             <button
                                 type="button"
@@ -154,6 +171,43 @@ export function FilterDrawer({
                             >
                                 <X className="h-5 w-5" strokeWidth={1.8} />
                             </button>
+                        </div>
+
+                        {/* Procuro */}
+                        <div>
+                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                                Procuro
+                            </p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {GENDER_OPTIONS.map((opt) => (
+                                    <button
+                                        key={opt.value || "garotas"}
+                                        type="button"
+                                        onClick={() => setGender(opt.value)}
+                                        className={cn(
+                                            "flex min-h-[44px] items-center justify-center rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
+                                            gender === opt.value
+                                                ? "border-rose bg-rose-soft text-rose"
+                                                : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
+                                        )}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Verificação */}
+                        <div>
+                            <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
+                                <input
+                                    type="checkbox"
+                                    checked={verifiedOnly}
+                                    onChange={(e) => setVerifiedOnly(e.target.checked)}
+                                    className="h-4 w-4"
+                                />
+                                <span className="text-md text-ink">Apenas verificadas</span>
+                            </label>
                         </div>
 
                         {/* Preço */}
@@ -210,7 +264,7 @@ export function FilterDrawer({
                                 Atendimento
                             </p>
                             <div className="flex flex-col gap-2">
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:bg-white">
+                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
                                     <input
                                         type="checkbox"
                                         checked={hasOwnPlace}
@@ -219,7 +273,7 @@ export function FilterDrawer({
                                     />
                                     <span className="text-md text-ink">Local próprio</span>
                                 </label>
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:bg-white">
+                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:border-ink/15">
                                     <input
                                         type="checkbox"
                                         checked={homeVisit}
@@ -234,7 +288,7 @@ export function FilterDrawer({
                         <div className="mt-auto flex gap-3 pt-4">
                             <Button
                                 variant="secondary"
-                                onClick={clearAdvanced}
+                                onClick={clearAll}
                                 className="flex-1"
                             >
                                 Limpar
