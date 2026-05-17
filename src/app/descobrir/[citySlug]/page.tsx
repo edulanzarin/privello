@@ -1,5 +1,5 @@
 ﻿/**
- * Página RSC — Listagem de perfis por cidade (descobrir).
+ * Página RSC — Listagem de perfis por cidade (descobrir) — Design System v2.
  *
  * Rota: `/descobrir/[citySlug]`.
  * Tipo: Server Component.
@@ -7,23 +7,26 @@
  *  permitir likes em stories).
  * Cache: `force-dynamic` (filtros, sort, view e stories personalizadas).
  *
- * Página principal de descoberta: stories no topo, sidebar de filtros
- * (gênero, preço, idade, verificação, atendimento) e grid/lista de perfis
- * com ordenação.
+ * Steering: `.kiro/steering/design-system.md` §13.3 + §5.2 (grid 3-col).
+ *
+ * Estrutura (sem sidebar lateral — decisão D do briefing):
+ *  1. SiteHeader.
+ *  2. CitySessionSaver (efeito).
+ *  3. DiscoverToolbar (header sticky completo: cidade + sort + filtros + view + chips + active pills).
+ *  4. StoryBar (se houver stories ativas).
+ *  5. Banner discreto: "Perfis com destaque aparecem primeiro…".
+ *  6. Grid masonry de ProfileCards (3-col desktop / 2-col tablet / 1-col mobile).
+ *  7. SiteFooter.
  *
  * Cross-refs:
- * - src/lib/services/city.service.ts (getOrCreateCityBySlug)
- * - src/lib/services/discover.service.ts (listProfilesForCity, listStoriesForCity)
- * - src/lib/discover-params.ts
- * - src/components/discover/* + src/components/profile/*
+ * - src/components/discover/discover-toolbar.tsx (header sticky)
+ * - src/components/profile/profile-card.tsx (decisão F1)
  * - src/components/stories/story-bar.tsx
  */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense, ViewTransition } from "react";
-import { DiscoverViewToggle } from "@/components/discover/discover-view-toggle";
 import { CitySessionSaver } from "@/components/discover/city-session-saver";
-import { CitySwitcher } from "@/components/discover/city-switcher";
+import { DiscoverToolbar } from "@/components/discover/discover-toolbar";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
@@ -33,10 +36,14 @@ import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 3 (descobrir lê auth() para isLoggedIn).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md §3.2 linha 3.
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ citySlug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ citySlug: string }>;
+}): Promise<Metadata> {
   const { citySlug } = await params;
   const city = await getOrCreateCityBySlug(citySlug);
   const title = `Acompanhantes em ${city.name}`;
@@ -56,7 +63,6 @@ type PageProps = {
 };
 
 const GENDER_OPTIONS = [
-  { value: "", label: "Garotas" },
   { value: "garotos", label: "Garotos" },
   { value: "casais", label: "Casais" },
 ] as const;
@@ -64,7 +70,8 @@ const GENDER_OPTIONS = [
 export default async function DiscoverPage({ params, searchParams }: PageProps) {
   const { citySlug } = await params;
   const raw = await searchParams;
-  const { filters, sort, view } = parseDiscoverSearchParams(raw);
+  const { filters, view } = parseDiscoverSearchParams(raw);
+
   const sp = new URLSearchParams();
   for (const [k, v] of Object.entries(raw)) {
     if (v === undefined) continue;
@@ -78,29 +85,25 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   const isLoggedIn = !!session?.user?.id;
 
   const [profiles, storyGroups] = await Promise.all([
-    listProfilesForCity(city.id, filters, sort),
+    listProfilesForCity(city.id, filters, parseDiscoverSearchParams(raw).sort),
     listStoriesForCity(city.id, session?.user?.id, filters.gender),
   ]);
   const count = profiles.length;
 
-  const sortLabel =
-    sort === "price_asc"
-      ? "Menor preço /h"
-      : sort === "price_desc"
-        ? "Maior preço /h"
-        : sort === "rating"
-          ? "Melhor avaliação"
-          : "Relevância";
-
-  // Active filter pills
+  // Active filter pills (avançados) — chips toggleáveis (Verificadas/Local/etc)
+  // já estão no DiscoverToolbar; aqui ficam só os filtros de range/texto.
   const activePills: { label: string; href: string }[] = [];
   if (filters.gender === "garotos" || filters.gender === "casais") {
     const g = GENDER_OPTIONS.find((o) => o.value === filters.gender);
-    if (g) activePills.push({ label: g.label, href: buildDiscoverHref(citySlug, { genero: null }, sp) });
+    if (g)
+      activePills.push({
+        label: g.label,
+        href: buildDiscoverHref(citySlug, { genero: null }, sp),
+      });
   }
   if (filters.priceMin != null || filters.priceMax != null) {
     activePills.push({
-      label: `R$ ${filters.priceMin ?? "—"}–${filters.priceMax ?? "—"} /h`,
+      label: `R$ ${filters.priceMin ?? "—"}–${filters.priceMax ?? "—"}/h`,
       href: buildDiscoverHref(citySlug, { pmin: null, pmax: null }, sp),
     });
   }
@@ -110,294 +113,121 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
       href: buildDiscoverHref(citySlug, { amin: null, amax: null }, sp),
     });
   }
-  if (filters.verifiedOnly) {
-    activePills.push({ label: "Verificadas", href: buildDiscoverHref(citySlug, { verified: null }, sp) });
-  }
-  if (filters.hasOwnPlace) {
-    activePills.push({ label: "Local próprio", href: buildDiscoverHref(citySlug, { local: null }, sp) });
-  }
-  if (filters.homeVisit) {
-    activePills.push({ label: "A domicílio", href: buildDiscoverHref(citySlug, { domicilio: null }, sp) });
-  }
   if (filters.search) {
-    activePills.push({ label: `"${filters.search}"`, href: buildDiscoverHref(citySlug, { q: null }, sp) });
+    activePills.push({
+      label: `"${filters.search}"`,
+      href: buildDiscoverHref(citySlug, { q: null }, sp),
+    });
   }
 
   return (
     <>
       <SiteHeader activeHref={`/descobrir/${citySlug}`} />
       <CitySessionSaver citySlug={citySlug} />
-      <CitySwitcher currentCityName={city.name} citySlug={citySlug} />
-      <main className="min-h-screen pb-28">
-        {/* ── Header ── */}
-        <div className="border-b border-black/[0.06] bg-white/50 backdrop-blur-sm">
-          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted">
-              Descobrir / {city.name}
-            </p>
-            <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <h1 className="text-4xl font-semibold tracking-tight sm:text-4xl">
-                {city.name} <span className="text-muted font-normal">·</span>{" "}
-                <span className="text-3xl font-normal text-muted sm:text-4xl">
-                  {count.toLocaleString("pt-BR")} perfis
-                </span>
-              </h1>
-              {count > 0 && (
-                <div className="flex flex-wrap items-center gap-3">
-                  <details className="relative">
-                    <summary className="cursor-pointer list-none rounded-lg border border-black/10 bg-white px-3.5 py-[6px] text-base font-medium shadow-sm">
-                      {sortLabel}
-                    </summary>
-                    <ul className="absolute left-0 z-20 mt-1.5 min-w-[180px] rounded-xl border border-black/[0.06] bg-white py-1 text-base shadow-xl overflow-hidden animate-scale-in">
-                      {(
-                        [
-                          ["relevance", "Relevância"],
-                          ["price_asc", "Menor preço /h"],
-                          ["price_desc", "Maior preço /h"],
-                          ["rating", "Melhor avaliação"],
-                        ] as const
-                      ).map(([value, label]) => (
-                        <li key={value}>
-                          <Link
-                            href={buildDiscoverHref(citySlug, { ordem: value === "relevance" ? null : value }, sp)}
-                            className="block px-3.5 py-2 transition-colors hover:bg-black/[0.04]"
-                          >
-                            {label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                  <Suspense fallback={<div className="h-8 w-16 animate-pulse rounded-lg bg-black/[0.04]" />}>
-                    <DiscoverViewToggle citySlug={citySlug} />
-                  </Suspense>
-                </div>
-              )}
-            </div>
 
-            {activePills.length > 0 && (
-              <div className="mt-5 flex flex-wrap gap-2">
-                {activePills.map((pill) => (
-                  <Link
-                    key={pill.label}
-                    href={pill.href}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-3 py-[4px] text-sm font-medium text-foreground transition-colors hover:bg-black/[0.08]"
-                  >
-                    {pill.label}
-                    <span className="text-coral font-bold text-xs">×</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+      <Suspense fallback={null}>
+        <DiscoverToolbar
+          citySlug={citySlug}
+          cityName={city.name}
+          count={count}
+          initialFilters={{
+            priceMin: filters.priceMin,
+            priceMax: filters.priceMax,
+            ageMin: filters.ageMin,
+            ageMax: filters.ageMax,
+            hasOwnPlace: filters.hasOwnPlace,
+            homeVisit: filters.homeVisit,
+          }}
+          activePills={activePills}
+        />
+      </Suspense>
 
-        {/* ── Stories ── */}
+      <main className="min-h-screen pb-32">
+        {/* ── Stories ───────────────────────────────────────────────── */}
         {storyGroups.length > 0 && (
           <StoryBar groups={storyGroups} isClient={isLoggedIn} />
         )}
 
-        {/* ── Body ── */}
+        {/* ── Body ──────────────────────────────────────────────────── */}
         {count === 0 ? (
-          /* ── Empty state ── */
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <div className="mx-auto max-w-md text-center">
-              <p className="text-4xl font-semibold tracking-tight">Ainda não há perfis em {city.name}.</p>
-              <p className="mt-3 text-md leading-relaxed text-muted">
-                {activePills.length > 0
-                  ? "Nenhum perfil corresponde aos filtros selecionados. Tente remover alguns filtros."
-                  : "Seja o primeiro a se cadastrar nessa cidade ou explore outras regiões."}
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                {activePills.length > 0 && (
-                  <Link
-                    href={`/descobrir/${citySlug}`}
-                    className="rounded-lg bg-foreground px-5 py-[7px] text-base font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
-                  >
-                    Limpar filtros
-                  </Link>
-                )}
-                <Link
-                  href="/buscar"
-                  className="rounded-lg border border-black/10 bg-white px-5 py-[7px] text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
-                >
-                  Buscar outra cidade
-                </Link>
-              </div>
-            </div>
-          </div>
+          <EmptyDiscover
+            cityName={city.name}
+            citySlug={citySlug}
+            hasFilters={activePills.length > 0}
+          />
         ) : (
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[260px_1fr] lg:px-6">
-            {/* ── Sidebar ── */}
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-              {/* Search by name / @handle */}
-              <form method="get" className="flex gap-2">
-                <input type="hidden" name="ordem" value={sort === "relevance" ? "" : sort} />
-                <input
-                  name="q"
-                  defaultValue={filters.search ?? ""}
-                  placeholder="Nome ou @handle…"
-                  className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all placeholder:text-muted/60 hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
-                />
-                <button type="submit" className="rounded-lg bg-foreground px-4 py-[7px] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]">
-                  Ir
-                </button>
-              </form>
-              {filters.search && (
-                <Link
-                  href={`/buscar?q=${encodeURIComponent(filters.search)}`}
-                  className="block text-center text-sm text-blue transition-colors hover:underline"
-                >
-                  Buscar em todas as cidades
-                </Link>
-              )}
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            {/* Banner glass discreto */}
+            <p className="mb-6 text-center text-sm text-ink-dim">
+              Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
+            </p>
 
-              <details className="group lg:open" open>
-                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm lg:hidden">
-                  <span>Filtros</span>
-                  <span className="text-muted group-open:rotate-180 transition-transform">▾</span>
-                </summary>
-
-                <div className="flex items-center justify-between pt-2 lg:pt-0">
-                  <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted">Filtros</p>
-                  <Link href={`/descobrir/${citySlug}`} className="text-sm text-blue transition-colors hover:underline">
-                    limpar
-                  </Link>
+            <ViewTransition
+              key={`${citySlug}-${view}`}
+              name="discover-grid"
+              share="auto"
+              enter="auto"
+              default="none"
+            >
+              {view === "list" ? (
+                <div className="space-y-3">
+                  {profiles.map((p) => (
+                    <ProfileListRow key={p.id} profile={p} />
+                  ))}
                 </div>
-
-                <form method="get" className="space-y-5 rounded-2xl border border-black/[0.06] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                  <input type="hidden" name="ordem" value={sort === "relevance" ? "" : sort} />
-                  {filters.search && <input type="hidden" name="q" value={filters.search} />}
-
-                  {/* Gênero */}
-                  <div>
-                    <p className="text-xs font-medium text-muted">Procuro</p>
-                    <div className="mt-2.5 flex flex-col gap-2">
-                      {GENDER_OPTIONS.map((o) => (
-                        <label key={o.value} className="flex cursor-pointer items-center gap-2 text-base">
-                          <input
-                            type="radio"
-                            name="genero"
-                            value={o.value}
-                            defaultChecked={filters.gender === o.value || (!filters.gender && o.value === "")}
-                            className="accent-coral"
-                          />
-                          {o.label}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Sinais de confiança */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted">Confiança</p>
-                    <label className="flex cursor-pointer items-center gap-2 text-base">
-                      <input type="checkbox" name="verified" value="1" defaultChecked={filters.verifiedOnly} className="accent-coral rounded" />
-                      Apenas verificadas
-                    </label>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full rounded-lg bg-foreground py-[8px] text-base font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[0.98]"
-                  >
-                    Aplicar ({count.toLocaleString("pt-BR")})
-                  </button>
-
-                  {/* Filtros avançados */}
-                  <details className="group">
-                    <summary className="cursor-pointer list-none text-xs font-medium text-muted group-open:mb-4">
-                      Avançados ▾
-                    </summary>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-xs font-medium text-muted">Preço /h</p>
-                        <div className="mt-2 flex gap-2">
-                          <input
-                            name="pmin"
-                            defaultValue={filters.priceMin ?? ""}
-                            placeholder="mín"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
-                          />
-                          <input
-                            name="pmax"
-                            defaultValue={filters.priceMax ?? ""}
-                            placeholder="máx"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-muted">Idade</p>
-                        <div className="mt-2 flex gap-2">
-                          <input
-                            name="amin"
-                            defaultValue={filters.ageMin ?? ""}
-                            placeholder="mín"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
-                          />
-                          <input
-                            name="amax"
-                            defaultValue={filters.ageMax ?? ""}
-                            placeholder="máx"
-                            className="w-full rounded-lg border border-black/10 bg-white px-3 py-[6px] text-base shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted">Atendimento</p>
-                        <label className="flex cursor-pointer items-center gap-2 text-base">
-                          <input type="checkbox" name="local" value="1" defaultChecked={filters.hasOwnPlace} className="accent-coral rounded" />
-                          Local próprio
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2 text-base">
-                          <input type="checkbox" name="domicilio" value="1" defaultChecked={filters.homeVisit} className="accent-coral rounded" />
-                          A domicílio
-                        </label>
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full rounded-lg border border-black/10 bg-white py-[7px] text-sm font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.98]"
-                      >
-                        Aplicar avançados
-                      </button>
-                    </div>
-                  </details>
-                </form>
-              </details>
-            </aside>
-
-            {/* ── Results ── */}
-            <div>
-              <div className="rounded-lg bg-foreground/90 px-4 py-2 text-center text-sm font-medium text-white/90">
-                Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
-              </div>
-              <ViewTransition
-                key={citySlug}
-                name="discover-grid"
-                share="auto"
-                enter="auto"
-                default="none"
-              >
-                {view === "list" ? (
-                  <div className="mt-6 space-y-3">
-                    {profiles.map((p) => (
-                      <ProfileListRow key={p.id} profile={p} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-6 columns-1 gap-5 sm:columns-2 xl:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
-                    {profiles.map((p) => (
-                      <ProfileCard key={p.id} profile={p} />
-                    ))}
-                  </div>
-                )}
-              </ViewTransition>
-            </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {profiles.map((p) => (
+                    <ProfileCard key={p.id} profile={p} />
+                  ))}
+                </div>
+              )}
+            </ViewTransition>
           </div>
         )}
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function EmptyDiscover({
+  cityName,
+  citySlug,
+  hasFilters,
+}: {
+  cityName: string;
+  citySlug: string;
+  hasFilters: boolean;
+}) {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-md text-center">
+        <p className="font-light text-4xl leading-tight tracking-tight text-ink sm:text-5xl">
+          Ainda não há perfis em <span className="text-rose">{cityName}</span>.
+        </p>
+        <p className="mt-4 text-md leading-relaxed text-ink-dim">
+          {hasFilters
+            ? "Nenhum perfil corresponde aos filtros selecionados. Tente remover alguns filtros."
+            : "Seja a primeira a se cadastrar nessa cidade ou explore outras regiões."}
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          {hasFilters && (
+            <a
+              href={`/descobrir/${citySlug}`}
+              className="rounded-full bg-rose px-5 py-2.5 text-base font-medium text-white shadow-[var(--shadow-sm)] transition-all duration-150 hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              Limpar filtros
+            </a>
+          )}
+          <a
+            href="/buscar"
+            className="rounded-full border border-line bg-white/55 px-5 py-2.5 text-base font-medium text-ink backdrop-blur-md transition-all duration-150 hover:bg-white/75 hover:border-ink/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Buscar outra cidade
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }

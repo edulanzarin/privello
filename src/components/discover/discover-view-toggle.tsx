@@ -6,17 +6,17 @@ import { Grid3X3, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Toggle "grade ↔ lista" da página `/descobrir/[citySlug]`. Renderiza dois
- * `<Link>` com `?view=grid|list` mantendo os outros search params intactos.
+ * DiscoverViewToggle — Design System v2 (Tahoe Sensual).
  *
- * Props:
- * - `citySlug` (string): slug da cidade atual usado como base do `href`.
+ * Caminho: src/components/discover/discover-view-toggle.tsx
+ * Steering: `.kiro/steering/design-system.md` §3.6 (glass) + §13.3.
  *
- * Consumidores conhecidos:
- * - src/app/descobrir/[citySlug]/page.tsx
+ * Toggle "grade ↔ lista" no header sticky de Descobrir.
+ * Container glass-pill com 2 botões circulares. Ativo em `bg-rose-soft text-rose`.
+ * Touch target ≥ 44×44.
  *
  * Side effects:
- * - `useSearchParams()` para ler/preservar o restante da query string.
+ *  - `useSearchParams()` para preservar o restante da query string.
  */
 export function DiscoverViewToggle({ citySlug }: { citySlug: string }) {
   const base = `/descobrir/${citySlug}`;
@@ -32,26 +32,34 @@ export function DiscoverViewToggle({ citySlug }: { citySlug: string }) {
   };
 
   return (
-    <div className="flex items-center gap-1 border border-line bg-white p-1">
+    <div className="glass-pill flex shrink-0 items-center gap-0.5 p-1">
       <Link
         href={buildHref("grid")}
+        aria-label="Visualizar em grade"
+        aria-current={view === "grid" ? "page" : undefined}
         className={cn(
-          "rounded p-2 text-muted transition hover:text-foreground",
-          view === "grid" && "bg-foreground text-white hover:text-white",
+          "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150 ease-[var(--ease-tahoe)]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          view === "grid"
+            ? "bg-rose-soft text-rose"
+            : "text-ink-dim hover:text-ink hover:bg-line/40",
         )}
-        aria-label="Grade"
       >
-        <Grid3X3 className="h-4 w-4" strokeWidth={1.5} />
+        <Grid3X3 className="h-4 w-4" strokeWidth={view === "grid" ? 2 : 1.6} />
       </Link>
       <Link
         href={buildHref("list")}
+        aria-label="Visualizar em lista"
+        aria-current={view === "list" ? "page" : undefined}
         className={cn(
-          "rounded p-2 text-muted transition hover:text-foreground",
-          view === "list" && "bg-foreground text-white hover:text-white",
+          "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150 ease-[var(--ease-tahoe)]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          view === "list"
+            ? "bg-rose-soft text-rose"
+            : "text-ink-dim hover:text-ink hover:bg-line/40",
         )}
-        aria-label="Lista"
       >
-        <List className="h-4 w-4" strokeWidth={1.5} />
+        <List className="h-4 w-4" strokeWidth={view === "list" ? 2 : 1.6} />
       </Link>
     </div>
   );
