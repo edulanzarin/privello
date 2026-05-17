@@ -25,12 +25,15 @@ import { formatBrl } from "@/lib/money";
  *  - `periodFormat?`: "long" → "/ hora" (default), "short" → "/h".
  *  - `variant?`: ver acima (default `card`).
  *  - `className?`: classes extras no wrapper.
- *  - `tone?`: `"rose"` (default) | `"ink"` — usado na tabela de Valores
- *     onde só "1 hora" é destaque rose e os demais são ink (preto ameixa).
+ *  - `tone?`: `"rose"` (default) | `"ink"` | `"white"`.
+ *     `"rose"` para destaque primário, `"ink"` para preço secundário em
+ *     fundo claro, `"white"` quando o card de fundo é escuro/colorido
+ *     (Plus em ink, Premium em rose). O label do período ajusta o
+ *     contraste automaticamente.
  */
 
 type PriceTagVariant = "hero" | "card" | "inline" | "compact";
-type PriceTagTone = "rose" | "ink";
+type PriceTagTone = "rose" | "ink" | "white";
 
 const variantStyles: Record<PriceTagVariant, { value: string; period: string; gap: string }> = {
     hero: {
@@ -55,9 +58,16 @@ const variantStyles: Record<PriceTagVariant, { value: string; period: string; ga
     },
 };
 
-const toneStyles: Record<PriceTagTone, string> = {
+const toneValueStyles: Record<PriceTagTone, string> = {
     rose: "text-rose",
     ink: "text-ink",
+    white: "text-white",
+};
+
+const tonePeriodStyles: Record<PriceTagTone, string> = {
+    rose: "text-ink-dim",
+    ink: "text-ink-dim",
+    white: "text-white/70",
 };
 
 export function PriceTag({
@@ -80,10 +90,10 @@ export function PriceTag({
 
     return (
         <span className={cn("inline-flex items-baseline", styles.gap, className)}>
-            <span className={cn(styles.value, "tabular-nums", toneStyles[tone])}>
+            <span className={cn(styles.value, "tabular-nums", toneValueStyles[tone])}>
                 {formatBrl(value)}
             </span>
-            <span className={cn(styles.period, "text-ink-dim")}>{periodLabel}</span>
+            <span className={cn(styles.period, tonePeriodStyles[tone])}>{periodLabel}</span>
         </span>
     );
 }
