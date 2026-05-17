@@ -18,6 +18,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
+    "db:seed:prod": "tsx prisma/seed.production.ts",
     "db:studio": "prisma studio"
   },
   "engines": {

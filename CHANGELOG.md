@@ -14,6 +14,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Added
 
+- **Seed de produção** (`prisma/seed.production.ts`) — script idempotente
+  que popula apenas o catálogo essencial: 27 capitais brasileiras, 1 admin,
+  e `HotPeriodConfig`. Nenhum profile/media/review fake é criado (esses
+  pertencem ao seed de dev). Comando: `npm run db:seed:prod`. Senha do admin
+  documentada apenas no gerenciador de senhas do operador (nunca no repo)
+  (migracao-infra-producao, post-deploy).
 - **`Storage_Module`** (`src/lib/storage.ts`): abstração de upload com `putObject`,
   `deleteObject`, `joinPublicUrl` e `isLocalFallbackMode`; backend Cloudflare R2 (S3
   API via `@aws-sdk/client-s3`) em produção e `Storage_Local_Fallback` (escrita em
