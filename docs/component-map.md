@@ -121,6 +121,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 |------------|-----------|-------|
 | `hero-search-form.tsx` | 🟢 | Hero search bar v2 — usa `<SearchBar>` |
 | `handle-search-form.tsx` | 🟢 | Busca por nome/@perfil — usa `<SearchBar>` |
+| `top-cities-pills.tsx` | 🟢 | Pílulas glass de top cidades — usado em Home + Descobrir hub |
 | `city-autocomplete.tsx` | 🟢 | Autocomplete de cidades |
 
 #### `painel/` — dashboard provider

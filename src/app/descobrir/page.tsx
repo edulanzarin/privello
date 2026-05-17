@@ -31,6 +31,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
 import { HandleSearchForm } from "@/components/marketing/handle-search-form";
+import { TopCitiesPills } from "@/components/marketing/top-cities-pills";
 import { searchProfilesGlobal } from "@/lib/services";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBrl } from "@/lib/money";
@@ -81,55 +82,45 @@ export default async function DiscoverHubPage({ searchParams }: PageProps) {
                     </div>
                 </div>
 
-                {/* ── Hero centralizado ─────────────────────────────────────── */}
+                {/* ── Hero alinhado à esquerda (mesmo padrão da Home) ─────── */}
                 <section className="py-12 lg:py-16">
-                    <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-                        <h1 className="font-bold leading-[1.05] tracking-[-0.025em] text-ink text-5xl sm:text-6xl">
-                            Descobrir{" "}
-                            <span className="text-rose">acompanhantes.</span>
-                        </h1>
-                        <p className="mx-auto mt-5 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
-                            Escolha a cidade ou busque pelo nome do perfil em qualquer lugar
-                            do Brasil.
-                        </p>
-                    </div>
-
-                    {/* Search bars com mesma largura, lado a lado conceitualmente */}
-                    <div className="mx-auto mt-10 max-w-3xl space-y-5 px-4 sm:px-6">
-                        <Suspense
-                            fallback={
-                                <div className="h-16 animate-pulse rounded-2xl bg-line/40" />
-                            }
-                        >
-                            <HeroSearchForm />
-                        </Suspense>
-
-                        {pills.length > 0 && (
-                            <div className="flex flex-wrap justify-center gap-2">
-                                {pills.map((p) => (
-                                    <Link
-                                        key={p.href}
-                                        href={p.href}
-                                        className="inline-flex items-center rounded-full border border-line bg-white px-4 py-1.5 text-sm font-semibold text-ink transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                                    >
-                                        {p.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Divisor "ou" */}
-                        <div className="flex items-center gap-3 py-2">
-                            <div className="h-px flex-1 bg-line" />
-                            <span className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
-                                ou
-                            </span>
-                            <div className="h-px flex-1 bg-line" />
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-3xl">
+                            <h1 className="font-bold leading-[1.05] tracking-[-0.025em] text-ink text-5xl sm:text-6xl">
+                                Descobrir{" "}
+                                <span className="text-rose">acompanhantes.</span>
+                            </h1>
+                            <p className="mt-5 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
+                                Escolha a cidade ou busque pelo nome do perfil em qualquer
+                                lugar do Brasil.
+                            </p>
                         </div>
 
-                        <HandleSearchForm defaultValue={q} />
+                        {/* Search bars empilhadas, mesma largura, mesmo container da Home */}
+                        <div className="mt-10 space-y-5">
+                            <Suspense
+                                fallback={
+                                    <div className="h-16 animate-pulse rounded-2xl bg-line/40" />
+                                }
+                            >
+                                <HeroSearchForm />
+                            </Suspense>
 
-                        {q && <SearchResults q={q} results={results} />}
+                            <TopCitiesPills pills={pills} />
+
+                            {/* Divisor "ou" */}
+                            <div className="flex items-center gap-3 py-2">
+                                <div className="h-px flex-1 bg-line" />
+                                <span className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                                    ou
+                                </span>
+                                <div className="h-px flex-1 bg-line" />
+                            </div>
+
+                            <HandleSearchForm defaultValue={q} />
+
+                            {q && <SearchResults q={q} results={results} />}
+                        </div>
                     </div>
                 </section>
             </main>

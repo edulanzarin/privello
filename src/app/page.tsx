@@ -29,6 +29,7 @@ import { ShieldCheck, Camera, Sparkles, TrendingUp } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
+import { TopCitiesPills } from "@/components/marketing/top-cities-pills";
 import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
 import { getPlatformStats, getSectionProfiles } from "@/lib/services";
@@ -129,19 +130,7 @@ export default async function HomePage() {
             >
               <HeroSearchForm />
             </Suspense>
-            {pills.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {pills.map((p) => (
-                  <Link
-                    key={p.href}
-                    href={p.href}
-                    className="inline-flex items-center rounded-full border border-line bg-white px-4 py-1.5 text-sm font-semibold text-ink transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  >
-                    {p.label}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <TopCitiesPills pills={pills} className="mt-4" />
           </div>
         </section>
 
