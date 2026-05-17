@@ -73,6 +73,7 @@ export function SearchBar({
                 "flex flex-col gap-2",
                 "md:flex-row md:items-stretch md:gap-0 md:p-1.5",
                 "shadow-[var(--shadow-md)]",
+                "mx-auto w-full",
                 // Divider vertical automático entre filhos diretos (apenas desktop).
                 "md:[&>*+*]:before:hidden", // resetar caso estilo herde
                 MAX_WIDTH_CLASS[maxWidth],

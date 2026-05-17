@@ -29,43 +29,28 @@ import { ShieldCheck, Camera, Sparkles, TrendingUp } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
-import { TopCitiesPills } from "@/components/marketing/top-cities-pills";
 import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
 import { getPlatformStats, getSectionProfiles } from "@/lib/services";
-import { prisma } from "@/lib/prisma";
 
 // Cache strategy: revalidate=60 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 1.
 export const revalidate = 60;
 
-async function getTopCities(limit = 5) {
-  const cities = await prisma.city.findMany({
-    where: { profiles: { some: {} } },
-    select: { name: true, slug: true, _count: { select: { profiles: true } } },
-    orderBy: { profiles: { _count: "desc" } },
-    take: limit,
-  });
-  return cities.map((c) => ({ href: `/descobrir/${c.slug}`, label: c.name }));
-}
-
 export default async function HomePage() {
   let stats = FALLBACK_PLATFORM_STATS;
   let hot: { profiles: Awaited<ReturnType<typeof getSectionProfiles>>["profiles"]; hasMore: boolean } = { profiles: [], hasMore: false };
   let boosted: typeof hot = { profiles: [], hasMore: false };
-  let pills: { href: string; label: string }[] = [];
 
   try {
-    const [s, h, b, p] = await Promise.all([
+    const [s, h, b] = await Promise.all([
       getPlatformStats(),
       getSectionProfiles("hot", 0),
       getSectionProfiles("boosted", 0),
-      getTopCities(5),
     ]);
     stats = s;
     hot = h;
     boosted = b;
-    pills = p;
   } catch {
     // use fallbacks
   }
@@ -130,7 +115,6 @@ export default async function HomePage() {
             >
               <HeroSearchForm />
             </Suspense>
-            <TopCitiesPills pills={pills} className="mt-4" />
           </div>
         </section>
 

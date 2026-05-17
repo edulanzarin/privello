@@ -31,26 +31,11 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
 import { HandleSearchForm } from "@/components/marketing/handle-search-form";
-import { TopCitiesPills } from "@/components/marketing/top-cities-pills";
 import { searchProfilesGlobal } from "@/lib/services";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBrl } from "@/lib/money";
-import { prisma } from "@/lib/prisma";
 
 export const revalidate = 120;
-
-async function getTopCities(limit = 5) {
-    const cities = await prisma.city.findMany({
-        where: { profiles: { some: {} } },
-        select: { name: true, slug: true, _count: { select: { profiles: true } } },
-        orderBy: { profiles: { _count: "desc" } },
-        take: limit,
-    });
-    return cities.map((c) => ({
-        href: `/descobrir/${c.slug}`,
-        label: c.name,
-    }));
-}
 
 type PageProps = {
     searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -61,10 +46,7 @@ export default async function DiscoverHubPage({ searchParams }: PageProps) {
     const rawQ = Array.isArray(sp.q) ? sp.q[0] : sp.q;
     const q = rawQ?.trim() ?? "";
 
-    const [pills, results] = await Promise.all([
-        getTopCities(5).catch(() => []),
-        q.length >= 2 ? searchProfilesGlobal(q, 40) : Promise.resolve([]),
-    ]);
+    const results = q.length >= 2 ? await searchProfilesGlobal(q, 40) : [];
 
     return (
         <>
@@ -105,8 +87,6 @@ export default async function DiscoverHubPage({ searchParams }: PageProps) {
                             >
                                 <HeroSearchForm />
                             </Suspense>
-
-                            <TopCitiesPills pills={pills} />
 
                             {/* Divisor "ou" */}
                             <div className="flex items-center gap-3 py-2">
