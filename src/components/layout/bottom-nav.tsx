@@ -56,7 +56,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
     if (saved) {
       router.push(`/descobrir/${saved}`);
     } else {
-      router.push("/buscar");
+      router.push("/descobrir");
     }
   }
 
@@ -102,7 +102,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
     },
     {
       key: "acompanhantes",
-      href: "/buscar",
+      href: "/descobrir",
       label: "Acompanhantes",
       icon: Users,
       active: pathname.startsWith("/descobrir") || pathname.startsWith("/buscar"),

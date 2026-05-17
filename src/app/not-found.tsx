@@ -14,7 +14,7 @@ export default function NotFound() {
         </p>
         <div className="mt-8 flex gap-3">
           <Link
-            href="/buscar"
+            href="/descobrir"
             className="rounded-lg bg-foreground px-5 py-2.5 text-base font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
           >
             Buscar acompanhantes

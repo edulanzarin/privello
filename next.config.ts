@@ -178,6 +178,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // /buscar foi consolidada em /descobrir em 2026-05-17 (decisão visual:
+  // ter 1 hub único de descoberta em vez de duas rotas redundantes). Mantemos
+  // redirect 308 (permanente) preservando query string (`?q=` para busca
+  // global por nome / @handle).
+  async redirects() {
+    return [
+      {
+        source: "/buscar",
+        destination: "/descobrir",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

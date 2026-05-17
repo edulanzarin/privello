@@ -37,7 +37,7 @@ export function FavoritesList({ favorites }: { favorites: Favorite[] }) {
         title="Nenhum perfil curtido ainda"
         description="Explore acompanhantes e curta os perfis que te interessam."
         icon={<Heart className="h-10 w-10" strokeWidth={1} />}
-        action={{ label: "Explorar perfis", href: "/buscar" }}
+        action={{ label: "Explorar perfis", href: "/descobrir" }}
       />
     );
   }

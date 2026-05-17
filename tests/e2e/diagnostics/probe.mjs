@@ -3,7 +3,7 @@
 const targets = [
     { url: "http://192.168.1.96:3000/", needles: ["h-[62px]", "z-[100]", "rounded-full p-[3px]", "scrollbar-hide"] },
     { url: "http://192.168.1.96:3000/descobrir/sao-paulo-sp", needles: ["h-[62px]", "z-[100]", "rounded-full p-[3px]"] },
-    { url: "http://192.168.1.96:3000/buscar", needles: ["Cidade", "Trocar cidade", "Ex: São Paulo"] },
+    { url: "http://192.168.1.96:3000/descobrir", needles: ["Cidade", "Trocar cidade", "Ex: São Paulo"] },
     { url: "http://192.168.1.96:3000/p/helena", needles: ["Compartilhar perfil", "Compartilhar"] },
     { url: "http://192.168.1.96:3000/reels/helena", needles: ["message-circle", "rounded-t-2xl", "MessageCircle"] },
 ];

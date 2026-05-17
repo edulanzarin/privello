@@ -273,7 +273,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           <div className="border-b border-line">
             <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-ink-dim sm:px-6">
               <Link
-                href="/buscar"
+                href="/descobrir"
                 className="transition-colors hover:text-ink"
               >
                 Descobrir

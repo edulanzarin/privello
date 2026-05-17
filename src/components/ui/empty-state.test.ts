@@ -55,12 +55,12 @@ describe("EmptyState — render + cta", () => {
         render(
             createElement(EmptyState, {
                 title: "x",
-                action: { label: "Explorar", href: "/buscar" },
+                action: { label: "Explorar", href: "/descobrir" },
             }),
         );
         const link = mountNode!.querySelector<HTMLAnchorElement>("a");
         expect(link).not.toBeNull();
-        expect(link!.getAttribute("href")).toBe("/buscar");
+        expect(link!.getAttribute("href")).toBe("/descobrir");
         expect(link!.textContent).toContain("Explorar");
     });
 

@@ -143,7 +143,8 @@ test.describe("Preservation 3.1 — desktop city autocomplete still shows sugges
 
     for (const q of QUERIES) {
         test(`renders dropdown options for query "${q}"`, async ({ page }, testInfo) => {
-            await page.goto("/buscar", { waitUntil: "domcontentloaded" });
+            // /buscar foi consolidada em /descobrir em 2026-05-17.
+            await page.goto("/descobrir", { waitUntil: "domcontentloaded" });
 
             // Wait for the IBGE prewarm so the first query doesn't race.
             await Promise.race([

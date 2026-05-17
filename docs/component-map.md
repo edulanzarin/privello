@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (slug + audio-player + CTAs migrados)
+**Última atualização**: 2026-05-17 (slug + /buscar consolidada em /descobrir)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -170,8 +170,9 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Rota | Arquivo | Status v2 | Commit | Notas |
 |------|---------|-----------|--------|-------|
 | `/` | `app/page.tsx` | 🟢 | `5223afb` | Hero + Em destaque + Em alta + Verificação séria |
+| `/descobrir` | `app/descobrir/page.tsx` | 🟢 | _next_ | Hub sem cidade — city picker + busca global @handle (substituiu /buscar em 2026-05-17) |
 | `/descobrir/[citySlug]` | `app/descobrir/[citySlug]/page.tsx` | 🟢 | `5223afb` | Toolbar sticky + grid masonry |
-| `/buscar` | `app/buscar/page.tsx` | 🔴 | — | Form de busca puro |
+| ~~`/buscar`~~ | ~~`app/buscar/`~~ | ❌ | _removed_ | Eliminada em 2026-05-17. 308 redirect para `/descobrir` (preserva `?q=`) |
 | `/cidades` | `app/cidades/page.tsx` | 🔴 | — | Listagem de cidades |
 | `/p/[slug]` | `app/p/[slug]/page.tsx` | 🟢 | _next_ | Hero split + selos hairline + Quem sou/Características/Valores/Atende/Disponibilidade + Reviews em cards |
 | `/em-alta` | `app/em-alta/page.tsx` | 🔴 | — | Ranking semanal |

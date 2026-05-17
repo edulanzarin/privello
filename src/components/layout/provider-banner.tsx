@@ -18,7 +18,7 @@ type Props = {
  *
  * Consumidores conhecidos:
  * - src/app/p/[slug]/page.tsx
- * - src/app/buscar/page.tsx (busca)
+ * - src/app/descobrir/page.tsx (hub sem cidade)
  * - src/app/descobrir/[citySlug]/page.tsx
  */
 export function ProviderBanner({ variant }: Props) {

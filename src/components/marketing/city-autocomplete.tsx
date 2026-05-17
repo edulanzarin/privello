@@ -115,7 +115,7 @@ type Props = {
  * Consumidores conhecidos:
  * - src/components/marketing/hero-search-form.tsx
  * - src/components/discover/city-switcher.tsx
- * - src/app/buscar/buscar-form.tsx
+ * - src/app/descobrir/discover-hub-form.tsx
  * - src/app/cadastro/acompanhante/provider-register-form.tsx
  * - src/app/conta/onboarding/perfil/perfil-form.tsx
  * - src/app/painel/perfil/perfil-editor.tsx

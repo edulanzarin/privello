@@ -196,7 +196,7 @@ function EmptyDiscover({
             </a>
           )}
           <a
-            href="/buscar"
+            href="/descobrir"
             className="rounded-full border border-line bg-white px-5 py-2.5 text-base font-medium text-ink transition-all duration-150 hover:bg-line/40 hover:border-ink/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Buscar outra cidade

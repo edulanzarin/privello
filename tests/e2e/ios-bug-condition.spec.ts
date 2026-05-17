@@ -12,7 +12,7 @@
  * Scoped PBT approach: the property domain is the four `kind` values, each
  * exercised with a deterministic concrete case the design says reproduces
  * the bug. Per kind:
- *   - citySuggest: type "São Pa" on /buscar; assert a dropdown <ul> with
+ *   - citySuggest: type "São Pa" on /descobrir; assert a dropdown <ul> with
  *     at least one option <li> is mounted within 1s.
  *   - storyTap: tap the first story circle on /; assert an overlay
  *     `[class*="fixed inset-0"]` with `[class*="z-[100]"]` is mounted within 1s.
@@ -117,16 +117,18 @@ test.describe("Property 1: iOS Safari touch interactions on non-secure origin", 
         // Attach BEFORE goto so the autocomplete's prewarm requests
         // (`/api/cities` on mount and the IBGE municipality list) are recorded.
         const collectNetwork = attachNetworkRecorder(page);
-        await page.goto("/buscar", { waitUntil: "domcontentloaded" });
+        // /buscar foi consolidada em /descobrir em 2026-05-17. A nova rota
+        // monta o mesmo CityAutocomplete via DiscoverHubForm.
+        await page.goto("/descobrir", { waitUntil: "domcontentloaded" });
 
-        // The CityAutocomplete is rendered inside the buscar-form. Find its
-        // input by placeholder (matches both compact and non-compact variants).
+        // The CityAutocomplete is rendered inside the discover-hub-form.
+        // Find its input by placeholder (matches both compact and non-compact variants).
         const input = page
             .locator(
                 'input[placeholder*="Cidade"], input[placeholder*="Trocar cidade"], input[placeholder*="Ex: São Paulo"]',
             )
             .first();
-        await expect(input, "city autocomplete input must be present on /buscar").toBeVisible({
+        await expect(input, "city autocomplete input must be present on /descobrir").toBeVisible({
             timeout: 10_000,
         });
 
