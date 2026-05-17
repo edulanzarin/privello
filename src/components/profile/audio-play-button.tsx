@@ -5,18 +5,19 @@ import { Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Botão compacto "Ouça minha voz" que toca/pausa um clipe de áudio inline em cards de perfil.
+ * Botão compacto "Ouça minha voz" — Design System v2.4 (Tahoe Sensual).
+ *
+ * Caminho: src/components/profile/audio-play-button.tsx
+ * Steering: `.kiro/steering/design-system.md` §3.2.
  *
  * Props:
- * - `src` (string): URL absoluta do arquivo de áudio (geralmente `.webm` em `/uploads`).
- * - `className?` (string): classes Tailwind extras encaminhadas ao botão.
- *
- * Consumidores conhecidos:
- * - src/components/profile/profile-card.tsx
+ * - `src` (string): URL do arquivo de áudio.
+ * - `className?`: classes Tailwind extras.
  *
  * Side effects:
- * - Instancia `new Audio(src)` lazy no primeiro clique e mantém em `useRef`.
- * - `e.preventDefault()` + `e.stopPropagation()` para não disparar o `<Link>` pai do card.
+ * - Instancia `new Audio(src)` lazy no primeiro clique.
+ * - `e.preventDefault()` + `e.stopPropagation()` para não disparar o `<Link>`
+ *   pai do card.
  */
 export function AudioPlayButton({ src, className }: { src: string; className?: string }) {
   const [playing, setPlaying] = useState(false);
@@ -46,17 +47,18 @@ export function AudioPlayButton({ src, className }: { src: string; className?: s
       type="button"
       onClick={toggle}
       className={cn(
-        "flex items-center gap-1 rounded-full px-2 py-[3px] text-2xs font-medium transition",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         playing
-          ? "border border-coral/30 bg-coral/10 text-coral"
-          : "border border-black/[0.07] bg-white text-muted hover:border-coral/20 hover:text-coral",
+          ? "bg-rose text-white"
+          : "border border-line bg-background text-rose hover:bg-rose-soft",
         className,
       )}
     >
       {playing ? (
-        <VolumeX className="h-2.5 w-2.5 shrink-0" strokeWidth={1.5} />
+        <VolumeX className="h-3 w-3 shrink-0" strokeWidth={2.2} />
       ) : (
-        <Volume2 className="h-2.5 w-2.5 shrink-0" strokeWidth={1.5} />
+        <Volume2 className="h-3 w-3 shrink-0" strokeWidth={2.2} />
       )}
       Ouça minha voz
     </button>

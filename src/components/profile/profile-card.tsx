@@ -1,6 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, Star, Video, Flame, Crown, Sparkles } from "lucide-react";
+import {
+  ShieldCheck,
+  Star,
+  Video,
+  Flame,
+  Crown,
+  Sparkles,
+  MapPin,
+  Volume2,
+  Home,
+  Car,
+} from "lucide-react";
 import { formatBrl } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { ProfileCardPayload } from "@/lib/services";
@@ -13,20 +24,21 @@ type ProfileCardProps = {
 };
 
 /**
- * ProfileCard — Design System v2.1 (Tahoe Sensual, calibrado).
+ * ProfileCard — Design System v2.4 (Tahoe Sensual, completo).
  *
  * Caminho: src/components/profile/profile-card.tsx
- * Steering: `.kiro/steering/design-system.md` §13.4 (decisão F1).
+ * Steering: `.kiro/steering/design-system.md` §13.4.
  *
- * Visual (v2.1 após feedback do user em 2026-05-17):
- *  - Foto 3:4 fullbleed. Card `rounded-2xl overflow-hidden` (16px, era 24px).
- *  - Sem chrome em volta da foto (decisão F1).
- *  - Glass strip rodapé MAIS opaco (rgba 0.62 + blur 16px, era 0.55+20).
- *  - Badges flutuantes em `bg-white/95` opaco com sombra-sm (era backdrop-blur).
- *  - Boost: Flame (chama, faz sentido com "boost") em peach.
- *  - Premium: Crown em plum.
- *  - Plus: Sparkles em cream.
- *  - Preço em `font-bold` no strip (mais contraste).
+ * Visual (v2.4 após feedback "completinho" 2026-05-17):
+ *  - Layout split: foto em cima (3:4) + área de info branca embaixo.
+ *  - Foto NÃO mais fullbleed — agora retangular com cantos arredondados
+ *    apenas na parte superior. Glass-strip sumiu.
+ *  - Área de info: nome+idade, cidade com pin, audio (se houver), tags
+ *    de serviço (Local próprio / A domicílio / Com áudio), preço destacado.
+ *  - Card opaco branco, rounded-2xl total. Hover: foto faz zoom 1.03 +
+ *    sombra ganha elevation.
+ *  - Badges flutuantes na foto: Boost / Premium / Plus + Verificada / Vídeo.
+ *  - Online badge top-right ainda na foto.
  */
 export function ProfileCard({ profile, className, storyRing = "none" }: ProfileCardProps) {
   const cover = profile.media.find((m) => m.isCover) ?? profile.media[0];
@@ -63,11 +75,18 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
     return null;
   })();
 
+  // Tags de serviço — só renderiza as ativas
+  const tags: { label: string; Icon: typeof Home }[] = [];
+  if (profile.hasOwnPlace) tags.push({ label: "Com local", Icon: Home });
+  if (profile.homeVisit) tags.push({ label: "A domicílio", Icon: Car });
+  if (audioUrl) tags.push({ label: "Com áudio", Icon: Volume2 });
+
   return (
     <Link
       href={`/p/${profile.slug}`}
       className={cn(
         "group relative block overflow-hidden rounded-2xl",
+        "bg-white border border-line",
         "shadow-[var(--shadow-sm)]",
         "transition-all duration-200 ease-[var(--ease-tahoe)]",
         "hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5",
@@ -76,7 +95,7 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
       )}
       style={{ viewTransitionName: `profile-${profile.id}` }}
     >
-      {/* Foto fullbleed 3:4 */}
+      {/* Foto 3:4 com badges flutuantes */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-line">
         <Image
           src={imageUrl}
@@ -84,16 +103,6 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
-
-        {/* Gradient overlay para legibilidade do strip */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5"
-          style={{
-            background:
-              "linear-gradient(180deg, transparent 0%, rgba(20,15,17,0.6) 70%, rgba(20,15,17,0.9) 100%)",
-          }}
-          aria-hidden
         />
 
         {/* Badges flutuantes — top-left */}
@@ -151,66 +160,81 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
             Online
           </span>
         )}
+      </div>
 
-        {/* Glass strip rodapé — info principal */}
-        <div className="absolute inset-x-3 bottom-3 rounded-xl glass-strip px-3 py-2.5">
-          <div className="flex items-end justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-md font-semibold leading-tight text-white">
-                {profile.displayName}, {profile.age}
-              </p>
-              <p className="mt-0.5 truncate text-sm leading-tight text-white/80">
-                {profile.district?.name
-                  ? `${profile.district.name} · `
-                  : ""}
-                {profile.city.name}
-              </p>
-            </div>
-
-            <div className="flex shrink-0 flex-col items-end">
-              <span className="text-md font-bold leading-none tabular-nums text-white">
-                {formatBrl(profile.priceHour)}
+      {/* Área de info — branca, separada da foto */}
+      <div className="flex flex-col gap-2.5 p-4">
+        {/* Nome + idade + rating */}
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-lg font-bold leading-tight text-ink">
+            {profile.displayName}
+            <span className="ml-1.5 text-base font-medium text-ink-dim">
+              {profile.age}
+            </span>
+          </p>
+          {profile.ratingCount > 0 && (
+            <span className="flex shrink-0 items-center gap-1 text-sm">
+              <Star
+                className="h-3.5 w-3.5 fill-cream text-cream"
+                strokeWidth={0}
+                aria-hidden
+              />
+              <span className="font-semibold tabular-nums text-ink">
+                {profile.ratingAvg.toFixed(1)}
               </span>
-              <span className="text-2xs leading-tight text-white/70">
-                por hora
+              <span className="text-ink-dim">
+                ({profile.ratingCount})
               </span>
-            </div>
-          </div>
-
-          {/* Audio + rating row */}
-          {(audioUrl || profile.ratingCount > 0) && (
-            <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/15 pt-2">
-              {audioUrl ? (
-                <div
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  className="flex-1 min-w-0"
-                >
-                  <AudioPlayButton src={audioUrl} />
-                </div>
-              ) : (
-                <span />
-              )}
-
-              {profile.ratingCount > 0 && (
-                <span className="flex shrink-0 items-center gap-1 text-2xs text-white/85">
-                  <Star
-                    className="h-3 w-3 fill-cream text-cream"
-                    strokeWidth={0}
-                    aria-hidden
-                  />
-                  <span className="font-semibold">
-                    {profile.ratingAvg.toFixed(1)}
-                  </span>
-                  <span className="opacity-70">
-                    ({profile.ratingCount})
-                  </span>
-                </span>
-              )}
-            </div>
+            </span>
           )}
+        </div>
+
+        {/* Cidade · bairro */}
+        <div className="flex items-center gap-1.5 text-sm text-ink-dim">
+          <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+          <span className="truncate">
+            {profile.district?.name ? `${profile.district.name} · ` : ""}
+            {profile.city.name}
+          </span>
+        </div>
+
+        {/* Audio inline (se houver) */}
+        {audioUrl && (
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <AudioPlayButton src={audioUrl} />
+          </div>
+        )}
+
+        {/* Tags de serviço */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <span
+                key={tag.label}
+                className="inline-flex items-center gap-1 rounded-full border border-line bg-background px-2.5 py-0.5 text-2xs font-medium text-ink-dim"
+              >
+                <tag.Icon
+                  className="h-2.5 w-2.5"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+                {tag.label}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Preço destacado */}
+        <div className="mt-1 flex items-baseline gap-1.5 border-t border-line pt-2.5">
+          <span className="text-xl font-bold tabular-nums text-rose">
+            {formatBrl(profile.priceHour)}
+          </span>
+          <span className="text-sm text-ink-dim">/ hora</span>
         </div>
       </div>
 
