@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, Grid3X3, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,8 @@ type FilterDrawerProps = {
     initial: {
         gender?: "garotos" | "casais" | undefined;
         verifiedOnly?: boolean;
+        sort?: "relevance" | "price_asc" | "price_desc" | "rating";
+        view?: "grid" | "list";
         priceMin?: number | null;
         priceMax?: number | null;
         ageMin?: number | null;
@@ -19,7 +21,7 @@ type FilterDrawerProps = {
         hasOwnPlace?: boolean;
         homeVisit?: boolean;
     };
-    /** searchParams atuais pra preservar `q` e outros não filtráveis aqui. */
+    /** searchParams atuais pra preservar `q` e outros não-filtráveis aqui. */
     preservedParams: Record<string, string>;
 };
 
@@ -29,27 +31,30 @@ const GENDER_OPTIONS: { value: "" | "garotos" | "casais"; label: string }[] = [
     { value: "casais", label: "Casais" },
 ];
 
+const SORT_OPTIONS = [
+    { value: "relevance", label: "Relevância" },
+    { value: "price_asc", label: "Menor preço" },
+    { value: "price_desc", label: "Maior preço" },
+    { value: "rating", label: "Avaliação" },
+] as const;
+
 /**
- * FilterDrawer — Design System v2.3 (Tahoe Sensual).
+ * FilterDrawer — Design System v2.4 (Tahoe Sensual).
  *
  * Caminho: src/components/discover/filter-drawer.tsx
  * Steering: `.kiro/steering/design-system.md` §13.3.
  *
- * Botão "Filtros" abre drawer com TODOS os filtros (decisão user 2026-05-17:
- * chips rápidos foram removidos da toolbar, tudo vai pro drawer):
- *  - Procuro (Garotas/Garotos/Casais) — radio.
- *  - Verificadas — checkbox.
- *  - Preço por hora — range numérico.
- *  - Idade — range numérico.
- *  - Atendimento (Local próprio, A domicílio) — checkboxes.
+ * Botão "Filtros" abre drawer com TUDO (decisão user 2026-05-17 final):
+ *  - Procuro (Garotas/Garotos/Casais).
+ *  - Apenas verificadas.
+ *  - Preço por hora — range.
+ *  - Idade — range.
+ *  - Atendimento (Local próprio, A domicílio).
+ *  - Ordenar (Relevância/Menor preço/Maior preço/Avaliação).
+ *  - Visualizar (Grade/Lista).
  *
- * Mobile = bottom-sheet (slide up), pb-28 reserva espaço pra BottomNav.
+ * Mobile = bottom-sheet (slide up, pb-28 reserva BottomNav).
  * Desktop = side drawer da direita.
- *
- * Acessibilidade:
- *  - role="dialog" aria-modal="true".
- *  - Fecha com Escape e clique no backdrop.
- *  - Touch target ≥ 44×44 nos controles.
  */
 export function FilterDrawer({
     citySlug,
@@ -61,6 +66,10 @@ export function FilterDrawer({
 
     const [gender, setGender] = useState<"" | "garotos" | "casais">(initial.gender ?? "");
     const [verifiedOnly, setVerifiedOnly] = useState(!!initial.verifiedOnly);
+    const [sort, setSort] = useState<"relevance" | "price_asc" | "price_desc" | "rating">(
+        initial.sort ?? "relevance",
+    );
+    const [view, setView] = useState<"grid" | "list">(initial.view ?? "grid");
     const [priceMin, setPriceMin] = useState(initial.priceMin?.toString() ?? "");
     const [priceMax, setPriceMax] = useState(initial.priceMax?.toString() ?? "");
     const [ageMin, setAgeMin] = useState(initial.ageMin?.toString() ?? "");
@@ -86,6 +95,10 @@ export function FilterDrawer({
         else sp.delete("genero");
         if (verifiedOnly) sp.set("verified", "1");
         else sp.delete("verified");
+        if (sort !== "relevance") sp.set("ordem", sort);
+        else sp.delete("ordem");
+        if (view === "list") sp.set("view", "list");
+        else sp.delete("view");
         if (priceMin) sp.set("pmin", priceMin);
         else sp.delete("pmin");
         if (priceMax) sp.set("pmax", priceMax);
@@ -106,6 +119,8 @@ export function FilterDrawer({
     function clearAll() {
         setGender("");
         setVerifiedOnly(false);
+        setSort("relevance");
+        setView("grid");
         setPriceMin("");
         setPriceMax("");
         setAgeMin("");
@@ -114,6 +129,20 @@ export function FilterDrawer({
         setHomeVisit(false);
     }
 
+    // Conta filtros ativos pra mostrar badge no botão.
+    const activeCount = [
+        gender !== "",
+        verifiedOnly,
+        sort !== "relevance",
+        view !== "grid",
+        priceMin !== "",
+        priceMax !== "",
+        ageMin !== "",
+        ageMax !== "",
+        hasOwnPlace,
+        homeVisit,
+    ].filter(Boolean).length;
+
     return (
         <>
             <button
@@ -121,16 +150,24 @@ export function FilterDrawer({
                 onClick={() => setOpen(true)}
                 className={cn(
                     "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2",
-                    "text-sm font-medium text-ink-dim",
+                    "text-sm font-semibold text-ink",
                     "border border-line bg-white",
                     "transition-all duration-150 ease-[var(--ease-tahoe)]",
-                    "hover:bg-line/40 hover:text-ink hover:border-ink/15",
+                    "hover:bg-line/40 hover:border-ink/15",
                     "active:scale-[0.97]",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 )}
             >
-                <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.8} />
+                <SlidersHorizontal className="h-3.5 w-3.5 text-rose" strokeWidth={2} />
                 Filtros
+                {activeCount > 0 && (
+                    <span
+                        className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-rose px-1.5 text-2xs font-bold text-white tabular-nums"
+                        aria-label={`${activeCount} filtros ativos`}
+                    >
+                        {activeCount}
+                    </span>
+                )}
             </button>
 
             {open && (
@@ -150,10 +187,8 @@ export function FilterDrawer({
                     <aside
                         className={cn(
                             "relative flex w-full flex-col gap-5 glass-panel",
-                            // Mobile: bottom-sheet — pb-28 reserva espaço pra BottomNav.
                             "rounded-t-3xl rounded-b-none px-5 pt-6 pb-28",
                             "max-h-[85vh] overflow-y-auto",
-                            // Desktop: side drawer
                             "md:max-w-md md:rounded-l-3xl md:rounded-r-none md:rounded-t-3xl",
                             "md:max-h-screen md:py-8 md:pb-8",
                             "animate-fade-in",
@@ -282,6 +317,65 @@ export function FilterDrawer({
                                     />
                                     <span className="text-md text-ink">A domicílio</span>
                                 </label>
+                            </div>
+                        </div>
+
+                        {/* Ordenar */}
+                        <div>
+                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                                Ordenar por
+                            </p>
+                            <div className="grid grid-cols-2 gap-2">
+                                {SORT_OPTIONS.map((opt) => (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        onClick={() => setSort(opt.value)}
+                                        className={cn(
+                                            "flex min-h-[44px] items-center justify-center rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
+                                            sort === opt.value
+                                                ? "border-rose bg-rose-soft text-rose"
+                                                : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
+                                        )}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Visualização */}
+                        <div>
+                            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                                Visualização
+                            </p>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setView("grid")}
+                                    className={cn(
+                                        "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
+                                        view === "grid"
+                                            ? "border-rose bg-rose-soft text-rose"
+                                            : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
+                                    )}
+                                >
+                                    <Grid3X3 className="h-4 w-4" strokeWidth={2} />
+                                    Grade
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setView("list")}
+                                    className={cn(
+                                        "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border px-3 text-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40",
+                                        view === "list"
+                                            ? "border-rose bg-rose-soft text-rose"
+                                            : "border-line bg-white text-ink-dim hover:border-ink/15 hover:text-ink",
+                                    )}
+                                >
+                                    <List className="h-4 w-4" strokeWidth={2} />
+                                    Lista
+                                </button>
                             </div>
                         </div>
 

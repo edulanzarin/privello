@@ -31,7 +31,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProfileCard } from "@/components/profile/profile-card";
 import { ProfileListRow } from "@/components/profile/profile-list-row";
-import { buildDiscoverHref, parseDiscoverSearchParams } from "@/lib/discover-params";
+import { parseDiscoverSearchParams } from "@/lib/discover-params";
 import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "@/lib/services";
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
@@ -62,22 +62,10 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const GENDER_OPTIONS = [
-  { value: "garotos", label: "Garotos" },
-  { value: "casais", label: "Casais" },
-] as const;
-
 export default async function DiscoverPage({ params, searchParams }: PageProps) {
   const { citySlug } = await params;
   const raw = await searchParams;
-  const { filters, view } = parseDiscoverSearchParams(raw);
-
-  const sp = new URLSearchParams();
-  for (const [k, v] of Object.entries(raw)) {
-    if (v === undefined) continue;
-    if (Array.isArray(v)) v.forEach((x) => sp.append(k, x));
-    else sp.set(k, v);
-  }
+  const { filters, sort, view } = parseDiscoverSearchParams(raw);
 
   const city = await getOrCreateCityBySlug(citySlug);
 
@@ -85,57 +73,24 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
   const isLoggedIn = !!session?.user?.id;
 
   const [profiles, storyGroups] = await Promise.all([
-    listProfilesForCity(city.id, filters, parseDiscoverSearchParams(raw).sort),
+    listProfilesForCity(city.id, filters, sort),
     listStoriesForCity(city.id, session?.user?.id, filters.gender),
   ]);
   const count = profiles.length;
 
-  // Active filter pills — todos os filtros vêm do drawer agora.
-  const activePills: { label: string; href: string }[] = [];
-  if (filters.gender === "garotos" || filters.gender === "casais") {
-    const g = GENDER_OPTIONS.find((o) => o.value === filters.gender);
-    if (g)
-      activePills.push({
-        label: g.label,
-        href: buildDiscoverHref(citySlug, { genero: null }, sp),
-      });
-  }
-  if (filters.verifiedOnly) {
-    activePills.push({
-      label: "Verificadas",
-      href: buildDiscoverHref(citySlug, { verified: null }, sp),
-    });
-  }
-  if (filters.priceMin != null || filters.priceMax != null) {
-    activePills.push({
-      label: `R$ ${filters.priceMin ?? "—"}–${filters.priceMax ?? "—"}/h`,
-      href: buildDiscoverHref(citySlug, { pmin: null, pmax: null }, sp),
-    });
-  }
-  if (filters.ageMin != null || filters.ageMax != null) {
-    activePills.push({
-      label: `${filters.ageMin ?? "—"}–${filters.ageMax ?? "—"} anos`,
-      href: buildDiscoverHref(citySlug, { amin: null, amax: null }, sp),
-    });
-  }
-  if (filters.hasOwnPlace) {
-    activePills.push({
-      label: "Local próprio",
-      href: buildDiscoverHref(citySlug, { local: null }, sp),
-    });
-  }
-  if (filters.homeVisit) {
-    activePills.push({
-      label: "A domicílio",
-      href: buildDiscoverHref(citySlug, { domicilio: null }, sp),
-    });
-  }
-  if (filters.search) {
-    activePills.push({
-      label: `"${filters.search}"`,
-      href: buildDiscoverHref(citySlug, { q: null }, sp),
-    });
-  }
+  // Detecta se há filtros aplicados (pra mostrar "Limpar filtros" no empty state).
+  const hasFilters =
+    filters.gender !== undefined ||
+    filters.verifiedOnly ||
+    filters.priceMin != null ||
+    filters.priceMax != null ||
+    filters.ageMin != null ||
+    filters.ageMax != null ||
+    filters.hasOwnPlace ||
+    filters.homeVisit ||
+    !!filters.search ||
+    sort !== "relevance" ||
+    view !== "grid";
 
   return (
     <>
@@ -150,6 +105,8 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           initialFilters={{
             gender: filters.gender,
             verifiedOnly: filters.verifiedOnly,
+            sort,
+            view,
             priceMin: filters.priceMin,
             priceMax: filters.priceMax,
             ageMin: filters.ageMin,
@@ -157,7 +114,6 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
             hasOwnPlace: filters.hasOwnPlace,
             homeVisit: filters.homeVisit,
           }}
-          activePills={activePills}
         />
       </Suspense>
 
@@ -172,7 +128,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           <EmptyDiscover
             cityName={city.name}
             citySlug={citySlug}
-            hasFilters={activePills.length > 0}
+            hasFilters={hasFilters}
           />
         ) : (
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
