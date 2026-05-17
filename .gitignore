@@ -44,5 +44,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# IDE / agent skill packs (não relacionados ao app — Stripe skills auto-instalados)
+.agents/
+.claude/skills/
+.kiro/skills/
+skills-lock.json
+
 # User uploaded files
 /public/uploads/

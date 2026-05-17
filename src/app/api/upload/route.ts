@@ -3,16 +3,17 @@
  *
  * Endpoint: `POST /api/upload`
  *
- * Recebe um `File` em `multipart/form-data` e salva em
- * `public/uploads/<profileId>/`. Para mídias normais (`mediaType` `IMAGE`/
- * `VIDEO`), também cria a `Media` no banco; para `REEL` ou `purpose === "story"`
- * só devolve a URL — o caller (action `createReel` / `createStory`) cria o
- * registro DB para evitar duplicidade.
+ * Recebe um `File` em `multipart/form-data` e o persiste via
+ * `Storage_Module` (`src/lib/storage.ts`) sob a Object_Key
+ * `uploads/<profileId>/<filename>`. Em produção a URL retornada aponta
+ * para o `R2_Public_URL` do Cloudflare R2; em dev sem credenciais o
+ * `Storage_Local_Fallback` escreve em `public/uploads/<profileId>/` e
+ * devolve URL relativa — paridade total com o comportamento legado.
  *
- * **Atenção:** uploads em filesystem local (`public/uploads`) não funcionam
- * em deploy serverless. Migração para storage externo (Vercel Blob/R2/S3)
- * está documentada em `docs/deploy-vercel.md` como bloqueante para
- * produção real.
+ * Para mídias normais (`mediaType` `IMAGE`/`VIDEO`), também cria a
+ * `Media` no banco; para `REEL` ou `purpose === "story"` só devolve a
+ * URL — o caller (action `createReel` / `createStory`) cria o registro
+ * DB para evitar duplicidade.
  *
  * Convenções:
  * - Autenticação: sessão NextAuth válida.
@@ -21,18 +22,21 @@
  * - Validação Zod: `UploadBodySchema` em `src/lib/validation/upload.schema.ts`.
  *   MIME e tamanho são checados manualmente no handler (per spec — Zod só
  *   verifica `instanceof File`).
+ * - Storage: `putObject` do `Storage_Module` é a única superfície de
+ *   escrita; nenhuma chamada a `mkdir`/`writeFile` permanece neste handler.
  *
  * Cross-refs:
  * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1 (`/api/upload`).
  * - .kiro/specs/fase-1-seguranca/rate-limits.md §"Tabela canônica" (linha
  *   `/api/upload`).
- * - docs/deploy-vercel.md — followup de storage externo.
+ * - .kiro/specs/migracao-infra-producao/requirements.md > Requirement 2.
+ * - .kiro/specs/migracao-infra-producao/design.md > Components and
+ *   Interfaces > 2.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { putObject } from "@/lib/storage";
 import { UploadBodySchema, formDataToObject } from "@/lib/validation";
 import { rateLimit } from "@/lib/rate-limit";
 import { rateLimitConfigFor } from "@/lib/rate-limit-config";
@@ -43,8 +47,8 @@ const ALLOWED_IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
 
 /**
- * Recebe `multipart/form-data`, persiste o arquivo em disco e (quando
- * aplicável) cria a `Media` correspondente.
+ * Recebe `multipart/form-data`, persiste o arquivo via `Storage_Module` e
+ * (quando aplicável) cria a `Media` correspondente.
  *
  * Body esperado (`UploadBodySchema`):
  *   - `file` (File, required): JPG/PNG/WebP/GIF (≤8 MB) ou
@@ -64,15 +68,21 @@ const ALLOWED_VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
  *   - 404: profile não encontrado para o user.
  *   - 413: `Content-Length` ultrapassa o teto absoluto (200 MB + 1 KB).
  *   - 429: rate limited (`Retry-After` header + log de auditoria).
+ *   - 500: falha ao persistir via `Storage_Module` (`{ error: "Falha ao enviar arquivo." }`).
  *
  * Side effects:
- * - FS: `public/uploads/<profileId>/<timestamp>-<rand>.<ext>`.
+ * - Storage: `putObject("uploads/<profileId>/<timestamp>-<rand>.<ext>", buffer, contentType)`
+ *   → R2 em produção, fallback local em dev.
  * - DB: `Media.create` (somente quando `mediaType !== "REEL"` e
  *   `purpose !== "story"`); a primeira foto pública pelo perfil é marcada
  *   como `isCover`.
- * - Log: linha estruturada `{ ts, endpoint, key, retryAfter }` em rate-limit hit.
+ * - Log: linha estruturada `{ ts, endpoint, key, retryAfter }` em
+ *   rate-limit hit; `{ ts, endpoint, key, ownerId, contentType, size, ok }`
+ *   em sucesso (`console.info`); `{ ts, endpoint, key, ownerId, contentType,
+ *   size, error }` em falha (`console.warn`).
  *
  * @see .kiro/specs/fase-1-seguranca/rate-limits.md (`upload`)
+ * @see .kiro/specs/migracao-infra-producao/design.md > Components and Interfaces > 2
  */
 export async function POST(req: NextRequest) {
   // Rejeitar requests com Content-Length absurdo antes de processar o body
@@ -135,19 +145,38 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Save to /public/uploads/<profileId>/
-  const dir = join(process.cwd(), "public", "uploads", profile.id);
-  await mkdir(dir, { recursive: true });
-
   const extMap: Record<string, string> = {
     "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif",
     "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
   };
   const ext = extMap[file.type] ?? "bin";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  await writeFile(join(dir, filename), buffer);
+  const key = `uploads/${profile.id}/${filename}`;
 
-  const url = `/uploads/${profile.id}/${filename}`;
+  let url: string;
+  try {
+    url = await putObject(key, buffer, file.type);
+  } catch (err) {
+    console.warn({
+      ts: Date.now(),
+      endpoint: "upload",
+      key,
+      ownerId: profile.id,
+      contentType: file.type,
+      size: file.size,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "Falha ao enviar arquivo." }, { status: 500 });
+  }
+  console.info({
+    ts: Date.now(),
+    endpoint: "upload",
+    key,
+    ownerId: profile.id,
+    contentType: file.type,
+    size: file.size,
+    ok: true,
+  });
 
   // REEL and story uploads: the caller (createReel action / createStory action) handles
   // the DB record — don't create a Media row here or we get duplicates.

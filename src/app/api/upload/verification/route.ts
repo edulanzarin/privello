@@ -3,10 +3,21 @@
  *
  * Endpoint: `POST /api/upload/verification`
  *
- * Recebe um arquivo (imagem ou vídeo) e salva em
+ * Recebe um arquivo (imagem ou vídeo) e persiste via `Storage_Module`
+ * (`src/lib/storage.ts`) sob a Object_Key
+ * `verification/<profileId>/<timestamp>-<rand>.<ext>`. Em produção o módulo
+ * faz `PutObjectCommand` contra o Cloudflare R2; em dev sem credenciais
+ * cai no `Storage_Local_Fallback` e escreve em
  * `public/verification/<profileId>/`. A criação da `VerificationCase` que
  * referencia essas URLs é feita pela server action `submitVerificationCase`
- * — este endpoint só persiste o arquivo e devolve a URL.
+ * — este endpoint só persiste o arquivo e devolve a URL via `{ ok: true, url }`.
+ *
+ * **TODO (blocker pré-go-live, task 7.1):** documentos de verificação são
+ * sensíveis (KYC). Esta fase usa URL pública composta com `R2_PUBLIC_URL`
+ * como fallback temporário aceito (Requirement 4.4); migrar para
+ * `Presigned_URL` + bucket privado dedicado para `verification/*` antes
+ * do go-live real está documentado como blocker em
+ * `docs/deploy-railway.md`.
  *
  * Convenções:
  * - Autenticação: sessão NextAuth válida.
@@ -14,17 +25,23 @@
  * - Validação Zod: `UploadVerificationBodySchema` em
  *   `src/lib/validation/upload.schema.ts`. MIME e tamanho são checados
  *   manualmente (per spec — Zod só verifica `instanceof File`).
+ * - Falha do `putObject`: HTTP 500 com mensagem pt-BR e log estruturado;
+ *   o log é envolto em try/catch para que falha do logger (stdout
+ *   indisponível) não propague exception ao cliente — o 500 sempre é
+ *   retornado (Requirement 4.6).
  *
  * Cross-refs:
  * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1
  *   (`/api/upload/verification`).
+ * - .kiro/specs/migracao-infra-producao/requirements.md > Requirement 4.
+ * - .kiro/specs/migracao-infra-producao/design.md > Components and
+ *   Interfaces > 4.
  * - src/app/_actions/verification.ts — `submitVerificationCase` consome as URLs.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { putObject } from "@/lib/storage";
 import { UploadVerificationBodySchema, formDataToObject } from "@/lib/validation";
 
 const MAX_SIZE_IMG = 10 * 1024 * 1024;  // 10 MB for images
@@ -40,15 +57,22 @@ const ALLOWED_VIDEO = ["video/mp4", "video/quicktime", "video/webm", "video/x-ms
  *     MP4/MOV/WebM/AVI (≤150 MB).
  *
  * @returns
- *   - 200: `{ ok: true, url }`.
+ *   - 200: `{ ok: true, url }` — `url` é a Persisted_URL composta pelo
+ *     `Storage_Module` (absoluta em produção R2, relativa em fallback dev).
  *   - 400: validation error (`flatten()`), MIME inválido ou arquivo > limite.
  *   - 401: não autenticado.
  *   - 404: profile não encontrado para o user.
+ *   - 500: falha do `putObject` (rede, credenciais, R2 indisponível); log
+ *     estruturado emitido em best-effort.
  *
  * Side effects:
- * - FS: `public/verification/<profileId>/<timestamp>-<rand>.<ext>`.
+ * - Storage: `verification/<profileId>/<timestamp>-<rand>.<ext>` via
+ *   `putObject` (R2 em produção, `public/` em dev fallback).
+ * - Log: linha estruturada `console.info` no sucesso e `console.warn`
+ *   (envolto em try/catch) na falha.
  *
  * @see .kiro/specs/fase-1-seguranca/endpoints-zod.md §4.1
+ * @see .kiro/specs/migracao-infra-producao/requirements.md > Requirement 4
  * @see src/app/_actions/verification.ts
  */
 export async function POST(req: NextRequest) {
@@ -86,9 +110,6 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const dir = join(process.cwd(), "public", "verification", profile.id);
-  await mkdir(dir, { recursive: true });
-
   const extMap: Record<string, string> = {
     "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
     "image/heic": "jpg", "image/heif": "jpg",
@@ -96,8 +117,39 @@ export async function POST(req: NextRequest) {
   };
   const ext = extMap[file.type] ?? "bin";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  await writeFile(join(dir, filename), buffer);
+  const key = `verification/${profile.id}/${filename}`;
 
-  const url = `/verification/${profile.id}/${filename}`;
+  let url: string;
+  try {
+    url = await putObject(key, buffer, file.type);
+  } catch (err) {
+    // Log envolto em try/catch — Requirement 4.6: HTTP 500 deve ser
+    // retornado mesmo se o logger lançar (stdout indisponível, etc.).
+    try {
+      console.warn({
+        ts: Date.now(),
+        endpoint: "upload-verification",
+        key,
+        ownerId: profile.id,
+        contentType: file.type,
+        size: file.size,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    } catch {
+      // logger indisponível; ainda assim retornar 500 (Requirement 4.6).
+    }
+    return NextResponse.json({ error: "Falha ao enviar documento." }, { status: 500 });
+  }
+
+  console.info({
+    ts: Date.now(),
+    endpoint: "upload-verification",
+    key,
+    ownerId: profile.id,
+    contentType: file.type,
+    size: file.size,
+    ok: true,
+  });
+
   return NextResponse.json({ ok: true, url });
 }

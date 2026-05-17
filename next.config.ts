@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import type { RemotePattern } from "next/dist/shared/lib/image-config";
+import { extractR2Hostname } from "./src/lib/r2-hostname";
 
 // AGENTS_Rule (area: headers) — consulta em 2026-03-14:
 //   - node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md
@@ -85,30 +86,68 @@ const securityHeaders = [
 //   - .kiro/specs/fase-1-seguranca/endpoints-zod.md > §5 (Imagens externas)
 // PRODUCTION_HOSTNAME entra como entrada apenas quando definido em .env (cobre
 // uploads servidos pelo próprio domínio de produção em /uploads/**).
-const remotePatterns: RemotePattern[] = [
-  ...(process.env.PRODUCTION_HOSTNAME
-    ? [
-      {
-        protocol: "https" as const,
-        hostname: process.env.PRODUCTION_HOSTNAME,
-        pathname: "/uploads/**",
-      },
-    ]
-    : []),
-  // Placeholder usado quando profile.media[0] é undefined
-  // (src/lib/queries.ts:441,501; src/components/profile/profile-card.tsx:44 etc.)
-  { protocol: "https", hostname: "picsum.photos", pathname: "/**" },
-  // Vídeos seed (scripts/seed-media-eduarda.ts:10–19).
-  { protocol: "https", hostname: "commondatastorage.googleapis.com", pathname: "/**" },
-  // Vídeos seed de verificação/reels (prisma/seed.ts:79–92).
-  { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
-  // Avatares Google (NextAuth OAuth Google — futuro; mantido por simetria com
-  // csp-origins.md §2.4). `*` casa um único segmento de subdomínio.
-  { protocol: "https", hostname: "*.googleusercontent.com", pathname: "/**" },
-];
+//
+// Cross-refs (migracao-infra-producao, Task 5.1):
+//   - .kiro/specs/migracao-infra-producao/requirements.md > Requirement 7
+//   - .kiro/specs/migracao-infra-producao/design.md > Components and Interfaces > 7
+// Entrada R2 condicional ao `R2_PUBLIC_URL`: hostname extraído via
+// `extractR2Hostname` (função pura testada em `src/lib/r2-hostname.pbt.ts`);
+// quando `R2_PUBLIC_URL` ausente ou inválido, o spread fica vazio e nenhuma
+// entrada R2 é incluída (Requirement 7.2). Sem `hostname: "**"` em nenhuma
+// entrada (Requirement 7.4).
+export function buildRemotePatterns(env: NodeJS.ProcessEnv): RemotePattern[] {
+  const r2Hostname = extractR2Hostname(env.R2_PUBLIC_URL);
+  return [
+    ...(env.PRODUCTION_HOSTNAME
+      ? [
+        {
+          protocol: "https" as const,
+          hostname: env.PRODUCTION_HOSTNAME,
+          pathname: "/uploads/**",
+        },
+      ]
+      : []),
+    ...(r2Hostname
+      ? [
+        {
+          protocol: "https" as const,
+          hostname: r2Hostname,
+          pathname: "/**",
+        },
+      ]
+      : []),
+    // Placeholder usado quando profile.media[0] é undefined
+    // (src/lib/queries.ts:441,501; src/components/profile/profile-card.tsx:44 etc.)
+    { protocol: "https", hostname: "picsum.photos", pathname: "/**" },
+    // Vídeos seed (scripts/seed-media-eduarda.ts:10–19).
+    { protocol: "https", hostname: "commondatastorage.googleapis.com", pathname: "/**" },
+    // Vídeos seed de verificação/reels (prisma/seed.ts:79–92).
+    { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
+    // Avatares Google (NextAuth OAuth Google — futuro; mantido por simetria com
+    // csp-origins.md §2.4). `*` casa um único segmento de subdomínio.
+    { protocol: "https", hostname: "*.googleusercontent.com", pathname: "/**" },
+  ];
+}
+
+const remotePatterns: RemotePattern[] = buildRemotePatterns(process.env);
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.1.93", ...extraOrigins],
+  // AGENTS_Rule (area: next-config / output) — consulta em 2026-05-17:
+  //   - node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/output.md
+  //     (guia "output" — `output: 'standalone'` produz `.next/standalone/`
+  //     com um `server.js` mínimo deployável sem instalar `node_modules`.
+  //     **Caveat copiado verbatim do guia:** "This minimal server does not
+  //     copy the `public` or `.next/static` folders by default ... these
+  //     folders can be copied to the `standalone/public` and
+  //     `standalone/.next/static` folders manually." O Dockerfile (Task 6.1)
+  //     copia `.next/static` e `public/` explicitamente para o estágio
+  //     `runner` por causa deste caveat.)
+  //
+  // Cross-refs (migracao-infra-producao, Task 5.1):
+  //   - .kiro/specs/migracao-infra-producao/requirements.md > Requirement 8.1
+  //   - .kiro/specs/migracao-infra-producao/design.md > Components and Interfaces > 7 (Edição B)
+  output: "standalone",
   // AGENTS_Rule (area: view-transitions) — consulta em 2026-05-17:
   //   - node_modules/next/dist/docs/01-app/02-guides/view-transitions.md
   //     (guia "View Transitions" — `<ViewTransition>` é fornecido pelo React 19

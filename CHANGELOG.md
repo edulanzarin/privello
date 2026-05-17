@@ -14,6 +14,29 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Added
 
+- **`Storage_Module`** (`src/lib/storage.ts`): abstração de upload com `putObject`,
+  `deleteObject`, `joinPublicUrl` e `isLocalFallbackMode`; backend Cloudflare R2 (S3
+  API via `@aws-sdk/client-s3`) em produção e `Storage_Local_Fallback` (escrita em
+  `public/<key>`) em dev/test (migracao-infra-producao).
+- **Containerização**: `Dockerfile` multi-stage (`deps` → `builder` → `runner`,
+  Alpine, usuário não-root `nextjs:1001`, `prisma migrate deploy` no `CMD`) e
+  `.dockerignore` na raiz (migracao-infra-producao).
+- **`Dockerfile`**: `ARG AUTH_URL` + `ENV AUTH_URL` no estágio `builder` (default
+  `http://localhost:3000`) — `next build` evalua `src/lib/auth.ts` em `NODE_ENV=production`,
+  que exige `AUTH_URL` por guard de boot do NextAuth v5; em produção o operador
+  passa o valor real via Railway env service ou `--build-arg` (migracao-infra-producao,
+  Task 8).
+- **`next.config.ts`**: `output: "standalone"` para imagem Docker enxuta — note que
+  `.next/standalone` não inclui `public/` nem `.next/static/` (caveat documentado em
+  `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/output.md`)
+  (migracao-infra-producao).
+- **Documentação operacional**: `docs/deploy-railway.md` (deploy canônico em
+  Railway + Cloudflare R2 + Cloudflare DNS, com `Rollback_Plan`, smoke checks e
+  blockers pré-go-live) (migracao-infra-producao).
+- **`.env.example`** e **`docs/env.md`**: 5 novas envvars `R2_ACCOUNT_ID`,
+  `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`,
+  opcionais em dev (Storage_Local_Fallback) e obrigatórias em prod
+  (migracao-infra-producao).
 - **CI**: pipeline GitHub Actions com 3 estágios — lint, typecheck, test — em
   `.github/workflows/ci.yml` (fase-7).
 - **Documentação operacional**: `docs/env.md` (variáveis de ambiente), `docs/docker.md`
@@ -56,6 +79,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Changed
 
+- **5 sites de upload** migrados de `mkdir + writeFile` (filesystem local) para
+  `Storage_Module.putObject`: `src/app/api/upload/route.ts`,
+  `src/app/api/upload-audio/route.ts`, `src/app/api/upload/verification/route.ts`,
+  `registerProviderAction` em `src/app/_actions/auth.ts`, e
+  `uploadClientAvatarAction` em `src/app/_actions/client-profile.ts`
+  (migracao-infra-producao).
+- **`next.config.ts > images.remotePatterns`**: entrada R2 condicional adicionada
+  via `extractR2Hostname(process.env.R2_PUBLIC_URL)` (incluída só quando definida);
+  demais entradas preservadas (migracao-infra-producao).
+- **Alvo de hospedagem**: Vercel → Railway. `docs/deploy-vercel.md` movido para
+  `docs/legacy/deploy-vercel.md` (rationale: preservar histórico em `docs/legacy/`
+  sem confundir devs novos; `docs/deploy-railway.md` é o documento canônico)
+  (migracao-infra-producao).
+- **`/api/cities` e `/api/top-cities`**: `export const dynamic = "force-dynamic"`
+  para evitar prerender no `next build` (Next 16 tenta prerender rotas sem APIs
+  dinâmicas explícitas; ambos os handlers fazem `prisma.city.findMany`, que
+  exige `DATABASE_URL` em runtime — não disponível em build de container nem em
+  Railway, que só conecta o DB ao service em runtime). `/api/cities` perdeu o
+  `revalidate = 3600` (ISR de 1h) — payload pequeno, custo aceitável
+  (migracao-infra-producao, Task 8).
 - **`src/lib/queries.ts`**: refatorado para estado híbrido com header
   `@deprecated 2026-05-30 — remoção planejada após 2026-06-13`. 27 re-exports de
   `@/lib/services` + helpers JUSTIFICADO (`sortProfileCards`, `finalizeDiscoverOrder`,

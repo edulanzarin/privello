@@ -21,7 +21,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 3600; // cache for 1 hour
+// `dynamic = "force-dynamic"` evita prerender no `next build`. O handler
+// faz `prisma.city.findMany()` que exige `DATABASE_URL` em runtime — em
+// build a env não está disponível (nem em Docker local sem build-arg, nem
+// no Railway que só liga DB ao service em runtime). Forçar dynamic
+// também é semanticamente correto: a lista de cidades é leitura simples
+// que não justifica complexidade de ISR para um payload pequeno.
+// Cross-ref: .kiro/specs/migracao-infra-producao § Task 8 (build smoke).
+export const dynamic = "force-dynamic";
 
 /**
  * Lista todas as cidades em ordem alfabética.

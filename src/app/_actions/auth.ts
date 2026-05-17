@@ -32,6 +32,7 @@ import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
 import { getOrCreateCityBySlug } from "@/lib/services";
+import { putObject } from "@/lib/storage";
 import {
   LoginActionSchema,
   SignupClientSchema,
@@ -201,9 +202,14 @@ export async function registerClientAction(formData: FormData) {
  * Side effects:
  * - `prisma.user.create` (com `profile` aninhado e `durationOptions`).
  * - Cria/garante `City` via `getOrCreateCityBySlug`.
- * - Escreve foto em `public/uploads/<profileId>/<timestamp>.<ext>` (não-fatal:
- *   se falhar, conta segue criada e foto pode ser anexada depois pelo painel).
- * - `signIn("credentials")` ao final.
+ * - Foto enviada via `Storage_Module` (`putObject`) com Object_Key
+ *   `uploads/<profileId>/<timestamp>.<ext>` — em produção grava no R2; em
+ *   dev sem credenciais R2 ativa `Storage_Local_Fallback`. Falha do upload
+ *   é não-fatal (try/catch absorve, log estruturado com
+ *   `endpoint: "register-provider-photo"`, conta segue criada e foto pode
+ *   ser anexada depois pelo painel).
+ * - `signIn("credentials")` ao final, **fora** do try/catch do upload —
+ *   auto-login executa mesmo após falha do upload.
  *
  * @see src/lib/validation/auth.schema.ts (`SignupProviderSchema`)
  */
@@ -299,28 +305,36 @@ export async function registerProviderAction(formData: FormData) {
 
   // Save profile photo. Validation of MIME/size is intentionally kept here —
   // the Zod schema only validates that `photo` is a File (`z.instanceof(File)`).
+  // Upload é não-fatal: falha do `putObject` é absorvida pelo try/catch e o
+  // cadastro completa sem `Media` inicial (Requirement 5.2). O auto-login via
+  // `signIn` ao final permanece fora do try/catch — executa mesmo após falha
+  // do upload (Requirement 5.4).
   const profile = newUser.profile;
   if (profile) {
+    const extMap: Record<string, string> = {
+      "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
+    };
+    const ext = extMap[photoFile.type] ?? "jpg";
+    const filename = `${Date.now()}.${ext}`;
+    const key = `uploads/${profile.id}/${filename}`;
     try {
-      const { writeFile, mkdir } = await import("fs/promises");
-      const { join } = await import("path");
-
-      const extMap: Record<string, string> = {
-        "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
-      };
-      const ext = extMap[photoFile.type] ?? "jpg";
-      const filename = `${Date.now()}.${ext}`;
-      const dir = join(process.cwd(), "public", "uploads", profile.id);
-      await mkdir(dir, { recursive: true });
       const bytes = await photoFile.arrayBuffer();
-      await writeFile(join(dir, filename), Buffer.from(bytes));
-      const url = `/uploads/${profile.id}/${filename}`;
+      const url = await putObject(key, Buffer.from(bytes), photoFile.type);
 
       await prisma.media.create({
         data: { profileId: profile.id, url, isPublic: true, sortOrder: 0, isCover: true },
       });
-    } catch {
-      // Non-fatal: account is created, photo can be added later from painel
+    } catch (err) {
+      // Non-fatal: account is created, photo can be added later from painel.
+      console.warn({
+        ts: Date.now(),
+        endpoint: "register-provider-photo",
+        key,
+        ownerId: profile.id,
+        contentType: photoFile.type,
+        size: photoFile.size,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 

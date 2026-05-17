@@ -6,7 +6,11 @@ export default defineConfig({
     },
     test: {
         environment: "node",
-        include: ["src/**/*.{test,pbt}.ts"],
+        include: [
+            "src/**/*.{test,pbt}.ts",
+            "*.{test,pbt}.ts",
+            "tests/**/*.{test,pbt}.ts",
+        ],
         exclude: ["tests/e2e/**", "node_modules/**", ".next/**"],
         setupFiles: ["./vitest.setup.ts"],
         coverage: {

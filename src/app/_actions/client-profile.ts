@@ -16,11 +16,15 @@
  * - Autenticação requerida via `auth()`; sem sessão → `{ error: "Não autorizado." }`.
  * - Validação de MIME/size do avatar permanece no handler (o schema só garante
  *   `z.instanceof(File)`).
- * - Foto persistida em `public/uploads/<userId>/`.
+ * - Avatar persistido via `Storage_Module` (`@/lib/storage`) → R2 em produção,
+ *   `Storage_Local_Fallback` (escrita em `public/uploads/<userId>/`) em dev.
  * - Cooldown de 30 dias para troca de `@` controlado por `User.slugChangedAt`.
  *
  * Cross-refs:
  * - .kiro/specs/fase-1-seguranca/endpoints-zod.md §2.3
+ * - .kiro/specs/migracao-infra-producao/requirements.md > Requirement 6
+ * - .kiro/specs/migracao-infra-producao/design.md > Components and Interfaces > 6
+ * - src/lib/storage.ts (`putObject`)
  * - src/lib/validation/client-profile.schema.ts
  * - src/lib/constants.ts (`PLAN_DURATION_MS`)
  */
@@ -28,8 +32,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PLAN_DURATION_MS } from "@/lib/constants";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { putObject } from "@/lib/storage";
 import {
     UploadClientAvatarSchema,
     UpdateClientNameSchema,
@@ -39,17 +42,29 @@ import {
 
 // ── Upload foto de perfil do cliente ──────────────────────────────────────────
 /**
- * Salva a foto de perfil do cliente no disco e atualiza `User.image`.
+ * Salva a foto de perfil do cliente via `Storage_Module` e atualiza
+ * `User.image`.
  *
  * @param formData - FormData com:
  *   - `avatar` (File, required): JPG/PNG/WebP, ≤5MB.
  * @returns `{ ok: true, url }` em sucesso ou `{ error, issues? }` em falha.
  *
+ * Comportamento de erro:
+ * - WHEN `putObject` ou `prisma.user.update` lançar (incluindo erros não-S3
+ *   propagados pelo módulo), THE action SHALL retornar
+ *   `{ error: "Falha ao enviar avatar." }` sem propagar a exception ao
+ *   boundary do server action (Requirement 6.4).
+ * - Falha registrada via `console.warn` estruturado com `endpoint:
+ *   "upload-client-avatar"`, `ownerId`, `contentType`, `size`, `error`
+ *   (convenção de logging do design § "Components and Interfaces").
+ *
  * Side effects:
- * - Escreve em `public/uploads/<userId>/<timestamp>-<rand>.<ext>`.
- * - `prisma.user.update({ image: url })`.
+ * - Storage: persiste em Object_Key `uploads/<userId>/<timestamp>-<rand>.<ext>`
+ *   via R2 em produção ou `public/uploads/<userId>/<file>` em fallback local.
+ * - DB: `prisma.user.update({ image: url })`.
  *
  * @see src/lib/validation/client-profile.schema.ts (`UploadClientAvatarSchema`)
+ * @see src/lib/storage.ts (`putObject`)
  */
 export async function uploadClientAvatarAction(formData: FormData) {
     const session = await auth();
@@ -68,23 +83,42 @@ export async function uploadClientAvatarAction(formData: FormData) {
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) return { error: "Formato inválido. Use JPG, PNG ou WebP." };
 
+    const userId = session.user.id;
     const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", session.user.id);
-    await mkdir(uploadDir, { recursive: true });
+    const key = `uploads/${userId}/${filename}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
 
-    const url = `/uploads/${session.user.id}/${filename}`;
+    // Storage_Module + DB update sob try/catch único: qualquer exception
+    // (R2/SDK, fallback local, ou Prisma) é traduzida em mensagem pt-BR
+    // sem propagar — Requirement 6.4 exige "any exception inside the upload
+    // returns the user-facing error string instead of propagating".
+    try {
+        const url = await putObject(key, buffer, file.type);
 
-    await prisma.user.update({
-        where: { id: session.user.id },
-        data: { image: url },
-    });
+        await prisma.user.update({
+            where: { id: userId },
+            data: { image: url },
+        });
 
-    return { ok: true, url };
+        return { ok: true, url };
+    } catch (err) {
+        try {
+            console.warn({
+                ts: Date.now(),
+                endpoint: "upload-client-avatar",
+                key,
+                ownerId: userId,
+                contentType: file.type,
+                size: file.size,
+                error: err instanceof Error ? err.message : String(err),
+            });
+        } catch {
+            // logger indisponível; preservar a mensagem ao cliente.
+        }
+        return { error: "Falha ao enviar avatar." };
+    }
 }
 
 // ── Alterar nome do cliente ───────────────────────────────────────────────────

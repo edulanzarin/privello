@@ -18,6 +18,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// `dynamic = "force-dynamic"` evita prerender no `next build`. O handler
+// faz `prisma.city.findMany()` que exige `DATABASE_URL` em runtime; em
+// build não há DB acessível (Railway só liga o Postgres ao service em
+// runtime). Cross-ref: .kiro/specs/migracao-infra-producao § Task 8.
+export const dynamic = "force-dynamic";
+
 /**
  * Lista as 5 cidades mais populadas (por número de profiles).
  *
