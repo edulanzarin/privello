@@ -14,21 +14,27 @@ type Props = {
 };
 
 /**
- * Botão "Curtir / Curtido" com toggle otimista que persiste o favorito do cliente.
+ * FavoriteButton — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/profile/favorite-button.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.3.
+ *
+ * Toggle otimista de favorito; visual segue o padrão dos secondary CTAs:
+ *  - Estado on (favoritado): `bg-rose text-white` (igual ao Button primary).
+ *  - Estado off: `bg-white border border-line text-ink` (igual ao secondary).
+ *  - Heart preenche quando favoritado.
  *
  * Props:
- * - `profileId` (string): id do perfil-alvo do favorito.
- * - `initialFavorited` (boolean): estado inicial vindo do servidor (`getFavoriteStatus`).
- * - `isLoggedIn` (boolean): se falso, redireciona para `/entrar?callbackUrl=...` no clique.
+ * - `profileId` (string): id do perfil-alvo.
+ * - `initialFavorited` (boolean): estado inicial vindo do servidor.
+ * - `isLoggedIn` (boolean): se falso, redireciona para `/entrar?callbackUrl=...`.
  * - `className?` (string): classes Tailwind extras.
  *
- * Consumidores conhecidos:
- * - src/app/p/[slug]/page.tsx
- *
  * Side effects:
- * - Server action `toggleFavorite(profileId)` em `src/app/_actions/favorites.ts`.
- * - `useOptimisticToggle` aplica/rollback do estado local; toast de erro via `useToast`.
- * - Redirect via `window.location.href` quando sessão não autenticada.
+ * - Server action `toggleFavorite(profileId)`.
+ * - `useOptimisticToggle` aplica/rollback.
+ * - Toast de erro via `useToast`.
+ * - Redirect via `window.location.href` quando não autenticado.
  */
 export function FavoriteButton({
   profileId,
@@ -67,17 +73,19 @@ export function FavoriteButton({
       disabled={pending}
       aria-label={favorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       className={cn(
-        "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-base font-medium transition-all active:scale-[0.97]",
+        "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-medium",
+        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         favorited
-          ? "bg-coral text-white shadow-sm hover:brightness-110"
-          : "bg-white border border-black/10 text-foreground shadow-sm hover:bg-black/[0.03]",
+          ? "bg-rose text-white shadow-[var(--shadow-sm)] hover:brightness-105"
+          : "border border-line bg-white text-ink hover:bg-line/30",
         pending && "opacity-50",
         extraClass,
       )}
     >
       <Heart
         className={cn("h-4 w-4", favorited && "fill-white")}
-        strokeWidth={1.5}
+        strokeWidth={2}
       />
       {favorited ? "Curtido" : "Curtir"}
     </button>

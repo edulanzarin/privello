@@ -2,24 +2,36 @@
 
 import { Share2, Check } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 /**
+ * ShareButton — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/components/profile/share-button.tsx
+ * Steering: `.kiro/steering/design-system.md` §6.3.
+ *
  * Botão "Compartilhar" que usa `navigator.share` quando disponível (mobile)
- * e cai para `navigator.clipboard.writeText` (com feedback "Copiado!" por 2s)
- * em desktop.
+ * e cai para `navigator.clipboard.writeText` (com feedback "Copiado!" 2s)
+ * em desktop. Visual idêntico ao secondary CTA (white card + line border).
  *
  * Props:
- * - `displayName` (string): título usado no diálogo nativo de share.
- * - `slug` (string): slug do perfil para montar `${origin}/p/[slug]`.
- * - `className?` (string): classes Tailwind extras encaminhadas ao botão.
- *
- * Consumidores conhecidos:
- * - src/app/p/[slug]/page.tsx
+ * - `displayName` (string): título do diálogo nativo.
+ * - `slug` (string): slug pra montar `${origin}/p/[slug]`.
+ * - `className?` (string): classes extras.
  *
  * Side effects:
- * - Browser API: `navigator.share`, `navigator.clipboard.writeText`, `window.prompt` (fallback).
+ * - Browser API: `navigator.share`, `navigator.clipboard.writeText`,
+ *   `window.prompt` (fallback).
  */
-export function ShareButton({ displayName, slug, className }: { displayName: string; slug: string; className?: string }) {
+export function ShareButton({
+  displayName,
+  slug,
+  className,
+}: {
+  displayName: string;
+  slug: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
@@ -29,7 +41,7 @@ export function ShareButton({ displayName, slug, className }: { displayName: str
         await navigator.share({ title: `${displayName} — Privello`, url });
         return;
       } catch {
-        // User cancelled or not supported — fall through to clipboard
+        // User cancelled or not supported — fall through.
       }
     }
     try {
@@ -37,7 +49,6 @@ export function ShareButton({ displayName, slug, className }: { displayName: str
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard unavailable (HTTP / no permission) — show prompt as last resort
       window.prompt("Copie o link:", url);
     }
   }
@@ -46,13 +57,19 @@ export function ShareButton({ displayName, slug, className }: { displayName: str
     <button
       type="button"
       onClick={handleShare}
-      className={`inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-base font-medium text-foreground shadow-sm transition-all hover:bg-black/[0.03] active:scale-[0.97]${className ? ` ${className}` : ""}`}
       title="Compartilhar perfil"
+      className={cn(
+        "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-2.5 text-base font-medium text-ink",
+        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
+        "hover:bg-line/30",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        className,
+      )}
     >
       {copied ? (
-        <Check className="h-4 w-4 text-success" strokeWidth={2} />
+        <Check className="h-4 w-4 text-success" strokeWidth={2.4} />
       ) : (
-        <Share2 className="h-4 w-4" strokeWidth={1.5} />
+        <Share2 className="h-4 w-4" strokeWidth={2} />
       )}
       {copied ? "Copiado!" : "Compartilhar"}
     </button>

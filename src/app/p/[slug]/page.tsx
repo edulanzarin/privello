@@ -8,8 +8,15 @@
  *  dono e read-only no resto).
  * Cache: `force-dynamic` (visualizações, favorito e dados personalizados).
  *
- * Hero com galeria + áudio, dados, valores, disponibilidade semanal e
- * reviews. CTAs principais: marcar horário, WhatsApp, favoritar, compartilhar.
+ * Visual v2 (Tahoe Sensual):
+ *  - Container `max-w-4xl` (reading archetype, steering §5.1).
+ *  - Hero split: capa story XL à esquerda + info à direita.
+ *  - Selos (Verificada / Vídeo / Membro / Views) numa lista hairline elegante.
+ *  - CTAs primários: "Marcar horário" (rose) + "WhatsApp" (verde).
+ *  - CTAs secundários: Curtir + Compartilhar.
+ *  - Bio + Características + Valores + "Atende a" em 2 colunas no desktop.
+ *  - Disponibilidade da semana ao lado (1.15fr / 0.85fr split).
+ *  - Reviews em cards brancos `rounded-2xl` com border-line.
  *
  * Cross-refs:
  * - src/lib/services/profile.service.ts (getProfileBySlug, getUserReviewForProfile)
@@ -22,7 +29,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
-import { MapPin, Star, ShieldCheck, Video, Clock3, Lock, Eye } from "lucide-react";
+import {
+  MapPin,
+  Star,
+  ShieldCheck,
+  Video,
+  Clock3,
+  Lock,
+  Eye,
+  CalendarClock,
+  Pencil,
+  Sparkles,
+  Crown,
+  Flame,
+} from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProviderBanner } from "@/components/layout/provider-banner";
@@ -36,7 +56,12 @@ import { getFavoriteStatus } from "@/app/_actions/favorites";
 import { ShareButton } from "@/components/profile/share-button";
 import { WhatsAppButton } from "@/components/profile/whatsapp-button";
 import { formatBrl } from "@/lib/money";
-import { getProfileBySlug, getUserReviewForProfile, getStoriesForProfile, isSubscriber } from "@/lib/services";
+import {
+  getProfileBySlug,
+  getUserReviewForProfile,
+  getStoriesForProfile,
+  isSubscriber,
+} from "@/lib/services";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
@@ -44,7 +69,11 @@ import { DAYS_PT } from "@/lib/constants";
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 2 (perfil personalizado por sessão).
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const profile = await prisma.profile.findUnique({
     where: { slug },
@@ -75,12 +104,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const PLAN_BADGE: Record<string, { bg: string; label: string }> = {
-  PREMIUM: { bg: "bg-coral", label: "PREMIUM" },
-  DESTAQUE: { bg: "bg-foreground", label: "PLUS" },
-  ESSENCIAL: { bg: "bg-black/60", label: "BASIC" },
-};
-
 type PageProps = { params: Promise<{ slug: string }> };
 
 export default async function PublicProfilePage({ params }: PageProps) {
@@ -88,10 +111,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
 
-  // Resolver ownership ANTES de buscar o perfil completo, para que possamos
-  // passar `includePrivate: ownerView` ao service (Wave 5 — Req 1). Donos
-  // veem suas mídias privadas; demais usuários só veem públicas (com overlay
-  // locked para não-assinantes em fase-5).
+  // Resolver ownership ANTES de buscar o perfil completo.
   let isProvider = false;
   let viewerProfileId: string | null = null;
   if (session?.user?.id) {
@@ -111,27 +131,28 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   const profile = await getProfileBySlug(slug, {
     userId: session?.user?.id,
-    // Quando o viewer é dono do perfil sendo exibido, mostramos privadas;
-    // do contrário, AC 1.2 limita a ≤ 12 itens públicos por sortOrder.
     includePrivate: viewerProfileId != null,
   });
   if (!profile) notFound();
-  const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
+  const isAdmin =
+    session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
   if (profile.isSuspended && !isAdmin) notFound();
 
   const ownerView = viewerProfileId != null && viewerProfileId === profile.id;
-
-  // Only non-provider users can interact — providers are read-only on all profiles
   const canInteract = isLoggedIn && !ownerView && !isProvider;
-  const initialFavorited = canInteract ? await getFavoriteStatus(profile.id) : false;
+  const initialFavorited = canInteract
+    ? await getFavoriteStatus(profile.id)
+    : false;
 
-  // Stories ativos deste perfil
   const storyGroup = await getStoriesForProfile(profile.id, session?.user?.id);
   const isClientUser = isLoggedIn && !ownerView && !isProvider;
-  const isSubscriberViewer = session?.user?.id ? await isSubscriber(session.user.id) : false;
-  const userReview = isLoggedIn && !ownerView && session?.user?.id
-    ? await getUserReviewForProfile(profile.id, session.user.id)
-    : null;
+  const isSubscriberViewer = session?.user?.id
+    ? await isSubscriber(session.user.id)
+    : false;
+  const userReview =
+    isLoggedIn && !ownerView && session?.user?.id
+      ? await getUserReviewForProfile(profile.id, session.user.id)
+      : null;
 
   const allMedia = profile.media.map((m) => ({
     id: m.id,
@@ -143,32 +164,102 @@ export default async function PublicProfilePage({ params }: PageProps) {
     createdAt: m.createdAt.toISOString(),
     likeCount: m._count.likes,
     commentCount: m._count.comments,
-    likedByMe: isClientUser ? (m.likes as { id: string }[]).length > 0 : false,
+    likedByMe: isClientUser
+      ? (m.likes as { id: string }[]).length > 0
+      : false,
   }));
-  const cover = allMedia.find((m) => m.isCover && m.isPublic) ?? allMedia.find((m) => m.isPublic) ?? allMedia[0];
+  const cover =
+    allMedia.find((m) => m.isCover && m.isPublic) ??
+    allMedia.find((m) => m.isPublic) ??
+    allMedia[0];
 
-  const memberLabel = profile.memberSince.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
-  // Page é dinâmica (`force-dynamic`); `Date.now()` aqui é avaliado uma vez por
-  // request para "membro há X meses". Comportamento intencional em RSC.
+  const memberLabel = profile.memberSince.toLocaleDateString("pt-BR", {
+    month: "short",
+    year: "numeric",
+  });
+  // Page é dinâmica; `Date.now()` aqui é avaliado uma vez por request.
   // eslint-disable-next-line react-hooks/purity -- intencional em RSC dinâmica
   const renderTimeMs = Date.now();
-  const monthsVerified = Math.max(0, Math.floor((renderTimeMs - profile.memberSince.getTime()) / (30.44 * 86400000)));
+  const monthsVerified = Math.max(
+    0,
+    Math.floor((renderTimeMs - profile.memberSince.getTime()) / (30.44 * 86400000)),
+  );
 
-  const isBoosted = profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
-  const planBadge = isBoosted
-    ? { bg: "bg-coral", label: "BOOST" }
-    : (PLAN_BADGE[profile.planTier] ?? PLAN_BADGE.ESSENCIAL);
+  const isBoosted =
+    profile.featuredUntil != null && new Date(profile.featuredUntil) > new Date();
 
-  // Verification seals
-  const seals: { icon: typeof ShieldCheck; label: string; sub: string; color: string }[] = [];
+  // Plan badge — alinhado com ProfileCard
+  const planBadge = (() => {
+    if (isBoosted) {
+      return { label: "Boost", Icon: Flame, bg: "bg-peach text-white" };
+    }
+    if (profile.planTier === "PREMIUM") {
+      return { label: "Premium", Icon: Crown, bg: "bg-plum text-white" };
+    }
+    if (profile.planTier === "DESTAQUE") {
+      return { label: "Plus", Icon: Sparkles, bg: "bg-cream text-ink" };
+    }
+    return null;
+  })();
+
+  // Selos (lista hairline)
+  const seals: {
+    Icon: typeof ShieldCheck;
+    label: string;
+    sub: string;
+    color: string;
+  }[] = [];
   if (profile.isVerified) {
-    seals.push({ icon: ShieldCheck, label: "Identidade verificada", sub: "Documento + selfie", color: "text-success" });
+    seals.push({
+      Icon: ShieldCheck,
+      label: "Identidade verificada",
+      sub: "Documento + selfie",
+      color: "text-rose",
+    });
   }
   if (profile.videoVerified) {
-    seals.push({ icon: Video, label: "Vídeo verificado", sub: "Gravação autenticada", color: "text-accent-purple" });
+    seals.push({
+      Icon: Video,
+      label: "Vídeo verificado",
+      sub: "Gravação autenticada",
+      color: "text-info",
+    });
   }
-  seals.push({ icon: Clock3, label: `Membro há ${monthsVerified} meses`, sub: `Desde ${memberLabel}`, color: "text-muted" });
-  seals.push({ icon: Eye, label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`, sub: "este mês", color: "text-blue" });
+  seals.push({
+    Icon: Clock3,
+    label: `Membro há ${monthsVerified} ${monthsVerified === 1 ? "mês" : "meses"}`,
+    sub: `Desde ${memberLabel}`,
+    color: "text-ink-dim",
+  });
+  seals.push({
+    Icon: Eye,
+    label: `${profile.viewsThisMonth.toLocaleString("pt-BR")} visualizações`,
+    sub: "este mês",
+    color: "text-ink-dim",
+  });
+
+  const services: [string, boolean][] = [
+    ["Homens", profile.servesMen],
+    ["Casais", profile.servesCouples],
+    ["Mulheres", profile.servesWomen],
+    ["Local próprio", profile.hasOwnPlace],
+    ["Hotel / domicílio", profile.homeVisit],
+    ["Viagens nacionais", profile.travelsNational],
+    ["Viagens internacionais", profile.travelsInternational],
+  ];
+
+  const characteristics: [string, string][] = [
+    [
+      "Altura",
+      profile.heightCm
+        ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m`
+        : "—",
+    ],
+    ["Manequim", profile.dressSize ?? "—"],
+    ["Cabelo", profile.hair ?? "—"],
+    ["Olhos", profile.eyes ?? "—"],
+    ["Idiomas", profile.languages ?? "—"],
+  ];
 
   return (
     <>
@@ -176,150 +267,233 @@ export default async function PublicProfilePage({ params }: PageProps) {
       {!ownerView && <ViewTracker profileId={profile.id} />}
       {ownerView && <ProviderBanner variant="own-profile" />}
 
-
       <ViewTransition enter="slide-up" default="none">
         <main className="min-h-screen pb-28">
-
-          {/* ── Breadcrumb ── */}
-          <div className="border-b border-black/[0.06]">
-            <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-muted sm:px-6">
-              <Link href="/buscar" className="transition-colors hover:text-foreground">Descobrir</Link>
-              {" / "}
-              <Link href={`/descobrir/${profile.city.slug}`} className="transition-colors hover:text-foreground">{profile.city.name}</Link>
-              {" / "}{profile.displayName}
+          {/* ── Breadcrumb ───────────────────────────────────────────── */}
+          <div className="border-b border-line">
+            <div className="mx-auto max-w-4xl px-4 py-3 text-xs font-medium text-ink-dim sm:px-6">
+              <Link
+                href="/buscar"
+                className="transition-colors hover:text-ink"
+              >
+                Descobrir
+              </Link>
+              <span className="mx-1.5 text-ink-faint">/</span>
+              <Link
+                href={`/descobrir/${profile.city.slug}`}
+                className="transition-colors hover:text-ink"
+              >
+                {profile.city.name}
+              </Link>
+              <span className="mx-1.5 text-ink-faint">/</span>
+              <span className="text-ink">{profile.displayName}</span>
             </div>
           </div>
 
-          {/* ── Hero section ── */}
-          <section className="bg-white border-b border-black/[0.06]">
-            <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
-
-                {/* ── Left: Round profile photo ── */}
-                <div className="shrink-0">
+          {/* ── Hero ─────────────────────────────────────────────────── */}
+          <section className="border-b border-line bg-white">
+            <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
+              <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-10">
+                {/* Foto + plan badge */}
+                <div className="relative shrink-0">
                   <ProfileStoryCover
                     storyGroup={storyGroup}
                     coverUrl={cover?.url ?? null}
                     displayName={profile.displayName}
-                    planBadge={planBadge}
                     isClient={isClientUser}
                   />
+                  {planBadge && (
+                    <span
+                      className={cn(
+                        "absolute -bottom-1 left-1/2 z-10 -translate-x-1/2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider",
+                        "shadow-[var(--shadow-sm)]",
+                        planBadge.bg,
+                      )}
+                    >
+                      <planBadge.Icon
+                        className="h-2.5 w-2.5"
+                        strokeWidth={2.4}
+                        aria-hidden
+                      />
+                      {planBadge.label}
+                    </span>
+                  )}
                 </div>
 
-                {/* ── Right: Info ── */}
-                <div className="flex flex-1 flex-col items-center sm:items-start text-center sm:text-left">
-
-                  {/* Status badges */}
-                  <div className="flex flex-wrap gap-2 mb-3">
+                {/* Info */}
+                <div className="flex flex-1 flex-col items-center text-center sm:items-start sm:text-left">
+                  {/* Status pills */}
+                  <div className="mb-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                     {profile.isOnline && (
-                      <span className="flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-[3px] text-xs font-semibold text-success-dark">
-                        <span className="h-[6px] w-[6px] rounded-full bg-success animate-pulse" /> Online
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1 text-2xs font-semibold text-success">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+                        </span>
+                        Online
                       </span>
                     )}
                     {profile.isVerified && (
-                      <span className="flex items-center gap-1.5 rounded-full bg-blue/10 px-2.5 py-[3px] text-xs font-semibold text-blue">
-                        <ShieldCheck className="h-3 w-3" strokeWidth={2} /> Verificada
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-soft px-2.5 py-1 text-2xs font-semibold text-rose">
+                        <ShieldCheck className="h-3 w-3" strokeWidth={2.4} />
+                        Verificada
                       </span>
                     )}
                     {profile.videoVerified && (
-                      <span className="flex items-center gap-1.5 rounded-full bg-accent-purple/10 px-2.5 py-[3px] text-xs font-semibold text-accent-purple">
-                        <Video className="h-3 w-3" strokeWidth={2} /> Vídeo
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-info-soft px-2.5 py-1 text-2xs font-semibold text-info">
+                        <Video className="h-3 w-3" strokeWidth={2.4} />
+                        Vídeo
                       </span>
                     )}
                   </div>
 
-                  <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-4xl leading-none">
+                  <h1 className="text-4xl font-bold leading-none tracking-[-0.025em] text-ink sm:text-5xl">
                     {profile.displayName}
                   </h1>
-                  <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-md text-muted">
-                    <span className="font-medium text-foreground">{profile.age} anos</span>
-                    <span className="text-black/20">·</span>
+
+                  <div className="mt-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-md text-ink-dim sm:justify-start">
+                    <span className="font-medium text-ink">
+                      {profile.age} anos
+                    </span>
+                    <span className="text-line">·</span>
                     <span className="inline-flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      <MapPin className="h-3.5 w-3.5" strokeWidth={2} />
                       {profile.city.name}
                     </span>
                     {profile.ratingCount > 0 && (
                       <>
-                        <span className="text-black/20">·</span>
+                        <span className="text-line">·</span>
                         <span className="inline-flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-warning text-warning" strokeWidth={0} />
-                          <span className="font-medium text-foreground">{profile.ratingAvg.toFixed(1)}</span>
-                          <span className="text-muted">({profile.ratingCount})</span>
+                          <Star
+                            className="h-3.5 w-3.5 fill-cream text-cream"
+                            strokeWidth={0}
+                          />
+                          <span className="font-semibold tabular-nums text-ink">
+                            {profile.ratingAvg.toFixed(1)}
+                          </span>
+                          <span>({profile.ratingCount})</span>
                         </span>
                       </>
                     )}
                   </div>
 
                   {profile.tagline && (
-                    <p className="mt-3 text-lg italic text-muted leading-snug max-w-md">
+                    <p className="mt-3 max-w-md text-lg leading-snug text-ink-dim">
                       &ldquo;{profile.tagline}&rdquo;
                     </p>
                   )}
 
-                  {/* Audio player */}
                   {profile.audioUrl && (
-                    <div className="mt-4">
+                    <div className="mt-5 w-full max-w-sm sm:max-w-none">
                       <AudioPlayer src={profile.audioUrl} />
                     </div>
                   )}
 
-                  {/* Price */}
-                  <div className="mt-5 inline-flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-foreground">{formatBrl(profile.priceHour)}</span>
-                    <span className="text-muted text-md">/hora</span>
+                  {/* Preço */}
+                  <div className="mt-5 flex items-baseline gap-3">
+                    <span className="text-4xl font-bold tabular-nums text-rose tracking-[-0.02em]">
+                      {formatBrl(profile.priceHour)}
+                    </span>
+                    <span className="text-md text-ink-dim">/ hora</span>
                     {profile.priceTwoHours && (
-                      <span className="text-muted text-base ml-3">{formatBrl(profile.priceTwoHours)}<span className="text-xs">/2h</span></span>
+                      <span className="text-base text-ink-dim">
+                        <span className="tabular-nums">
+                          {formatBrl(profile.priceTwoHours)}
+                        </span>
+                        <span className="ml-0.5 text-xs">/ 2h</span>
+                      </span>
                     )}
                   </div>
 
-                  {/* Verification seals */}
+                  {/* Selos lista hairline */}
                   {seals.length > 0 && (
-                    <div className="mt-5 w-full max-w-sm sm:max-w-none divide-y divide-black/[0.05] rounded-xl border border-black/[0.07] bg-black/[0.02]">
+                    <ul className="mt-5 w-full max-w-sm divide-y divide-line rounded-xl border border-line bg-white sm:max-w-none">
                       {seals.map((s) => (
-                        <div key={s.label} className="flex items-center gap-3 px-3.5 py-2.5">
-                          <s.icon className={`h-4 w-4 shrink-0 ${s.color}`} strokeWidth={1.5} />
-                          <div className="min-w-0">
-                            <span className="text-sm font-semibold text-foreground">{s.label}</span>
-                            <span className="ml-1.5 text-xs text-muted">{s.sub}</span>
+                        <li
+                          key={s.label}
+                          className="flex items-center gap-3 px-3.5 py-2.5"
+                        >
+                          <s.Icon
+                            className={cn("h-4 w-4 shrink-0", s.color)}
+                            strokeWidth={2}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <span className="text-sm font-semibold text-ink">
+                              {s.label}
+                            </span>
+                            <span className="ml-1.5 text-xs text-ink-dim">
+                              {s.sub}
+                            </span>
                           </div>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   )}
 
-                  {/* CTAs primários */}
+                  {/* CTAs */}
                   {!ownerView ? (
                     <>
                       <div className="mt-5 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:max-w-none">
                         <Link
                           href={`/solicitar/${profile.slug}`}
-                          className="flex items-center justify-center gap-2 rounded-full bg-coral py-3 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+                          className={cn(
+                            "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-semibold text-white",
+                            "bg-rose shadow-[var(--shadow-sm)]",
+                            "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
+                            "hover:brightness-105 active:brightness-95",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                          )}
                         >
+                          <CalendarClock className="h-4 w-4" strokeWidth={2} />
                           Marcar horário
                         </Link>
-                        <WhatsAppButton phone={profile.whatsappPhone} profileId={profile.id} className="w-full py-3" />
+                        <WhatsAppButton
+                          phone={profile.whatsappPhone}
+                          profileId={profile.id}
+                          className="w-full"
+                        />
                       </div>
                       <div className="mt-2 grid w-full max-w-sm grid-cols-2 gap-2 sm:max-w-none">
-                        <FavoriteButton profileId={profile.id} initialFavorited={initialFavorited} isLoggedIn={isLoggedIn} className="w-full py-2.5" />
-                        <ShareButton displayName={profile.displayName} slug={profile.slug} className="w-full py-2.5" />
+                        <FavoriteButton
+                          profileId={profile.id}
+                          initialFavorited={initialFavorited}
+                          isLoggedIn={isLoggedIn}
+                          className="w-full"
+                        />
+                        <ShareButton
+                          displayName={profile.displayName}
+                          slug={profile.slug}
+                          className="w-full"
+                        />
                       </div>
                     </>
                   ) : (
-                    <div className="mt-5 flex gap-2.5">
-                      <Link href="/painel/perfil" className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]">
+                    <div className="mt-5 flex flex-wrap gap-2.5">
+                      <Link
+                        href="/painel/perfil"
+                        className={cn(
+                          "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-2.5 text-base font-medium text-ink",
+                          "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
+                          "hover:bg-line/30",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        )}
+                      >
+                        <Pencil className="h-4 w-4" strokeWidth={2} />
                         Editar perfil
                       </Link>
-                      <ShareButton displayName={profile.displayName} slug={profile.slug} />
+                      <ShareButton
+                        displayName={profile.displayName}
+                        slug={profile.slug}
+                      />
                     </div>
                   )}
-
                 </div>
               </div>
             </div>
           </section>
 
-          {/* ── Media Gallery (tabs: Fotos | Vídeos | Reels) ── */}
-          <section className="border-t border-black/[0.06]">
+          {/* ── Galeria ──────────────────────────────────────────────── */}
+          <section className="border-b border-line">
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <MediaGallery
                 media={allMedia}
@@ -334,86 +508,97 @@ export default async function PublicProfilePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* ── Bio + Characteristics + Availability ── */}
-          <section className="border-t border-black/[0.06] bg-background py-14">
-            <div className="mx-auto grid max-w-4xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr]">
-
-              <div className="space-y-8">
+          {/* ── Quem sou + Características + Disponibilidade ────────── */}
+          <section className="border-b border-line py-14">
+            <div className="mx-auto grid max-w-4xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+              <div className="space-y-10">
                 <div>
-                  <h2 className="text-2xl font-semibold tracking-tight">Quem sou</h2>
-                  <div className="mt-3 space-y-3 text-md leading-relaxed text-muted">
-                    {profile.bio.split("\n").map((p, i) => <p key={i}>{p}</p>)}
+                  <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
+                    Quem sou
+                  </h2>
+                  <div className="mt-4 space-y-3 text-md leading-relaxed text-ink-dim">
+                    {profile.bio.split("\n").map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
                   </div>
                 </div>
 
                 <div className="grid gap-8 sm:grid-cols-2">
                   <div>
-                    <h3 className="text-xs font-medium text-muted">Características</h3>
-                    <ul className="mt-3 space-y-0">
-                      {[
-                        ["Altura", profile.heightCm ? `${(profile.heightCm / 100).toFixed(2).replace(".", ",")} m` : "—"],
-                        ["Manequim", profile.dressSize ?? "—"],
-                        ["Cabelo", profile.hair ?? "—"],
-                        ["Olhos", profile.eyes ?? "—"],
-                        ["Idiomas", profile.languages ?? "—"],
-                      ].map(([k, v]) => (
-                        <li key={String(k)} className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                          <span className="text-muted">{k}</span>
-                          <span className="font-medium">{v}</span>
+                    <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                      Características
+                    </h3>
+                    <ul className="mt-3 divide-y divide-line border-b border-line">
+                      {characteristics.map(([k, v]) => (
+                        <li
+                          key={k}
+                          className="flex justify-between py-2.5 text-base"
+                        >
+                          <span className="text-ink-dim">{k}</span>
+                          <span className="font-medium text-ink">{v}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
+
                   <div>
-                    <h3 className="text-xs font-medium text-muted">Valores</h3>
-                    <ul className="mt-3 space-y-0">
-                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                        <span className="text-muted">1 hora</span>
-                        <span className="font-semibold">{formatBrl(profile.priceHour)}</span>
+                    <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                      Valores
+                    </h3>
+                    <ul className="mt-3 divide-y divide-line border-b border-line">
+                      <li className="flex justify-between py-2.5 text-base">
+                        <span className="text-ink-dim">1 hora</span>
+                        <span className="font-semibold tabular-nums text-rose">
+                          {formatBrl(profile.priceHour)}
+                        </span>
                       </li>
                       {profile.priceTwoHours ? (
-                        <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                          <span className="text-muted">2 horas</span>
-                          <span className="font-semibold">{formatBrl(profile.priceTwoHours)}</span>
+                        <li className="flex justify-between py-2.5 text-base">
+                          <span className="text-ink-dim">2 horas</span>
+                          <span className="font-semibold tabular-nums text-ink">
+                            {formatBrl(profile.priceTwoHours)}
+                          </span>
                         </li>
                       ) : null}
                       {profile.priceOvernight ? (
-                        <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                          <span className="text-muted">Pernoite</span>
-                          <span className="font-semibold">{formatBrl(profile.priceOvernight)}</span>
+                        <li className="flex justify-between py-2.5 text-base">
+                          <span className="text-ink-dim">Pernoite</span>
+                          <span className="font-semibold tabular-nums text-ink">
+                            {formatBrl(profile.priceOvernight)}
+                          </span>
                         </li>
                       ) : null}
                       {profile.priceTravelDay ? (
-                        <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                          <span className="text-muted">Viagem (diária)</span>
-                          <span className="font-semibold">{formatBrl(profile.priceTravelDay)}</span>
+                        <li className="flex justify-between py-2.5 text-base">
+                          <span className="text-ink-dim">Viagem (diária)</span>
+                          <span className="font-semibold tabular-nums text-ink">
+                            {formatBrl(profile.priceTravelDay)}
+                          </span>
                         </li>
                       ) : null}
-                      <li className="flex justify-between border-b border-black/[0.05] py-2.5 text-base">
-                        <span className="text-muted">Pagamento</span>
-                        <span className="font-medium">{profile.paymentMethods ?? "—"}</span>
+                      <li className="flex justify-between py-2.5 text-base">
+                        <span className="text-ink-dim">Pagamento</span>
+                        <span className="font-medium text-ink">
+                          {profile.paymentMethods ?? "—"}
+                        </span>
                       </li>
                     </ul>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-medium text-muted">Atende a</h3>
+                  <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                    Atende a
+                  </h3>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {[
-                      ["Homens", profile.servesMen],
-                      ["Casais", profile.servesCouples],
-                      ["Mulheres", profile.servesWomen],
-                      ["Local próprio", profile.hasOwnPlace],
-                      ["Hotel / domicílio", profile.homeVisit],
-                      ["Viagens nacionais", profile.travelsNational],
-                      ["Viagens internacionais", profile.travelsInternational],
-                    ].map(([label, on]) => (
+                    {services.map(([label, on]) => (
                       <span
-                        key={String(label)}
+                        key={label}
                         className={cn(
-                          "rounded-full px-3 py-1 text-sm font-medium",
-                          on ? "bg-foreground text-white" : "bg-black/[0.04] text-muted line-through",
+                          "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
+                          on
+                            ? "bg-ink text-white"
+                            : "bg-line/40 text-ink-faint line-through",
                         )}
                       >
                         {label}
@@ -424,19 +609,30 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight">Esta semana</h2>
-                <ul className="mt-4 space-y-0">
+                <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
+                  Esta semana
+                </h2>
+                <ul className="mt-4 divide-y divide-line border-y border-line">
                   {profile.availabilityRules.map((r) => (
-                    <li key={r.id} className="flex items-center justify-between border-b border-black/[0.05] py-2.5 text-base">
-                      <span>{DAYS_PT[r.weekday]} · {r.startTime} – {r.endTime}</span>
-                      <span className="text-xs font-medium uppercase">
+                    <li
+                      key={r.id}
+                      className="flex items-center justify-between py-2.5 text-base"
+                    >
+                      <span className="text-ink">
+                        {DAYS_PT[r.weekday]} ·{" "}
+                        <span className="tabular-nums text-ink-dim">
+                          {r.startTime} – {r.endTime}
+                        </span>
+                      </span>
+                      <span className="text-2xs font-semibold uppercase tracking-wider">
                         {r.status === "CLOSED" ? (
-                          <span className="text-muted">Fechado</span>
+                          <span className="text-ink-dim">Fechado</span>
                         ) : r.status === "BUSY" ? (
-                          <span className="text-coral">Ocupada</span>
+                          <span className="text-warning">Ocupada</span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-success-dark">
-                            <span className="h-[5px] w-[5px] rounded-full bg-success" />Disponível
+                          <span className="inline-flex items-center gap-1 text-success">
+                            <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                            Disponível
                           </span>
                         )}
                       </span>
@@ -444,46 +640,67 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   ))}
                 </ul>
                 {!ownerView && (
-                  <>
+                  <div className="mt-6 space-y-3">
                     <Link
                       href={`/solicitar/${profile.slug}`}
-                      className="mt-6 flex w-full items-center justify-center rounded-full bg-coral py-3 text-md font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                      className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-xl py-3 text-md font-semibold text-white",
+                        "bg-rose shadow-[var(--shadow-sm)]",
+                        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.98]",
+                        "hover:brightness-105",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      )}
                     >
-                      Montar horário → WhatsApp
+                      <CalendarClock className="h-4 w-4" strokeWidth={2} />
+                      Montar horário · WhatsApp
                     </Link>
-                    <p className="mt-3 text-sm leading-relaxed text-muted text-center">
-                      Escolha dia, horário e duração. Abrimos o WhatsApp com texto pronto — sem intermediários.
+                    <p className="text-center text-sm leading-relaxed text-ink-dim">
+                      Escolha dia, horário e duração. Abrimos o WhatsApp com
+                      texto pronto, sem intermediários.
                     </p>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
           </section>
 
-          {/* ── Reviews ── */}
-          <section className="border-t border-black/[0.06] py-14">
+          {/* ── Reviews ──────────────────────────────────────────────── */}
+          <section className="py-14">
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-3xl font-semibold tracking-tight">
+                <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink">
                   {profile.ratingAvg > 0 ? (
-                    <>{profile.ratingAvg.toFixed(1)} <span className="text-xl text-muted font-normal">· {profile.ratingCount} avaliações</span></>
+                    <>
+                      <span className="tabular-nums">
+                        {profile.ratingAvg.toFixed(1)}
+                      </span>
+                      <span className="ml-2 text-xl font-medium text-ink-dim">
+                        · {profile.ratingCount} avaliações
+                      </span>
+                    </>
                   ) : (
-                    <span className="text-2xl text-muted">Sem avaliações ainda</span>
+                    <span className="text-2xl text-ink-dim">
+                      Sem avaliações ainda
+                    </span>
                   )}
                 </h2>
-                {/* CTA for eligible clients */}
                 {isClientUser && !ownerView && (
                   isSubscriberViewer ? (
                     <Link
                       href={`/avaliar/${profile.slug}`}
-                      className="shrink-0 rounded-lg border border-foreground px-4 py-2 text-base font-semibold text-foreground transition hover:bg-foreground hover:text-white active:scale-[0.97]"
+                      className={cn(
+                        "shrink-0 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-line bg-white px-4 py-2 text-base font-semibold text-ink",
+                        "transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97]",
+                        "hover:bg-line/30",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      )}
                     >
                       {userReview ? "Editar avaliação" : "Avaliar"}
                     </Link>
                   ) : (
                     <Link
                       href={`/assinar?from=/p/${profile.slug}`}
-                      className="shrink-0 text-xs font-semibold text-coral hover:underline"
+                      className="shrink-0 text-2xs font-semibold uppercase tracking-wider text-rose hover:underline"
                     >
                       Assine para avaliar
                     </Link>
@@ -492,33 +709,53 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
 
               {profile.reviews.length === 0 ? (
-                <p className="mt-8 text-sm text-muted">Nenhuma avaliação ainda.</p>
+                <p className="mt-8 text-sm text-ink-dim">
+                  Nenhuma avaliação ainda.
+                </p>
               ) : (
-                <div className="mt-10 grid gap-4 md:grid-cols-3">
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
                   {profile.reviews.map((r) => (
-                    <article key={r.id} className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
+                    <article
+                      key={r.id}
+                      className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]"
+                    >
                       <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-medium text-white">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
                           {(r.user.name ?? "?")[0].toUpperCase()}
                         </span>
-                        <div>
-                          <p className="text-md font-semibold">
+                        <div className="min-w-0">
+                          <p className="truncate text-md font-semibold text-ink">
                             {r.user.slug ? `@${r.user.slug}` : r.user.name}
                           </p>
-                          <p className="mt-0.5 flex items-center gap-1 text-base text-muted">
-                            {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
-                            <span className="ml-1">{r.createdAt.toLocaleDateString("pt-BR")}</span>
+                          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-dim">
+                            <span className="text-cream">
+                              {"★".repeat(r.rating)}
+                              <span className="text-line">
+                                {"★".repeat(5 - r.rating)}
+                              </span>
+                            </span>
+                            <span className="tabular-nums">
+                              {r.createdAt.toLocaleDateString("pt-BR")}
+                            </span>
                           </p>
                         </div>
                       </div>
                       {isSubscriberViewer ? (
                         r.comment && (
-                          <p className="mt-4 text-md italic leading-relaxed text-muted">{r.comment}</p>
+                          <p className="mt-4 text-base italic leading-relaxed text-ink-dim">
+                            {r.comment}
+                          </p>
                         )
                       ) : (
-                        <div className="mt-4 flex items-center gap-2 rounded-lg bg-black/[0.03] px-3 py-2">
-                          <Lock className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
-                          <Link href={`/assinar?from=/p/${profile.slug}`} className="text-base text-coral hover:underline">
+                        <div className="mt-4 flex items-center gap-2 rounded-xl bg-line/30 px-3 py-2">
+                          <Lock
+                            className="h-3 w-3 shrink-0 text-ink-dim"
+                            strokeWidth={2}
+                          />
+                          <Link
+                            href={`/assinar?from=/p/${profile.slug}`}
+                            className="text-sm font-semibold text-rose hover:underline"
+                          >
                             Assine para ver o comentário
                           </Link>
                         </div>

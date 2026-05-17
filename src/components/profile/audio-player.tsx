@@ -2,21 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
- * Player de áudio completo com barra de progresso clicável e contador `mm:ss / mm:ss`.
+ * AudioPlayer — Design System v2 (Tahoe Sensual).
  *
- * Renderizado na página de perfil público quando o anúncio possui um clipe de voz.
+ * Caminho: src/components/profile/audio-player.tsx
+ * Steering: `.kiro/steering/design-system.md` §4 (typography), §5.4 (shadow).
+ *
+ * Player de áudio completo com barra de progresso clicável e contador
+ * `mm:ss / mm:ss`. Renderizado na página de perfil público quando o
+ * anúncio possui um clipe de voz.
+ *
+ * Visual v2:
+ *  - Card branco com border-line + shadow-sm.
+ *  - Ícone Volume2 em rose, label "Ouça minha voz" em ink-dim.
+ *  - Barra de progresso: trilha bg-line, fill em bg-rose.
+ *  - Botão play/pause: bg-rose com hover brilho (mesmo padrão do Button primary).
  *
  * Props:
- * - `src` (string): URL absoluta do arquivo de áudio (geralmente `.webm` em `/uploads`).
- *
- * Consumidores conhecidos:
- * - src/app/p/[slug]/page.tsx
+ *  - `src` (string): URL absoluta do arquivo de áudio.
  *
  * Side effects:
- * - `useEffect` registra listeners `timeupdate`/`loadedmetadata`/`ended` no `<audio>`.
- * - Clique na barra de progresso ajusta `audio.currentTime` via `getBoundingClientRect`.
+ *  - `useEffect` registra listeners `timeupdate`/`loadedmetadata`/`ended`.
+ *  - Clique na barra ajusta `audio.currentTime` via `getBoundingClientRect`.
  */
 export function AudioPlayer({ src }: { src: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -29,7 +38,10 @@ export function AudioPlayer({ src }: { src: string }) {
     if (!a) return;
     const onTime = () => setProgress(a.currentTime);
     const onMeta = () => setDuration(a.duration);
-    const onEnded = () => { setPlaying(false); setProgress(0); };
+    const onEnded = () => {
+      setPlaying(false);
+      setProgress(0);
+    };
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("loadedmetadata", onMeta);
     a.addEventListener("ended", onEnded);
@@ -43,22 +55,29 @@ export function AudioPlayer({ src }: { src: string }) {
   function toggle() {
     const a = audioRef.current;
     if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); }
-    else { a.play(); setPlaying(true); }
+    if (playing) {
+      a.pause();
+      setPlaying(false);
+    } else {
+      a.play();
+      setPlaying(true);
+    }
   }
 
   const pct = duration > 0 ? (progress / duration) * 100 : 0;
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  const fmt = (s: number) =>
+    `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
   return (
-    <div className="mt-6 flex items-center gap-4 rounded-xl border border-black/[0.06] bg-white px-4 py-3">
+    <div className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 shadow-[var(--shadow-sm)]">
       <audio ref={audioRef} src={src} preload="metadata" />
-      <Volume2 className="h-4 w-4 shrink-0 text-coral" strokeWidth={1.5} />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-muted">Ouça minha voz</p>
-        {/* Waveform progress bar */}
+      <Volume2 className="h-4 w-4 shrink-0 text-rose" strokeWidth={2} />
+      <div className="min-w-0 flex-1">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Ouça minha voz
+        </p>
         <div
-          className="mt-1.5 h-1.5 w-full cursor-pointer rounded-full bg-line overflow-hidden"
+          className="mt-1.5 h-1.5 w-full cursor-pointer overflow-hidden rounded-full bg-line"
           onClick={(e) => {
             const a = audioRef.current;
             if (!a || !duration) return;
@@ -67,22 +86,35 @@ export function AudioPlayer({ src }: { src: string }) {
           }}
         >
           <div
-            className="h-full rounded-full bg-coral transition-all"
+            className="h-full rounded-full bg-rose transition-all"
             style={{ width: `${pct}%` }}
           />
         </div>
         {duration > 0 && (
-          <p className="mt-1 text-2xs text-muted">{fmt(progress)} / {fmt(duration)}</p>
+          <p className="mt-1 text-2xs tabular-nums text-ink-dim">
+            {fmt(progress)} / {fmt(duration)}
+          </p>
         )}
       </div>
       <button
         onClick={toggle}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-coral text-white hover:bg-coral/90 transition"
+        className={cn(
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+          "bg-rose text-white shadow-[var(--shadow-sm)]",
+          "transition-all duration-150 ease-[var(--ease-tahoe)]",
+          "hover:brightness-105 active:brightness-95 active:scale-[0.96]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        )}
+        aria-label={playing ? "Pausar áudio" : "Tocar áudio"}
       >
-        {playing
-          ? <Pause className="h-4 w-4 fill-white" strokeWidth={0} />
-          : <Play className="h-4 w-4 fill-white translate-x-[1px]" strokeWidth={0} />
-        }
+        {playing ? (
+          <Pause className="h-4 w-4 fill-white" strokeWidth={0} />
+        ) : (
+          <Play
+            className="h-4 w-4 fill-white translate-x-[1px]"
+            strokeWidth={0}
+          />
+        )}
       </button>
     </div>
   );

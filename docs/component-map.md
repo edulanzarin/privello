@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17
+**Última atualização**: 2026-05-17 (slug + audio-player + CTAs migrados)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -83,11 +83,11 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `media-gallery.tsx` | 🔴 | grid de mídia + lightbox | Próximo a migrar (parte do `/p/[slug]`) |
 | `media-lightbox.tsx` | 🔴 | overlay de mídia | Vai virar wrapper de `<Modal fullscreen>` |
 | `photo-carousel.tsx` | 🔴 | swipe horizontal de fotos | Mobile do `/p/[slug]` |
-| `audio-player.tsx` | 🟡 | player completo | Mantido funcional, visual precisa polish |
+| `audio-player.tsx` | 🟢 | player completo | Card branco border-line, rose accent, play button bg-rose |
 | `audio-play-button.tsx` | 🟡 | botão inline ▶ | Usado em ProfileCard, audio compacto |
-| `favorite-button.tsx` | 🔴 | toggle de favoritar | Visual coral antigo |
-| `share-button.tsx` | 🔴 | compartilhar/copiar link | Visual coral antigo |
-| `whatsapp-button.tsx` | 🔴 | CTA WhatsApp | Cor de WhatsApp mantida, visual envolto antigo |
+| `favorite-button.tsx` | 🟢 | toggle de favoritar | bg-rose quando on, white+border-line quando off |
+| `share-button.tsx` | 🟢 | compartilhar/copiar link | Padrão secondary CTA white+line |
+| `whatsapp-button.tsx` | 🟢 | CTA WhatsApp | bg-whatsapp, alinhado com Button variant whatsapp |
 | `view-tracker.tsx` | ⚪ | efeito de tracking | Headless |
 
 #### `stories/` — formato story
@@ -173,7 +173,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `/descobrir/[citySlug]` | `app/descobrir/[citySlug]/page.tsx` | 🟢 | `5223afb` | Toolbar sticky + grid masonry |
 | `/buscar` | `app/buscar/page.tsx` | 🔴 | — | Form de busca puro |
 | `/cidades` | `app/cidades/page.tsx` | 🔴 | — | Listagem de cidades |
-| `/p/[slug]` | `app/p/[slug]/page.tsx` | 🔴 | — | **Próximo** — perfil público |
+| `/p/[slug]` | `app/p/[slug]/page.tsx` | 🟢 | _next_ | Hero split + selos hairline + Quem sou/Características/Valores/Atende/Disponibilidade + Reviews em cards |
 | `/em-alta` | `app/em-alta/page.tsx` | 🔴 | — | Ranking semanal |
 | `/em-destaque` | `app/em-destaque/page.tsx` | 🔴 | — | Boost ativo |
 | `/novidades` | `app/novidades/page.tsx` | 🔴 | — | Novos perfis |
@@ -272,8 +272,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 Ordem por impacto + dependência:
 
-1. **`/p/[slug]`** — perfil público (high-impact, fundação para `/avaliar` e `/solicitar`)
-2. **`/p/[slug]` filhos**: media-gallery, photo-carousel, favorite-button, share-button, whatsapp-button
+1. ~~**`/p/[slug]`**~~ ✅ done (commit pendente)
+2. **`MediaGallery` + `media-lightbox` + `photo-carousel`** — children do slug ainda v1
 3. `/em-alta`, `/em-destaque`, `/novidades` — variações de listagem (reusam ProfileCard)
 4. `/entrar` + `/cadastro/**` — auth (forms padronizados com `Section`+`SwitchRow`)
 5. `/planos` — pricing page (visual editorial)
