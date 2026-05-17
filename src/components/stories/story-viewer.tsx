@@ -410,27 +410,28 @@ export function StoryViewer({
                         </Link>
                     )}
                 </div>
-            </div>
 
-            {/* Profile chevrons (multi-group only) */}
-            {hasMultipleGroups && groupIdx > 0 && (
-                <button
-                    onClick={() => jumpGroup(-1)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 sm:left-4"
-                    aria-label="Perfil anterior"
-                >
-                    <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-            )}
-            {hasMultipleGroups && groupIdx < groups.length - 1 && (
-                <button
-                    onClick={() => jumpGroup(1)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 sm:right-4"
-                    aria-label="Próximo perfil"
-                >
-                    <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-            )}
+                {/* Profile chevrons (multi-group only) — vivem dentro do card pra
+                     ficarem colados nas bordas da foto em qualquer breakpoint. */}
+                {hasMultipleGroups && groupIdx > 0 && (
+                    <button
+                        onClick={() => jumpGroup(-1)}
+                        className="absolute left-2 top-1/2 z-30 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
+                        aria-label="Perfil anterior"
+                    >
+                        <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
+                    </button>
+                )}
+                {hasMultipleGroups && groupIdx < groups.length - 1 && (
+                    <button
+                        onClick={() => jumpGroup(1)}
+                        className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
+                        aria-label="Próximo perfil"
+                    >
+                        <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
+                    </button>
+                )}
+            </div>
         </Modal>
     );
 }
