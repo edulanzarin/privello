@@ -242,8 +242,14 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
                   type="button"
                   onPointerDown={(e) => {
                     e.preventDefault();
+                    // Reseta a flag pra impedir o useEffect de re-abrir o
+                    // dropdown quando o setQuery abaixo dispara — sem isto,
+                    // o label selecionado refaz a busca, encontra 1 resultado
+                    // (a própria seleção) e o dropdown volta a abrir.
+                    userTypedRef.current = false;
                     setQuery(r.label);
                     setOpen(false);
+                    setResults([]);
                     onSelect(r.slug, r.label);
                   }}
                   className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-base text-ink transition-colors hover:bg-line/40"
