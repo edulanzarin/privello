@@ -105,9 +105,9 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
 
-        {/* Badges flutuantes — top-left */}
-        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          {planBadge && (
+        {/* Plan badge — top-left */}
+        {planBadge && (
+          <div className="absolute left-3 top-3">
             <span
               className={cn(
                 "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider",
@@ -121,6 +121,22 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
                 aria-hidden
               />
               {planBadge.label}
+            </span>
+          </div>
+        )}
+
+        {/* Verificações + online — top-right (stack vertical pra não atropelar) */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
+          {profile.isOnline && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-2xs font-semibold text-ink shadow-[var(--shadow-sm)]"
+              aria-label="Online"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+              </span>
+              Online
             </span>
           )}
 
@@ -146,20 +162,6 @@ export function ProfileCard({ profile, className, storyRing = "none" }: ProfileC
             </span>
           )}
         </div>
-
-        {/* Online dot — top-right */}
-        {profile.isOnline && (
-          <span
-            className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-2xs font-semibold text-ink shadow-[var(--shadow-sm)]"
-            aria-label="Online"
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-            </span>
-            Online
-          </span>
-        )}
       </div>
 
       {/* Área de info — branca, separada da foto */}
