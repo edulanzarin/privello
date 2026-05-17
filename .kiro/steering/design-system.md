@@ -293,7 +293,7 @@ Antes de criar componente novo, **leia esta tabela**:
 | Tem foto de perfil em listagem? | Use `<ProfileCard>` (pra criar) |
 | Tem story circle? | Use `<StoryCircle>` |
 | Tem chip de filtro horizontal sticky? | Use `<FilterChip>` (pra criar) |
-| Tem search bar pública? | Use `<SearchBar>` (pra criar) |
+| Tem search bar pública? | Use `<SearchBar>` + `<SearchField>` + `<SearchSubmit>` |
 | Tem bottom-sheet mobile? | Use `<BottomSheet>` (pra criar) |
 
 ### 6.2 API contract universal
@@ -738,3 +738,58 @@ O close do modal e o botão de like vivem em `story-viewer.tsx` e o teste
 PBT em `src/components/_tests/touch-target.pbt.ts` referencia esse path.
 **Não recriar handlers de close/like fora do viewer** — quebraria o
 `min-h-[44px] min-w-[44px]` declarado e o teste.
+
+
+---
+
+## 16. SearchBar — primitivo compartilhado para barras de busca
+
+A v1 tinha 2 search bars com visual diferente (`HeroSearchForm` na Home como
+glass-pill e `BuscarForm` em /buscar como card sólido). A consolidação
+levou as duas a aparecer lado a lado em `/descobrir` e a divergência ficou
+gritante. v2.6 extrai o shell em `<SearchBar>` + 2 partes (`SearchField`,
+`SearchSubmit`).
+
+### 16.1 Anatomia
+
+```tsx
+<SearchBar onSubmit={...}>
+  <SearchField icon={MapPin}>
+    <input ... />
+  </SearchField>
+  <SearchField icon={Users} label="Procuro" divider={false} className="md:max-w-[220px]">
+    <select ... />
+  </SearchField>
+  <SearchSubmit>
+    <Search className="h-4 w-4" />
+    Descobrir
+  </SearchSubmit>
+</SearchBar>
+```
+
+- **`<SearchBar>`** — shell glass-panel rounded-2xl, padding 2 mobile / 1.5
+  desktop, layout column → row em `md:`. Recebe `onSubmit`.
+- **`<SearchField>`** — slot tipado com `icon` (lucide), `label?` opcional
+  (`text-xs ink-dim`), `divider?` (default true — esconde com `divider={false}`
+  no último campo), `className?` (ex.: `md:max-w-[220px]` em campos auxiliares).
+  O conteúdo (input/select/Autocomplete) é "naked" — sem chrome próprio,
+  apenas `border-0 bg-transparent`.
+- **`<SearchSubmit>`** — botão rose primary com `min-w-[150px]` em desktop pra
+  peso visual estável independente do label.
+
+### 16.2 Consumidores
+
+| Componente | Fields | Submit | Usado em |
+|------------|--------|--------|----------|
+| `HeroSearchForm` | Cidade + Procuro | "Descobrir" | Home + Descobrir hub |
+| `HandleSearchForm` | Nome ou @perfil | "Buscar" | Descobrir hub |
+
+**Regra**: nunca crie outra search bar com chrome próprio. Use os 3
+building-blocks. Se um caso não couber neles, estenda o primitivo
+(propor variante nova) em vez de partir pra inline custom.
+
+### 16.3 Convenções de copy
+
+- **Não use "@handle"** — usuários não entendem. Use **"@perfil"** ou
+  apenas **"nome do perfil"**.
+- Placeholders curtos sempre (ex.: `Cidade...`, `Nome ou @perfil em qualquer cidade...`).

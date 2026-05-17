@@ -47,6 +47,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | KPICard | `ui/kpi-card.tsx` | 🟢 | número grande + label uppercase | Dashboards |
 | LoadingSkeleton | `ui/loading-skeleton.tsx` | 🟢 | `card`, `list`, `text`, `avatar` | Suspense fallback |
 | Modal | `ui/modal.tsx` | 🟢 | `center`, `bottom`, `fullscreen` | Story viewer, lightbox, age gate, BottomSheet |
+| 🆕 SearchBar | `ui/search-bar.tsx` | 🟢 | `<SearchBar>` shell + `<SearchField>` slots + `<SearchSubmit>` CTA | HeroSearchForm + HandleSearchForm — paridade visual entre Home + Descobrir |
 | Select | `ui/select.tsx` | 🟢 | dropdown nativo estilizado | Forms |
 | StatCard | `ui/stat-card.tsx` | 🟢 | variação compacta de KPICard | Painel sidebar |
 | 🆕 StoryCircle | `ui/story-circle.tsx` | 🟢 | `sm` (48), `md` (62), `lg` (96), `xl` (160/192) | StoryBar, futuras listagens de stories |
@@ -118,7 +119,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
-| `hero-search-form.tsx` | 🟢 | Hero search bar v2 |
+| `hero-search-form.tsx` | 🟢 | Hero search bar v2 — usa `<SearchBar>` |
+| `handle-search-form.tsx` | 🟢 | Busca por nome/@perfil — usa `<SearchBar>` |
 | `city-autocomplete.tsx` | 🟢 | Autocomplete de cidades |
 
 #### `painel/` — dashboard provider

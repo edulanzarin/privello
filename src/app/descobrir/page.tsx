@@ -6,24 +6,22 @@
  * Auth: público.
  * Cache: `revalidate = 120`.
  *
- * Substitui a antiga `/buscar` (eliminada em 2026-05-17). Reusa o
- * `<HeroSearchForm>` da Home para garantir paridade visual e o mesmo
- * comportamento (cidade default `sao-paulo-sp` quando vazio + sessionStorage).
+ * Substitui a antiga `/buscar` (eliminada em 2026-05-17). Reusa os primitivos
+ * `<HeroSearchForm>` e `<HandleSearchForm>` (ambos compostos sobre
+ * `<SearchBar>`) — garante paridade visual com a Home e entre as duas barras
+ * desta própria página.
  *
  * Estrutura:
  *  1. Header + breadcrumb fino.
- *  2. Hero compacto com headline rose + sub.
- *  3. HeroSearchForm (mesmo da Home).
- *  4. Pílulas de top cidades (sem flechinha — mesmo estilo da Home).
- *  5. Divisor "ou" + Busca global por nome / @handle (form server-side `?q=`).
- *  6. Resultados em cards row brancos (quando `?q=`).
+ *  2. Hero centralizado com headline rose + sub.
+ *  3. HeroSearchForm (cidade + procuro + CTA Descobrir).
+ *  4. Pílulas de top cidades (mesmo estilo da Home).
+ *  5. Divisor "ou".
+ *  6. HandleSearchForm (busca por nome / @perfil).
+ *  7. Resultados em cards row brancos (quando `?q=` está presente).
  *
  * Steering: `.kiro/steering/design-system.md` §5.1 (max-w-7xl listing),
  * §13.6 (hero pattern).
- *
- * Cross-refs:
- *  - src/components/marketing/hero-search-form.tsx
- *  - src/lib/services/profile.service.ts (searchProfilesGlobal)
  */
 import Link from "next/link";
 import Image from "next/image";
@@ -32,6 +30,7 @@ import { MapPin, BadgeCheck } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
+import { HandleSearchForm } from "@/components/marketing/handle-search-form";
 import { searchProfilesGlobal } from "@/lib/services";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBrl } from "@/lib/money";
@@ -82,68 +81,53 @@ export default async function DiscoverHubPage({ searchParams }: PageProps) {
                     </div>
                 </div>
 
-                {/* ── Hero + Search ─────────────────────────────────────────── */}
-                <section className="py-10 lg:py-14">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <h1 className="font-bold leading-[1.05] tracking-[-0.025em] text-ink text-5xl sm:text-6xl lg:text-7xl">
+                {/* ── Hero centralizado ─────────────────────────────────────── */}
+                <section className="py-12 lg:py-16">
+                    <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+                        <h1 className="font-bold leading-[1.05] tracking-[-0.025em] text-ink text-5xl sm:text-6xl">
                             Descobrir{" "}
                             <span className="text-rose">acompanhantes.</span>
                         </h1>
-                        <p className="mt-5 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
-                            Escolha a cidade para ver perfis disponíveis ou busque por nome
-                            ou @handle em qualquer lugar.
+                        <p className="mx-auto mt-5 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
+                            Escolha a cidade ou busque pelo nome do perfil em qualquer lugar
+                            do Brasil.
                         </p>
-
-                        <div className="mt-8">
-                            <Suspense
-                                fallback={
-                                    <div className="h-16 animate-pulse rounded-2xl bg-line/40" />
-                                }
-                            >
-                                <HeroSearchForm />
-                            </Suspense>
-                            {pills.length > 0 && (
-                                <div className="mt-4 flex flex-wrap gap-2">
-                                    {pills.map((p) => (
-                                        <Link
-                                            key={p.href}
-                                            href={p.href}
-                                            className="inline-flex items-center rounded-full border border-line bg-white px-4 py-1.5 text-sm font-semibold text-ink transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                                        >
-                                            {p.label}
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
                     </div>
-                </section>
 
-                {/* ── Busca global por nome / @handle ──────────────────────── */}
-                <section className="border-t border-line py-10">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-baseline gap-3">
-                            <h2 className="text-3xl font-bold tracking-[-0.022em] text-ink sm:text-4xl">
-                                Buscar por nome
-                            </h2>
-                            <span className="text-sm text-ink-dim">ou @handle</span>
+                    {/* Search bars com mesma largura, lado a lado conceitualmente */}
+                    <div className="mx-auto mt-10 max-w-3xl space-y-5 px-4 sm:px-6">
+                        <Suspense
+                            fallback={
+                                <div className="h-16 animate-pulse rounded-2xl bg-line/40" />
+                            }
+                        >
+                            <HeroSearchForm />
+                        </Suspense>
+
+                        {pills.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {pills.map((p) => (
+                                    <Link
+                                        key={p.href}
+                                        href={p.href}
+                                        className="inline-flex items-center rounded-full border border-line bg-white px-4 py-1.5 text-sm font-semibold text-ink transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                                    >
+                                        {p.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Divisor "ou" */}
+                        <div className="flex items-center gap-3 py-2">
+                            <div className="h-px flex-1 bg-line" />
+                            <span className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                                ou
+                            </span>
+                            <div className="h-px flex-1 bg-line" />
                         </div>
 
-                        <form method="get" className="mt-6 flex max-w-2xl gap-2">
-                            <input
-                                type="search"
-                                name="q"
-                                defaultValue={q}
-                                placeholder="Nome ou @handle em qualquer cidade…"
-                                className="flex-1 rounded-xl border border-line bg-white px-4 py-2.5 text-md text-ink shadow-[var(--shadow-sm)] outline-none transition-all placeholder:text-ink-faint hover:border-ink/15 focus-visible:border-rose focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                            />
-                            <button
-                                type="submit"
-                                className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-rose px-6 py-2.5 text-md font-semibold text-white shadow-[var(--shadow-sm)] transition-all duration-150 ease-[var(--ease-tahoe)] hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                            >
-                                Buscar
-                            </button>
-                        </form>
+                        <HandleSearchForm defaultValue={q} />
 
                         {q && <SearchResults q={q} results={results} />}
                     </div>
@@ -164,7 +148,7 @@ function SearchResults({
 }) {
     if (results.length === 0) {
         return (
-            <div className="mt-8 max-w-2xl">
+            <div className="mt-2">
                 <EmptyState
                     title={`Nenhum perfil encontrado para "${q}"`}
                     description="Tente um nome diferente ou busque por cidade."
@@ -175,7 +159,7 @@ function SearchResults({
     }
 
     return (
-        <div className="mt-8 max-w-2xl space-y-2">
+        <div className="mt-2 space-y-2 text-left">
             <p className="text-sm text-ink-dim">
                 {results.length} perfil{results.length !== 1 ? "s" : ""} encontrado
                 {results.length !== 1 ? "s" : ""} para{" "}
