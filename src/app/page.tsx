@@ -25,7 +25,7 @@
  */
 import Link from "next/link";
 import { Suspense } from "react";
-import { ShieldCheck, Camera, Sparkles } from "lucide-react";
+import { ShieldCheck, Camera, Sparkles, TrendingUp } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
@@ -174,7 +174,10 @@ export default async function HomePage() {
               <h2 className="text-3xl font-bold tracking-[-0.02em] text-ink sm:text-4xl">
                 Em alta
               </h2>
-              <span className="text-sm text-ink-dim">da semana</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-soft px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider text-rose">
+                <TrendingUp className="h-3 w-3" strokeWidth={2.4} aria-hidden />
+                Da semana
+              </span>
             </div>
           </div>
           {hot.profiles.length ? (
