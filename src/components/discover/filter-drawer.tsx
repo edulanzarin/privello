@@ -132,12 +132,13 @@ export function FilterDrawer({
                     <aside
                         className={cn(
                             "relative flex w-full flex-col gap-5 glass-panel",
-                            // Mobile: bottom-sheet
-                            "rounded-t-3xl rounded-b-none px-5 py-6",
+                            // Mobile: bottom-sheet — pb extra reserva espaço pra
+                            // BottomNav flutuante (pill em bottom-4 + ~56px).
+                            "rounded-t-3xl rounded-b-none px-5 pt-6 pb-28",
                             "max-h-[85vh] overflow-y-auto",
                             // Desktop: side drawer
                             "md:max-w-md md:rounded-l-3xl md:rounded-r-none md:rounded-t-3xl",
-                            "md:max-h-screen md:py-8",
+                            "md:max-h-screen md:py-8 md:pb-8",
                             "animate-fade-in",
                         )}
                     >
