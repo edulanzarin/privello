@@ -759,7 +759,7 @@ export function MediaGallery({
           </div>
 
           {hasMore && (
-            <div className="mt-4 border-t border-line bg-white p-4 text-center">
+            <div className="mt-4 border-t border-line p-4 text-center">
               <button
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
                 className="text-xs font-semibold text-ink-dim underline-offset-2 transition-colors hover:text-rose hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"

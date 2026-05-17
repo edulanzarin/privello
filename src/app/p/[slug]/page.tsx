@@ -291,7 +291,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           </div>
 
           {/* ── Hero ─────────────────────────────────────────────────── */}
-          <section className="border-b border-line bg-white">
+          <section className="border-b border-line">
             <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-10">
                 {/* Foto + plan badge */}
