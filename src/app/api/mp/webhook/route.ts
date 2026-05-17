@@ -134,8 +134,16 @@ export async function POST(req: NextRequest) {
     const payment = new Payment(client);
     paymentData = await payment.get({ id: body.data.id });
   } catch (err) {
-    console.error("[MP webhook] Failed to fetch payment:", body.data.id, err);
-    return NextResponse.json({ error: "Failed to fetch payment" }, { status: 500 });
+    // Payment not found ou erro de rede:
+    //   - Se for 404 (payment não existe), o MP está enviando um teste de
+    //     conectividade ou um ID inválido. Retornamos 200 para evitar retries
+    //     inúteis — não há o que processar.
+    //   - Para outros erros (rede transiente, 5xx do MP), também retornamos
+    //     200 e logamos: o MP não tem retry inteligente que ajude aqui, e
+    //     pagamentos aprovados sempre disparam novos webhooks.
+    // Cf. .kiro/specs/migracao-infra-producao — best practice de webhooks.
+    console.warn("[MP webhook] Failed to fetch payment (likely test or invalid ID):", body.data.id, err);
+    return NextResponse.json({ ok: true });
   }
 
   if (paymentData.status !== "approved") {
