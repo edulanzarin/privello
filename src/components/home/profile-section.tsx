@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { ProfileCard } from "@/components/profile/profile-card";
 import type { ProfileCardPayload } from "@/lib/services";
+import { cn } from "@/lib/utils";
 
 type Props = {
   type: "hot" | "boosted";
@@ -13,21 +15,19 @@ type Props = {
 };
 
 /**
- * Seção de cards na home (`/`) com paginação cliente "Ver mais" para "Em alta"
- * ou "Em destaque" (boosted). Renderiza grid masonry de `<ProfileCard>` e
- * carrega mais perfis via `/api/profiles/section`.
+ * ProfileSection — Design System v2 (Tahoe Sensual).
  *
- * Props:
- * - `type` ("hot" | "boosted"): qual seção carregar (passa para a query string).
- * - `initialProfiles` (ProfileCardPayload[]): primeiros perfis vindos do RSC.
- * - `initialHasMore` (boolean): se há mais perfis para o "Ver mais".
- * - `viewAllHref` (string): destino do link "Ver todas →" (`/em-alta` ou `/em-destaque`).
+ * Caminho: src/components/home/profile-section.tsx
+ * Steering: `.kiro/steering/design-system.md` §5.2 (grid de listagem).
  *
- * Consumidores conhecidos:
- * - src/app/page.tsx (home)
+ * Grid 3-col desktop / 2-col tablet / 1-col mobile (decisão B1).
+ * Aspect 3:4 fixo via ProfileCard. Gap 5 (20px) entre cards.
+ *
+ * "Ver mais" (paginação cliente) usa Button-like glass; "Ver todas →"
+ * com seta e cor rose pra dar discovery hint.
  *
  * Side effects:
- * - `fetch("/api/profiles/section?type=...&offset=...")` no clique de "Ver mais".
+ *  - `fetch("/api/profiles/section?type=...&offset=...")` no clique de "Ver mais".
  */
 export function ProfileSection({ type, initialProfiles, initialHasMore, viewAllHref }: Props) {
   const [profiles, setProfiles] = useState(initialProfiles);
@@ -49,29 +49,39 @@ export function ProfileSection({ type, initialProfiles, initialHasMore, viewAllH
 
   return (
     <>
-      <div className="mx-auto mt-10 max-w-6xl columns-1 gap-6 px-4 sm:columns-2 sm:px-6 lg:columns-4 [&>*]:mb-6 [&>*]:break-inside-avoid">
+      <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-5 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
         {profiles.map((p) => (
           <ProfileCard key={p.id} profile={p} />
         ))}
       </div>
 
-      <div className="mx-auto mt-8 flex max-w-6xl items-center justify-between px-4 sm:px-6">
-        <div>
-          {hasMore && (
-            <button
-              onClick={loadMore}
-              disabled={loading}
-              className="text-sm font-semibold text-foreground underline-offset-2 hover:underline disabled:opacity-50"
-            >
-              {loading ? "Carregando…" : "Ver mais →"}
-            </button>
-          )}
-        </div>
+      <div className="mx-auto mt-6 flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {hasMore ? (
+          <button
+            onClick={loadMore}
+            disabled={loading}
+            className={cn(
+              "rounded-full border border-line bg-white/55 px-5 py-2.5 text-base font-medium text-ink",
+              "backdrop-blur-md backdrop-saturate-150",
+              "transition-all duration-150 ease-[var(--ease-tahoe)]",
+              "hover:bg-white/75 hover:border-ink/15",
+              "active:scale-[0.97]",
+              "disabled:opacity-50",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            )}
+          >
+            {loading ? "Carregando…" : "Ver mais"}
+          </button>
+        ) : (
+          <span />
+        )}
+
         <Link
           href={viewAllHref}
-          className="text-xs font-semibold text-foreground hover:text-coral transition"
+          className="inline-flex items-center gap-1.5 text-base font-medium text-rose hover:text-plum transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
         >
-          Ver todas →
+          Ver todas
+          <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
         </Link>
       </div>
     </>

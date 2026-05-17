@@ -1,13 +1,21 @@
 /**
- * Página RSC — Home pública (landing).
+ * Página RSC — Home pública (landing) — Design System v2 (Tahoe Sensual).
  *
  * Rota: `/`.
  * Tipo: Server Component.
  * Auth: público.
  * Cache: `revalidate = 60` (Route Segment Config — janela de 60s).
  *
- * Renderiza hero com busca, estatísticas da plataforma, seções "Em destaque"
- * (boost ativo) e "Em alta da semana", além de pílulas de top cidades.
+ * Steering: `.kiro/steering/design-system.md` §13.6 (Hero da Home).
+ *
+ * Estrutura:
+ *  1. Hero — headline Inter 300 grande + sub + glass stats card lateral.
+ *  2. Search bar pill grande (HeroSearchForm).
+ *  3. Pílulas top-cidades (glass-pill secundárias).
+ *  4. "Em destaque" — só renderiza com boost ativo. Grid 3-col.
+ *  5. "Em alta da semana" — sempre renderiza ou mensagem fallback.
+ *  6. "Verificação séria" — bloco editorial 2-col com 3 steps.
+ *  7. Footer.
  *
  * Cross-refs:
  * - src/lib/services/stats.service.ts
@@ -17,6 +25,7 @@
  */
 import Link from "next/link";
 import { Suspense } from "react";
+import { ShieldCheck, Camera, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HeroSearchForm } from "@/components/marketing/hero-search-form";
@@ -27,8 +36,6 @@ import { prisma } from "@/lib/prisma";
 
 // Cache strategy: revalidate=60 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 1.
-// Home pública (cidades top + stats + hot/boosted sections); janela de 60s aceitável.
-// Decisão de não ativar `cacheComponents: true` registrada em §5.1.
 export const revalidate = 60;
 
 async function getTopCities(limit = 5) {
@@ -66,70 +73,91 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        {/* ── Hero ──────────────────────────────────────────────────── */}
+        <section className="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
+          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-16">
+            {/* Left: headline + sub */}
             <div>
-              <h1 className="text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl">
-                Acompanhantes verificadas,{" "}
-                <span className="text-coral">
-                  perto de você.
-                </span>
+              <h1 className="font-light leading-[1.05] tracking-[-0.04em] text-ink text-5xl sm:text-6xl lg:text-7xl">
+                Acompanhantes
+                <br />
+                verificadas,
+                <br />
+                <span className="text-rose">perto de você.</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-                Fotos reais, áudio e vídeo. Perfis com verificação de identidade. Você escolhe a cidade, o horário e com quem se encontrar.
+              <p className="mt-6 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
+                Fotos reais, áudio e vídeo. Perfis com verificação de identidade.
+                Você escolhe a cidade, o horário e com quem se encontrar.
               </p>
             </div>
-            <aside className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
-              <ul className="space-y-4 text-md">
-                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
-                  <span className="text-muted">Perfis ativos</span>
-                  <span className="font-semibold tabular-nums">{stats.profiles.toLocaleString("pt-BR")}</span>
+
+            {/* Right: stats glass */}
+            <aside className="glass-panel rounded-3xl p-6">
+              <ul className="space-y-3.5 text-md">
+                <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
+                  <span className="text-ink-dim">Perfis ativos</span>
+                  <span className="font-semibold tabular-nums text-ink">
+                    {stats.profiles.toLocaleString("pt-BR")}
+                  </span>
                 </li>
-                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
-                  <span className="text-muted">Verificados</span>
-                  <span className="font-semibold tabular-nums">{stats.verifiedPct}%</span>
+                <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
+                  <span className="text-ink-dim">Verificados</span>
+                  <span className="font-semibold tabular-nums text-ink">
+                    {stats.verifiedPct}%
+                  </span>
                 </li>
-                <li className="flex justify-between gap-4 border-b border-black/[0.05] pb-3">
-                  <span className="text-muted">Cidades</span>
-                  <span className="font-semibold tabular-nums">{stats.cities}</span>
+                <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
+                  <span className="text-ink-dim">Cidades</span>
+                  <span className="font-semibold tabular-nums text-ink">
+                    {stats.cities}
+                  </span>
                 </li>
-                <li className="flex justify-between gap-4">
-                  <span className="text-muted">Revisão de perfil</span>
-                  <span className="font-semibold">24h</span>
+                <li className="flex items-center justify-between gap-4">
+                  <span className="text-ink-dim">Revisão de perfil</span>
+                  <span className="font-semibold text-ink">24h</span>
                 </li>
               </ul>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-ink-faint">
                 Selo de verificação via documento + selfie. Conteúdo adulto (+18).
               </p>
             </aside>
           </div>
 
-          <div className="mt-12">
-            <Suspense fallback={<div className="h-24 animate-pulse bg-line" />}>
+          {/* Search bar */}
+          <div className="mt-10">
+            <Suspense
+              fallback={
+                <div className="h-16 animate-pulse rounded-full bg-line/40" />
+              }
+            >
               <HeroSearchForm />
             </Suspense>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {pills.map((p) => (
-                <Link
-                  key={p.href}
-                  href={p.href}
-                  className="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-black/[0.03]"
-                >
-                  {p.label}
-                </Link>
-              ))}
-            </div>
+            {pills.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {pills.map((p) => (
+                  <Link
+                    key={p.href}
+                    href={p.href}
+                    className="inline-flex items-center rounded-full border border-line bg-white/55 px-4 py-1.5 text-sm font-medium text-ink-dim backdrop-blur-md backdrop-saturate-150 transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    {p.label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
-        {/* ── Em destaque (boost ativo) — só aparece quando há perfis boosted ── */}
+        {/* ── Em destaque (boost ativo) ─────────────────────────────── */}
         {boosted.profiles.length > 0 && (
-          <section className="border-t border-black/[0.06] py-16">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="text-4xl font-semibold tracking-tight">
-                Em destaque{" "}
-                <span className="text-muted font-normal">· boost ativo</span>
-              </h2>
+          <section className="border-t border-line py-14 lg:py-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                  Em destaque
+                </h2>
+                <span className="text-sm text-ink-dim">boost ativo</span>
+              </div>
             </div>
             <ProfileSection
               type="boosted"
@@ -140,12 +168,15 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* ── Em alta da semana ── */}
-        <section className="border-t border-black/[0.06] py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="text-4xl font-semibold tracking-tight">
-              Em alta <span className="text-muted font-normal">da semana</span>
-            </h2>
+        {/* ── Em alta ───────────────────────────────────────────────── */}
+        <section className="border-t border-line py-14 lg:py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Em alta
+              </h2>
+              <span className="text-sm text-ink-dim">da semana</span>
+            </div>
           </div>
           {hot.profiles.length ? (
             <ProfileSection
@@ -155,44 +186,83 @@ export default async function HomePage() {
               viewAllHref="/em-alta"
             />
           ) : (
-            <p className="mx-auto mt-10 max-w-6xl px-4 text-center text-sm text-muted sm:px-6">
-              Novos perfis em breve. Seja o primeiro a se cadastrar na sua cidade.
+            <p className="mx-auto mt-8 max-w-7xl px-4 text-center text-base text-ink-dim sm:px-6 lg:px-8">
+              Novos perfis em breve. Seja a primeira a se cadastrar na sua cidade.
             </p>
           )}
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-2">
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Verificação <span className="text-coral">séria.</span> Sem rodeios.
-            </h2>
-            <ol className="space-y-8 text-md">
-              <li className="flex gap-4">
-                <span className="text-3xl font-bold text-coral">01</span>
-                <div>
-                  <p className="font-semibold">Cadastro do perfil</p>
-                  <p className="mt-1 text-muted">Informações, valores e fotos públicas/privadas com diretrizes claras.</p>
-                </div>
-              </li>
-              <li className="flex gap-4">
-                <span className="text-3xl font-bold text-coral">02</span>
-                <div>
-                  <p className="font-semibold">Publicação imediata</p>
-                  <p className="mt-1 text-muted">Seu perfil entra na listagem assim que completar o cadastro.</p>
-                </div>
-              </li>
-              <li className="flex gap-4">
-                <span className="text-3xl font-bold text-coral">03</span>
-                <div>
-                  <p className="font-semibold">Verificação opcional → selo</p>
-                  <p className="mt-1 text-muted">Envie documento + selfie para ganhar o selo de verificada. Conferência humana e trilha de auditoria.</p>
-                </div>
-              </li>
-            </ol>
+        {/* ── Verificação séria ────────────────────────────────────── */}
+        <section className="border-t border-line py-16 lg:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+              <div>
+                <h2 className="font-light leading-[1.1] tracking-[-0.03em] text-ink text-4xl sm:text-5xl">
+                  Verificação{" "}
+                  <span className="text-rose">séria.</span>
+                  <br />
+                  Sem rodeios.
+                </h2>
+                <p className="mt-6 max-w-md text-md leading-relaxed text-ink-dim">
+                  Documento e selfie analisados por humano. Trilha de auditoria
+                  completa. Selo público no perfil de quem passa.
+                </p>
+              </div>
+
+              <ol className="space-y-6">
+                <Step
+                  n="01"
+                  Icon={Camera}
+                  title="Cadastro do perfil"
+                  desc="Informações, valores e fotos públicas/privadas com diretrizes claras."
+                />
+                <Step
+                  n="02"
+                  Icon={Sparkles}
+                  title="Publicação imediata"
+                  desc="Seu perfil entra na listagem assim que você completa o cadastro."
+                />
+                <Step
+                  n="03"
+                  Icon={ShieldCheck}
+                  title="Verificação opcional → selo"
+                  desc="Envie documento + selfie para ganhar o selo de verificada. Conferência humana e trilha de auditoria."
+                />
+              </ol>
+            </div>
           </div>
         </section>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function Step({
+  n,
+  Icon,
+  title,
+  desc,
+}: {
+  n: string;
+  Icon: typeof ShieldCheck;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <li className="flex gap-5">
+      <div className="flex shrink-0 flex-col items-center">
+        <span className="text-2xs font-semibold uppercase tracking-[0.2em] text-rose">
+          {n}
+        </span>
+        <span className="mt-2 flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/55 backdrop-blur-md">
+          <Icon className="h-4 w-4 text-rose" strokeWidth={1.8} />
+        </span>
+      </div>
+      <div className="flex-1 pt-1">
+        <p className="text-lg font-semibold text-ink">{title}</p>
+        <p className="mt-1.5 text-md leading-relaxed text-ink-dim">{desc}</p>
+      </div>
+    </li>
   );
 }
