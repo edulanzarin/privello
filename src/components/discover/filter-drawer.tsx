@@ -172,7 +172,7 @@ export function FilterDrawer({
 
             {open && (
                 <div
-                    className="fixed inset-0 z-50 flex items-end justify-end md:items-stretch md:pt-20"
+                    className="fixed inset-0 z-50 flex items-stretch justify-center px-4 pt-20 pb-24 md:items-stretch md:justify-end md:px-0 md:pt-20 md:pr-4 md:pb-4"
                     role="dialog"
                     aria-modal="true"
                     aria-label="Filtros"
@@ -187,15 +187,11 @@ export function FilterDrawer({
                     <aside
                         className={cn(
                             "relative flex w-full flex-col gap-5 glass-panel",
-                            // Mobile: bottom-sheet (pb-28 reserva BottomNav).
-                            "rounded-t-3xl rounded-b-none px-5 pt-6 pb-28",
-                            "max-h-[85vh] overflow-y-auto",
-                            // Desktop: side drawer da direita — wrapper já
-                            // empurra com pt-20 (80px) pra ficar abaixo do
-                            // header sticky h-16 (64px) + 16px de respiro.
-                            "md:mr-4 md:mb-4 md:max-w-md",
-                            "md:rounded-3xl md:px-6 md:pt-6 md:pb-6",
-                            "md:max-h-[calc(100vh-6rem)]",
+                            // Drawer flutuante (mobile e desktop). Wrapper já
+                            // empurra com pt-20 (header) + pb-24 mobile (BottomNav)
+                            // ou pb-4 desktop, e px-4 lateral.
+                            "rounded-3xl px-5 py-6 overflow-y-auto",
+                            "md:max-w-md md:px-6",
                             "animate-fade-in",
                         )}
                     >
