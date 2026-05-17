@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (em-alta + em-destaque + novidades migrados; novo `<ListingHeader>` primitive)
+**Última atualização**: 2026-05-17 (auth migrada — entrar + cadastro + recuperar-senha + AuthShell shell)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -110,6 +110,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `site-footer.tsx` | 🟡 | `<SiteFooter />` | Funcional, visual ok mas pode polish |
 | `bottom-nav.tsx` | 🟢 | `<BottomNav />` | Pill flutuante glass em todos breakpoints, auto-hide quando `body[data-modal-open]` |
 | `bottom-nav-wrapper.tsx` | 🟢 | server wrapper | Headless |
+| 🆕 `auth-shell.tsx` | 🟢 | `<AuthShell footer caption width>` | Shell centralizado para /entrar, /cadastro, /recuperar-senha, /cadastro/sucesso |
 | `dark-sidebar-shell.tsx` | 🔴 | sidebar escura admin/painel | Vai virar `GlassSidebarShell` (steering §13.5) |
 | `provider-banner.tsx` | 🔴 | banner topo p/ providers | Não migrado |
 
@@ -196,13 +197,13 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Arquivo | Status v2 |
 |------|---------|-----------|
-| `/entrar` | `app/entrar/page.tsx` | 🔴 |
-| `/cadastro` | `app/cadastro/page.tsx` | 🔴 |
-| `/cadastro/cliente` | `app/cadastro/cliente/page.tsx` | 🔴 |
-| `/cadastro/acompanhante` | `app/cadastro/acompanhante/page.tsx` | 🔴 |
-| `/cadastro/sucesso` | `app/cadastro/sucesso/page.tsx` | 🔴 |
-| `/recuperar-senha` | `app/recuperar-senha/page.tsx` | 🔴 |
-| `/recuperar-senha/[token]` | `app/recuperar-senha/[token]/page.tsx` | 🔴 |
+| `/entrar` | `app/entrar/page.tsx` | 🟢 |
+| `/cadastro` | `app/cadastro/page.tsx` | 🟢 |
+| `/cadastro/cliente` | `app/cadastro/cliente/page.tsx` | 🟢 |
+| `/cadastro/acompanhante` | `app/cadastro/acompanhante/page.tsx` | 🟢 |
+| `/cadastro/sucesso` | `app/cadastro/sucesso/page.tsx` | 🟢 |
+| `/recuperar-senha` | `app/recuperar-senha/page.tsx` | 🟢 |
+| `/recuperar-senha/[token]` | `app/recuperar-senha/[token]/page.tsx` | 🟢 |
 
 ### 3.3 Cliente logado (`/conta/**`)
 
@@ -282,9 +283,9 @@ Ordem por impacto + dependência:
 1. ~~**`/p/[slug]`**~~ ✅ done
 2. ~~**`MediaGallery` + `media-lightbox` + `photo-carousel`**~~ ✅ done
 3. ~~**`favorites-list.tsx` + `client-profile-edit.tsx` + `/conta/perfil`**~~ ✅ done
-4. ~~**`/em-alta`, `/em-destaque`, `/novidades`**~~ ✅ done (novo `<ListingHeader>` extraído)
-5. **`/entrar` + `/cadastro/**`** — auth (forms padronizados com `Section`+`SwitchRow`)
-6. `/planos` — pricing page (visual editorial)
+4. ~~**`/em-alta`, `/em-destaque`, `/novidades`**~~ ✅ done
+5. ~~**`/entrar` + `/cadastro/**` + `/recuperar-senha/**`**~~ ✅ done (novo `<AuthShell>` extraído)
+6. **`/planos`** — pricing page (visual editorial)
 7. `/conta/onboarding/**` + `/conta/verificacao` — onboarding cliente
 8. `/painel/**` — provider dashboard (precisa do `GlassSidebarShell` antes)
 9. `/admin/**` — moderação (mais denso, vem por último)

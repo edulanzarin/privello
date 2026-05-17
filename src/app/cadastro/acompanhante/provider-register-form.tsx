@@ -210,11 +210,11 @@ export function ProviderRegisterForm() {
       <div className="mb-8 sm:hidden">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-muted">Passo {step} de {STEP_LABELS.length}</span>
-          <span className="text-xs font-semibold text-coral">{STEP_LABELS[step - 1]}</span>
+          <span className="text-xs font-semibold text-rose">{STEP_LABELS[step - 1]}</span>
         </div>
         <div className="h-1 w-full rounded-full bg-line overflow-hidden">
           <div
-            className="h-full rounded-full bg-coral transition-all duration-300"
+            className="h-full rounded-full bg-rose transition-all duration-300"
             style={{ width: `${(step / STEP_LABELS.length) * 100}%` }}
           />
         </div>
@@ -232,12 +232,12 @@ export function ProviderRegisterForm() {
                 <div
                   className={cn(
                     "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
-                    done ? "bg-success text-white" : active ? "bg-coral text-white scale-110" : "bg-line text-muted",
+                    done ? "bg-success text-white" : active ? "bg-rose text-white scale-110" : "bg-line text-ink-dim",
                   )}
                 >
                   {done ? "✓" : n}
                 </div>
-                <span className={cn("mt-1.5 text-2xs font-medium", active ? "text-foreground" : "text-muted")}>
+                <span className={cn("mt-1.5 text-2xs font-medium", active ? "text-ink" : "text-ink-dim")}>
                   {label}
                 </span>
               </div>
@@ -281,8 +281,8 @@ export function ProviderRegisterForm() {
                   placeholder="valentina-silva"
                 />
                 {slug && (
-                  <p className="mt-1.5 text-xs text-muted">
-                    Seu perfil: <span className="font-semibold text-foreground">privello.com/p/{slug}</span>
+                  <p className="mt-1.5 text-xs text-ink-dim">
+                    Seu perfil: <span className="font-semibold text-ink">privello.com/p/{slug}</span>
                   </p>
                 )}
               </div>
@@ -459,7 +459,7 @@ export function ProviderRegisterForm() {
                     size="md"
                   />
                   <span className={cn("w-20 shrink-0 text-sm font-medium", !durEnabled[d.key] && "text-muted")}>
-                    {d.label}{d.required && <span className="ml-1 text-coral">*</span>}
+                    {d.label}{d.required && <span className="ml-1 text-rose">*</span>}
                   </span>
                   <div className="max-w-[180px]">
                     <Input
@@ -554,14 +554,14 @@ export function ProviderRegisterForm() {
             <div className="flex flex-col items-center gap-4">
               {/* Preview */}
               <div
-                className="relative h-48 w-36 overflow-hidden rounded-2xl bg-line cursor-pointer border-2 border-dashed border-black/15 transition hover:border-coral/50"
+                className="relative h-48 w-36 cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-line bg-line/40 transition hover:border-rose/50"
                 onClick={() => document.getElementById("photo-input")?.click()}
               >
                 {photoPreviewUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- preview de upload local (blob URL); next/image exige domain whitelist e não funciona com objectURL
                   <img src={photoPreviewUrl} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-muted">
+                  <div className="flex h-full flex-col items-center justify-center gap-2 text-ink-dim">
                     <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -582,13 +582,14 @@ export function ProviderRegisterForm() {
                 }}
               />
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="md"
                 onClick={() => document.getElementById("photo-input")?.click()}
-                className="rounded-xl border border-black/10 bg-white px-4 py-2 text-base font-medium text-foreground shadow-sm transition hover:bg-black/[0.03] active:scale-[0.97]"
               >
                 {photoPreviewUrl ? "Trocar foto" : "Selecionar foto"}
-              </button>
+              </Button>
             </div>
           </Card>
 
@@ -602,7 +603,7 @@ export function ProviderRegisterForm() {
       {/* Navigation */}
       <div className="mt-8 flex items-center justify-between">
         {step > 1 ? (
-          <Button variant="secondary" onClick={back} disabled={pending} className="min-h-[44px]">
+          <Button variant="secondary" onClick={back} disabled={pending}>
             ← Voltar
           </Button>
         ) : (
@@ -610,11 +611,11 @@ export function ProviderRegisterForm() {
         )}
 
         {step < 5 ? (
-          <Button variant="coral" size="lg" onClick={next} className="min-h-[44px]">
+          <Button variant="primary" size="lg" onClick={next}>
             {step < 4 ? "Continuar →" : "Próximo →"}
           </Button>
         ) : (
-          <Button variant="coral" size="lg" onClick={handleFinish} loading={pending} className="min-h-[44px]">
+          <Button variant="primary" size="lg" onClick={handleFinish} loading={pending}>
             {pending ? "Criando perfil…" : "Finalizar cadastro"}
           </Button>
         )}

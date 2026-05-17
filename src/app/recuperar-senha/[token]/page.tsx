@@ -1,24 +1,22 @@
 "use client";
 
 /**
- * Página RSC — Redefinir senha com token enviado por e-mail.
+ * Página Client — Redefinir senha com token enviado por e-mail.
  *
  * Rota: `/recuperar-senha/[token]`.
- * Tipo: Client Component (`"use client"`).
+ * Tipo: Client Component.
  * Auth: público (token é a credencial efêmera; expira em 1h).
- * Cache: default (Client Component).
- *
- * Recebe o `token` via params, pede nova senha e confirmação, e chama o
- * server action `resetPassword`. Em sucesso, redireciona para
- * `/entrar?reset=1`.
  *
  * Cross-refs:
- * - src/app/_actions/password-reset.ts (resetPassword)
+ *  - src/app/_actions/password-reset.ts (resetPassword)
  */
-import Link from "next/link";
 import { use, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "@/app/_actions/password-reset";
+import { AuthShell } from "@/components/layout/auth-shell";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function RedefinirSenhaPage({
   params,
@@ -43,57 +41,57 @@ export default function RedefinirSenhaPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
-      <div className="w-full max-w-sm">
-        <Link href="/" className="font-serif text-xl">
-          privello<span className="text-coral">.</span>
-        </Link>
+    <AuthShell>
+      <Card variant="solid" padding="lg">
+        <h1 className="text-2xl font-bold tracking-[-0.022em] text-ink">
+          Nova senha
+        </h1>
+        <p className="mt-2 text-sm text-ink-dim">
+          Escolha uma nova senha para sua conta.
+        </p>
 
-        <form onSubmit={handleSubmit} className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
-          <h1 className="font-serif text-2xl">Nova senha</h1>
-          <p className="mt-2 text-sm text-muted">
-            Escolha uma nova senha para sua conta.
-          </p>
-
-          <label className="mt-6 block text-base font-medium text-foreground">
-            Nova senha
-          </label>
-          <input
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <Input
             name="password"
             type="password"
+            label="Nova senha"
             required
             minLength={8}
             autoComplete="new-password"
-            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
             placeholder="Mínimo 8 caracteres"
           />
 
-          <label className="mt-4 block text-base font-medium text-foreground">
-            Confirmar nova senha
-          </label>
-          <input
+          <Input
             name="confirm"
             type="password"
+            label="Confirmar nova senha"
             required
             minLength={8}
             autoComplete="new-password"
-            className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
             placeholder="Repita a senha"
           />
 
           {error && (
-            <p className="mt-3 text-xs text-coral">{error}</p>
+            <Card
+              variant="danger-subtle"
+              padding="sm"
+              className="text-sm text-danger"
+            >
+              {error}
+            </Card>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={pending}
-            className="mt-6 w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+            variant="primary"
+            size="lg"
+            loading={pending}
+            className="w-full"
           >
             {pending ? "Salvando…" : "Redefinir senha"}
-          </button>
+          </Button>
         </form>
-      </div>
-    </div>
+      </Card>
+    </AuthShell>
   );
 }

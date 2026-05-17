@@ -6,10 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+/**
+ * ClientRegisterForm — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/cadastro/cliente/client-register-form.tsx
+ * Steering: `.kiro/steering/design-system.md` §6 (forms), §16.3 (copy).
+ *
+ * Form de cadastro de cliente. Slug normalizado conforme regra
+ * `cleanSlug` (lowercase + sem acentos + apenas a-z/0-9/hífen).
+ */
 export function ClientRegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
 
   function cleanSlug(s: string) {
@@ -36,7 +44,11 @@ export function ClientRegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       {error && (
-        <Card variant="danger-subtle" padding="sm" className="text-base text-danger">
+        <Card
+          variant="danger-subtle"
+          padding="sm"
+          className="text-base text-danger"
+        >
           {error}
         </Card>
       )}
@@ -47,23 +59,22 @@ export function ClientRegisterForm() {
         hint="Nome exibido na plataforma — pode alterar quando quiser"
         required
         autoComplete="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
         placeholder="Ex: João Silva"
       />
 
       <div>
         <Input
-          label="Seu @"
-          hint="Único na plataforma — só pode alterar 1x por mês"
+          label="Seu @perfil"
+          hint="Único na plataforma — só pode alterar 1× por mês"
           prefix="@"
           value={slug}
           onChange={(e) => setSlug(cleanSlug(e.target.value))}
           placeholder="joao-silva"
         />
         {slug && (
-          <p className="mt-1.5 text-sm text-muted">
-            Seu perfil: <span className="font-medium text-foreground">privello.com/@{slug}</span>
+          <p className="mt-1.5 text-sm text-ink-dim">
+            Seu perfil:{" "}
+            <span className="font-semibold text-ink">privello.com/@{slug}</span>
           </p>
         )}
       </div>
@@ -88,15 +99,15 @@ export function ClientRegisterForm() {
 
       <Button
         type="submit"
-        variant="coral"
+        variant="primary"
         size="lg"
         loading={pending}
-        className="w-full min-h-[44px]"
+        className="min-h-[44px] w-full"
       >
         {pending ? "Criando conta…" : "Criar conta"}
       </Button>
 
-      <p className="text-center text-sm text-muted">
+      <p className="text-center text-sm text-ink-dim">
         Ao criar conta você confirma ter +18 anos.
       </p>
     </form>

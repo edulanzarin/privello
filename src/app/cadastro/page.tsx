@@ -1,20 +1,24 @@
 /**
- * Página RSC — Cadastro: escolher tipo de conta (cliente vs acompanhante).
+ * Página RSC — Cadastro: escolher tipo de conta — Design System v2.
  *
  * Rota: `/cadastro`.
  * Tipo: Server Component.
  * Auth: público (já-logado é redirecionado para `/painel`).
  * Cache: `force-dynamic` (lê `auth()` para redirect).
  *
- * Splash de cadastro com 2 cards de escolha; encaminha para
- * `/cadastro/cliente` ou `/cadastro/acompanhante`.
+ * Splash de cadastro centralizado, com 2 cards de escolha encaminhando
+ * para `/cadastro/cliente` ou `/cadastro/acompanhante`. Reutiliza o
+ * `<AuthShell>` por consistência visual com `/entrar` e
+ * `/recuperar-senha`.
  */
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { UserRound, Users, ArrowRight } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { UserRound, Users } from "lucide-react";
+import { AuthShell } from "@/components/layout/auth-shell";
+import { Card } from "@/components/ui/card";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 14 (cadastro lê auth() para redirect).
+// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 14.
 export const dynamic = "force-dynamic";
 
 export default async function CadastroPage() {
@@ -22,83 +26,100 @@ export default async function CadastroPage() {
   if (session) redirect("/painel");
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      {/* Left panel */}
-      <aside className="flex w-full flex-col justify-between bg-sidebar px-8 py-12 text-white md:max-w-sm md:min-h-screen">
-        <div>
-          <Link href="/" className="text-xl font-black tracking-tight">
-            privello<span className="text-coral">.</span>
+    <AuthShell
+      caption={
+        <>
+          Ao se cadastrar você concorda com os{" "}
+          <Link
+            href="/termos-de-uso"
+            className="underline-offset-2 hover:underline"
+          >
+            termos de uso
+          </Link>{" "}
+          e confirma ter +18 anos.
+        </>
+      }
+      footer={
+        <>
+          Já tem conta?{" "}
+          <Link
+            href="/entrar"
+            className="font-semibold text-rose hover:underline"
+          >
+            Entrar
           </Link>
-          <h1 className="mt-12 text-3xl font-bold leading-tight">
-            Crie sua conta.
+        </>
+      }
+      width="2xl"
+    >
+      <div>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold tracking-[-0.022em] text-ink sm:text-4xl">
+            Quem é você?
           </h1>
-          <p className="mt-4 text-sm leading-relaxed text-white/60">
+          <p className="mt-3 text-md text-ink-dim">
             Escolha o tipo de conta que melhor descreve você.
           </p>
         </div>
-        <p className="mt-10 text-xs text-white/30 md:mt-0">
-          Conteúdo adulto · +18 · Privello © 2025
-        </p>
-      </aside>
 
-      {/* Right panel */}
-      <main className="flex flex-1 flex-col justify-center bg-background px-6 py-12 md:px-16">
-        <div className="mx-auto w-full max-w-md">
-          <h2 className="text-2xl font-bold tracking-tight">Quem é você?</h2>
-          <p className="mt-2 text-sm text-muted">
-            Já tem conta?{" "}
-            <Link href="/entrar" className="font-semibold text-coral underline-offset-2 hover:underline">
-              Entrar
-            </Link>
-          </p>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {/* Cliente */}
-            <Link
-              href="/cadastro/cliente"
-              className="group flex flex-col gap-4 rounded-2xl border border-white/30 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-lg hover:-translate-y-0.5 hover:bg-white"
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {/* Cliente */}
+          <Link
+            href="/cadastro/cliente"
+            className="group focus-visible:outline-none"
+          >
+            <Card
+              variant="solid"
+              padding="lg"
+              className="flex h-full flex-col gap-4 transition-all duration-200 ease-[var(--ease-tahoe)] group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-md)] group-focus-visible:ring-2 group-focus-visible:ring-rose/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-line transition group-hover:bg-foreground">
-                <UserRound className="h-6 w-6 text-muted transition group-hover:text-white" strokeWidth={1.5} />
-              </div>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-line/40 text-ink-dim transition-colors group-hover:bg-rose-soft group-hover:text-rose">
+                <UserRound className="h-6 w-6" strokeWidth={2} />
+              </span>
               <div>
-                <p className="font-bold">Sou cliente</p>
-                <p className="mt-1 text-xs leading-relaxed text-muted">
+                <p className="text-lg font-bold tracking-[-0.015em] text-ink">
+                  Sou cliente
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-dim">
                   Quero encontrar e entrar em contato com acompanhantes.
                 </p>
               </div>
-              <span className="mt-auto text-xs font-semibold text-coral">
-                Cadastro gratuito →
+              <span className="mt-auto inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-wider text-rose">
+                Cadastro gratuito
+                <ArrowRight className="h-3 w-3" strokeWidth={2.4} />
               </span>
-            </Link>
+            </Card>
+          </Link>
 
-            {/* Acompanhante */}
-            <Link
-              href="/cadastro/acompanhante"
-              className="group flex flex-col gap-4 rounded-2xl border-2 border-coral bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-lg hover:-translate-y-0.5 hover:bg-coral"
+          {/* Acompanhante */}
+          <Link
+            href="/cadastro/acompanhante"
+            className="group focus-visible:outline-none"
+          >
+            <Card
+              variant="solid"
+              padding="lg"
+              className="flex h-full flex-col gap-4 border-rose ring-1 ring-rose/30 transition-all duration-200 ease-[var(--ease-tahoe)] group-hover:-translate-y-0.5 group-hover:shadow-[var(--shadow-md)] group-focus-visible:ring-2 group-focus-visible:ring-rose/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-coral transition group-hover:bg-white">
-                <Users className="h-6 w-6 text-white transition group-hover:text-coral" strokeWidth={1.5} />
-              </div>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose text-white transition-colors">
+                <Users className="h-6 w-6" strokeWidth={2} />
+              </span>
               <div>
-                <p className="font-bold transition group-hover:text-white">Sou acompanhante</p>
-                <p className="mt-1 text-xs leading-relaxed text-muted transition group-hover:text-white/70">
+                <p className="text-lg font-bold tracking-[-0.015em] text-ink">
+                  Sou acompanhante
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-dim">
                   Quero criar meu perfil e anunciar meus serviços.
                 </p>
               </div>
-              <span className="mt-auto text-xs font-semibold text-coral transition group-hover:text-white">
-                Criar perfil →
+              <span className="mt-auto inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-wider text-rose">
+                Criar perfil
+                <ArrowRight className="h-3 w-3" strokeWidth={2.4} />
               </span>
-            </Link>
-          </div>
-
-          <p className="mt-8 text-center text-xs text-muted">
-            Ao se cadastrar você concorda com os{" "}
-            <Link href="/termos" className="underline underline-offset-2">termos de uso</Link>
-            {" "}e confirma ter +18 anos.
-          </p>
+            </Card>
+          </Link>
         </div>
-      </main>
-    </div>
+      </div>
+    </AuthShell>
   );
 }

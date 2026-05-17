@@ -1,23 +1,27 @@
 "use client";
 
 /**
- * Página RSC — Solicitar recuperação de senha por e-mail.
+ * Página Client — Solicitar recuperação de senha por e-mail.
  *
  * Rota: `/recuperar-senha`.
  * Tipo: Client Component (`"use client"`).
  * Auth: público.
  * Cache: default (Client Component).
  *
- * Formulário de e-mail; chama o server action `requestPasswordReset` e
- * mostra confirmação genérica (não vaza se o e-mail existe).
+ * Form de e-mail; chama o server action `requestPasswordReset` e mostra
+ * confirmação genérica (não vaza se o e-mail existe).
  *
  * Cross-refs:
- * - src/app/_actions/password-reset.ts (requestPasswordReset)
- * - src/app/recuperar-senha/[token]/page.tsx
+ *  - src/app/_actions/password-reset.ts (requestPasswordReset)
+ *  - src/app/recuperar-senha/[token]/page.tsx
  */
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { requestPasswordReset } from "@/app/_actions/password-reset";
+import { AuthShell } from "@/components/layout/auth-shell";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function RecuperarSenhaPage() {
   const [pending, startTransition] = useTransition();
@@ -36,68 +40,80 @@ export default function RecuperarSenhaPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
-      <div className="w-full max-w-sm">
-        <Link href="/" className="font-serif text-xl">
-          privello<span className="text-coral">.</span>
+    <AuthShell
+      footer={
+        <Link
+          href="/entrar"
+          className="font-semibold text-rose hover:underline"
+        >
+          Voltar ao login
         </Link>
-
+      }
+    >
+      <Card variant="solid" padding="lg">
         {done ? (
-          <div className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
-            <h1 className="font-serif text-2xl">Verifique seu email</h1>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Se existe uma conta com esse email, enviamos um link para redefinir
-              a senha. O link expira em <strong>1 hora</strong>.
+          <>
+            <h1 className="text-2xl font-bold tracking-[-0.022em] text-ink">
+              Verifique seu email
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-ink-dim">
+              Se existe uma conta com esse email, enviamos um link para
+              redefinir a senha. O link expira em{" "}
+              <span className="font-semibold text-ink">1 hora</span>.
             </p>
-            <p className="mt-4 text-xs text-muted">
+            <p className="mt-4 text-xs text-ink-dim">
               Não recebeu?{" "}
               <button
-                className="text-coral hover:underline"
+                type="button"
                 onClick={() => setDone(false)}
+                className="font-semibold text-rose hover:underline"
               >
                 Tentar novamente
               </button>
             </p>
-          </div>
+          </>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
-            <h1 className="font-serif text-2xl">Recuperar acesso</h1>
-            <p className="mt-2 text-sm text-muted">
+          <form onSubmit={handleSubmit}>
+            <h1 className="text-2xl font-bold tracking-[-0.022em] text-ink">
+              Recuperar acesso
+            </h1>
+            <p className="mt-2 text-sm text-ink-dim">
               Informe seu email e enviaremos um link para redefinir a senha.
             </p>
 
-            <label className="mt-6 block text-base font-medium text-foreground">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              className="mt-1.5 w-full rounded-lg border border-black/10 bg-white px-3 py-[7px] text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-blue focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all"
-              placeholder="seu@email.com"
-            />
+            <div className="mt-6 space-y-4">
+              <Input
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                label="E-mail"
+                placeholder="seu@email.com"
+              />
 
-            {error && (
-              <p className="mt-3 text-xs text-coral">{error}</p>
-            )}
+              {error && (
+                <Card
+                  variant="danger-subtle"
+                  padding="sm"
+                  className="text-sm text-danger"
+                >
+                  {error}
+                </Card>
+              )}
 
-            <button
-              type="submit"
-              disabled={pending}
-              className="mt-6 min-h-[44px] w-full rounded-lg bg-coral py-3 text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
-            >
-              {pending ? "Enviando…" : "Enviar link"}
-            </button>
-
-            <p className="mt-4 text-center text-xs text-muted">
-              <Link href="/entrar" className="hover:text-foreground">
-                Voltar ao login
-              </Link>
-            </p>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                loading={pending}
+                className="min-h-[44px] w-full"
+              >
+                {pending ? "Enviando…" : "Enviar link"}
+              </Button>
+            </div>
           </form>
         )}
-      </div>
-    </div>
+      </Card>
+    </AuthShell>
   );
 }

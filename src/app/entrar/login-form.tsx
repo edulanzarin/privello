@@ -5,6 +5,15 @@ import { loginAction } from "@/app/_actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+/**
+ * LoginForm — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/entrar/login-form.tsx
+ * Steering: `.kiro/steering/design-system.md` §6 (forms).
+ *
+ * Form de login — apenas e-mail + senha. CTAs gerenciadas pelo `<Button
+ * variant="primary">` v2.
+ */
 export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const [pending, startTransition] = useTransition();
 
@@ -12,7 +21,9 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     if (callbackUrl) fd.set("callbackUrl", callbackUrl);
-    startTransition(async () => { await loginAction(fd); });
+    startTransition(async () => {
+      await loginAction(fd);
+    });
   }
 
   return (
@@ -37,10 +48,10 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
 
       <Button
         type="submit"
-        variant="coral"
+        variant="primary"
         size="lg"
         loading={pending}
-        className="w-full mt-2 min-h-[44px]"
+        className="mt-2 min-h-[44px] w-full"
       >
         {pending ? "Entrando…" : "Entrar"}
       </Button>

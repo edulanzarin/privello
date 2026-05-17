@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Página RSC — Confirmação de cadastro: poll do webhook do MP.
+ * Página Client — Confirmação de cadastro: poll do webhook do MP.
  *
  * Rota: `/cadastro/sucesso`.
  * Tipo: Client Component (`"use client"`).
@@ -13,25 +13,33 @@
  * Pago concluiu a criação da conta. Sem `s`, mostra confirmação imediata.
  *
  * Cross-refs:
- * - src/app/api/cadastro/verificar/route.ts
- * - src/app/api/mp/webhook/route.ts
+ *  - src/app/api/cadastro/verificar/route.ts
+ *  - src/app/api/mp/webhook/route.ts
  */
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { CheckCircle, Loader2, Clock } from "lucide-react";
+import { AuthShell } from "@/components/layout/auth-shell";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 function SucessoContent() {
   const params = useSearchParams();
   const slug = params.get("s");
 
-  const [status, setStatus] = useState<"waiting" | "ready" | "timeout">("waiting");
+  const [status, setStatus] = useState<"waiting" | "ready" | "timeout">(
+    "waiting",
+  );
   const [, setAttempts] = useState(0);
 
   useEffect(() => {
     // Sem slug = pagamento já confirmado externamente; pular polling.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- early-return baseado em prop
-    if (!slug) { setStatus("ready"); return; }
+    if (!slug) {
+      setStatus("ready");
+      return;
+    }
 
     let cancelled = false;
     const MAX = 20;
@@ -40,39 +48,47 @@ function SucessoContent() {
       if (cancelled) return;
       try {
         const res = await fetch(`/api/cadastro/verificar?s=${slug}`);
-        const data = await res.json() as { exists: boolean };
+        const data = (await res.json()) as { exists: boolean };
         if (data.exists) {
           setStatus("ready");
           return;
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
 
       setAttempts((n) => {
         const next = n + 1;
-        if (next >= MAX) { setStatus("timeout"); return next; }
+        if (next >= MAX) {
+          setStatus("timeout");
+          return next;
+        }
         setTimeout(check, 3000);
         return next;
       });
     }
 
     const t = setTimeout(check, 3000);
-    return () => { cancelled = true; clearTimeout(t); };
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [slug]);
 
   if (status === "waiting") {
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue/10">
-          <Loader2 className="h-8 w-8 animate-spin text-blue" />
-        </div>
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+        <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-info-soft text-info">
+          <Loader2 className="h-8 w-8 animate-spin" strokeWidth={2} />
+        </span>
+        <h1 className="text-3xl font-bold tracking-[-0.022em] text-ink">
           Confirmando pagamento
         </h1>
-        <p className="max-w-xs text-sm text-muted">
+        <p className="max-w-xs text-sm leading-relaxed text-ink-dim">
           Aguarde enquanto confirmamos seu pagamento e criamos sua conta…
         </p>
-        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
-          <Clock className="h-3.5 w-3.5" />
+        <div className="mt-2 flex items-center gap-2 text-xs text-ink-dim">
+          <Clock className="h-3.5 w-3.5" strokeWidth={2} />
           <span>Isso costuma levar menos de 30 segundos</span>
         </div>
       </div>
@@ -82,20 +98,23 @@ function SucessoContent() {
   if (status === "timeout") {
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-warning-soft">
-          <Clock className="h-8 w-8 text-warning" />
-        </div>
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+        <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-warning-soft text-warning">
+          <Clock className="h-8 w-8" strokeWidth={2} />
+        </span>
+        <h1 className="text-3xl font-bold tracking-[-0.022em] text-ink">
           Pagamento em processamento
         </h1>
-        <p className="max-w-xs text-sm text-muted">
-          Seu pagamento foi recebido, mas a confirmação está demorando mais que o normal.
-          <br />
-          Sua conta será criada em breve — você receberá acesso automaticamente.
+        <p className="max-w-xs text-sm leading-relaxed text-ink-dim">
+          Seu pagamento foi recebido, mas a confirmação está demorando mais
+          que o normal. Sua conta será criada em breve — você receberá acesso
+          automaticamente.
         </p>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-ink-dim">
           Já tem acesso?{" "}
-          <Link href="/entrar" className="font-semibold text-blue hover:underline">
+          <Link
+            href="/entrar"
+            className="font-semibold text-rose hover:underline"
+          >
             Fazer login →
           </Link>
         </p>
@@ -105,22 +124,20 @@ function SucessoContent() {
 
   return (
     <div className="flex flex-col items-center gap-4 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
-        <CheckCircle className="h-8 w-8 text-success" strokeWidth={1.5} />
-      </div>
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+      <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success">
+        <CheckCircle className="h-8 w-8" strokeWidth={2} />
+      </span>
+      <h1 className="text-3xl font-bold tracking-[-0.022em] text-ink">
         Cadastro concluído!
       </h1>
-      <p className="max-w-xs text-sm text-muted">
-        Sua conta foi criada. Faça login para adicionar suas fotos e ativar seu perfil.
+      <p className="max-w-xs text-sm leading-relaxed text-ink-dim">
+        Sua conta foi criada. Faça login para adicionar suas fotos e ativar
+        seu perfil.
       </p>
-      <div className="mt-4 flex flex-col gap-3 w-full max-w-[200px]">
-        <Link
-          href="/entrar"
-          className="rounded-xl bg-coral px-6 py-3 text-center text-md font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
-        >
+      <div className="mt-4 flex w-full max-w-[200px] flex-col gap-3">
+        <Button href="/entrar" variant="primary" size="lg">
           Fazer login
-        </Link>
+        </Button>
       </div>
     </div>
   );
@@ -128,12 +145,12 @@ function SucessoContent() {
 
 export default function CadastroSucessoPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-black/[0.06] bg-white p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+    <AuthShell caption={null}>
+      <Card variant="solid" padding="lg">
         <Suspense fallback={null}>
           <SucessoContent />
         </Suspense>
-      </div>
-    </div>
+      </Card>
+    </AuthShell>
   );
 }
