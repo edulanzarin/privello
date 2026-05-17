@@ -420,6 +420,10 @@ Se você está prestes a criar um componente "exclusivo dessa página":
 
 ## 11. Estado atual (rastreabilidade)
 
+> **Mapa vivo de migração**: [`docs/component-map.md`](../../docs/component-map.md)
+> contém status v2 por componente E por página (80+ rotas). Atualize-o
+> a cada PR de migração.
+
 - **Spec ativa**: `redesign-tahoe-sensual` (próxima a criar — substitui
   `redesign-macos-system` cuja v1 já foi commitada como base).
 - **Última paleta commitada**: cream + coral + Inter exclusiva (commit `e6672e7`).
