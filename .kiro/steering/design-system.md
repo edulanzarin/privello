@@ -753,7 +753,7 @@ gritante. v2.6 extrai o shell em `<SearchBar>` + 2 partes (`SearchField`,
 ### 16.1 Anatomia
 
 ```tsx
-<SearchBar onSubmit={...}>
+<SearchBar onSubmit={...} maxWidth="3xl">
   <SearchField icon={MapPin}>
     <input ... />
   </SearchField>
@@ -768,7 +768,9 @@ gritante. v2.6 extrai o shell em `<SearchBar>` + 2 partes (`SearchField`,
 ```
 
 - **`<SearchBar>`** — shell glass-panel rounded-2xl, padding 2 mobile / 1.5
-  desktop, layout column → row em `md:`. Recebe `onSubmit`.
+  desktop, layout column → row em `md:`. Recebe `onSubmit` e `maxWidth?`
+  (default `"3xl"` ~ 768px — inputs de busca raramente precisam mais).
+  Use `maxWidth="none"` pra herdar a largura do container pai.
 - **`<SearchField>`** — slot tipado com `icon` (lucide), `label?` opcional
   (`text-xs ink-dim`), `divider?` (default true — esconde com `divider={false}`
   no último campo), `className?` (ex.: `md:max-w-[220px]` em campos auxiliares).

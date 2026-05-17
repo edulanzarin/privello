@@ -27,20 +27,43 @@ import { cn } from "@/lib/utils";
  *
  * Convenção de tamanhos:
  *  - SearchBar: padding interno fixo (`p-2 md:p-1.5`).
+ *  - **Largura**: cap default `max-w-3xl` (~768px). Inputs de busca raramente
+ *    precisam de mais — nomes de cidade/perfil cabem com folga. Ajuste via
+ *    prop `maxWidth` (`"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`, `"3xl"`,
+ *    `"4xl"`, `"none"`) caso layout específico precise de outra.
  *  - SearchField: padding interno padrão (`px-3.5 py-2`); rounded-xl em
  *    mobile pra "respirar" como cards individuais empilhados.
  *  - SearchSubmit: rounded-xl com `min-w-[150px]` em desktop pra peso
  *    visual idêntico em qualquer tela.
  */
 
+const MAX_WIDTH_CLASS = {
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    "2xl": "max-w-2xl",
+    "3xl": "max-w-3xl",
+    "4xl": "max-w-4xl",
+    none: "",
+} as const;
+
+export type SearchBarMaxWidth = keyof typeof MAX_WIDTH_CLASS;
+
 export function SearchBar({
     children,
     onSubmit,
     className,
+    maxWidth = "3xl",
 }: {
     children: ReactNode;
     onSubmit?: FormEventHandler<HTMLFormElement>;
     className?: string;
+    /**
+     * Cap de largura da barra (default `"3xl"` = ~768px).
+     * Use `"none"` para herdar a largura do container pai.
+     */
+    maxWidth?: SearchBarMaxWidth;
 }) {
     return (
         <form
@@ -52,6 +75,7 @@ export function SearchBar({
                 "shadow-[var(--shadow-md)]",
                 // Divider vertical automático entre filhos diretos (apenas desktop).
                 "md:[&>*+*]:before:hidden", // resetar caso estilo herde
+                MAX_WIDTH_CLASS[maxWidth],
                 className,
             )}
         >
