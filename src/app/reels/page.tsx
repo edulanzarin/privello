@@ -76,7 +76,7 @@ export default async function ReelsPage({ searchParams }: PageProps) {
       <div className="fixed inset-x-0 top-0 z-50 flex items-center gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-1.5 text-white/70 hover:text-white transition">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
-          <span className="text-sm font-semibold tracking-tight">privello<span className="text-coral">.</span></span>
+          <span className="text-sm font-semibold tracking-tight">privello<span className="text-rose">.</span></span>
         </Link>
 
         <div className="ml-auto">
@@ -86,7 +86,7 @@ export default async function ReelsPage({ searchParams }: PageProps) {
 
       {cityName && (
         <div className="fixed top-14 inset-x-0 z-40 flex justify-center">
-          <span className="rounded-full bg-coral/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+          <span className="rounded-full bg-rose/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
             {cityName}
           </span>
         </div>

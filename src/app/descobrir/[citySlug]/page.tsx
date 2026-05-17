@@ -134,7 +134,7 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             {/* Banner glass discreto */}
             <p className="mb-6 text-center text-sm text-ink-dim">
-              Perfis com destaque aparecem primeiro — todos passaram pela mesma verificação.
+              Perfis com destaque aparecem primeiro.
             </p>
 
             <ViewTransition

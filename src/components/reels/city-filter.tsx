@@ -123,7 +123,7 @@ export function ReelsCityFilter({ cities, currentSlug }: Props) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar cidade…"
               autoComplete="off"
-              className="w-full bg-transparent text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-white/40"
+              className="w-full bg-transparent text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-white/40"
             />
             {query && (
               <button type="button" onClick={() => setQuery("")}>
@@ -139,7 +139,7 @@ export function ReelsCityFilter({ cities, currentSlug }: Props) {
               <button
                 type="button"
                 onClick={clearFilter}
-                className={`flex w-full items-center px-3 py-2 text-left text-sm transition hover:bg-white/10 ${!currentSlug ? "text-coral font-semibold" : "text-white/70"}`}
+                className={`flex w-full items-center px-3 py-2 text-left text-sm transition hover:bg-white/10 ${!currentSlug ? "text-rose font-semibold" : "text-white/70"}`}
               >
                 Todas as cidades
               </button>
@@ -153,7 +153,7 @@ export function ReelsCityFilter({ cities, currentSlug }: Props) {
                   <button
                     type="button"
                     onClick={() => select(city)}
-                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/10 ${city.slug === currentSlug ? "text-coral font-semibold" : "text-white"}`}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/10 ${city.slug === currentSlug ? "text-rose font-semibold" : "text-white"}`}
                   >
                     <MapPin className="h-3 w-3 shrink-0 text-white/30" strokeWidth={1.5} />
                     {cityLabel(city)}

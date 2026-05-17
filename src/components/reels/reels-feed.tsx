@@ -61,7 +61,7 @@ function LockedReelOverlay({ profileSlug }: { profileSlug: string }) {
       <div className="flex flex-col gap-2 w-44">
         <Link
           href="/assinar"
-          className="block rounded-full bg-coral py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
+          className="block rounded-full bg-rose py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97]"
         >
           Assinar · {SUBSCRIPTION_PRICE_LABEL}
         </Link>
@@ -246,7 +246,7 @@ function ReelPlayer({
               aria-label={liked ? "Descurtir" : "Curtir"}
             >
               <Heart
-                className={cn("h-7 w-7 drop-shadow transition", liked ? "fill-coral text-coral" : "text-white")}
+                className={cn("h-7 w-7 drop-shadow transition", liked ? "fill-rose text-rose" : "text-white")}
                 strokeWidth={1.5}
               />
               <span className="text-xs font-semibold text-white drop-shadow">{likes}</span>
@@ -275,33 +275,33 @@ function ReelPlayer({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-black/[0.06] shrink-0">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
                 <p className="text-lg font-semibold">{commentCount} comentários</p>
                 <button
                   onClick={() => setShowComments(false)}
-                  className="rounded-full p-1 hover:bg-black/[0.04] transition-colors"
+                  className="rounded-full p-1 hover:bg-line/40 transition-colors"
                 >
-                  <X className="h-5 w-5 text-muted" strokeWidth={1.5} />
+                  <X className="h-5 w-5 text-ink-dim" strokeWidth={1.5} />
                 </button>
               </div>
 
               {/* Comments list */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                 {loadingComments ? (
-                  <p className="text-center text-base text-muted py-6">Carregando…</p>
+                  <p className="text-center text-base text-ink-dim py-6">Carregando…</p>
                 ) : comments.length === 0 ? (
-                  <p className="text-center text-base text-muted py-6">Seja o primeiro a comentar.</p>
+                  <p className="text-center text-base text-ink-dim py-6">Seja o primeiro a comentar.</p>
                 ) : (
                   comments.map((c) => (
                     <div key={c.id} className="flex gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white">
                         {(c.user.name ?? "?")[0].toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">
+                        <p className="text-sm font-semibold text-ink">
                           {c.user.slug ? `@${c.user.slug}` : c.user.name}
                         </p>
-                        <p className="text-base text-foreground/80 leading-snug mt-0.5">{c.text}</p>
+                        <p className="text-base text-ink/80 leading-snug mt-0.5">{c.text}</p>
                       </div>
                     </div>
                   ))
@@ -310,28 +310,28 @@ function ReelPlayer({
 
               {/* Comment input */}
               {isClient && isSubscriber ? (
-                <div className="flex items-center gap-2 border-t border-black/[0.06] px-4 py-3 shrink-0">
+                <div className="flex items-center gap-2 border-t border-line px-4 py-3 shrink-0">
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && postComment()}
                     placeholder="Adicionar comentário…"
                     maxLength={500}
-                    className="flex-1 rounded-full bg-black/[0.04] px-4 py-2 text-md outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-muted/60 focus:bg-black/[0.06] transition-colors"
+                    className="flex-1 rounded-full bg-line/40 px-4 py-2 text-md outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-ink-dim/60 focus:bg-line/50 transition-colors"
                   />
                   <button
                     onClick={postComment}
                     disabled={!commentText.trim() || posting}
-                    className="rounded-full bg-coral p-2 text-white disabled:opacity-30 transition-opacity hover:brightness-110 active:scale-[0.95]"
+                    className="rounded-full bg-rose p-2 text-white disabled:opacity-30 transition-opacity hover:brightness-110 active:scale-[0.95]"
                   >
                     <Send className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
               ) : (
-                <div className="border-t border-black/[0.06] px-4 py-3 text-center shrink-0">
+                <div className="border-t border-line px-4 py-3 text-center shrink-0">
                   <Link
                     href={isClient ? "/assinar" : "/entrar"}
-                    className="text-base font-medium text-blue hover:underline"
+                    className="text-base font-medium text-rose hover:underline"
                   >
                     {isClient ? "Assine para comentar" : "Entre para comentar"}
                   </Link>

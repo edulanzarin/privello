@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (admin migrado: 7 rotas + admin-shell + componentes; tokens via batch swap + targeted patches)
+**Última atualização**: 2026-05-17 (reels migrado: feed + city-filter + 2 rotas)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -155,8 +155,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
-| `reels-feed.tsx` | 🔴 | Feed vertical estilo TikTok |
-| `city-filter.tsx` | 🔴 | Filtro de cidade do reels |
+| `reels-feed.tsx` | 🟢 | Feed vertical TikTok-style com IntersectionObserver, autoplay, comments slide-up |
+| `city-filter.tsx` | 🟢 | Filtro de cidade dropdown sobre o feed (rose active state) |
 | `city-restorer.tsx` | ⚪ | Headless |
 
 #### Outros
@@ -185,8 +185,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `/em-alta` | `app/em-alta/page.tsx` | 🟢 | _next_ | Listing v2 — ListingHeader + grid 3-col ProfileCard |
 | `/em-destaque` | `app/em-destaque/page.tsx` | 🟢 | _next_ | Listing v2 — eyebrow peach |
 | `/novidades` | `app/novidades/page.tsx` | 🟢 | _next_ | Reading max-w-3xl, Card glass placeholder |
-| `/reels` | `app/reels/page.tsx` | 🔴 | — | Feed |
-| `/reels/[slug]` | `app/reels/[slug]/page.tsx` | 🔴 | — | Reel individual |
+| `/reels` | `app/reels/page.tsx` | 🟢 | _next_ | Feed global ink; rose accent on city pill + privello dot |
+| `/reels/[slug]` | `app/reels/[slug]/page.tsx` | 🟢 | _next_ | Feed por perfil |
 | `/avaliar/[slug]` | `app/avaliar/[slug]/page.tsx` | 🔴 | — | Form de avaliação |
 | `/solicitar/[slug]` | `app/solicitar/[slug]/page.tsx` | 🔴 | — | Solicitar encontro |
 | `/planos` | `app/planos/page.tsx` | 🟢 | _next_ | ListingHeader + 3 plan cards (Basic neutro / Plus ink / Premium rose) + Boost à la carte (Card glass) + FAQ details |
@@ -289,8 +289,8 @@ Ordem por impacto + dependência:
 7. ~~**`/conta/onboarding/**` + `/conta/verificacao`**~~ ✅ done
 8. ~~**`/painel/**`**~~ ✅ done
 9. ~~**`/admin/**`**~~ ✅ done
-10. **`/reels/**`** — formato vídeo (overlay scheme custom — vai querer `<MediaActions>` extraído)
-11. Legal (`/termos-de-uso`, `/politica-de-privacidade`) — typografia editorial
+10. ~~**`/reels/**`**~~ ✅ done (decisão: NÃO extrair `<MediaActions>` — APIs por consumer divergem demais; cada uso < 30 linhas; YAGNI)
+11. **Legal (`/termos-de-uso`, `/politica-de-privacidade`)** — typografia editorial
 12. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)
 
 ---
