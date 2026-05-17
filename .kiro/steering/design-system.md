@@ -103,13 +103,11 @@ body {
 Tradução: pêssego canto sup-esquerdo, rosa-empoeirado sup-direito, dourado
 claro inferior, cream off-white base.
 
-### 3.6 Glass — surface canônica (calibrado v2.2)
+### 3.6 Glass — surface canônica (calibrado v2.3)
 
 ```css
 .glass-panel {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: #ffffff;
   border: 0.5px solid rgba(26, 21, 23, 0.06);
   box-shadow: var(--shadow-sm);
 }
@@ -118,23 +116,26 @@ claro inferior, cream off-white base.
 Variantes:
 - `.glass-pill` — mesma fórmula, `border-radius: 9999px` (chips, search bar pequena).
 - `.glass-strip` — para overlays sobre foto (rodapé de ProfileCard). Background
-  `rgba(20,15,17,0.78)` + blur 20px — translucência maior porque está sobre
+  `rgba(20,15,17,0.82)` + blur 20px — translucência parcial porque está sobre
   foto e precisa do blur pra texto ficar legível.
-- `.glass-elevated` — hover state, blur sobe pra 28px.
+- `.glass-elevated` — hover state, sombra md.
+- `.glass` — header sticky. Mantém translucência (`rgba(253,252,251,0.96)`) +
+  blur 16px porque o header passa sobre conteúdo que rola por baixo.
 
 **Histórico de calibração** (cuidado pra não regredir):
 - v2.0 (initial): `0.55` opacity + `40px` blur — quase invisível em fundos claros.
 - v2.1: `0.82` opacity + `24px` blur — ainda transparente demais.
-- v2.2 (atual, decisão user 2026-05-17): `0.96` opacity + `20px` blur — praticamente
-  sólido com hint sutil de glass via blur. **Não voltar a valores menores que 0.92.**
+- v2.2: `0.96` opacity + `20px` blur — quase sólido mas user pediu mais.
+- v2.3 (atual, 2026-05-17): cards/pills/cards são **`#ffffff` sólidos** sem blur.
+  Glass aparece só onde faz sentido funcional: `.glass-strip` (overlay sobre foto)
+  e `.glass` (header sticky cobrindo conteúdo). **Não voltar pra valores < 0.98.**
 
 **Inputs/Selects/Textarea**: NÃO usam glass — fundo sólido `bg-white` com border
-hairline. Glass é só para superfícies estruturais (Card, Header, Drawer, BottomNav).
+hairline. Glass é só para superfícies estruturais que cobrem outras (header, strip).
 
-**Fallback:** `@supports not (backdrop-filter: blur())` → `background:
-rgba(255,255,255,0.98)`. Funciona em Firefox sem feature flag.
+**Fallback:** N/A (cards sólidos não dependem mais de backdrop-filter).
 
-**Mobile:** blur reduzido pra 16px (perf).
+**Mobile:** `.glass` reduz blur pra 12px (perf).
 
 ---
 

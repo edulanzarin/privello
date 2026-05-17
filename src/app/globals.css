@@ -179,33 +179,30 @@ body {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Liquid Glass — surfaces canônicas (calibrado v2.2: muito mais opaco)
-   v2.0 era transparente demais (0.55). v2.1 ainda glass demais (0.82).
-   v2.2: praticamente sólido com leve hint de glass — apenas o blur sutil
-   denuncia que ainda há vidro. Decisão user 2026-05-17.
+   Liquid Glass — surfaces canônicas (calibrado v2.3: praticamente sólido)
+   v2.0 (0.55): transparente demais.
+   v2.1 (0.82): ainda glass demais.
+   v2.2 (0.96): user pediu mais opaco ainda.
+   v2.3 (atual, 2026-05-17): cards sólidos (1.0). Blur só denuncia camadas
+   sob scroll (header sticky cobrindo conteúdo). Não voltar pra valores < 0.98.
    ────────────────────────────────────────────────────────────────────────── */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: #ffffff;
   border: 0.5px solid rgba(26, 21, 23, 0.06);
   box-shadow: var(--shadow-sm);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: #ffffff;
   border: 0.5px solid rgba(26, 21, 23, 0.06);
   border-radius: 9999px;
   box-shadow: var(--shadow-sm);
 }
 
 /* Strip glass escura para overlay sobre foto (rodapé do ProfileCard).
-   Mantém translucência maior porque está sobre foto e precisa do blur
-   pra texto ficar legível. */
+   Mantém translucência parcial porque está sobre foto. */
 .glass-strip {
-  background: rgba(20, 15, 17, 0.78);
+  background: rgba(20, 15, 17, 0.82);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 0.5px solid rgba(255, 255, 255, 0.10);
@@ -213,31 +210,26 @@ body {
 }
 
 .glass-elevated {
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
   box-shadow: var(--shadow-md);
 }
 
-/* Alias legado — antes era `.glass-card`, manter funcionando até refator. */
+/* Alias legado — antes era `.glass-card`. */
 .glass-card {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: #ffffff;
   border: 0.5px solid rgba(26, 21, 23, 0.06);
   box-shadow: var(--shadow-sm);
 }
 
+/* Header sticky precisa do blur — sai sobre conteúdo que rola por baixo. */
 .glass {
-  background: rgba(253, 252, 251, 0.94);
+  background: rgba(253, 252, 251, 0.96);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   border-bottom: 0.5px solid var(--line);
 }
 
 .glass-dark {
-  background: rgba(20, 15, 17, 0.96);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: rgba(20, 15, 17, 0.98);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
