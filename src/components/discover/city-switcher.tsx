@@ -81,9 +81,9 @@ export function CitySwitcher({ currentCityName, citySlug, sticky = true }: Props
           className={cn(
             "inline-flex items-center gap-2 rounded-full px-3 py-1.5",
             "text-base font-medium text-ink",
-            "border border-line bg-white/55 backdrop-blur-md backdrop-saturate-150",
+            "border border-line bg-white ",
             "transition-all duration-150 ease-[var(--ease-tahoe)]",
-            "hover:bg-white/75 hover:border-ink/15",
+            "hover:bg-line/40 hover:border-ink/15",
             "active:scale-[0.97]",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           )}

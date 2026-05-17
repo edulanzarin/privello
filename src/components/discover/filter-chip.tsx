@@ -23,7 +23,7 @@ type FilterChipProps = {
  * Pílula glass clicável usada no header sticky de Descobrir.
  *
  * Variantes:
- *  - `inactive`: glass-pill borda hairline, hover bg-white/70.
+ *  - `inactive`: glass-pill borda hairline, hover bg-line/40.
  *  - `active`: bg-rose-soft border-rose/30 text-rose com ring.
  *  - `removable`: bg-line/40 com × no fim (active filter pill).
  *
@@ -42,14 +42,14 @@ export function FilterChip({
         "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5",
         "text-sm font-medium",
         "border transition-all duration-150 ease-[var(--ease-tahoe)]",
-        "backdrop-blur-md backdrop-saturate-150",
+        "",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "active:scale-[0.97]",
         active
             ? "bg-rose-soft border-rose/30 text-rose hover:bg-rose-soft/80"
             : removable
                 ? "bg-line/40 border-line text-ink hover:bg-line/60"
-                : "bg-white/55 border-line text-ink-dim hover:bg-white/75 hover:text-ink hover:border-ink/15",
+                : "bg-white border-line text-ink-dim hover:bg-line/40 hover:text-ink hover:border-ink/15",
         className,
     );
 

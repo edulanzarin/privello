@@ -104,9 +104,9 @@ export function FilterDrawer({
                 className={cn(
                     "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2",
                     "text-sm font-medium text-ink-dim",
-                    "border border-line bg-white/55 backdrop-blur-md backdrop-saturate-150",
+                    "border border-line bg-white ",
                     "transition-all duration-150 ease-[var(--ease-tahoe)]",
-                    "hover:bg-white/75 hover:text-ink hover:border-ink/15",
+                    "hover:bg-line/40 hover:text-ink hover:border-ink/15",
                     "active:scale-[0.97]",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 )}
@@ -209,7 +209,7 @@ export function FilterDrawer({
                                 Atendimento
                             </p>
                             <div className="flex flex-col gap-2">
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white/40 px-4 transition-colors hover:bg-white/60">
+                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:bg-white">
                                     <input
                                         type="checkbox"
                                         checked={hasOwnPlace}
@@ -218,7 +218,7 @@ export function FilterDrawer({
                                     />
                                     <span className="text-md text-ink">Local próprio</span>
                                 </label>
-                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white/40 px-4 transition-colors hover:bg-white/60">
+                                <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-line bg-white px-4 transition-colors hover:bg-white">
                                     <input
                                         type="checkbox"
                                         checked={homeVisit}

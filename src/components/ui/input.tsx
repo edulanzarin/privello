@@ -52,12 +52,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         id={inputId}
                         className={cn(
-                            "w-full rounded-xl border border-line bg-white/55 px-3 py-[9px] text-md text-ink",
-                            "backdrop-blur-md backdrop-saturate-150",
+                            "w-full rounded-xl border border-line bg-white px-3 py-[9px] text-md text-ink",
                             "transition-all duration-150 ease-[var(--ease-tahoe)]",
                             "placeholder:text-ink-dim/55",
-                            "hover:border-ink/15 hover:bg-white/65",
-                            "focus:outline-none focus:bg-white/75 focus:border-rose/50",
+                            "hover:border-ink/15",
+                            "focus:outline-none focus:border-rose/50",
                             "focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                             "disabled:bg-line/30 disabled:text-ink-dim disabled:cursor-not-allowed",
                             prefix && "pl-7",

@@ -58,7 +58,7 @@ export function HeroSearchForm() {
       )}
     >
       {/* Cidade */}
-      <div className="flex flex-1 items-center gap-2.5 rounded-xl bg-white/60 px-3.5 py-2 md:rounded-lg md:bg-transparent md:hover:bg-white/40 transition-colors">
+      <div className="flex flex-1 items-center gap-2.5 rounded-xl px-3.5 py-2 md:rounded-lg md:hover:bg-line/30 transition-colors">
         <MapPin
           className="h-4 w-4 shrink-0 text-ink-dim"
           strokeWidth={2}
@@ -76,7 +76,7 @@ export function HeroSearchForm() {
       <div className="hidden h-auto w-px self-stretch bg-line md:block" aria-hidden />
 
       {/* Gênero */}
-      <label className="flex flex-1 cursor-pointer items-center gap-2.5 rounded-xl bg-white/60 px-3.5 py-2 md:rounded-lg md:bg-transparent md:hover:bg-white/40 transition-colors md:max-w-[220px]">
+      <label className="flex flex-1 cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 md:rounded-lg md:hover:bg-line/30 transition-colors md:max-w-[220px]">
         <Users
           className="h-4 w-4 shrink-0 text-ink-dim"
           strokeWidth={2}

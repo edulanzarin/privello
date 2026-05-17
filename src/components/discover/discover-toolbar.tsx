@@ -134,9 +134,9 @@ export function DiscoverToolbar({
                                 aria-haspopup="listbox"
                                 className={cn(
                                     "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium",
-                                    "border border-line bg-white/55 text-ink-dim backdrop-blur-md backdrop-saturate-150",
+                                    "border border-line bg-white text-ink-dim ",
                                     "transition-all duration-150 ease-[var(--ease-tahoe)]",
-                                    "hover:bg-white/75 hover:text-ink hover:border-ink/15",
+                                    "hover:bg-line/40 hover:text-ink hover:border-ink/15",
                                     "active:scale-[0.97]",
                                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                                 )}

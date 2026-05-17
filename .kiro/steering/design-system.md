@@ -103,33 +103,36 @@ body {
 Tradução: pêssego canto sup-esquerdo, rosa-empoeirado sup-direito, dourado
 claro inferior, cream off-white base.
 
-### 3.6 Glass — surface canônica (calibrado v2.1)
+### 3.6 Glass — surface canônica (calibrado v2.2)
 
 ```css
 .glass-panel {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 0.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 12px 40px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 0.5px solid rgba(26, 21, 23, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 ```
 
 Variantes:
 - `.glass-pill` — mesma fórmula, `border-radius: 9999px` (chips, search bar pequena).
 - `.glass-strip` — para overlays sobre foto (rodapé de ProfileCard). Background
-  `rgba(20,15,17,0.62)` + blur 16px — texto branco legível sobre foto.
-- `.glass-elevated` — hover state, blur sobe pra 40px.
+  `rgba(20,15,17,0.78)` + blur 20px — translucência maior porque está sobre
+  foto e precisa do blur pra texto ficar legível.
+- `.glass-elevated` — hover state, blur sobe pra 28px.
 
-**Calibração v2.1**: opacity subiu de 0.55 → 0.82 e blur baixou de 40 → 24px
-após feedback do user em 2026-05-17. Glass v2.0 ficou transparente demais —
-quase invisível em fotos com fundos claros. Não voltar para 0.55.
+**Histórico de calibração** (cuidado pra não regredir):
+- v2.0 (initial): `0.55` opacity + `40px` blur — quase invisível em fundos claros.
+- v2.1: `0.82` opacity + `24px` blur — ainda transparente demais.
+- v2.2 (atual, decisão user 2026-05-17): `0.96` opacity + `20px` blur — praticamente
+  sólido com hint sutil de glass via blur. **Não voltar a valores menores que 0.92.**
+
+**Inputs/Selects/Textarea**: NÃO usam glass — fundo sólido `bg-white` com border
+hairline. Glass é só para superfícies estruturais (Card, Header, Drawer, BottomNav).
 
 **Fallback:** `@supports not (backdrop-filter: blur())` → `background:
-rgba(255,255,255,0.96)`. Funciona em Firefox sem feature flag.
+rgba(255,255,255,0.98)`. Funciona em Firefox sem feature flag.
 
 **Mobile:** blur reduzido pra 16px (perf).
 
