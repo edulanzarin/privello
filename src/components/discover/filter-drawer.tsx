@@ -187,10 +187,15 @@ export function FilterDrawer({
                     <aside
                         className={cn(
                             "relative flex w-full flex-col gap-5 glass-panel",
+                            // Mobile: bottom-sheet (pb-28 reserva BottomNav).
                             "rounded-t-3xl rounded-b-none px-5 pt-6 pb-28",
                             "max-h-[85vh] overflow-y-auto",
-                            "md:max-w-md md:rounded-l-3xl md:rounded-r-none md:rounded-t-3xl",
-                            "md:max-h-screen md:py-8 md:pb-8",
+                            // Desktop: side drawer da direita — limita altura ao
+                            // viewport útil (subtrai header sticky h-16 = 64px),
+                            // alinha topo abaixo do header pra não cortar título.
+                            "md:my-4 md:mr-4 md:max-w-md",
+                            "md:rounded-3xl md:px-6 md:pt-6 md:pb-6",
+                            "md:max-h-[calc(100vh-2rem)]",
                             "animate-fade-in",
                         )}
                     >
