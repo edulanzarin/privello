@@ -82,13 +82,8 @@ const CRITICAL_CONTROLS = [
         expectedSnippet: "min-h-[44px] min-w-[44px]",
     },
     {
-        category: "(c) botão fechar Modal — story-bar viewer",
-        file: "src/components/stories/story-bar.tsx",
-        expectedSnippet: "min-h-[44px] min-w-[44px]",
-    },
-    {
-        category: "(c) botão fechar Modal — profile-story-cover viewer",
-        file: "src/components/profile/profile-story-cover.tsx",
+        category: "(c) botão fechar Modal — story-viewer (compartilhado por story-bar e profile-story-cover)",
+        file: "src/components/stories/story-viewer.tsx",
         expectedSnippet: "min-h-[44px] min-w-[44px]",
     },
     {
@@ -112,13 +107,8 @@ const CRITICAL_CONTROLS = [
         expectedSnippet: "min-h-[44px] min-w-[44px]",
     },
     {
-        category: "(d) like/comments em mídia — story-bar like",
-        file: "src/components/stories/story-bar.tsx",
-        expectedSnippet: "min-h-[44px] min-w-[44px]",
-    },
-    {
-        category: "(d) like/comments em mídia — profile-story-cover like",
-        file: "src/components/profile/profile-story-cover.tsx",
+        category: "(d) like/comments em mídia — story-viewer (compartilhado por story-bar e profile-story-cover)",
+        file: "src/components/stories/story-viewer.tsx",
         expectedSnippet: "min-h-[44px] min-w-[44px]",
     },
     {

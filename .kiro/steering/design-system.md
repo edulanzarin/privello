@@ -291,7 +291,7 @@ Antes de criar componente novo, **leia esta tabela**:
 | Tem tile de KPI? | Use `<KPICard>` |
 | Tem fallback de lista vazia? | Use `<EmptyState>` |
 | Tem foto de perfil em listagem? | Use `<ProfileCard>` (pra criar) |
-| Tem story circle? | Use `<StoryCircle>` (pra criar) |
+| Tem story circle? | Use `<StoryCircle>` |
 | Tem chip de filtro horizontal sticky? | Use `<FilterChip>` (pra criar) |
 | Tem search bar pública? | Use `<SearchBar>` (pra criar) |
 | Tem bottom-sheet mobile? | Use `<BottomSheet>` (pra criar) |
@@ -631,3 +631,101 @@ deve mostrar badge com contagem de filtros ativos:
   )}
 </button>
 ```
+
+
+---
+
+## 15. Stories — `StoryCircle` + `StoryViewer` (componentes compartilhados)
+
+A v1 tinha **duas implementações** quase idênticas de viewer fullscreen
+(uma em `story-bar.tsx`, outra em `profile-story-cover.tsx`), cada uma com
+350+ linhas duplicando: progress bar, autoavanço 5s, view tracking,
+like otimista com rollback, navegação por teclado, tap zones,
+sessionStorage `prv_seen`. A v2 extrai isso em **um único `StoryViewer`**
++ um primitivo de círculo `StoryCircle`.
+
+### 15.1 `<StoryCircle>` — primitivo do círculo
+
+`src/components/ui/story-circle.tsx`. Bolinha redonda Tahoe Sensual usada
+em qualquer lugar que mostre stories de um perfil.
+
+**Visual:**
+- Não-visto: ring com gradiente diagonal `linear-gradient(135deg, rose
+  → peach → plum)` — substitui o `from-coral via-coral to-warning` da v1.
+- Visto: ring sólido `bg-line` (hairline) + foto com `opacity-90`.
+- Hover desktop: scale 1.04 com easing `var(--ease-tahoe)`, 200ms.
+- Press: scale 0.98.
+
+**Sizes:**
+
+| Size | Diâmetro | Uso |
+|------|----------|-----|
+| `sm` | 48 px | Headers compactos, popovers, drawers (futuro) |
+| `md` | **62 px** | StoryBar default — **NÃO ALTERAR** (selector e2e em `tests/e2e/lib/instrumentation.ts` depende de `h-[62px] w-[62px]` no DOM) |
+| `lg` | 96 px | Listagens densas, cards de destaque |
+| `xl` | 160 / 192 px responsivo | Capa do perfil público |
+
+**API:**
+
+```tsx
+<StoryCircle
+  imageUrl={group.coverUrl}
+  displayName={group.displayName}
+  seen={group.allSeen}
+  size="md"          // sm | md | lg | xl
+  withLabel          // mostra primeiro nome abaixo (default true)
+  onClick={() => openViewer(idx)}
+/>
+```
+
+Sem `onClick` → renderiza estático (avatar grande sem afford de click).
+
+### 15.2 `<StoryViewer>` — modal fullscreen compartilhado
+
+`src/components/stories/story-viewer.tsx`. **Toda lógica de viewer** vive
+aqui (progress, autoavanço, view, like, teclado, tap zones, sessionStorage).
+
+**API:**
+
+```tsx
+<StoryViewer
+  groups={groups}             // 1+ grupos
+  initialGroupIdx={openIdx}   // qual grupo abrir
+  initialStoryIdx={0}         // story dentro do grupo (default 0)
+  onClose={() => setOpen(false)}
+  onChange={(updated) => setGroups(updated)}  // sync de likes/views pro consumer
+  isClient={isLoggedIn}       // libera curtir + view tracking server-side
+/>
+```
+
+**Modos automáticos:**
+- **Multi-group** (StoryBar): ≥ 2 grupos → mostra chevrons L/R pra
+  navegar entre perfis.
+- **Single-group** (ProfileStoryCover): 1 grupo → esconde chevrons.
+
+**Side effects (mantidos da v1, sem mudança comportamental):**
+- `POST /api/stories/view` ao abrir cada story (se `isClient`).
+- `POST /api/stories/like` toggle otimista com rollback em erro.
+- `sessionStorage.prv_seen` persiste vistos entre páginas.
+- `requestAnimationFrame` + `setTimeout(5000)` pra progress.
+- `keydown` (Esc, ←, →) global enquanto aberto.
+- `body.style.overflow = "hidden"` enquanto aberto.
+
+### 15.3 Consumidores e composição
+
+| Consumer | Circle size | Viewer mode | Notas |
+|----------|-------------|-------------|-------|
+| `StoryBar` (Descobrir) | `md` | multi-group | Wrapper de 80 linhas — só orquestra abertura |
+| `ProfileStoryCover` (perfil público) | XL custom (mantém ring + pílula contadora condicional) | single-group | Não usa `StoryCircle` direto porque a foto é também a capa do perfil sem stories |
+
+**Não duplique a lógica de viewer.** Se uma página nova precisar mostrar
+stories (em-alta, novidades, dashboard), o caminho é:
+1. Renderize `<StoryCircle>` (ou capa custom) na lista.
+2. Ao clicar, abra `<StoryViewer>` com o grupo correto.
+
+### 15.4 Touch-target (PBT)
+
+O close do modal e o botão de like vivem em `story-viewer.tsx` e o teste
+PBT em `src/components/_tests/touch-target.pbt.ts` referencia esse path.
+**Não recriar handlers de close/like fora do viewer** — quebraria o
+`min-h-[44px] min-w-[44px]` declarado e o teste.
