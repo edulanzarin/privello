@@ -51,7 +51,7 @@ const PLACEHOLDER = "animate-pulse rounded-xl bg-line/60";
 function CardItem({ index }: { index: number }) {
     return (
         <div className="space-y-2" data-testid={`skeleton-card-${index}`}>
-            <div className={cn(PLACEHOLDER, "aspect-[3/4] rounded-3xl")} />
+            <div className={cn(PLACEHOLDER, "aspect-[3/4] rounded-2xl")} />
             <div className={cn(PLACEHOLDER, "h-4 w-24 rounded-md")} />
             <div className={cn(PLACEHOLDER, "h-3 w-16 rounded-md")} />
         </div>
@@ -70,7 +70,7 @@ function ListItem({ index }: { index: number }) {
 function DetailItem({ index }: { index: number }) {
     return (
         <div className="space-y-4" data-testid={`skeleton-detail-${index}`}>
-            <div className={cn(PLACEHOLDER, "aspect-[4/5] w-full rounded-3xl")} />
+            <div className={cn(PLACEHOLDER, "aspect-[4/5] w-full rounded-2xl")} />
             <div className="space-y-2">
                 <div className={cn(PLACEHOLDER, "h-7 w-40 rounded-md")} />
                 <div className={cn(PLACEHOLDER, "h-4 w-64 rounded-md")} />

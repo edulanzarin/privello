@@ -41,7 +41,10 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
-        <div className="flex flex-1 flex-col pb-14">
+        {/* pb-24 reserva espaço para a BottomNav flutuante (visible em
+            todos breakpoints — decisão do usuário em 2026-05-17). 24*4 = 96px
+            cobre a altura da pill (~56px) + bottom-4 (16px) + safe-area. */}
+        <div className="flex flex-1 flex-col pb-24">
           {children}
         </div>
         <BottomNavWrapper />

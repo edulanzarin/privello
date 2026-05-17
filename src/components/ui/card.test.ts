@@ -8,7 +8,7 @@
  * Cobertura:
  *  - Variantes v2: `glass` (default), `solid`, `dark`, `success-subtle`,
  *    `warning-subtle`, `danger-subtle`. Variant `default` é alias de `glass`.
- *  - Radius `rounded-3xl` (24px) em todas as variantes (Tahoe generoso).
+ *  - Radius `rounded-2xl` (24px) em todas as variantes (Tahoe generoso).
  *  - Padding `none`/`sm`/`md`/`lg` mapeados para classes p-*.
  *  - Props HTML pass-through (className, data-*, aria-*).
  *  - Sub-componentes (`CardHeader`, `CardTitle`, `CardDescription`).
@@ -55,16 +55,16 @@ describe("Card v2 — variantes base", () => {
         render(createElement(Card, null, "conteudo"));
         const el = getCard();
         expect(el.className).toContain("glass-panel");
-        expect(el.className).toContain("rounded-3xl");
+        expect(el.className).toContain("rounded-2xl");
         expect(el.className).toContain("p-5");
         expect(el.textContent).toContain("conteudo");
     });
 
-    it("variant=\"glass\" aplica glass-panel + rounded-3xl", () => {
+    it("variant=\"glass\" aplica glass-panel + rounded-2xl", () => {
         render(createElement(Card, { variant: "glass" } as CardProps, "x"));
         const cls = getCard().className;
         expect(cls).toContain("glass-panel");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 
     it("variant=\"solid\" aplica bg-surface + hairline border-line", () => {
@@ -72,7 +72,7 @@ describe("Card v2 — variantes base", () => {
         const cls = getCard().className;
         expect(cls).toContain("bg-surface");
         expect(cls).toContain("border-line");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 
     it("variant=\"dark\" aplica bg-ink + text-white", () => {
@@ -80,7 +80,7 @@ describe("Card v2 — variantes base", () => {
         const cls = getCard().className;
         expect(cls).toContain("bg-ink");
         expect(cls).toContain("text-white");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 });
 
@@ -90,7 +90,7 @@ describe("Card v2 — variantes subtle", () => {
         const cls = getCard().className;
         expect(cls).toContain("bg-success-soft");
         expect(cls).toContain("border-success/30");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 
     it("variant=\"warning-subtle\" usa bg-warning-soft + border-warning/30", () => {
@@ -98,7 +98,7 @@ describe("Card v2 — variantes subtle", () => {
         const cls = getCard().className;
         expect(cls).toContain("bg-warning-soft");
         expect(cls).toContain("border-warning/30");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 
     it("variant=\"danger-subtle\" usa bg-danger-soft + border-danger/30", () => {
@@ -106,7 +106,7 @@ describe("Card v2 — variantes subtle", () => {
         const cls = getCard().className;
         expect(cls).toContain("bg-danger-soft");
         expect(cls).toContain("border-danger/30");
-        expect(cls).toContain("rounded-3xl");
+        expect(cls).toContain("rounded-2xl");
     });
 
     it("variantes subtle não vazam classes de glass/dark/solid", () => {

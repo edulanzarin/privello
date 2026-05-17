@@ -103,14 +103,14 @@ body {
 Tradução: pêssego canto sup-esquerdo, rosa-empoeirado sup-direito, dourado
 claro inferior, cream off-white base.
 
-### 3.6 Glass — surface canônica
+### 3.6 Glass — surface canônica (calibrado v2.1)
 
 ```css
 .glass-panel {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 0.5px solid rgba(255, 255, 255, 0.85);
   box-shadow:
     inset 0 0.5px 0 rgba(255, 255, 255, 0.9),
     0 1px 2px rgba(0, 0, 0, 0.04),
@@ -119,14 +119,19 @@ claro inferior, cream off-white base.
 ```
 
 Variantes:
-- `.glass-pill` — mesma fórmula, `border-radius: 9999px` (chips, search bar).
+- `.glass-pill` — mesma fórmula, `border-radius: 9999px` (chips, search bar pequena).
 - `.glass-strip` — para overlays sobre foto (rodapé de ProfileCard). Background
-  `rgba(20,15,17,0.55)` + blur — texto branco legível sobre foto.
-- `.glass-elevated` — hover state, blur sobe pra 60px e shadow ganha 4px.
+  `rgba(20,15,17,0.62)` + blur 16px — texto branco legível sobre foto.
+- `.glass-elevated` — hover state, blur sobe pra 40px.
 
-**Fallback:** `@supports not (backdrop-filter: blur())` → `background: rgba(255,255,255,0.92)`. Funciona em Firefox sem feature flag.
+**Calibração v2.1**: opacity subiu de 0.55 → 0.82 e blur baixou de 40 → 24px
+após feedback do user em 2026-05-17. Glass v2.0 ficou transparente demais —
+quase invisível em fotos com fundos claros. Não voltar para 0.55.
 
-**Mobile:** blur reduzido pra 20px (perf).
+**Fallback:** `@supports not (backdrop-filter: blur())` → `background:
+rgba(255,255,255,0.96)`. Funciona em Firefox sem feature flag.
+
+**Mobile:** blur reduzido pra 16px (perf).
 
 ---
 
@@ -172,21 +177,26 @@ respira. Corpo em 13–14px usa 400/500 — fica legível em densidade alta.
 
 ### 4.3 Aplicação
 
-**Hero / display (`text-6xl`+):** `font-weight: 300`, `letter-spacing: -0.04em`,
-`line-height: 1.05`. Substitui o que seria serif italic — Inter Light em
-tamanho grande tem personalidade sensual sem perder legibilidade.
+**Hero / display (`text-6xl`+):** `font-weight: 700` (font-bold), `letter-spacing: -0.025em`,
+`line-height: 1.05`. Inter Bold em tamanho grande tem presença e contraste
+forte — combina com a marca sensual + sofisticada.
 
-**Títulos de seção (`text-4xl`/`text-5xl`):** `font-weight: 500/600`,
-`letter-spacing: -0.025em`, `line-height: 1.1`.
+**Calibração v2.1**: a especificação inicial pedia Inter Light (300) em
+display pra parecer editorial. User pediu mais negrito em 2026-05-17 —
+display mudou pra `font-bold` (700). Não voltar para light.
 
-**Body (`text-base`/`text-md`):** `font-weight: 400`, `letter-spacing: -0.011em`,
-`line-height: 1.55`.
+**Títulos de seção (`text-3xl`/`text-4xl`):** `font-weight: 700` (font-bold),
+`letter-spacing: -0.02em`, `line-height: 1.1`. Aplicado em "Em destaque",
+"Em alta", "Verificação séria" etc.
 
-**Números (preço, KPI, contadores):** sempre `font-feature-settings: "tnum" 1`
-(tabular-nums), `font-weight: 600`.
+**Body (`text-base`/`text-md`):** `font-weight: 400`, `letter-spacing:
+-0.011em`, `line-height: 1.55`.
 
-**Nunca:** italic em display ou em UI. Italic Inter fica genérico — só usar em
-ênfase pontual de citação no body, e ainda assim com critério.
+**Números (preço, KPI, contadores):** sempre `font-feature-settings: "tnum"
+1` (tabular-nums), `font-weight: 700` (font-bold) em destaque.
+
+**Nunca:** italic em display ou em UI. Italic Inter fica genérico — só usar
+em ênfase pontual de citação no body, e ainda assim com critério.
 
 ---
 
@@ -215,16 +225,21 @@ Tailwind default (4px = 1 unidade). Padrões fixos:
 Aspect ratio fixo `3/4` em todos os breakpoints. Sem masonry (alturas iguais
 pra grid limpo).
 
-### 5.3 Radius (macOS Tahoe — generoso)
+### 5.3 Radius (macOS Tahoe — moderado, não exagerado)
 
 | Contexto | Raio |
 |----------|------|
-| ProfileCard, Hero block, Modal grande, Card padrão | `rounded-3xl` (24px) |
-| Glass panel grande, KPICard, dropdown elevado | `rounded-2xl` (16px) |
+| ProfileCard, Hero block, Modal grande, Card padrão | `rounded-2xl` (16px) |
+| Glass panel grande, KPICard, dropdown elevado, Search bar pill | `rounded-2xl` (16px) |
 | Button md/lg, Input, Select, Textarea | `rounded-xl` (12px) |
 | Button sm, ToggleChip simples | `rounded-lg` (8px) |
-| Badge, FilterChip, Avatar, Bottom nav pill, Tabs item (pills), Search bar | `rounded-full` |
+| Badge, FilterChip, Avatar, Bottom nav pill, Tabs item (pills), Glass pill | `rounded-full` |
 | Hairline divider em tabela | sem radius |
+
+**Calibração v2.1**: `rounded-3xl` (24px) ficou exagerado em cards de
+listagem (feedback user 2026-05-17). Padrão agora é `rounded-2xl` (16px)
+para cards em geral. `rounded-3xl` reservado para hero blocks e modais
+grandes onde os cantos generosos contam visualmente.
 
 ### 5.4 Shadow
 
@@ -415,9 +430,10 @@ levantada para revisão.
 
 ## 13. Layout shells & padrões mobile-first
 
-### 13.1 Bottom navigation (mobile-only, glass-pill flutuante)
+### 13.1 Bottom navigation (visível em todos breakpoints, glass-pill flutuante)
 
-- Visível apenas em `< 768px`. Oculto em desktop (header pega a navegação).
+- Visível em **todos breakpoints** (decisão user 2026-05-17 — substitui também
+  a nav inline que ficava no header desktop). Antes era `md:hidden` mobile-only.
 - **Pill flutuante**, não cola no bottom: posicionada
   `fixed bottom-4 left-1/2 -translate-x-1/2`.
 - `.glass-pill` com 4 ícones (Home / Acompanhantes / Reels / Entrar-Conta).
@@ -425,17 +441,15 @@ levantada para revisão.
 - Item inativo: ícone + label em `text-ink-dim`.
 - Touch target ≥ 44×44 por item. Drop shadow `--shadow-md`.
 - Safe-area aware: `padding-bottom: env(safe-area-inset-bottom)`.
-- Aparece em todas as rotas públicas + painel/conta. Não em admin (sidebar própria).
+- Body precisa de `pb-24` no RootLayout pra reservar espaço.
 
 ### 13.2 Site header
 
-- **Mobile (`< 768px`):** `h-14`, `glass`, sticky-top. Apenas logo `privello.`
-  à esquerda + botão hambúrguer à direita (abre drawer com Entrar/Criar conta).
-  Search **NÃO** aparece no header — search vive no hero da home ou no header
-  sticky de Descobrir.
-- **Desktop (`≥ 768px`):** `h-16`, `glass`, sticky-top. Logo + nav inline
-  (Acompanhantes, Planos, Contato) + ações à direita (Entrar / Criar conta).
-- Active link com underline rose 2px ou pill `bg-rose-soft`.
+- **Mobile (`< 768px`):** `h-14`, `glass`, sticky-top. Logo `privello.` à
+  esquerda + botão hambúrguer à direita (drawer com Entrar/Criar conta).
+- **Desktop (`≥ 768px`):** `h-16`, `glass`, sticky-top. **Apenas logo +
+  ações** (Entrar / Criar conta) — nav inline foi REMOVIDA (decisão user
+  2026-05-17 — BottomNav cobre Acompanhantes/Reels em todos breakpoints).
 
 ### 13.3 Header sticky em Descobrir
 

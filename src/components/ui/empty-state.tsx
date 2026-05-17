@@ -71,7 +71,7 @@ export function EmptyState({
     return (
         <div
             className={cn(
-                "glass-panel rounded-3xl px-6 py-14 text-center",
+                "glass-panel rounded-2xl px-6 py-14 text-center",
                 className,
             )}
         >

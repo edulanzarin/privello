@@ -78,11 +78,8 @@ export default async function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-16">
             {/* Left: headline + sub */}
             <div>
-              <h1 className="font-light leading-[1.05] tracking-[-0.04em] text-ink text-5xl sm:text-6xl lg:text-7xl">
-                Acompanhantes
-                <br />
-                verificadas,
-                <br />
+              <h1 className="font-bold leading-[1.05] tracking-[-0.025em] text-ink text-5xl sm:text-6xl lg:text-7xl">
+                Acompanhantes verificadas,{" "}
                 <span className="text-rose">perto de você.</span>
               </h1>
               <p className="mt-6 max-w-xl text-md leading-relaxed text-ink-dim sm:text-lg">
@@ -92,29 +89,29 @@ export default async function HomePage() {
             </div>
 
             {/* Right: stats glass */}
-            <aside className="glass-panel rounded-3xl p-6">
+            <aside className="glass-panel rounded-2xl p-6">
               <ul className="space-y-3.5 text-md">
                 <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
                   <span className="text-ink-dim">Perfis ativos</span>
-                  <span className="font-semibold tabular-nums text-ink">
+                  <span className="font-bold tabular-nums text-ink">
                     {stats.profiles.toLocaleString("pt-BR")}
                   </span>
                 </li>
                 <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
                   <span className="text-ink-dim">Verificados</span>
-                  <span className="font-semibold tabular-nums text-ink">
+                  <span className="font-bold tabular-nums text-ink">
                     {stats.verifiedPct}%
                   </span>
                 </li>
                 <li className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
                   <span className="text-ink-dim">Cidades</span>
-                  <span className="font-semibold tabular-nums text-ink">
+                  <span className="font-bold tabular-nums text-ink">
                     {stats.cities}
                   </span>
                 </li>
                 <li className="flex items-center justify-between gap-4">
                   <span className="text-ink-dim">Revisão de perfil</span>
-                  <span className="font-semibold text-ink">24h</span>
+                  <span className="font-bold text-ink">24h</span>
                 </li>
               </ul>
               <p className="mt-4 text-sm leading-relaxed text-ink-faint">
@@ -138,7 +135,7 @@ export default async function HomePage() {
                   <Link
                     key={p.href}
                     href={p.href}
-                    className="inline-flex items-center rounded-full border border-line bg-white/55 px-4 py-1.5 text-sm font-medium text-ink-dim backdrop-blur-md backdrop-saturate-150 transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="inline-flex items-center rounded-full border border-line bg-white/80 px-4 py-1.5 text-sm font-semibold text-ink transition-all duration-150 hover:bg-rose-soft hover:text-rose hover:border-rose/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     {p.label}
                   </Link>
@@ -152,11 +149,13 @@ export default async function HomePage() {
         {boosted.profiles.length > 0 && (
           <section className="border-t border-line py-14 lg:py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              <div className="flex items-baseline gap-3">
+                <h2 className="text-3xl font-bold tracking-[-0.02em] text-ink sm:text-4xl">
                   Em destaque
                 </h2>
-                <span className="text-sm text-ink-dim">boost ativo</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-peach-soft px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider text-peach">
+                  Boost ativo
+                </span>
               </div>
             </div>
             <ProfileSection
@@ -171,8 +170,8 @@ export default async function HomePage() {
         {/* ── Em alta ───────────────────────────────────────────────── */}
         <section className="border-t border-line py-14 lg:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-3xl font-bold tracking-[-0.02em] text-ink sm:text-4xl">
                 Em alta
               </h2>
               <span className="text-sm text-ink-dim">da semana</span>
@@ -197,7 +196,7 @@ export default async function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
               <div>
-                <h2 className="font-light leading-[1.1] tracking-[-0.03em] text-ink text-4xl sm:text-5xl">
+                <h2 className="font-bold leading-[1.1] tracking-[-0.02em] text-ink text-4xl sm:text-5xl">
                   Verificação{" "}
                   <span className="text-rose">séria.</span>
                   <br />

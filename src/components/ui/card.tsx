@@ -20,7 +20,7 @@ import type { HTMLAttributes } from "react";
  *  - `default`: alias de `glass` (compat com call-sites pré-v2).
  *
  * Padding: `none` | `sm` (p-4) | `md` (p-5, default) | `lg` (p-6).
- * Radius: `rounded-3xl` (24px) — Tahoe generoso.
+ * Radius: `rounded-2xl` (16px) — Tahoe moderado (calibrado v2.1, era 3xl).
  */
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -36,16 +36,16 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles = {
-    default: "glass-panel rounded-3xl",
-    glass: "glass-panel rounded-3xl",
-    solid: "bg-surface rounded-3xl border border-line shadow-[var(--shadow-sm)]",
-    dark: "bg-ink text-white rounded-3xl shadow-[var(--shadow-md)]",
+    default: "glass-panel rounded-2xl",
+    glass: "glass-panel rounded-2xl",
+    solid: "bg-surface rounded-2xl border border-line shadow-[var(--shadow-sm)]",
+    dark: "bg-ink text-white rounded-2xl shadow-[var(--shadow-md)]",
     "success-subtle":
-        "bg-success-soft rounded-3xl border border-success/30 shadow-[var(--shadow-hairline)]",
+        "bg-success-soft rounded-2xl border border-success/30 shadow-[var(--shadow-hairline)]",
     "warning-subtle":
-        "bg-warning-soft rounded-3xl border border-warning/30 shadow-[var(--shadow-hairline)]",
+        "bg-warning-soft rounded-2xl border border-warning/30 shadow-[var(--shadow-hairline)]",
     "danger-subtle":
-        "bg-danger-soft rounded-3xl border border-danger/30 shadow-[var(--shadow-hairline)]",
+        "bg-danger-soft rounded-2xl border border-danger/30 shadow-[var(--shadow-hairline)]",
 };
 
 const paddingStyles = {

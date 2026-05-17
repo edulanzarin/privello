@@ -16,27 +16,28 @@ const NAV_LINKS: { href: string; label: string }[] = [
 ];
 
 /**
- * Site header — Design System v2 (Tahoe Sensual).
+ * Site header — Design System v2.1 (Tahoe Sensual, calibrado).
  *
+ * Caminho: src/components/layout/site-header.tsx
  * Steering: `.kiro/steering/design-system.md` §13.2.
  *
  * Mobile (`< 768px`): h-14, glass sticky, logo + hambúrguer drawer.
- *   Search NÃO aparece no header — vive no hero da home ou no header
- *   sticky de Descobrir.
+ * Desktop (`≥ 768px`): h-16, glass sticky, logo + ações (Entrar / Criar conta).
  *
- * Desktop (`≥ 768px`): h-16, glass sticky, logo + nav inline + ações.
- *   Logado: avatar + handle (atalho pra perfil/painel).
- *   Anônimo: Entrar (ghost) + Criar conta (rose primary).
+ * Nav inline desktop foi REMOVIDA (decisão do user 2026-05-17): a BottomNav
+ * pill flutuante é visível em todos breakpoints e cobre Home/Acompanhantes/
+ * Reels/Perfil — sem duplicação no header.
  *
- * Active link com pill `bg-rose-soft text-rose`.
+ * Logado: avatar + handle (atalho pra perfil/painel).
+ * Anônimo: Entrar (ghost) + Criar conta (rose primary).
  *
  * Server Component — busca handle/avatar via auth() + prisma.
  *
  * Props:
  *  - `variant?` (legado, sem efeito visual atual).
- *  - `activeHref?` (string): match exato ou prefixo p destacar nav item ativo em desktop.
+ *  - `activeHref?` (legado — desktop nav inline removida; sem destaque).
  */
-export async function SiteHeader({ activeHref }: SiteHeaderProps = {}) {
+export async function SiteHeader(_props: SiteHeaderProps = {}) {
   const session = await auth();
 
   let handle: string | null = null;
@@ -73,19 +74,13 @@ export async function SiteHeader({ activeHref }: SiteHeaderProps = {}) {
       : "/painel"
     : "/conta/perfil";
 
-  function isActive(href: string): boolean {
-    if (!activeHref) return false;
-    if (href === "/") return activeHref === "/";
-    return activeHref === href || activeHref.startsWith(href + "/");
-  }
-
   return (
     <header className="glass sticky top-0 z-40">
       {/* Mobile bar */}
       <div className="flex h-14 items-center justify-between px-4 md:hidden">
         <Link
           href={isProvider ? "/painel" : "/"}
-          className="text-lg font-semibold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+          className="text-lg font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
         >
           privello<span className="text-rose">.</span>
         </Link>
@@ -99,37 +94,14 @@ export async function SiteHeader({ activeHref }: SiteHeaderProps = {}) {
         />
       </div>
 
-      {/* Desktop bar */}
+      {/* Desktop bar — só logo + ações (nav vai pra BottomNav) */}
       <div className="mx-auto hidden h-16 max-w-7xl items-center justify-between px-6 md:flex lg:px-8">
-        <div className="flex items-center gap-8">
-          <Link
-            href={isProvider ? "/painel" : "/"}
-            className="text-xl font-semibold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
-          >
-            privello<span className="text-rose">.</span>
-          </Link>
-
-          <nav className="flex items-center gap-1" aria-label="Navegação principal">
-            {NAV_LINKS.map((link) => {
-              const active = isActive(link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={active ? "page" : undefined}
-                  className={
-                    "rounded-full px-3 py-1.5 text-base font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background " +
-                    (active
-                      ? "bg-rose-soft text-rose"
-                      : "text-ink-dim hover:text-ink hover:bg-line/40")
-                  }
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        <Link
+          href={isProvider ? "/painel" : "/"}
+          className="text-xl font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+        >
+          privello<span className="text-rose">.</span>
+        </Link>
 
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
@@ -143,7 +115,7 @@ export async function SiteHeader({ activeHref }: SiteHeaderProps = {}) {
                 fallback={userName || handle || undefined}
                 size="sm"
               />
-              <span className="hidden text-base font-medium text-ink lg:inline">
+              <span className="hidden text-base font-semibold text-ink lg:inline">
                 {handle ? `@${handle}` : session.user.name?.split(" ")[0]}
               </span>
             </Link>
@@ -151,13 +123,13 @@ export async function SiteHeader({ activeHref }: SiteHeaderProps = {}) {
             <>
               <Link
                 href="/entrar"
-                className="rounded-full px-4 py-1.5 text-base font-medium text-ink-dim transition-colors hover:text-ink hover:bg-line/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="rounded-full px-4 py-2 text-base font-semibold text-ink-dim transition-colors hover:text-ink hover:bg-line/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Entrar
               </Link>
               <Link
                 href="/cadastro"
-                className="rounded-full bg-rose px-4 py-1.5 text-base font-medium text-white shadow-[var(--shadow-sm)] transition-all duration-150 hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="rounded-full bg-rose px-4 py-2 text-base font-semibold text-white shadow-[var(--shadow-sm)] transition-all duration-150 hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Criar conta
               </Link>

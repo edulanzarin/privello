@@ -10,7 +10,7 @@
  * via classes adicionais — bg + border de warning).
  *
  * Estilo travado:
- *  - Container: `Card variant="solid" padding="md"` (rounded-3xl, hairline,
+ *  - Container: `Card variant="solid" padding="md"` (rounded-2xl, hairline,
  *    sombra suave).
  *  - Label: `text-2xs font-semibold uppercase tracking-wider text-ink-dim`.
  *  - Valor: `text-2xl font-semibold tabular-nums tracking-tight text-ink`.
@@ -94,7 +94,7 @@ export function KPICard({
             <Link
                 href={href}
                 aria-label={`${label}: ${value}`}
-                className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
                 {tile}
             </Link>

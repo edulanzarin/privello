@@ -148,7 +148,7 @@ export function BottomNav({ isLoggedIn, userRole, isAdmin, providerSlug }: Botto
 function NavShell({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center"
       style={{
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
       }}

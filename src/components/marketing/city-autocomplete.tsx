@@ -212,28 +212,28 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
   }, []);
 
   return (
-    <div ref={containerRef} className={`relative flex items-center gap-3 bg-white text-left ${compact ? "px-3 py-[7px]" : "px-4 py-3"}`}>
+    <div ref={containerRef} className={`relative ${compact ? "" : "flex items-center gap-3 bg-white px-4 py-3"} text-left`}>
       {!compact && <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />}
-      <span className="w-full">
+      <span className={compact ? "block w-full" : "w-full"}>
         {!compact && <span className="block text-xs font-medium text-muted">Cidade</span>}
         <input
           type="text"
           value={query}
           onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); }}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={compact ? "Trocar cidade…" : "Ex: São Paulo, SP…"}
+          placeholder={compact ? "Cidade…" : "Ex: São Paulo, SP…"}
           autoComplete="off"
           className={compact
-            ? "w-full border-0 bg-transparent p-0 text-md text-foreground outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:text-muted/60"
-            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium outline-none focus-visible:ring-2 focus-visible:ring-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-muted/60"
+            ? "w-full border-0 bg-transparent p-0 text-md font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-ink-dim/60"
+            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-muted/60"
           }
         />
       </span>
 
       {open && (
-        <ul className="absolute left-0 top-full z-50 mt-1 w-full min-w-[240px] rounded-xl border border-black/[0.06] bg-white py-1 shadow-xl overflow-hidden animate-scale-in">
+        <ul className="absolute left-0 top-full z-50 mt-2 w-full min-w-[260px] glass-panel rounded-2xl py-1 overflow-hidden animate-scale-in">
           {loading && (
-            <li className="px-4 py-2 text-sm text-muted">Buscando…</li>
+            <li className="px-4 py-2 text-sm text-ink-dim">Buscando…</li>
           )}
           {!loading &&
             results.map((r) => (
@@ -246,9 +246,9 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
                     setOpen(false);
                     onSelect(r.slug, r.label);
                   }}
-                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-base transition-colors hover:bg-black/[0.04]"
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-base text-ink transition-colors hover:bg-line/40"
                 >
-                  <MapPin className="h-3 w-3 shrink-0 text-muted" strokeWidth={1.5} />
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-rose" strokeWidth={2} />
                   {r.label}
                 </button>
               </li>
