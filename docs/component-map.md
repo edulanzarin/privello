@@ -257,8 +257,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Status v2 |
 |------|-----------|
-| `/error` (root) | 🔴 |
-| `/not-found` | 🔴 |
+| `/error` (root) | 🟢 |
+| `/not-found` | 🟢 |
 
 ---
 
@@ -292,7 +292,7 @@ Ordem por impacto + dependência:
 9. ~~**`/admin/**`**~~ ✅ done
 10. ~~**`/reels/**`**~~ ✅ done (decisão: NÃO extrair `<MediaActions>` — APIs por consumer divergem demais; cada uso < 30 linhas; YAGNI)
 11. ~~**Legal (`/termos-de-uso`, `/politica-de-privacidade`)**~~ ✅ done (`<LegalShell>` + `<LegalSection>` extraídos para `src/components/layout/legal-shell.tsx`)
-12. **Erro/sistema (`error.tsx`, `not-found.tsx` por rota)** — próxima fila
+12. ~~**Erro/sistema (`error.tsx`, `not-found.tsx` por rota)**~~ ✅ done (41 `error.tsx` já consumiam `<ErrorState>` v2; `not-found.tsx` raiz refatorado para Inter Bold + Button polimórfico, sem `font-serif`)
 
 ---
 
