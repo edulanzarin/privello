@@ -35,6 +35,12 @@ import { parseDiscoverSearchParams } from "@/lib/discover-params";
 import { getOrCreateCityBySlug, listProfilesForCity, listStoriesForCity } from "@/lib/services";
 import { StoryBar } from "@/components/stories/story-bar";
 import { auth } from "@/lib/auth";
+import {
+  absoluteUrl,
+  breadcrumbJsonLd,
+  itemListJsonLd,
+  jsonLdKey,
+} from "@/lib/seo";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md §3.2 linha 3.
 export const dynamic = "force-dynamic";
@@ -47,12 +53,23 @@ export async function generateMetadata({
   const { citySlug } = await params;
   const city = await getOrCreateCityBySlug(citySlug);
   const title = `Acompanhantes em ${city.name}`;
+  const description = `Encontre acompanhantes em ${city.name}. Perfis verificados com fotos reais, áudio e vídeo. Acesse agora no Privello.`;
+  const canonicalPath = `/descobrir/${citySlug}`;
+
   return {
     title,
-    description: `Encontre acompanhantes em ${city.name}. Perfis verificados com fotos reais, áudio e vídeo. Acesse agora no Privello.`,
+    description,
+    alternates: { canonical: canonicalPath },
     openGraph: {
+      type: "website",
+      url: absoluteUrl(canonicalPath),
       title: `${title} · privello.`,
       description: `Acompanhantes verificadas em ${city.name}. Fotos reais, áudio e vídeo.`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
@@ -92,8 +109,34 @@ export default async function DiscoverPage({ params, searchParams }: PageProps) 
     sort !== "relevance" ||
     view !== "grid";
 
+  // Structured data — só emite Breadcrumb + ItemList na visualização canônica
+  // (sem filtros nem sort custom). Páginas filtradas usam `noindex` lógico via
+  // canonical apontando para a base, então não precisam de nodes próprios.
+  const ldBlocks = !hasFilters
+    ? [
+      breadcrumbJsonLd([
+        { name: "Descobrir", path: "/descobrir" },
+        { name: city.name, path: `/descobrir/${citySlug}` },
+      ]),
+      itemListJsonLd(
+        profiles.slice(0, 20).map((p) => ({
+          name: p.displayName,
+          path: `/p/${p.slug}`,
+        })),
+        `Acompanhantes em ${city.name}`,
+      ),
+    ]
+    : [];
+
   return (
     <>
+      {ldBlocks.map((ld) => (
+        <script
+          key={jsonLdKey(ld)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
       <SiteHeader activeHref={`/descobrir/${citySlug}`} />
       <CitySessionSaver citySlug={citySlug} />
 

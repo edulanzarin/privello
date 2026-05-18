@@ -71,6 +71,12 @@ import {
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { DAYS_PT } from "@/lib/constants";
+import {
+  absoluteUrl,
+  breadcrumbJsonLd,
+  jsonLdKey,
+  personJsonLd,
+} from "@/lib/seo";
 
 // dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 2 (perfil personalizado por sessão).
 export const dynamic = "force-dynamic";
@@ -87,26 +93,57 @@ export async function generateMetadata({
       displayName: true,
       age: true,
       tagline: true,
+      isSuspended: true,
+      planExpiresAt: true,
       city: { select: { name: true, slug: true } },
       media: { where: { isCover: true }, select: { url: true }, take: 1 },
     },
   });
   if (!profile) return {};
 
+  const isPubliclyIndexable =
+    !profile.isSuspended &&
+    profile.planExpiresAt != null &&
+    profile.planExpiresAt > new Date();
+
   const title = `${profile.displayName}, ${profile.age} anos — Acompanhante em ${profile.city.name}`;
   const description = profile.tagline
     ? `${profile.tagline} · Acompanhante em ${profile.city.name}. Perfil verificado no Privello.`
     : `Acompanhante em ${profile.city.name}. Veja fotos, áudio e vídeo no Privello.`;
   const coverUrl = profile.media[0]?.url;
+  const canonicalPath = `/p/${slug}`;
 
   return {
     title,
     description,
+    alternates: { canonical: canonicalPath },
     openGraph: {
+      type: "profile",
+      url: absoluteUrl(canonicalPath),
       title: `${title} · privello.`,
       description,
-      ...(coverUrl ? { images: [{ url: coverUrl, width: 800, height: 1000 }] } : {}),
+      ...(coverUrl
+        ? {
+          images: [
+            {
+              url: coverUrl,
+              width: 800,
+              height: 1000,
+              alt: `Foto de ${profile.displayName}`,
+            },
+          ],
+        }
+        : {}),
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(coverUrl ? { images: [coverUrl] } : {}),
+    },
+    robots: isPubliclyIndexable
+      ? undefined
+      : { index: false, follow: false },
   };
 }
 
@@ -267,8 +304,48 @@ export default async function PublicProfilePage({ params }: PageProps) {
     ["Idiomas", profile.languages ?? "—"],
   ];
 
+  // Structured data — Person + Breadcrumb (só quando publicamente indexável,
+  // o gating em generateMetadata já barra perfis suspensos / sem plano via
+  // robots noindex; aqui evitamos vazar JSON-LD em pages bloqueadas).
+  const isPubliclyIndexable =
+    !profile.isSuspended &&
+    profile.planExpiresAt != null &&
+    new Date(profile.planExpiresAt) > new Date();
+
+  const ldBlocks = isPubliclyIndexable
+    ? [
+      personJsonLd({
+        slug: profile.slug,
+        displayName: profile.displayName,
+        age: profile.age,
+        cityName: profile.city.name,
+        tagline: profile.tagline,
+        coverUrl: cover?.url ?? null,
+        aggregateRating:
+          profile.ratingCount > 0
+            ? {
+              ratingValue: profile.ratingAvg,
+              reviewCount: profile.ratingCount,
+            }
+            : null,
+      }),
+      breadcrumbJsonLd([
+        { name: "Descobrir", path: "/descobrir" },
+        { name: profile.city.name, path: `/descobrir/${profile.city.slug}` },
+        { name: profile.displayName, path: `/p/${profile.slug}` },
+      ]),
+    ]
+    : [];
+
   return (
     <>
+      {ldBlocks.map((ld) => (
+        <script
+          key={jsonLdKey(ld)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
       <SiteHeader activeHref={`/descobrir/${profile.city.slug}`} />
       {!ownerView && <ViewTracker profileId={profile.id} />}
       {ownerView && <ProviderBanner variant="own-profile" />}

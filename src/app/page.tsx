@@ -32,6 +32,7 @@ import { HeroSearchForm } from "@/components/marketing/hero-search-form";
 import { ProfileSection } from "@/components/home/profile-section";
 import { FALLBACK_PLATFORM_STATS } from "@/lib/constants";
 import { getPlatformStats, getSectionProfiles } from "@/lib/services";
+import { jsonLdKey, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 // Cache strategy: revalidate=60 (legacy Route Segment Config).
 // Cf. .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 1.
@@ -55,8 +56,20 @@ export default async function HomePage() {
     // use fallbacks
   }
 
+  // Structured data — emitidos na home pra ancorar Organization + WebSite.
+  // O resto das rotas (Person, Breadcrumb, ItemList) referencia o mesmo
+  // `@id` da Organization quando útil.
+  const ldBlocks = [organizationJsonLd(), websiteJsonLd()];
+
   return (
     <>
+      {ldBlocks.map((ld) => (
+        <script
+          key={jsonLdKey(ld)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
       <SiteHeader />
       <main>
         {/* ── Hero ──────────────────────────────────────────────────── */}

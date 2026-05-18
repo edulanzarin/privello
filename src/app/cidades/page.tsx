@@ -27,6 +27,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListingHeader } from "@/components/ui/listing-header";
+import { itemListJsonLd, jsonLdKey } from "@/lib/seo";
 import { getAllCities } from "@/lib/services";
 
 export const revalidate = 900;
@@ -34,6 +35,7 @@ export const revalidate = 900;
 export const metadata = {
   title: "Cidades · Privello",
   description: "Escolha uma cidade para ver perfis verificados e filtros por bairro.",
+  alternates: { canonical: "/cidades" },
 };
 
 export default async function CidadesPage() {
@@ -44,8 +46,22 @@ export default async function CidadesPage() {
     cities = [];
   }
 
+  const ld = cities.length
+    ? itemListJsonLd(
+      cities.map((c) => ({ name: c.name, path: `/descobrir/${c.slug}` })),
+      "Cidades atendidas pelo Privello",
+    )
+    : null;
+
   return (
     <>
+      {ld && (
+        <script
+          key={jsonLdKey(ld)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      )}
       <SiteHeader />
       <main className="mx-auto max-w-7xl px-4 pb-32 sm:px-6 lg:px-8">
         <ListingHeader
