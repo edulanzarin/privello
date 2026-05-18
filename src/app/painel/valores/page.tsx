@@ -26,15 +26,22 @@ export default async function PainelValoresPage() {
 
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
-    include: { durationOptions: { where: { active: true }, orderBy: { sortOrder: "asc"} } },
+    include: { durationOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } } },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
   return (
-    <div className="space-y-6 max-w-sm mx-auto">
+    <div className="mx-auto max-w-sm space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Valores e durações</h1>
-        <p className="mt-1 text-md text-ink-dim">Ative as durações que você oferece e defina o valor de cada uma.</p>
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Tabela de preços
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Valores e durações
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
+          Ative as durações que você oferece e defina o valor de cada uma.
+        </p>
       </div>
       <ValoresForm profile={profile} />
     </div>

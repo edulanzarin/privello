@@ -32,10 +32,15 @@ export default async function PainelDisponibilidadePage() {
   if (!profile) redirect("/conta/onboarding/perfil");
 
   return (
-    <div className="space-y-6 max-w-md mx-auto">
+    <div className="mx-auto max-w-md space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Disponibilidade</h1>
-        <p className="mt-1 text-md text-ink-dim">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Agenda
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Disponibilidade
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
           Defina seus horários por dia da semana.
         </p>
       </div>

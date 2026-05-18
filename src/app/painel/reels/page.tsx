@@ -29,16 +29,21 @@ export default async function PainelReelsPage() {
   if (!profile) redirect("/conta/onboarding/perfil");
 
   const reels = await prisma.media.findMany({
-    where: { profileId: profile.id, mediaType: "REEL"},
-    orderBy: { sortOrder: "asc"},
+    where: { profileId: profile.id, mediaType: "REEL" },
+    orderBy: { sortOrder: "asc" },
     select: { id: true, url: true, caption: true, isPublic: true },
   });
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Reels</h1>
-        <p className="mt-1 text-md text-ink-dim">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Vídeos verticais
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Reels
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
           Vídeos curtos em formato vertical para destacar sua personalidade.
         </p>
       </div>

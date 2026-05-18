@@ -34,11 +34,11 @@ export default async function PainelPerfilPage() {
     where: { userId: session.user.id },
     include: {
       city: true,
-      media: { orderBy: { sortOrder: "asc"} },
+      media: { orderBy: { sortOrder: "asc" } },
       stories: {
         where: { expiresAt: { gt: stories24hWindow } },
         include: { _count: { select: { views: true, likes: true } } },
-        orderBy: { createdAt: "desc"},
+        orderBy: { createdAt: "desc" },
         take: 20,
       },
     },
@@ -48,12 +48,17 @@ export default async function PainelPerfilPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Editar perfil</h1>
-        <p className="mt-1 text-md text-ink-dim">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Perfil público
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Editar perfil
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
           Alterações são salvas imediatamente e refletem no seu anúncio público.
         </p>
       </div>
-      <div className="max-w-xl mx-auto">
+      <div className="mx-auto max-w-xl">
         <PerfilEditor
           profile={profile}
           cityName={profile.city?.name ?? ""}

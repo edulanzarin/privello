@@ -34,25 +34,34 @@ export default async function PainelStoriesPage() {
       planTier: true,
       stories: {
         include: { _count: { select: { views: true, likes: true } } },
-        orderBy: { createdAt: "desc"},
+        orderBy: { createdAt: "desc" },
         take: 50,
       },
     },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
 
-  if (profile.planTier !== "DESTAQUE"&& profile.planTier !== "PREMIUM") {
+  if (profile.planTier !== "DESTAQUE" && profile.planTier !== "PREMIUM") {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
-        <Diamond className="h-10 w-10 text-rose"strokeWidth={1} />
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-soft">
+          <Diamond className="h-8 w-8 text-rose" strokeWidth={1.5} />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Stories</h1>
-          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-ink-dim">
-            Stories estão disponíveis nos planos <strong>Plus</strong> e <strong>Premium</strong>.
-            Apareça nas bolinhas acima das buscas e conquiste mais visualizações.
+          <h1 className="text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+            Stories
+          </h1>
+          <p className="mx-auto mt-3 max-w-sm text-md leading-relaxed text-ink-dim">
+            Stories estão disponíveis nos planos{" "}
+            <strong className="text-ink">Plus</strong> e{" "}
+            <strong className="text-ink">Premium</strong>. Apareça nas bolinhas
+            acima das buscas e conquiste mais visualizações.
           </p>
         </div>
-        <Link href="/painel/plano"className="rounded-full bg-rose px-8 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-110 active:scale-[0.97] transition">
+        <Link
+          href="/painel/plano"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-rose px-6 py-3 text-md font-semibold text-white shadow-[var(--shadow-sm)] transition-all duration-150 ease-[var(--ease-tahoe)] hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
           Fazer upgrade
         </Link>
       </div>
@@ -66,8 +75,13 @@ export default async function PainelStoriesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Stories</h1>
-        <p className="mt-1 text-sm text-ink-dim">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Conteúdo de 24h
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Stories
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
           Cada story dura 24h e aparece nas bolinhas da página de busca. Igual ao Instagram.
         </p>
       </div>

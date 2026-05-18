@@ -103,7 +103,7 @@ export async function submitVerificationCase(formData: FormData): Promise<{ erro
     });
   }
 
-  revalidatePath("/conta/verificacao");
+  revalidatePath("/painel/verificacao");
   return { success: true };
 }
 

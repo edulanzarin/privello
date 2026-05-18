@@ -30,7 +30,7 @@ export default async function PainelMidiasPage() {
     select: {
       id: true,
       slug: true,
-      media: { orderBy: { sortOrder: "asc"} },
+      media: { orderBy: { sortOrder: "asc" } },
     },
   });
   if (!profile) redirect("/conta/onboarding/perfil");
@@ -46,8 +46,13 @@ export default async function PainelMidiasPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Mídias</h1>
-        <p className="mt-1 text-md text-ink-dim">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+          Galeria
+        </p>
+        <h1 className="mt-1.5 text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Mídias
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
           Gerencie suas fotos, vídeos e reels. A primeira foto pública é a foto de perfil do anúncio.
         </p>
       </div>

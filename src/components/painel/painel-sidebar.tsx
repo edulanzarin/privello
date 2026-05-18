@@ -42,7 +42,7 @@ const PLAN_LABELS: Record<string, string> = {
  * por conta da página de Plano).
  */
 function buildNav(slug: string, planTier?: string): NavItem[] {
-  const canStories = planTier === "DESTAQUE"|| planTier === "PREMIUM";
+  const canStories = planTier === "DESTAQUE" || planTier === "PREMIUM";
   const items: NavItem[] = [
     { href: "/painel", label: "Visão geral", icon: LayoutDashboard },
     { href: `/p/${slug}`, label: "Ver perfil", icon: User },
@@ -54,7 +54,7 @@ function buildNav(slug: string, planTier?: string): NavItem[] {
   }
   items.push(
     { href: "/painel/perfil", label: "Editar perfil", icon: Pencil },
-    { href: "/conta/verificacao", label: "Verificação", icon: ShieldCheck },
+    { href: "/painel/verificacao", label: "Verificação", icon: ShieldCheck },
     { href: "/painel/disponibilidade", label: "Disponibilidade", icon: Clock },
     { href: "/painel/valores", label: "Valores", icon: CircleDollarSign },
     { href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
@@ -98,15 +98,15 @@ function PainelFooter({
         <div className="flex items-center gap-2">
           {hasPlan ? (
             <CheckCircle2
-              className="h-3.5 w-3.5 shrink-0 text-success"strokeWidth={2.4}
+              className="h-3.5 w-3.5 shrink-0 text-success" strokeWidth={2.4}
             />
           ) : (
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning"/>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
           )}
           <p
             className={cn(
-"text-sm font-semibold",
-              hasPlan ? "text-success": "text-warning",
+              "text-sm font-semibold",
+              hasPlan ? "text-success" : "text-warning",
             )}
           >
             {hasPlan
@@ -115,8 +115,8 @@ function PainelFooter({
           </p>
         </div>
         <Link
-          href="/painel/plano"className="mt-2 block text-xs font-medium text-rose/80 transition hover:text-rose">
-          {hasPlan ? "Gerenciar plano →": "Assinar um plano →"}
+          href="/painel/plano" className="mt-2 block text-xs font-medium text-rose/80 transition hover:text-rose">
+          {hasPlan ? "Gerenciar plano →" : "Assinar um plano →"}
         </Link>
       </div>
 
@@ -124,7 +124,7 @@ function PainelFooter({
         <Avatar
           src={avatarUrl}
           fallback={displayName}
-          size="sm"className="shrink-0 bg-white/10 text-white/60"/>
+          size="sm" className="shrink-0 bg-white/10 text-white/60" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">
             {displayName}
@@ -200,7 +200,7 @@ export function PainelSidebar({
 
   return (
     <DarkSidebarShell
-      logoHref="/"nav={nav}
+      logoHref="/" nav={nav}
       pathname={pathname}
       footer={
         <PainelFooter
