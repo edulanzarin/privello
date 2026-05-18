@@ -48,11 +48,11 @@ function DocImage({ url, label }: { url: string | null; label: string }) {
     <div className="space-y-1">
       <p className="text-2xs font-bold uppercase tracking-wider text-ink-dim">{label}</p>
       {isVideo ? (
-        <video src={url} controls className="h-64 w-full rounded border border-line object-contain bg-black"/>
+        <video src={url} controls className="h-64 w-full rounded border border-line object-contain bg-black" />
       ) : (
-        <a href={url} target="_blank"rel="noopener noreferrer"className="block">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="block">
           <div className="relative h-64 w-full overflow-hidden rounded border border-line bg-line">
-            <Image src={url} alt={label} fill className="object-contain"/>
+            <Image src={url} alt={label} fill className="object-contain" />
           </div>
         </a>
       )}
@@ -72,7 +72,7 @@ export default async function VerificationDetailPage({ params }: PageProps) {
         include: {
           city: { select: { name: true } },
           district: { select: { name: true } },
-          media: { take: 1, orderBy: { sortOrder: "asc"}, select: { url: true } },
+          media: { take: 1, orderBy: { sortOrder: "asc" }, select: { url: true } },
           user: { select: { email: true, phone: true } },
         },
       },
@@ -91,13 +91,13 @@ export default async function VerificationDetailPage({ params }: PageProps) {
   const waitMin = Math.max(1, Math.floor((nowMs - vc.waitingSince.getTime()) / 60000));
 
   async function approve() {
-"use server";
+    "use server";
     await approveVerification(id);
     redirect("/admin/moderacao");
   }
 
   async function reject(formData: FormData) {
-"use server";
+    "use server";
     const note = (formData.get("note") as string | null)?.trim() || undefined;
     await rejectVerification(id, note);
     redirect("/admin/moderacao");
@@ -105,7 +105,7 @@ export default async function VerificationDetailPage({ params }: PageProps) {
 
   return (
     <AdminShell>
-      <Link href="/admin/moderacao"className="mb-4 inline-flex items-center gap-1 text-xs text-ink-dim hover:text-ink transition">
+      <Link href="/admin/moderacao" className="mb-4 inline-flex items-center gap-1 text-xs text-ink-dim hover:text-ink transition">
         ← Moderação
       </Link>
       {/* Case header */}
@@ -113,31 +113,31 @@ export default async function VerificationDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-4">
           {coverUrl ? (
             <div className="relative h-16 w-16 overflow-hidden rounded-full border border-line">
-              <Image src={coverUrl} alt=""fill className="object-cover"/>
+              <Image src={coverUrl} alt="" fill className="object-cover" />
             </div>
           ) : (
-            <div className="h-16 w-16 rounded-full bg-line"/>
+            <div className="h-16 w-16 rounded-full bg-line" />
           )}
           <div>
-            <p className="text-xl font-bold">{profile.displayName}</p>
-            <p className="text-sm text-muted">
+            <p className="text-xl font-bold tracking-[-0.022em] text-ink">{profile.displayName}</p>
+            <p className="text-sm text-ink-dim">
               {profile.city.name}{profile.district ? ` · ${profile.district.name}` : ""}
             </p>
-            <p className="mt-1 text-xs text-muted">{profile.user?.email}</p>
+            <p className="mt-1 text-xs text-ink-dim">{profile.user?.email}</p>
           </div>
         </div>
         <div className="flex flex-col items-start gap-2 sm:items-end">
           <Badge variant={statusToBadgeVariant(vc.status)}>{vc.status}</Badge>
-          <p className="text-xs text-muted">Aguardando há {waitMin} min</p>
-          <p className="text-xs text-muted">Tipo: {vc.documentType ?? "—"}</p>
+          <p className="text-xs text-ink-dim">Aguardando há {waitMin} min</p>
+          <p className="text-xs text-ink-dim">Tipo: {vc.documentType ?? "—"}</p>
         </div>
       </div>
 
       {/* Documents */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <DocImage url={vc.documentFrontUrl} label="Documento (frente)"/>
-        <DocImage url={vc.documentBackUrl} label="Documento (verso)"/>
-        <DocImage url={vc.selfieUrl} label="Selfie com documento"/>
+        <DocImage url={vc.documentFrontUrl} label="Documento (frente)" />
+        <DocImage url={vc.documentBackUrl} label="Documento (verso)" />
+        <DocImage url={vc.selfieUrl} label="Selfie com documento" />
       </div>
 
       {/* Existing notes */}
@@ -152,43 +152,43 @@ export default async function VerificationDetailPage({ params }: PageProps) {
       <div className="mt-4 flex gap-2">
         <Link
           href={`/p/${profile.slug}`}
-          target="_blank"className="rounded border border-line bg-white px-3 py-1.5 text-xs font-semibold hover:bg-line transition">
+          target="_blank" className="rounded border border-line bg-white px-3 py-1.5 text-xs font-semibold hover:bg-line transition">
           Ver perfil público ↗
         </Link>
       </div>
 
-      {vc.status !== "APROVADO"&& vc.status !== "REJEITADO"? (
+      {vc.status !== "APROVADO" && vc.status !== "REJEITADO" ? (
         <div className="mt-8 grid gap-6 sm:grid-cols-2">
           {/* Approve */}
-          <Card variant="success-subtle"padding="md">
+          <Card variant="success-subtle" padding="md">
             <p className="mb-3 font-semibold text-success">Aprovar verificação</p>
-            <p className="mb-4 text-sm text-muted">
+            <p className="mb-4 text-sm text-ink-dim">
               O perfil será marcado como verificado e o selo aparecerá publicamente.
             </p>
             <form action={approve}>
-              <Button type="submit"variant="primary"className="w-full">
+              <Button type="submit" variant="primary" className="w-full">
                 Aprovar
               </Button>
             </form>
           </Card>
 
           {/* Reject */}
-          <Card variant="danger-subtle"padding="md">
+          <Card variant="danger-subtle" padding="md">
             <p className="mb-3 font-semibold text-danger">Rejeitar verificação</p>
             <form action={reject} className="space-y-3">
               <Textarea
-                name="note"rows={3}
-                placeholder="Motivo da rejeição (opcional — aparece para o moderador)"/>
-              <Button type="submit"variant="danger"className="w-full">
+                name="note" rows={3}
+                placeholder="Motivo da rejeição (opcional — aparece para o moderador)" />
+              <Button type="submit" variant="danger" className="w-full">
                 Rejeitar
               </Button>
             </form>
           </Card>
         </div>
       ) : (
-        <div className="mt-8 rounded border border-line bg-white p-5 text-center">
-          <p className="text-sm text-muted">Este caso já foi {vc.status === "APROVADO"? "aprovado": "rejeitado"}.</p>
-          <Link href="/admin/moderacao"className="mt-3 inline-block text-sm font-semibold text-rose hover:underline">
+        <div className="mt-8 rounded-2xl border border-line bg-white p-5 text-center shadow-[var(--shadow-sm)]">
+          <p className="text-sm text-ink-dim">Este caso já foi {vc.status === "APROVADO" ? "aprovado" : "rejeitado"}.</p>
+          <Link href="/admin/moderacao" className="mt-3 inline-block text-sm font-semibold text-rose hover:underline">
             Voltar à fila
           </Link>
         </div>

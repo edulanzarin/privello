@@ -149,7 +149,7 @@ export function TicketChat({
             placeholder="Escreva sua mensagem… (Enter para enviar)"
             rows={2}
             maxLength={2000}
-            className="flex-1 resize-none rounded-xl border border-line bg-white px-3 py-2 text-md text-ink placeholder:text-ink-dim/55 shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none transition-all duration-150 ease-[var(--ease-tahoe)] hover:border-ink/15 focus:border-rose/50 focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="flex-1 resize-none rounded-xl border border-line bg-white px-3 py-2 text-md text-ink placeholder:text-ink-dim/55 outline-none transition-all duration-150 ease-[var(--ease-tahoe)] hover:border-ink/15 focus:border-rose/50 focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           />
           <button
             type="button"

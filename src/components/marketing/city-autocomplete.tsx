@@ -213,9 +213,9 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
 
   return (
     <div ref={containerRef} className={`relative ${compact ? "" : "flex items-center gap-3 bg-white px-4 py-3"} text-left`}>
-      {!compact && <MapPin className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />}
+      {!compact && <MapPin className="h-4 w-4 shrink-0 text-ink-dim" strokeWidth={1.75} />}
       <span className={compact ? "block w-full" : "w-full"}>
-        {!compact && <span className="block text-xs font-medium text-muted">Cidade</span>}
+        {!compact && <span className="block text-2xs font-semibold uppercase tracking-wider text-ink-dim">Cidade</span>}
         <input
           type="text"
           value={query}
@@ -225,7 +225,7 @@ export function CityAutocomplete({ onSelect, initialLabel = "", compact = false 
           autoComplete="off"
           className={compact
             ? "w-full border-0 bg-transparent p-0 text-md font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-ink-dim/60"
-            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-muted/60"
+            : "mt-0.5 w-full border-0 bg-transparent p-0 text-md font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background placeholder:font-normal placeholder:text-ink-dim/55"
           }
         />
       </span>

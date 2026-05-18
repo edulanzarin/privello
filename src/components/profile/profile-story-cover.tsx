@@ -81,7 +81,7 @@ export function ProfileStoryCover({
         onClick={() => setOpen(true)}
         className={cn(
           "group relative mx-auto block h-40 w-40 overflow-hidden rounded-full bg-line sm:h-48 sm:w-48",
-          "shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_32px_rgba(0,0,0,0.08)]",
+          "shadow-[var(--shadow-md)]",
           "transition-transform duration-200 ease-[var(--ease-tahoe)]",
           hasStory && "cursor-pointer hover:scale-[1.02] active:scale-[0.99]",
           !hasStory && "cursor-default",

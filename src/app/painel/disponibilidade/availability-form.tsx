@@ -11,9 +11,9 @@ import { useToast } from "@/components/ui/toast";
 const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
 const TIME_OPTIONS = [
-"00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00",
-"08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
-"16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "23:59",
+  "00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00",
+  "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+  "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "23:59",
 ];
 
 const TIME_OPTS = TIME_OPTIONS.map((t) => ({ value: t, label: t }));
@@ -29,21 +29,21 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
   const [openDays, setOpenDays] = useState<boolean[]>(() =>
     [0, 1, 2, 3, 4, 5, 6].map((wd) => {
       const r = byWd.get(wd);
-      return r ? r.status !== "CLOSED": false;
+      return r ? r.status !== "CLOSED" : false;
     })
   );
 
   const [starts, setStarts] = useState<string[]>(() =>
     [0, 1, 2, 3, 4, 5, 6].map((wd) => {
       const r = byWd.get(wd);
-      return r && r.status !== "CLOSED"? r.startTime : "09:00";
+      return r && r.status !== "CLOSED" ? r.startTime : "09:00";
     })
   );
 
   const [ends, setEnds] = useState<string[]>(() =>
     [0, 1, 2, 3, 4, 5, 6].map((wd) => {
       const r = byWd.get(wd);
-      return r && r.status !== "CLOSED"? r.endTime : "22:00";
+      return r && r.status !== "CLOSED" ? r.endTime : "22:00";
     })
   );
 
@@ -69,7 +69,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Card variant="solid"padding="none"className="overflow-hidden divide-y divide-line">
+      <Card variant="solid" padding="none" className="overflow-hidden divide-y divide-line">
         {[0, 1, 2, 3, 4, 5, 6].map((wd) => (
           <div key={wd} className="flex items-center gap-4 px-5 py-[14px]">
             <span className="w-[76px] text-md font-semibold">{DAYS[wd]}</span>
@@ -79,7 +79,7 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
               onChange={(c) =>
                 setOpenDays((prev) => prev.map((p, i) => (i === wd ? c : p)))
               }
-              size="md"/>
+              size="md" />
 
             {openDays[wd] ? (
               <div className="ml-auto flex items-center gap-2">
@@ -112,8 +112,8 @@ export function AvailabilityForm({ initialRules }: { initialRules: Rule[] }) {
         ))}
       </Card>
 
-      <Button type="submit"variant="coral"size="lg"disabled={pending}>
-        {pending ? "Salvando…": "Salvar disponibilidade"}
+      <Button type="submit" variant="primary" size="lg" disabled={pending}>
+        {pending ? "Salvando…" : "Salvar disponibilidade"}
       </Button>
     </form>
   );

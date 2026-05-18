@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { giveWarning, suspendProfile, unsuspendProfile } from "@/app/_actions/admin-moderation";
 import { AlertTriangle, Ban, CheckCircle } from "lucide-react";
+import {
+  giveWarning,
+  suspendProfile,
+  unsuspendProfile,
+} from "@/app/_actions/admin-moderation";
+import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 type WarningFormProps = {
@@ -14,35 +20,36 @@ type WarningFormProps = {
 };
 
 /**
- * Cluster de ações de moderação para um perfil: badge de advertências,
- * botões "Advertir"/ "Suspender"/ "Reativar"e modal com `<textarea>`
- * para motivo. O modal aplica `position` responsivo (bottom-sheet em mobile,
- * center em desktop) via `useMediaQuery`.
+ * WarningForm — Design System v2 (Tahoe Sensual).
  *
- * Props:
- * - `profileId` (string): id do perfil-alvo.
- * - `profileName` (string): nome de exibição (usado no header do modal).
- * - `warningCount` (number): número de advertências atuais (controla badge e label do modal).
- * - `isSuspended` (boolean): se a conta já está suspensa (alterna botão "Reativar").
+ * Caminho: src/components/admin/warning-form.tsx
+ * Steering: §3 (cor semântica), §6.3 (Button variants), §3.4 (soft surfaces).
  *
- * Consumidores conhecidos:
- * - src/app/admin/perfis/page.tsx
+ * Cluster de ações de moderação para um perfil:
+ * - Badge de advertências em pílula warning-soft / warning / danger conforme
+ *   intensidade (1, 2, 3+).
+ * - Botões "Advertir" (warning-subtle outline), "Suspender" (danger outline),
+ *   "Reativar" (success).
+ * - Modal com `<Textarea>` v2 para motivo (bottom-sheet em mobile, center desktop).
  *
  * Side effects:
- * - Server actions `giveWarning`, `suspendProfile`, `unsuspendProfile`
- *   em `src/app/_actions/admin-moderation.ts`.
- * - `useMediaQuery("(max-width: 640px)")` para escolher `position` do modal (fase-6).
+ * - Server actions `giveWarning`, `suspendProfile`, `unsuspendProfile`.
+ * - `useMediaQuery("(max-width: 640px)")` para escolher posição do modal.
  */
-export function WarningForm({ profileId, profileName, warningCount, isSuspended }: WarningFormProps) {
+export function WarningForm({
+  profileId,
+  profileName,
+  warningCount,
+  isSuspended,
+}: WarningFormProps) {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"warn"| "suspend">("warn");
+  const [mode, setMode] = useState<"warn" | "suspend">("warn");
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
-  // fase-6: bottom-sheet em mobile (≤ 640px), center em desktop. Cf. mockups-diff.md > §Bottom-sheet decisões.
   const isMobile = useMediaQuery("(max-width: 640px)");
 
-  function openModal(m: "warn"| "suspend") {
+  function openModal(m: "warn" | "suspend") {
     setMode(m);
     setReason("");
     setError("");
@@ -61,10 +68,16 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
     start(async () => {
       if (mode === "warn") {
         const res = await giveWarning(profileId, reason);
-        if (res.error) { setError(res.error); return; }
+        if (res.error) {
+          setError(res.error);
+          return;
+        }
       } else {
         const res = await suspendProfile(profileId, reason);
-        if (res.error) { setError(res.error); return; }
+        if (res.error) {
+          setError(res.error);
+          return;
+        }
       }
       setOpen(false);
       setReason("");
@@ -73,34 +86,51 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
 
   return (
     <>
-      <div className="flex items-center gap-1 flex-wrap">
+      <div className="flex flex-wrap items-center gap-1.5">
         {/* Warning badge */}
         {warningCount > 0 && (
-          <span className={`text-2xs font-bold px-1.5 py-0.5 rounded ${warningCount >= 3 ? "bg-red-100 text-red-700": warningCount === 2 ? "bg-orange-100 text-orange-700": "bg-yellow-100 text-yellow-700"}`}>
+          <span
+            className={
+              warningCount >= 3
+                ? "inline-flex items-center rounded-full bg-danger px-2 py-0.5 text-2xs font-bold uppercase tracking-wider text-white"
+                : warningCount === 2
+                  ? "inline-flex items-center rounded-full bg-warning-soft px-2 py-0.5 text-2xs font-bold uppercase tracking-wider text-warning"
+                  : "inline-flex items-center rounded-full bg-cream px-2 py-0.5 text-2xs font-bold uppercase tracking-wider text-ink"
+            }
+          >
             {warningCount} adv.
           </span>
         )}
 
         {isSuspended ? (
           <button
+            type="button"
             onClick={handleUnsuspend}
             disabled={pending}
-            className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-success/30 bg-success/10 text-success hover:bg-success/20 transition disabled:opacity-40"title="Reativar conta">
-            <CheckCircle className="h-3 w-3"strokeWidth={2} />
+            title="Reativar conta"
+            className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-success transition hover:bg-success/15 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40"
+          >
+            <CheckCircle className="h-3 w-3" strokeWidth={2} />
             Reativar
           </button>
         ) : (
           <>
             <button
+              type="button"
               onClick={() => openModal("warn")}
-              className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition"title="Dar advertência">
-              <AlertTriangle className="h-3 w-3"strokeWidth={2} />
+              title="Dar advertência"
+              className="inline-flex items-center gap-1 rounded-full border border-warning/30 bg-warning-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-warning transition hover:bg-warning/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40"
+            >
+              <AlertTriangle className="h-3 w-3" strokeWidth={2} />
               Advertir
             </button>
             <button
+              type="button"
               onClick={() => openModal("suspend")}
-              className="flex items-center gap-1 text-2xs font-bold px-2 py-1 border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"title="Suspender conta">
-              <Ban className="h-3 w-3"strokeWidth={2} />
+              title="Suspender conta"
+              className="inline-flex items-center gap-1 rounded-full border border-danger/30 bg-danger-soft px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-danger transition hover:bg-danger/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40"
+            >
+              <Ban className="h-3 w-3" strokeWidth={2} />
               Suspender
             </button>
           </>
@@ -110,33 +140,56 @@ export function WarningForm({ profileId, profileName, warningCount, isSuspended 
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        position={isMobile ? "bottom": "center"}
-        className="w-full max-w-sm bg-white p-6 shadow-xl">
-        <h2 className="font-bold text-sm mb-1">
-          {mode === "warn"? "Advertir": "Suspender"} — <span className="font-normal text-ink-dim">{profileName}</span>
+        position={isMobile ? "bottom" : "center"}
+        className="w-full max-w-sm bg-white p-6 shadow-[var(--shadow-lg)]"
+      >
+        <h2 className="text-md font-semibold tracking-[-0.011em] text-ink">
+          {mode === "warn" ? "Advertir" : "Suspender"} —{" "}
+          <span className="font-normal text-ink-dim">{profileName}</span>
         </h2>
-        <p className="text-xs text-ink-dim mb-4">
-          {mode === "warn"? `Advertência ${warningCount + 1}/3. Ao atingir 3, a conta é suspensa automaticamente.`
+        <p className="mt-1 mb-4 text-xs leading-relaxed text-ink-dim">
+          {mode === "warn"
+            ? `Advertência ${warningCount + 1}/3. Ao atingir 3, a conta é suspensa automaticamente.`
             : "A conta será suspensa e o perfil ficará invisível."}
         </p>
-        <textarea
+        <Textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder={mode === "warn"? "Motivo da advertência…": "Motivo da suspensão…"}
+          placeholder={
+            mode === "warn"
+              ? "Motivo da advertência…"
+              : "Motivo da suspensão…"
+          }
           rows={3}
-          className="w-full rounded-lg border border-line px-3 py-2 text-sm shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] transition-all resize-none"/>
-        {error && <p className="mt-2 text-xs text-danger">{error}</p>}
-        <div className="mt-4 flex gap-2 justify-end">
-          <button onClick={() => setOpen(false)} className="rounded-lg px-3 py-1.5 text-xs border border-line hover:bg-line active:scale-[0.97] transition">
+        />
+        {error && (
+          <p className="mt-2 text-xs text-danger" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="mt-4 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen(false)}
+          >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
+            type="button"
+            variant={mode === "warn" ? "primary" : "danger"}
+            size="sm"
             onClick={handleSubmit}
             disabled={pending || !reason.trim()}
-            className={`rounded-lg px-4 py-1.5 text-xs font-semibold text-white transition active:scale-[0.97] disabled:opacity-40 ${mode === "warn"? "bg-yellow-600 hover:bg-yellow-700": "bg-red-600 hover:bg-red-700"}`}
+            loading={pending}
           >
-            {pending ? "Enviando…": mode === "warn"? "Confirmar advertência": "Confirmar suspensão"}
-          </button>
+            {pending
+              ? "Enviando…"
+              : mode === "warn"
+                ? "Confirmar advertência"
+                : "Confirmar suspensão"}
+          </Button>
         </div>
       </Modal>
     </>

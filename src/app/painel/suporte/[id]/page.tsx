@@ -4,10 +4,12 @@
  * Rota: `/painel/suporte/[id]`.
  * Tipo: Server Component (chat é Client).
  * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`;
- *  retorna 404 se o ticket não pertencer ao usuário (`ticket.userId === session.user.id`).
+ *  retorna 404 se o ticket não pertencer ao usuário.
  * Cache: `force-dynamic` (mensagens em tempo real).
  *
- * Detalhe e chat de um `SupportTicket` do próprio provider.
+ * Visual v2 (Tahoe Sensual):
+ * - Container `rounded-2xl border-line bg-white shadow-sm`.
+ * - Status pills consistentes com `/painel/suporte`.
  *
  * Cross-refs:
  * - src/components/support/ticket-chat.tsx
@@ -20,7 +22,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TicketChat } from "@/components/support/ticket-chat";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 35 (chat de ticket).
 export const dynamic = "force-dynamic";
 
 const statusLabel: Record<string, string> = {
@@ -28,10 +29,11 @@ const statusLabel: Record<string, string> = {
   IN_PROGRESS: "Em andamento",
   CLOSED: "Fechado",
 };
+
 const statusClass: Record<string, string> = {
-  OPEN: "bg-blue/10 text-blue",
-  IN_PROGRESS: "bg-warning/10 text-warning-dark",
-  CLOSED: "bg-black/[0.06] text-muted",
+  OPEN: "bg-rose-soft text-rose",
+  IN_PROGRESS: "bg-warning-soft text-warning",
+  CLOSED: "bg-line/40 text-ink-dim",
 };
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -45,7 +47,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
     where: { id },
     include: {
       messages: {
-        orderBy: { createdAt: "asc"},
+        orderBy: { createdAt: "asc" },
         include: { user: { select: { name: true } } },
       },
     },
@@ -62,22 +64,31 @@ export default async function TicketDetailPage({ params }: PageProps) {
   }));
 
   return (
-    <div className="space-y-4 max-w-xl mx-auto">
+    <div className="mx-auto max-w-xl space-y-4">
       <Link
-        href="/painel/suporte"className="inline-flex items-center gap-1.5 text-base text-muted transition hover:text-foreground">
-        <ArrowLeft className="h-3.5 w-3.5"strokeWidth={1.5} />
+        href="/painel/suporte"
+        className="inline-flex items-center gap-1.5 rounded-md text-base text-ink-dim transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
         Todos os chamados
       </Link>
 
-      <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center justify-between border-b border-black/[0.06] px-5 py-4">
-          <div>
-            <p className="text-md font-semibold">{ticket.subject}</p>
-            <p className="mt-0.5 text-sm text-muted">
-              Aberto em {new Date(ticket.createdAt).toLocaleDateString("pt-BR")}
+      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-sm)]">
+        <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
+          <div className="min-w-0">
+            <p className="truncate text-md font-semibold tracking-[-0.011em] text-ink">
+              {ticket.subject}
+            </p>
+            <p className="mt-0.5 text-sm text-ink-dim">
+              Aberto em{" "}
+              <span className="tabular-nums">
+                {new Date(ticket.createdAt).toLocaleDateString("pt-BR")}
+              </span>
             </p>
           </div>
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass[ticket.status]}`}>
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wider ${statusClass[ticket.status] ?? ""}`}
+          >
             {statusLabel[ticket.status]}
           </span>
         </div>

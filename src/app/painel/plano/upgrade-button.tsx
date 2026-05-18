@@ -1,52 +1,78 @@
 "use client";
 
 import { useTransition } from "react";
-import { devActivatePlan, claimFreeBoost } from "@/app/painel/_actions/provider-settings";
+import { Button } from "@/components/ui/button";
+import {
+  devActivatePlan,
+  claimFreeBoost,
+} from "@/app/painel/_actions/provider-settings";
 
 const IS_DEV = process.env.NODE_ENV !== "production";
 const MP_ENABLED = !!process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
 
+/**
+ * UpgradeButton — Design System v2 (Tahoe Sensual).
+ *
+ * Variantes:
+ *  - Em dev: form com fallback `devActivatePlan` (rose dashed outline).
+ *  - Em prod: dispara `/api/mp/checkout`.
+ *
+ * Padroniza visual via `<Button>` primitivo (variant primary fullwidth).
+ */
 export function UpgradeButton({ tier }: { tier: string }) {
   const [pending, startTransition] = useTransition();
 
   if (IS_DEV) {
     return (
       <form action={devActivatePlan}>
-        <input type="hidden"name="tier"value={tier} />
-        <button
-          type="submit"className="block w-full rounded-xl border-2 border-dashed border-blue/40 bg-info/[0.04] py-2.5 text-center text-base font-semibold text-rose transition hover:bg-info/[0.08] active:scale-[0.97]">
+        <input type="hidden" name="tier" value={tier} />
+        <Button
+          type="submit"
+          variant="secondary"
+          size="md"
+          className="w-full border-dashed border-rose/40"
+        >
           Ativar grátis (dev)
-        </button>
+        </Button>
       </form>
     );
   }
 
   function handleClick() {
     if (!MP_ENABLED) {
-      alert("Configure NEXT_PUBLIC_MP_PUBLIC_KEY no .env para ativar pagamentos.");
+      alert(
+        "Configure NEXT_PUBLIC_MP_PUBLIC_KEY no .env para ativar pagamentos.",
+      );
       return;
     }
     startTransition(async () => {
       const res = await fetch("/api/mp/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "plan", tier }),
       });
-      const data = await res.json() as { url?: string; error?: string };
+      const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) window.location.href = data.url;
     });
   }
 
   return (
-    <button
+    <Button
       onClick={handleClick}
       disabled={pending}
-      className="block w-full rounded-xl border border-line bg-line/30 py-2.5 text-center text-base font-semibold text-ink shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.04)] transition hover:bg-ink hover:text-white active:scale-[0.97] disabled:opacity-50">
-      {pending ? "Redirecionando…": "Fazer upgrade"}
-    </button>
+      loading={pending}
+      variant="primary"
+      size="md"
+      className="w-full"
+    >
+      {pending ? "Redirecionando…" : "Fazer upgrade"}
+    </Button>
   );
 }
 
+/**
+ * FreeBoostButton — usado para Premium reivindicar boost grátis mensal.
+ */
 export function FreeBoostButton() {
   const [pending, startTransition] = useTransition();
 
@@ -57,40 +83,51 @@ export function FreeBoostButton() {
   }
 
   return (
-    <button
+    <Button
       onClick={handleClick}
       disabled={pending}
-      className="inline-flex items-center gap-2 rounded-xl bg-rose px-5 py-2.5 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50">
-      {pending ? "Ativando…": "Usar boost grátis"}
-    </button>
+      loading={pending}
+      variant="primary"
+      size="md"
+    >
+      {pending ? "Ativando…" : "Usar boost grátis"}
+    </Button>
   );
 }
 
+/**
+ * BoostButton — disparo pago de boost (R$ 89 / 24h).
+ */
 export function BoostButton() {
   const [pending, startTransition] = useTransition();
 
   function handleClick() {
     if (!MP_ENABLED) {
-      alert("Configure NEXT_PUBLIC_MP_PUBLIC_KEY no .env para ativar pagamentos.");
+      alert(
+        "Configure NEXT_PUBLIC_MP_PUBLIC_KEY no .env para ativar pagamentos.",
+      );
       return;
     }
     startTransition(async () => {
       const res = await fetch("/api/mp/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify({ type: "boost"}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "boost" }),
       });
-      const data = await res.json() as { url?: string; error?: string };
+      const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) window.location.href = data.url;
     });
   }
 
   return (
-    <button
+    <Button
       onClick={handleClick}
       disabled={pending}
-      className="mt-3 inline-block rounded-lg bg-rose px-5 py-2.5 text-base font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-[0.97] disabled:opacity-50">
-      {pending ? "Redirecionando…": "Disparar boost"}
-    </button>
+      loading={pending}
+      variant="primary"
+      size="md"
+    >
+      {pending ? "Redirecionando…" : "Disparar boost"}
+    </Button>
   );
 }

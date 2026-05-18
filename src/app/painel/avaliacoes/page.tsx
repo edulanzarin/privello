@@ -4,42 +4,26 @@
  * Rota: `/painel/avaliacoes`.
  * Tipo: Server Component.
  * Auth: acompanhante (PROVIDER) — gate em `src/app/painel/layout.tsx`.
- * Cache: `force-dynamic` (lista pode mudar a qualquer momento).
+ * Cache: `force-dynamic`.
  *
- * Sumário (média, total, distribuição) + lista cronológica de `Review`s.
+ * Visual v2 (Tahoe Sensual):
+ * - 3 KPI cards `rounded-2xl border-line bg-white shadow-sm` com eyebrow uppercase.
+ * - Estrelas via `<RatingStars>` primitivo (cream fill, line vazio).
+ * - Lista de reviews em cards com border-l-2 rose/30 no comentário.
  *
  * Cross-refs:
  * - src/app/painel/layout.tsx
  * - src/app/api/review/route.ts
+ * - src/components/ui/rating-stars.tsx
  */
 import { redirect } from "next/navigation";
-import { Star, MessageSquare, TrendingUp } from "lucide-react";
+import { MessageSquare, Star, TrendingUp } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
+import { RatingStars } from "@/components/ui/rating-stars";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 31 (avaliações recebidas).
 export const dynamic = "force-dynamic";
-
-const STARS = [1, 2, 3, 4, 5];
-
-function StarRow({ rating }: { rating: number }) {
-  return (
-    <span className="flex items-center gap-0.5">
-      {STARS.map((n) => (
-        <Star
-          key={n}
-          className={cn(
-"h-3.5 w-3.5",
-            n <= rating ? "fill-coral text-rose": "text-line",
-          )}
-          strokeWidth={0}
-        />
-      ))}
-    </span>
-  );
-}
 
 function ratingLabel(r: number) {
   return ["", "Muito ruim", "Ruim", "Regular", "Boa", "Excelente"][r] ?? "";
@@ -57,13 +41,12 @@ export default async function PainelAvaliacoesPage() {
 
   const reviews = await prisma.review.findMany({
     where: { profileId: profile.id },
-    orderBy: { createdAt: "desc"},
+    orderBy: { createdAt: "desc" },
     include: {
       user: { select: { name: true, slug: true } },
     },
   });
 
-  // Distribution
   const dist = [5, 4, 3, 2, 1].map((n) => ({
     star: n,
     count: reviews.filter((r) => r.rating === n).length,
@@ -73,52 +56,72 @@ export default async function PainelAvaliacoesPage() {
     profile.ratingCount > 0 ? Math.round((n / profile.ratingCount) * 100) : 0;
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Avaliações</h1>
-        <p className="mt-1 text-md text-ink-dim">
-          O que os clientes dizem sobre você. Visível para assinantes no seu perfil.
+        <h1 className="text-3xl font-bold tracking-[-0.025em] text-ink sm:text-4xl">
+          Avaliações
+        </h1>
+        <p className="mt-2 text-md text-ink-dim">
+          O que os clientes dizem sobre você. Visível para assinantes no seu
+          perfil.
         </p>
       </div>
 
       {/* Summary */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-ink-dim">Média geral</p>
-          <p className="mt-2 text-4xl font-bold tabular-nums">
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
+          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+            Média geral
+          </p>
+          <p className="mt-2 text-4xl font-bold tabular-nums tracking-[-0.025em] text-ink">
             {profile.ratingAvg > 0 ? profile.ratingAvg.toFixed(1) : "—"}
           </p>
           {profile.ratingAvg > 0 && (
             <div className="mt-2">
-              <StarRow rating={Math.round(profile.ratingAvg)} />
+              <RatingStars
+                value={Math.round(profile.ratingAvg)}
+                size="sm"
+              />
             </div>
           )}
         </div>
 
-        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-ink-dim">Total</p>
-          <p className="mt-2 text-4xl font-bold tabular-nums">{profile.ratingCount}</p>
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
+          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+            Total
+          </p>
+          <p className="mt-2 text-4xl font-bold tabular-nums tracking-[-0.025em] text-ink">
+            {profile.ratingCount}
+          </p>
           <p className="mt-1 text-xs text-ink-dim">
-            avaliação{profile.ratingCount !== 1 ? "ões": ""}
+            avaliação{profile.ratingCount !== 1 ? "ões" : ""}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-xs font-medium text-ink-dim flex items-center gap-1.5">
-            <TrendingUp className="h-3.5 w-3.5"strokeWidth={1.5} />
+        <div className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
+          <p className="inline-flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+            <TrendingUp className="h-3.5 w-3.5" strokeWidth={1.75} />
             Distribuição
           </p>
           <ul className="mt-3 space-y-1.5">
             {dist.map(({ star, count }) => (
               <li key={star} className="flex items-center gap-2 text-xs">
-                <span className="w-4 shrink-0 text-right text-ink-dim">{star}</span>
-                <Star className="h-3 w-3 fill-coral text-rose shrink-0"strokeWidth={0} />
-                <div className="flex-1 h-1.5 rounded-full bg-line overflow-hidden">
+                <span className="w-4 shrink-0 text-right tabular-nums text-ink-dim">
+                  {star}
+                </span>
+                <Star
+                  className="h-3 w-3 shrink-0 fill-cream text-cream"
+                  strokeWidth={0}
+                />
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line/50">
                   <div
-                    className="h-full rounded-full bg-rose"style={{ width: `${pct(count)}%` }}
+                    className="h-full rounded-full bg-rose"
+                    style={{ width: `${pct(count)}%` }}
                   />
                 </div>
-                <span className="w-5 shrink-0 text-right text-ink-dim">{count}</span>
+                <span className="w-5 shrink-0 text-right tabular-nums text-ink-dim">
+                  {count}
+                </span>
               </li>
             ))}
           </ul>
@@ -128,31 +131,40 @@ export default async function PainelAvaliacoesPage() {
       {/* Reviews list */}
       {reviews.length === 0 ? (
         <EmptyState
-          title="Nenhuma avaliação ainda"description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil."icon={<MessageSquare className="h-10 w-10"strokeWidth={1.5} />}
+          title="Nenhuma avaliação ainda"
+          description="As avaliações aparecem aqui depois que clientes assinantes visitarem seu perfil."
+          icon={<MessageSquare className="h-10 w-10" strokeWidth={1.5} />}
         />
       ) : (
         <div className="space-y-3">
-          <p className="text-base font-medium text-ink-dim">
-            {reviews.length} avaliação{reviews.length !== 1 ? "ões": ""}
+          <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+            {reviews.length} avaliação{reviews.length !== 1 ? "ões" : ""}
           </p>
           {reviews.map((r) => (
-            <article key={r.id} className="rounded-2xl border border-line bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <article
+              key={r.id}
+              className="rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]"
+            >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
                     {(r.user.name ?? "?")[0].toUpperCase()}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold leading-tight">
-                      {r.user.slug ? `@${r.user.slug}` : (r.user.name ?? "Usuário")}
+                    <p className="text-sm font-semibold leading-tight text-ink">
+                      {r.user.slug
+                        ? `@${r.user.slug}`
+                        : r.user.name ?? "Usuário"}
                     </p>
                     <div className="mt-1 flex items-center gap-2">
-                      <StarRow rating={r.rating} />
-                      <span className="text-xs text-ink-dim">{ratingLabel(r.rating)}</span>
+                      <RatingStars value={r.rating} size="xs" />
+                      <span className="text-xs text-ink-dim">
+                        {ratingLabel(r.rating)}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <time className="shrink-0 text-xs text-ink-dim">
+                <time className="shrink-0 text-xs tabular-nums text-ink-faint">
                   {r.createdAt.toLocaleDateString("pt-BR", {
                     day: "numeric",
                     month: "short",

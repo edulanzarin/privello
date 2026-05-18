@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { saveDurationOptions } from "@/app/painel/_actions/provider-settings";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import { ToggleChip } from "@/components/ui/toggle-chip";
+import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { ToggleChip } from "@/components/ui/toggle-chip";
 import { cn } from "@/lib/utils";
 
 const DURATIONS = [
@@ -31,6 +32,16 @@ type Profile = {
   durationOptions: DurationOption[];
 };
 
+/**
+ * ValoresForm — Design System v2 (Tahoe Sensual).
+ *
+ * Caminho: src/app/painel/valores/valores-form.tsx
+ * Steering: §3 (tokens), §6 (Switch + Card + ToggleChip), §14 (forms densos).
+ *
+ * Editor de durações + valores + formas de pagamento. Usa `<Card variant="solid">`
+ * com header bordered + body, switch macOS por linha, input numérico inline com
+ * prefixo "R$" sem CSS hardcoded (focus ring rose, hover border).
+ */
 export function ValoresForm({ profile }: { profile: Profile }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -39,25 +50,30 @@ export function ValoresForm({ profile }: { profile: Profile }) {
   const byMin = new Map(profile.durationOptions.map((o) => [o.minutes, o]));
 
   const [enabled, setEnabled] = useState<Record<number, boolean>>(() =>
-    Object.fromEntries(DURATIONS.map((d) => [
-      d.minutes,
-      d.required || byMin.has(d.minutes),
-    ]))
+    Object.fromEntries(
+      DURATIONS.map((d) => [d.minutes, d.required || byMin.has(d.minutes)]),
+    ),
   );
   const [prices, setPrices] = useState<Record<number, number>>(() =>
-    Object.fromEntries(DURATIONS.map((d) => [
-      d.minutes,
-      byMin.get(d.minutes)?.priceBrl
-      ?? (d.minutes === 60 ? profile.priceHour : 0)
-      ?? 0,
-    ]))
+    Object.fromEntries(
+      DURATIONS.map((d) => [
+        d.minutes,
+        byMin.get(d.minutes)?.priceBrl ??
+        (d.minutes === 60 ? profile.priceHour : 0) ??
+        0,
+      ]),
+    ),
   );
   const [payments, setPayments] = useState<string[]>(() =>
-    profile.paymentMethods ? profile.paymentMethods.split("· ").map((s) => s.trim()) : []
+    profile.paymentMethods
+      ? profile.paymentMethods.split("·").map((s) => s.trim()).filter(Boolean)
+      : [],
   );
 
   function togglePayment(p: string) {
-    setPayments((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+    setPayments((prev) =>
+      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
+    );
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -71,7 +87,7 @@ export function ValoresForm({ profile }: { profile: Profile }) {
       fd.set(`dur_${idx}_price`, String(prices[d.minutes]));
       idx++;
     });
-    fd.set("paymentMethods", payments.join("· "));
+    fd.set("paymentMethods", payments.join(" · "));
     startTransition(async () => {
       await saveDurationOptions(fd);
       toast("Valores salvos.");
@@ -82,14 +98,21 @@ export function ValoresForm({ profile }: { profile: Profile }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Durações */}
-      <div className="rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+      <Card variant="solid" padding="none">
         <div className="border-b border-line px-6 py-4">
-          <p className="text-md font-semibold">Durações e valores</p>
-          <p className="mt-1 text-sm text-ink-dim">Ative as durações que você oferece e defina o valor.</p>
+          <p className="text-md font-semibold tracking-[-0.011em] text-ink">
+            Durações e valores
+          </p>
+          <p className="mt-1 text-sm text-ink-dim">
+            Ative as durações que você oferece e defina o valor.
+          </p>
         </div>
-        <div className="divide-y divide-black/[0.04]">
+        <div className="divide-y divide-line">
           {DURATIONS.map((d) => (
-            <div key={d.minutes} className="flex items-center gap-4 px-6 py-4">
+            <div
+              key={d.minutes}
+              className="flex items-center gap-4 px-6 py-4"
+            >
               <Switch
                 checked={!!enabled[d.minutes]}
                 onChange={(c) =>
@@ -97,33 +120,50 @@ export function ValoresForm({ profile }: { profile: Profile }) {
                   setEnabled((p) => ({ ...p, [d.minutes]: c }))
                 }
                 disabled={d.required}
-                size="md"/>
-              <span className={cn(
-"w-20 shrink-0 text-md font-medium",
-                !enabled[d.minutes] && "text-ink-dim",
-              )}>
+                size="md"
+              />
+              <span
+                className={cn(
+                  "w-20 shrink-0 text-md font-medium",
+                  enabled[d.minutes] ? "text-ink" : "text-ink-dim",
+                )}
+              >
                 {d.label}
-                {d.required && <span className="ml-1 text-rose">*</span>}
+                {d.required && (
+                  <span className="ml-1 text-rose">*</span>
+                )}
               </span>
               <div className="relative max-w-[160px]">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-ink-dim">R$</span>
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-ink-dim">
+                  R$
+                </span>
                 <input
-                  type="number"min={50}
+                  type="number"
+                  min={50}
                   step={50}
                   disabled={!enabled[d.minutes]}
                   value={prices[d.minutes] || ""}
-                  onChange={(e) => setPrices((p) => ({ ...p, [d.minutes]: Number(e.target.value) }))}
-                  placeholder="0"className="w-full rounded-lg border border-line bg-white py-[7px] pl-9 pr-3 text-md shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:border-black/20 focus:border-rose focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] disabled:bg-line/30 disabled:text-ink-dim"/>
+                  onChange={(e) =>
+                    setPrices((p) => ({
+                      ...p,
+                      [d.minutes]: Number(e.target.value),
+                    }))
+                  }
+                  placeholder="0"
+                  className="w-full rounded-xl border border-line bg-white py-[9px] pl-9 pr-3 text-md tabular-nums text-ink transition-all duration-150 ease-[var(--ease-tahoe)] placeholder:text-ink-dim/55 hover:border-ink/15 focus:border-rose/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:bg-line/30 disabled:text-ink-dim"
+                />
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Pagamentos */}
-      <div className="rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+      <Card variant="solid" padding="none">
         <div className="border-b border-line px-6 py-4">
-          <p className="text-md font-semibold">Formas de pagamento</p>
+          <p className="text-md font-semibold tracking-[-0.011em] text-ink">
+            Formas de pagamento
+          </p>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-5">
           {PAYMENT_OPTIONS.map((p) => (
@@ -136,10 +176,10 @@ export function ValoresForm({ profile }: { profile: Profile }) {
             </ToggleChip>
           ))}
         </div>
-      </div>
+      </Card>
 
-      <Button type="submit"variant="coral"size="lg"loading={pending}>
-        {pending ? "Salvando…": "Salvar valores"}
+      <Button type="submit" variant="primary" size="lg" loading={pending}>
+        {pending ? "Salvando…" : "Salvar valores"}
       </Button>
     </form>
   );

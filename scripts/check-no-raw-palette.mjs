@@ -37,6 +37,23 @@ const RAW_PALETTE_RE =
 const OUTLINE_NONE_CSS_RE = /outline\s*:\s*['"]?none['"]?\b/g;
 const OUTLINE_NONE_CLASS_RE = /\boutline-none\b/g;
 
+// v2 (Tahoe Sensual): tokens v1 banidos fora de `src/components/ui/**`.
+// `text-foreground` / `bg-foreground` / `text-muted` / `bg-muted` / `text-coral`/
+// `fill-coral` / `bg-coral` / `accent-coral` / `border-coral` / `font-serif` —
+// substituídos por `text-ink` / `bg-ink` / `text-ink-dim` / `text-rose` / etc.
+const LEGACY_TOKEN_RE =
+    /\b(?:text|bg|border|ring|fill|accent|from|to|via)-(?:foreground|muted|coral)(?:\/[\d.]+)?\b|\bfont-serif\b|\bborder-black\/\[0\.0[0-9]+\]/g;
+
+// v2: raw shadow inline `shadow-[0_1px_3px_rgba(0,0,0,...)]` ou variantes
+// hardcoded — usar tokens `shadow-[var(--shadow-sm|md|lg|hairline)]` em vez.
+// Bate em `shadow-[<...rgba...>]` quando o conteúdo tem `rgba(`.
+const RAW_SHADOW_RE = /shadow-\[[^\]]*rgba\([^\]]*\]/g;
+
+// v2: focus-ring azul de v1 (`focus:shadow-[0_0_0_3px_rgba(10,132,255...]`),
+// `focus:border-blue`, `ring-blue`, etc. — substituídos por `ring-rose/40`.
+const BLUE_FOCUS_RE =
+    /focus:shadow-\[0_0_0_3px_rgba\(10,132,255[^\]]*\]|focus:border-blue\b|focus-within:border-blue\b|focus-within:shadow-\[0_0_0_3px_rgba\(10,132,255[^\]]*\]/g;
+
 // ── Configuração de escopo ──────────────────────────────────────────────────
 const ROOT = process.cwd();
 
@@ -160,12 +177,51 @@ function outlineWithoutRing(text, regex) {
 
 function analyzeFile(file) {
     const text = fs.readFileSync(file, "utf8");
+    // Strip block + line comments antes de checar legacy patterns. Mantém o
+    // texto original para line/col reporting via `findMatchesInStripped`.
+    const stripped = stripComments(text);
     const violations = [];
 
     for (const { match, index } of findMatches(text, RAW_PALETTE_RE)) {
         const { line, col } = lineColForOffset(text, index);
         violations.push({
             kind: "raw-palette",
+            file,
+            line,
+            col,
+            match,
+        });
+    }
+
+    // Legacy v1 tokens, raw shadows e blue focus rings: regras de v2. Buscamos
+    // no `stripped` para evitar falsos positivos em docstrings explicando "sem
+    // font-serif" ou "rejeita text-muted".
+    for (const { match, index } of findMatches(stripped, LEGACY_TOKEN_RE)) {
+        const { line, col } = lineColForOffset(stripped, index);
+        violations.push({
+            kind: "legacy-v1-token",
+            file,
+            line,
+            col,
+            match,
+        });
+    }
+
+    for (const { match, index } of findMatches(stripped, RAW_SHADOW_RE)) {
+        const { line, col } = lineColForOffset(stripped, index);
+        violations.push({
+            kind: "raw-shadow",
+            file,
+            line,
+            col,
+            match,
+        });
+    }
+
+    for (const { match, index } of findMatches(stripped, BLUE_FOCUS_RE)) {
+        const { line, col } = lineColForOffset(stripped, index);
+        violations.push({
+            kind: "blue-focus-ring",
             file,
             line,
             col,
@@ -193,6 +249,49 @@ function analyzeFile(file) {
     }
 
     return violations;
+}
+
+/**
+ * Substitui comentários por espaços do mesmo tamanho preservando line numbers
+ * e column positions. Usado para checagens v2 (legacy tokens, raw shadows,
+ * blue focus) que não devem disparar em docstrings explicando o anti-pattern.
+ *
+ * Cobre:
+ *  - `// line comments`
+ *  - `/* block comments *\/`
+ *
+ * Não tenta parsear strings/regex literals (overkill para este script).
+ */
+function stripComments(text) {
+    let out = "";
+    let i = 0;
+    const n = text.length;
+    while (i < n) {
+        const c = text[i];
+        const next = i + 1 < n ? text[i + 1] : "";
+        if (c === "/" && next === "/") {
+            // Line comment until \n
+            while (i < n && text[i] !== "\n") {
+                out += text[i] === "\n" ? "\n" : " ";
+                i++;
+            }
+        } else if (c === "/" && next === "*") {
+            // Block comment until */
+            while (i < n) {
+                if (text[i] === "*" && text[i + 1] === "/") {
+                    out += "  ";
+                    i += 2;
+                    break;
+                }
+                out += text[i] === "\n" ? "\n" : " ";
+                i++;
+            }
+        } else {
+            out += c;
+            i++;
+        }
+    }
+    return out;
 }
 
 // ── CLI ─────────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { registerProviderAction } from "@/app/_actions/auth";
@@ -29,14 +29,14 @@ const EYES_OPTIONS = [
   { value: "Cinzas", label: "Cinzas" },
 ];
 const LANGUAGE_OPTIONS = [
-  { value: "PT", label: "Português" },
-  { value: "EN", label: "Inglês" },
+  { value: "PT", label: "PortuguÃªs" },
+  { value: "EN", label: "InglÃªs" },
   { value: "ES", label: "Espanhol" },
-  { value: "FR", label: "Francês" },
+  { value: "FR", label: "FrancÃªs" },
   { value: "IT", label: "Italiano" },
-  { value: "DE", label: "Alemão" },
+  { value: "DE", label: "AlemÃ£o" },
 ];
-const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferência", "Cripto"];
+const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "CartÃ£o de crÃ©dito", "TransferÃªncia", "Cripto"];
 const DURATIONS = [
   { key: "30min", label: "30 min", minutes: 30, required: false },
   { key: "1h", label: "1 hora", minutes: 60, required: true },
@@ -44,7 +44,7 @@ const DURATIONS = [
   { key: "3h", label: "3 horas", minutes: 180, required: false },
   { key: "4h", label: "4 horas", minutes: 240, required: false },
   { key: "overnight", label: "Pernoite", minutes: 720, required: false },
-  { key: "travel", label: "Diária", minutes: 1440, required: false },
+  { key: "travel", label: "DiÃ¡ria", minutes: 1440, required: false },
 ] as const;
 
 type DurKey = (typeof DURATIONS)[number]["key"];
@@ -66,7 +66,7 @@ export function ProviderRegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  // Step 5 — photo
+  // Step 5 â€” photo
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
@@ -109,19 +109,19 @@ export function ProviderRegisterForm() {
 
   function validate(s: number): string | null {
     if (s === 1) {
-      if (!displayName.trim()) return "Informe seu nome artístico.";
+      if (!displayName.trim()) return "Informe seu nome artÃ­stico.";
       if (!slug.trim()) return "Escolha seu @handle.";
-      if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) return "O @ deve ter apenas letras minúsculas, números e hífens.";
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) return "O @ deve ter apenas letras minÃºsculas, nÃºmeros e hÃ­fens.";
       if (slug.length < 3) return "O @ deve ter ao menos 3 caracteres.";
-      if (!age || parseInt(age) < 18) return "Você deve ter ao menos 18 anos.";
-      if (!citySlug) return "Selecione a cidade onde você atende.";
+      if (!age || parseInt(age) < 18) return "VocÃª deve ter ao menos 18 anos.";
+      if (!citySlug) return "Selecione a cidade onde vocÃª atende.";
     }
     if (s === 2) {
       if (!bio.trim() || bio.trim().length < 20) return "A bio deve ter ao menos 20 caracteres.";
       if (languages.length === 0) return "Selecione ao menos um idioma.";
     }
     if (s === 3) {
-      if (!durPrice["1h"] || Number(durPrice["1h"]) < 50) return "Informe o valor para 1 hora (mínimo R$ 50).";
+      if (!durPrice["1h"] || Number(durPrice["1h"]) < 50) return "Informe o valor para 1 hora (mÃ­nimo R$ 50).";
     }
     if (s === 4) {
       if (!email.trim()) return "Informe seu e-mail.";
@@ -136,7 +136,7 @@ export function ProviderRegisterForm() {
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
-      setError("Imagem muito grande. Máximo 8 MB.");
+      setError("Imagem muito grande. MÃ¡ximo 8 MB.");
       return;
     }
     setError(null);
@@ -172,7 +172,7 @@ export function ProviderRegisterForm() {
     fd.set("dressSize", dressSize);
     fd.set("hair", hair);
     fd.set("eyes", eyes);
-    fd.set("languages", languages.join(" · "));
+    fd.set("languages", languages.join(" Â· "));
     fd.set("servesMen", servesMen ? "1" : "0");
     fd.set("servesWomen", servesWomen ? "1" : "0");
     fd.set("servesCouples", servesCouples ? "1" : "0");
@@ -180,7 +180,7 @@ export function ProviderRegisterForm() {
     fd.set("homeVisit", homeVisit ? "1" : "0");
     fd.set("travelsNational", travelsNational ? "1" : "0");
     fd.set("travelsInternational", travelsInternational ? "1" : "0");
-    fd.set("paymentMethods", payments.join(" · "));
+    fd.set("paymentMethods", payments.join(" Â· "));
     fd.set("durationsJson", JSON.stringify(durations));
     fd.set("photo", photoFile);
 
@@ -209,7 +209,7 @@ export function ProviderRegisterForm() {
       {/* Mobile: barra de progresso compacta */}
       <div className="mb-8 sm:hidden">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted">Passo {step} de {STEP_LABELS.length}</span>
+          <span className="text-xs font-medium text-ink-dim">Passo {step} de {STEP_LABELS.length}</span>
           <span className="text-xs font-semibold text-rose">{STEP_LABELS[step - 1]}</span>
         </div>
         <div className="h-1 w-full rounded-full bg-line overflow-hidden">
@@ -220,7 +220,7 @@ export function ProviderRegisterForm() {
         </div>
       </div>
 
-      {/* Desktop: círculos */}
+      {/* Desktop: cÃ­rculos */}
       <div className="mb-8 hidden sm:flex items-center justify-center gap-0">
         {STEP_LABELS.map((label, i) => {
           const n = i + 1;
@@ -235,7 +235,7 @@ export function ProviderRegisterForm() {
                     done ? "bg-success text-white" : active ? "bg-rose text-white scale-110" : "bg-line text-ink-dim",
                   )}
                 >
-                  {done ? "✓" : n}
+                  {done ? "âœ“" : n}
                 </div>
                 <span className={cn("mt-1.5 text-2xs font-medium", active ? "text-ink" : "text-ink-dim")}>
                   {label}
@@ -255,16 +255,16 @@ export function ProviderRegisterForm() {
         </Card>
       )}
 
-      {/* ── Step 1: Identidade ── */}
+      {/* â”€â”€ Step 1: Identidade â”€â”€ */}
       {step === 1 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
-            <p className="text-md font-semibold mb-5">Como você é conhecida</p>
+            <p className="text-md font-semibold mb-5">Como vocÃª Ã© conhecida</p>
 
             <div className="space-y-5">
               <Input
-                label="Nome artístico"
-                hint="Como você aparece no anúncio — pode ter iguais"
+                label="Nome artÃ­stico"
+                hint="Como vocÃª aparece no anÃºncio â€” pode ter iguais"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Ex: Valentina"
@@ -274,7 +274,7 @@ export function ProviderRegisterForm() {
               <div>
                 <Input
                   label="Seu @"
-                  hint="Único e permanente — escolha com cuidado"
+                  hint="Ãšnico e permanente â€” escolha com cuidado"
                   prefix="@"
                   value={slug}
                   onChange={(e) => setSlug(cleanSlug(e.target.value))}
@@ -290,7 +290,7 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card className="overflow-visible">
-            <p className="text-md font-semibold mb-5">Dados básicos</p>
+            <p className="text-md font-semibold mb-5">Dados bÃ¡sicos</p>
 
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -304,8 +304,8 @@ export function ProviderRegisterForm() {
                 required
               />
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Cidade</label>
-                <div className="rounded-lg border border-black/10 bg-white shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]">
+                <label className="block text-xs font-medium text-ink-dim-foreground mb-1.5">Cidade</label>
+                <div className="rounded-lg border border-black/10 bg-white ">
                   <CityAutocomplete
                     compact
                     onSelect={(s, lbl) => { setCitySlug(s); setCityLabel(lbl); }}
@@ -317,7 +317,7 @@ export function ProviderRegisterForm() {
         </div>
       )}
 
-      {/* ── Step 2: Perfil ── */}
+      {/* â”€â”€ Step 2: Perfil â”€â”€ */}
       {step === 2 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
@@ -332,15 +332,15 @@ export function ProviderRegisterForm() {
           </Card>
 
           <Card>
-            <p className="text-md font-semibold mb-5">Apresentação</p>
+            <p className="text-md font-semibold mb-5">ApresentaÃ§Ã£o</p>
 
             <div className="space-y-5">
               <Input
                 label="Frase de destaque"
-                hint="Opcional — aparece no topo do seu perfil"
+                hint="Opcional â€” aparece no topo do seu perfil"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                placeholder="Ex: Encontros com calma e presença de verdade."
+                placeholder="Ex: Encontros com calma e presenÃ§a de verdade."
               />
 
               <div>
@@ -349,15 +349,15 @@ export function ProviderRegisterForm() {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={5}
-                  placeholder="Fale sobre você, seu estilo, o que você oferece..."
+                  placeholder="Fale sobre vocÃª, seu estilo, o que vocÃª oferece..."
                 />
-                <p className="mt-1 text-2xs text-muted">{bio.length}/20 mín.</p>
+                <p className="mt-1 text-2xs text-ink-dim">{bio.length}/20 mÃ­n.</p>
               </div>
             </div>
           </Card>
 
           <Card>
-            <p className="text-md font-semibold mb-5">Características</p>
+            <p className="text-md font-semibold mb-5">CaracterÃ­sticas</p>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <Input
@@ -392,7 +392,7 @@ export function ProviderRegisterForm() {
             </div>
 
             <div className="mt-5">
-              <label className="block text-xs font-medium text-muted-foreground mb-2">Idiomas</label>
+              <label className="block text-xs font-medium text-ink-dim-foreground mb-2">Idiomas</label>
               <div className="flex flex-wrap gap-2">
                 {LANGUAGE_OPTIONS.map((lang) => (
                   <ToggleChip
@@ -416,7 +416,7 @@ export function ProviderRegisterForm() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-2">Atende a</label>
+                <label className="block text-xs font-medium text-ink-dim-foreground mb-2">Atende a</label>
                 <div className="flex flex-wrap gap-2">
                   <ToggleChip active={servesMen} onClick={() => setServesMen((v) => !v)}>Homens</ToggleChip>
                   <ToggleChip active={servesWomen} onClick={() => setServesWomen((v) => !v)}>Mulheres</ToggleChip>
@@ -425,10 +425,10 @@ export function ProviderRegisterForm() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-2">Modalidade</label>
+                <label className="block text-xs font-medium text-ink-dim-foreground mb-2">Modalidade</label>
                 <div className="flex flex-wrap gap-2">
-                  <ToggleChip active={hasOwnPlace} onClick={() => setHasOwnPlace((v) => !v)}>Local próprio</ToggleChip>
-                  <ToggleChip active={homeVisit} onClick={() => setHomeVisit((v) => !v)}>A domicílio</ToggleChip>
+                  <ToggleChip active={hasOwnPlace} onClick={() => setHasOwnPlace((v) => !v)}>Local prÃ³prio</ToggleChip>
+                  <ToggleChip active={homeVisit} onClick={() => setHomeVisit((v) => !v)}>A domicÃ­lio</ToggleChip>
                   <ToggleChip active={travelsNational} onClick={() => setTravelsNational((v) => !v)}>Viagens nacionais</ToggleChip>
                   <ToggleChip active={travelsInternational} onClick={() => setTravelsInternational((v) => !v)}>Viagens internacionais</ToggleChip>
                 </div>
@@ -438,13 +438,13 @@ export function ProviderRegisterForm() {
         </div>
       )}
 
-      {/* ── Step 3: Valores ── */}
+      {/* â”€â”€ Step 3: Valores â”€â”€ */}
       {step === 3 && (
         <div className="space-y-5 animate-fade-in">
           <Card padding="none">
             <div className="border-b border-line/50 px-6 py-4">
-              <p className="text-md font-semibold">Durações e valores</p>
-              <p className="mt-1 text-xs text-muted">Ative as durações que você oferece.</p>
+              <p className="text-md font-semibold">DuraÃ§Ãµes e valores</p>
+              <p className="mt-1 text-xs text-ink-dim">Ative as duraÃ§Ãµes que vocÃª oferece.</p>
             </div>
             <div className="divide-y divide-line/50">
               {DURATIONS.map((d) => (
@@ -458,7 +458,7 @@ export function ProviderRegisterForm() {
                     disabled={d.required}
                     size="md"
                   />
-                  <span className={cn("w-20 shrink-0 text-sm font-medium", !durEnabled[d.key] && "text-muted")}>
+                  <span className={cn("w-20 shrink-0 text-sm font-medium", !durEnabled[d.key] && "text-ink-dim")}>
                     {d.label}{d.required && <span className="ml-1 text-rose">*</span>}
                   </span>
                   <div className="max-w-[180px]">
@@ -495,12 +495,12 @@ export function ProviderRegisterForm() {
         </div>
       )}
 
-      {/* ── Step 4: Acesso ── */}
+      {/* â”€â”€ Step 4: Acesso â”€â”€ */}
       {step === 4 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
             <p className="text-md font-semibold mb-2">Dados de acesso</p>
-            <p className="text-xs text-muted mb-5">Privados — não aparecem no seu anúncio.</p>
+            <p className="text-xs text-ink-dim mb-5">Privados â€” nÃ£o aparecem no seu anÃºncio.</p>
 
             <div className="space-y-4">
               <Input
@@ -518,7 +518,7 @@ export function ProviderRegisterForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
-                placeholder="Mínimo 8 caracteres"
+                placeholder="MÃ­nimo 8 caracteres"
                 required
               />
             </div>
@@ -527,28 +527,28 @@ export function ProviderRegisterForm() {
           <Card variant="glass">
             <p className="text-md font-semibold mb-3">Resumo</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
-              <span className="text-muted">Nome artístico</span>
+              <span className="text-ink-dim">Nome artÃ­stico</span>
               <span className="font-semibold">{displayName}</span>
-              <span className="text-muted">@handle</span>
+              <span className="text-ink-dim">@handle</span>
               <span className="font-semibold">@{slug}</span>
-              <span className="text-muted">Idade</span>
+              <span className="text-ink-dim">Idade</span>
               <span className="font-semibold">{age} anos</span>
-              <span className="text-muted">Cidade</span>
+              <span className="text-ink-dim">Cidade</span>
               <span className="font-semibold">{cityLabel || citySlug}</span>
-              <span className="text-muted">Valor/hora</span>
-              <span className="font-semibold">R$ {durPrice["1h"] || "—"}</span>
+              <span className="text-ink-dim">Valor/hora</span>
+              <span className="font-semibold">R$ {durPrice["1h"] || "â€”"}</span>
             </div>
           </Card>
         </div>
       )}
 
-      {/* ── Step 5: Foto de perfil ── */}
+      {/* â”€â”€ Step 5: Foto de perfil â”€â”€ */}
       {step === 5 && (
         <div className="space-y-5 animate-fade-in">
           <Card>
             <p className="text-md font-semibold mb-1">Foto de perfil</p>
-            <p className="text-xs text-muted mb-5">
-              Será sua foto principal — você pode trocar depois no painel.
+            <p className="text-xs text-ink-dim mb-5">
+              SerÃ¡ sua foto principal â€” vocÃª pode trocar depois no painel.
             </p>
 
             <div className="flex flex-col items-center gap-4">
@@ -558,7 +558,7 @@ export function ProviderRegisterForm() {
                 onClick={() => document.getElementById("photo-input")?.click()}
               >
                 {photoPreviewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- preview de upload local (blob URL); next/image exige domain whitelist e não funciona com objectURL
+                  // eslint-disable-next-line @next/next/no-img-element -- preview de upload local (blob URL); next/image exige domain whitelist e nÃ£o funciona com objectURL
                   <img src={photoPreviewUrl} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-ink-dim">
@@ -593,9 +593,9 @@ export function ProviderRegisterForm() {
             </div>
           </Card>
 
-          <p className="text-center text-xs text-muted">
-            Ao finalizar você confirma ter +18 anos e concorda com os termos.
-            <br />Após o cadastro você precisará ativar um plano para aparecer nas buscas.
+          <p className="text-center text-xs text-ink-dim">
+            Ao finalizar vocÃª confirma ter +18 anos e concorda com os termos.
+            <br />ApÃ³s o cadastro vocÃª precisarÃ¡ ativar um plano para aparecer nas buscas.
           </p>
         </div>
       )}
@@ -604,7 +604,7 @@ export function ProviderRegisterForm() {
       <div className="mt-8 flex items-center justify-between">
         {step > 1 ? (
           <Button variant="secondary" onClick={back} disabled={pending}>
-            ← Voltar
+            â† Voltar
           </Button>
         ) : (
           <span />
@@ -612,11 +612,11 @@ export function ProviderRegisterForm() {
 
         {step < 5 ? (
           <Button variant="primary" size="lg" onClick={next}>
-            {step < 4 ? "Continuar →" : "Próximo →"}
+            {step < 4 ? "Continuar â†’" : "PrÃ³ximo â†’"}
           </Button>
         ) : (
           <Button variant="primary" size="lg" onClick={handleFinish} loading={pending}>
-            {pending ? "Criando perfil…" : "Finalizar cadastro"}
+            {pending ? "Criando perfilâ€¦" : "Finalizar cadastro"}
           </Button>
         )}
       </div>
