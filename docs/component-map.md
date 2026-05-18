@@ -111,6 +111,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `bottom-nav.tsx` | 🟢 | `<BottomNav />` | Pill flutuante glass em todos breakpoints, auto-hide quando `body[data-modal-open]` |
 | `bottom-nav-wrapper.tsx` | 🟢 | server wrapper | Headless |
 | 🆕 `auth-shell.tsx` | 🟢 | `<AuthShell footer caption width>` | Shell centralizado para /entrar, /cadastro, /recuperar-senha, /cadastro/sucesso |
+| 🆕 `legal-shell.tsx` | 🟢 | `<LegalShell title version validFrom>` + `<LegalSection n title>` | Shell editorial Inter Bold tracking apertado para `/termos-de-uso` e `/politica-de-privacidade`. Container `max-w-3xl` (reading) sobre tokens ink/ink-dim. Sem `font-serif`. |
 | `dark-sidebar-shell.tsx` | 🟢 | Sidebar ink (preto ameixa) compartilhada por painel + admin. Tokens v2 (rose focus, ink offset). |
 | `provider-banner.tsx` | 🔴 | banner topo p/ providers | Não migrado |
 
@@ -190,8 +191,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `/avaliar/[slug]` | `app/avaliar/[slug]/page.tsx` | 🔴 | — | Form de avaliação |
 | `/solicitar/[slug]` | `app/solicitar/[slug]/page.tsx` | 🔴 | — | Solicitar encontro |
 | `/planos` | `app/planos/page.tsx` | 🟢 | _next_ | ListingHeader + 3 plan cards (Basic neutro / Plus ink / Premium rose) + Boost à la carte (Card glass) + FAQ details |
-| `/termos-de-uso` | `app/termos-de-uso/page.tsx` | 🔴 | — | Legal |
-| `/politica-de-privacidade` | `app/politica-de-privacidade/page.tsx` | 🔴 | — | Legal |
+| `/termos-de-uso` | `app/termos-de-uso/page.tsx` | 🟢 | _next_ | Tahoe Sensual via `<LegalShell>` + `<LegalSection>` (Inter Bold, sem `font-serif`) |
+| `/politica-de-privacidade` | `app/politica-de-privacidade/page.tsx` | 🟢 | _next_ | Mesmo shell de termos; usa `LegalSubheading` local para subdivisões 2.x |
 
 ### 3.2 Auth (entrar / cadastro / recuperar)
 
@@ -290,8 +291,8 @@ Ordem por impacto + dependência:
 8. ~~**`/painel/**`**~~ ✅ done
 9. ~~**`/admin/**`**~~ ✅ done
 10. ~~**`/reels/**`**~~ ✅ done (decisão: NÃO extrair `<MediaActions>` — APIs por consumer divergem demais; cada uso < 30 linhas; YAGNI)
-11. **Legal (`/termos-de-uso`, `/politica-de-privacidade`)** — typografia editorial
-12. Erro/sistema (`error.tsx`, `not-found.tsx` por rota)
+11. ~~**Legal (`/termos-de-uso`, `/politica-de-privacidade`)**~~ ✅ done (`<LegalShell>` + `<LegalSection>` extraídos para `src/components/layout/legal-shell.tsx`)
+12. **Erro/sistema (`error.tsx`, `not-found.tsx` por rota)** — próxima fila
 
 ---
 
