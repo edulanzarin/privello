@@ -6,40 +6,53 @@
  * Auth: público (renderiza confirmação estática).
  * Cache: default (RSC SSR; sem segredo dinâmico).
  *
- * Tela de sucesso pós-checkout do Mercado Pago com CTAs para explorar a
- * plataforma e ver Reels.
+ * Visual:
+ * - Tahoe Sensual v2 — `<SiteHeader>` + `<SiteFooter>`, container reading
+ *   `max-w-sm` centralizado, card `rounded-2xl border-line bg-white shadow-sm`
+ *   com `<CheckCircle>` em `text-success` no topo.
+ * - Tipografia Inter Bold tracking apertado (sem font-serif). Steering §4.3.
+ * - CTAs: Button primary "Explorar conteúdo" + Button outline "Ver Reels".
+ *
+ * Cross-refs:
+ * - src/components/ui/button.tsx (polimórfico)
  */
-import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+
+export const metadata = {
+  title: "Assinatura ativada · Privello",
+  description: "Sua assinatura Privello foi ativada — explore o conteúdo exclusivo.",
+};
 
 export default function AssinaturaSuccessPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
-      <div className="w-full max-w-sm text-center">
-        <Link href="/" className="font-serif text-xl">
-          privello<span className="text-coral">.</span>
-        </Link>
-
-        <div className="mt-10 rounded-2xl border border-black/[0.06] bg-white p-8 shadow-sm">
-          <CheckCircle className="mx-auto h-12 w-12 text-success" strokeWidth={1.5} />
-          <h1 className="mt-4 font-serif text-2xl">Assinatura ativada!</h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
+    <>
+      <SiteHeader />
+      <main className="mx-auto flex max-w-sm flex-col items-center px-4 py-16 text-center sm:px-6">
+        <div className="w-full rounded-2xl border border-line bg-white p-8 shadow-[var(--shadow-sm)]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft">
+            <CheckCircle className="h-7 w-7 text-success" strokeWidth={1.75} aria-hidden />
+          </div>
+          <h1 className="mt-4 text-2xl font-bold tracking-[-0.022em] text-ink sm:text-3xl">
+            Assinatura ativada
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-ink-dim">
             Bem-vindo ao Privello. Você agora tem acesso a todo o conteúdo exclusivo da plataforma.
           </p>
-          <Link
-            href="/"
-            className="mt-6 inline-block w-full rounded-lg bg-foreground py-3 text-center text-base font-semibold text-white hover:bg-foreground/80 active:scale-[0.97] transition"
-          >
-            Explorar conteúdo
-          </Link>
-          <Link
-            href="/reels"
-            className="mt-2 inline-block w-full rounded-lg border border-line py-3 text-center text-base font-semibold text-muted hover:text-foreground hover:bg-line/40 transition"
-          >
-            Ver Reels exclusivos
-          </Link>
+
+          <div className="mt-6 flex flex-col gap-2.5">
+            <Button href="/" variant="primary" size="lg" className="w-full">
+              Explorar conteúdo
+            </Button>
+            <Button href="/reels" variant="outline" size="lg" className="w-full">
+              Ver Reels exclusivos
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

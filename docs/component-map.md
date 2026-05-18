@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (reels migrado: feed + city-filter + 2 rotas)
+**Última atualização**: 2026-05-17 (cleanup final v2: cidades, avaliar, solicitar, assinar, age-gate, ticket-chat — 100% rotas em status 🟢)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -113,7 +113,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | 🆕 `auth-shell.tsx` | 🟢 | `<AuthShell footer caption width>` | Shell centralizado para /entrar, /cadastro, /recuperar-senha, /cadastro/sucesso |
 | 🆕 `legal-shell.tsx` | 🟢 | `<LegalShell title version validFrom>` + `<LegalSection n title>` | Shell editorial Inter Bold tracking apertado para `/termos-de-uso` e `/politica-de-privacidade`. Container `max-w-3xl` (reading) sobre tokens ink/ink-dim. Sem `font-serif`. |
 | `dark-sidebar-shell.tsx` | 🟢 | Sidebar ink (preto ameixa) compartilhada por painel + admin. Tokens v2 (rose focus, ink offset). |
-| `provider-banner.tsx` | 🔴 | banner topo p/ providers | Não migrado |
+| `provider-banner.tsx` | 🟢 | banner topo p/ providers — pill rose-soft / warning-soft `max-w-7xl`, hover rose, focus ring rose canônico |
 
 #### `home/` — landing
 
@@ -164,10 +164,10 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
-| `age-gate.tsx` | 🔴 | Modal +18 |
+| `age-gate.tsx` | 🟢 | Modal +18 fullscreen sobre fundo preto — Inter Bold, rose accent, ring focus rose |
 | `onboarding/onboarding-sidebar.tsx` | 🟢 | Sidebar do onboarding |
-| `solicitar/solicitar-whatsapp-panel.tsx` | 🔴 | Painel de solicitação |
-| `support/ticket-chat.tsx` | 🔴 | Chat de suporte |
+| `solicitar/solicitar-whatsapp-panel.tsx` | 🟢 | Painel sticky lateral em `/solicitar/[slug]` — card branco border-line, total tabular-nums, CTA whatsapp |
+| `support/ticket-chat.tsx` | 🟢 | Chat de ticket — bolha rose/line ao estilo iMessage, textarea v2, Send button rose 44×44 |
 
 ---
 
@@ -181,15 +181,15 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | `/descobrir` | `app/descobrir/page.tsx` | 🟢 | _next_ | Hub sem cidade — city picker + busca global @handle (substituiu /buscar em 2026-05-17) |
 | `/descobrir/[citySlug]` | `app/descobrir/[citySlug]/page.tsx` | 🟢 | `5223afb` | Toolbar sticky + grid masonry |
 | ~~`/buscar`~~ | ~~`app/buscar/`~~ | ❌ | _removed_ | Eliminada em 2026-05-17. 308 redirect para `/descobrir` (preserva `?q=`) |
-| `/cidades` | `app/cidades/page.tsx` | 🔴 | — | Listagem de cidades |
+| `/cidades` | `app/cidades/page.tsx` | 🟢 | _next_ | Tahoe Sensual — `<ListingHeader>` rose + grid 2/3/4 cols com cards `rounded-2xl` + ícone `MapPin` em rose-soft, hover rose-soft / border rose/30; `<EmptyState>` quando seed vazio |
 | `/p/[slug]` | `app/p/[slug]/page.tsx` | 🟢 | _next_ | Hero split + selos hairline + Quem sou/Características/Valores/Atende/Disponibilidade + Reviews em cards |
 | `/em-alta` | `app/em-alta/page.tsx` | 🟢 | _next_ | Listing v2 — ListingHeader + grid 3-col ProfileCard |
 | `/em-destaque` | `app/em-destaque/page.tsx` | 🟢 | _next_ | Listing v2 — eyebrow peach |
 | `/novidades` | `app/novidades/page.tsx` | 🟢 | _next_ | Reading max-w-3xl, Card glass placeholder |
 | `/reels` | `app/reels/page.tsx` | 🟢 | _next_ | Feed global ink; rose accent on city pill + privello dot |
 | `/reels/[slug]` | `app/reels/[slug]/page.tsx` | 🟢 | _next_ | Feed por perfil |
-| `/avaliar/[slug]` | `app/avaliar/[slug]/page.tsx` | 🔴 | — | Form de avaliação |
-| `/solicitar/[slug]` | `app/solicitar/[slug]/page.tsx` | 🔴 | — | Solicitar encontro |
+| `/avaliar/[slug]` | `app/avaliar/[slug]/page.tsx` | 🟢 | _next_ | Form reading max-w-md — picker de estrelas inline (rose fill 9×9), Textarea v2, Button primary fullwidth |
+| `/solicitar/[slug]` | `app/solicitar/[slug]/page.tsx` | 🟢 | _next_ | Fluxo 4 steps com calendário + slot/duração/local em cards rose active state; SolicitarWhatsAppPanel sticky desktop |
 | `/planos` | `app/planos/page.tsx` | 🟢 | _next_ | ListingHeader + 3 plan cards (Basic neutro / Plus ink / Premium rose) + Boost à la carte (Card glass) + FAQ details |
 | `/termos-de-uso` | `app/termos-de-uso/page.tsx` | 🟢 | _next_ | Tahoe Sensual via `<LegalShell>` + `<LegalSection>` (Inter Bold, sem `font-serif`) |
 | `/politica-de-privacidade` | `app/politica-de-privacidade/page.tsx` | 🟢 | _next_ | Mesmo shell de termos; usa `LegalSubheading` local para subdivisões 2.x |
@@ -238,8 +238,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 
 | Rota | Status v2 |
 |------|-----------|
-| `/assinar` | 🔴 |
-| `/assinar/sucesso` | 🔴 |
+| `/assinar` | 🟢 |
+| `/assinar/sucesso` | 🟢 |
 
 ### 3.6 Admin (`/admin/**`)
 

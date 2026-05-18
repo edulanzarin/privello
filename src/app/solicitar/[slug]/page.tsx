@@ -11,14 +11,26 @@
  * local (próprio ou domicílio) e painel lateral com resumo + CTA que
  * abre o WhatsApp com mensagem pronta.
  *
+ * Visual:
+ * - Tahoe Sensual v2 — `<SiteHeader>` global + main `max-w-7xl` (steering
+ *   §5.1: dashboard archetype, fluxo cheio de inputs em duas colunas).
+ * - Cards step-by-step em `rounded-2xl border-line bg-white shadow-sm`,
+ *   eyebrow uppercase ink-dim por step, estado active em `bg-rose text-white`
+ *   (substitui `bg-foreground` da v1).
+ * - Calendário: dia selecionado em `bg-rose`, dot do "hoje" em `bg-rose`,
+ *   indisponíveis em `text-ink-faint line-through`.
+ *
  * Cross-refs:
  * - src/lib/booking-slots.ts
  * - src/lib/time-utils.ts
  * - src/lib/services/profile.service.ts (getProfileBySlug)
  * - src/components/solicitar/solicitar-whatsapp-panel.tsx
+ *
+ * dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 12 (solicitar lê auth() + searchParams).
  */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import {
   calendarMonthCells,
   computeEndTimeLabel,
@@ -29,21 +41,17 @@ import {
   isDateSelectable,
   resolveDurationOptions,
 } from "@/lib/booking-slots";
-import {
-  formatYearMonth,
-  parseMonthParam,
-} from "@/lib/time-utils";
+import { formatYearMonth, parseMonthParam } from "@/lib/time-utils";
 import { formatBrl } from "@/lib/money";
 import { getProfileBySlug } from "@/lib/services";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { SolicitarWhatsAppPanel } from "@/components/solicitar/solicitar-whatsapp-panel";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { DAYS_PT } from "@/lib/constants";
 
-// dynamic justificado — ver .kiro/specs/fase-3-backend/metricas-baseline.md > §3.2 linha 12 (solicitar lê auth() + searchParams).
 export const dynamic = "force-dynamic";
 
 type Props = {
@@ -51,7 +59,11 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function buildSolicitarHref(slug: string, next: Record<string, string | null>, current: URLSearchParams) {
+function buildSolicitarHref(
+  slug: string,
+  next: Record<string, string | null>,
+  current: URLSearchParams,
+) {
   const p = new URLSearchParams(current.toString());
   for (const [k, v] of Object.entries(next)) {
     if (v === null) p.delete(k);
@@ -74,6 +86,15 @@ function firstSelectableYmd(
     }
   }
   return null;
+}
+
+/** Eyebrow padrão dos passos do fluxo. */
+function StepEyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+      {children}
+    </p>
+  );
 }
 
 export default async function SolicitarPage({ params, searchParams }: Props) {
@@ -129,7 +150,11 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
     : new Date(year, month - 1, 1);
   const window = diaResolved ? getWindowForWeekday(rules, selectedDate.getDay()) : null;
   const allStarts = window ? generateHalfHourStarts(window) : [];
-  const starts = isOvernight ? [] : (window ? filterStartsForDuration(allStarts, durationMinutes, window) : []);
+  const starts = isOvernight
+    ? []
+    : window
+      ? filterStartsForDuration(allStarts, durationMinutes, window)
+      : [];
 
   let hora = get("hora");
   if (!isOvernight) {
@@ -169,61 +194,63 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
 
   return (
     <>
-      <header className="border-b border-black/[0.06] bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href={`/p/${profile.slug}`} className="text-base text-muted hover:text-foreground transition-colors">
-            ← Voltar ao perfil
-          </Link>
-          <Link href="/" className="text-xl font-semibold tracking-tight">
-            privello<span className="text-coral">.</span>
-          </Link>
-          <p className="flex items-center gap-2 text-base">
-            <span className="hidden sm:inline text-muted">Cliente</span>
-            <Check className="h-3.5 w-3.5 text-success" strokeWidth={2} />
-            <span className="text-2xs text-muted">fluxo Privello</span>
+      <SiteHeader />
+      <main className="mx-auto max-w-7xl px-4 pb-32 sm:px-6 lg:px-8">
+        <Link
+          href={`/p/${profile.slug}`}
+          className="mt-8 inline-flex items-center gap-1.5 text-base text-ink-dim transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Voltar ao perfil
+        </Link>
+
+        <div className="mt-6">
+          <p className="text-2xs font-semibold uppercase tracking-wider text-rose">
+            Marcar horário
+          </p>
+          <h1 className="mt-2 text-3xl font-bold leading-[1.1] tracking-[-0.025em] text-ink sm:text-4xl">
+            Combinar com {profile.displayName}
+            <span className="text-rose">.</span>
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-dim">
+            Escolha dia e horário em intervalos de 30 minutos conforme a disponibilidade
+            cadastrada por ela. Ao clicar em{" "}
+            <strong className="text-ink">Marcar no WhatsApp</strong>, abrimos o WhatsApp com
+            uma mensagem já montada — sem exibir ocupação de outros clientes no site.
           </p>
         </div>
-      </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <p className="text-xs font-medium text-muted">Marcar horário</p>
-        <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-4xl">
-          Combinar com {profile.displayName}
-          <span className="text-coral">.</span>
-        </h1>
-        <p className="mt-3 max-w-2xl text-md leading-relaxed text-muted">
-          Escolha dia e horário em intervalos de 30 minutos conforme a disponibilidade cadastrada por ela. Ao clicar em{" "}
-          <strong className="text-foreground">Marcar no WhatsApp</strong>, abrimos o WhatsApp com uma mensagem já
-          montada — sem exibir ocupação de outros clientes no site.
-        </p>
-
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px]">
+        <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_340px]">
           <div className="space-y-12">
+            {/* 01 — Calendário */}
             <section>
-              <p className="text-xs font-medium text-muted">01 · Escolha um dia</p>
-              <div className="mt-4 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]">
+              <StepEyebrow>01 · Escolha um dia</StepEyebrow>
+              <div className="mt-4 rounded-2xl border border-line bg-white p-5 shadow-[var(--shadow-sm)]">
                 <div className="flex items-center justify-between text-md font-medium">
                   <Link
                     href={buildSolicitarHref(slug, { mes: prevMes }, sp)}
                     scroll={false}
-                    className="rounded-lg px-2 py-1 text-muted hover:text-foreground hover:bg-black/[0.04] transition-all"
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg px-2 text-ink-dim transition-all duration-150 hover:bg-line/40 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     aria-label="Mês anterior"
                   >
                     ←
                   </Link>
-                  <span className="text-lg font-semibold capitalize tracking-tight">
-                    {selectedDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+                  <span className="text-lg font-semibold capitalize tracking-[-0.015em] text-ink">
+                    {selectedDate.toLocaleDateString("pt-BR", {
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </span>
                   <Link
                     href={buildSolicitarHref(slug, { mes: nextMes }, sp)}
                     scroll={false}
-                    className="rounded-lg px-2 py-1 text-muted hover:text-foreground hover:bg-black/[0.04] transition-all"
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg px-2 text-ink-dim transition-all duration-150 hover:bg-line/40 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     aria-label="Próximo mês"
                   >
                     →
                   </Link>
                 </div>
-                <div className="mt-4 grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted">
+                <div className="mt-4 grid grid-cols-7 gap-1 text-center text-2xs font-semibold uppercase tracking-wider text-ink-dim">
                   {DAYS_PT.map((d) => (
                     <span key={d}>{d}</span>
                   ))}
@@ -239,35 +266,44 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     return (
                       <Link
                         key={ymd}
-                        href={selectable ? buildSolicitarHref(slug, { dia: ymd, mes: mesStr }, sp) : "#"}
+                        href={
+                          selectable
+                            ? buildSolicitarHref(slug, { dia: ymd, mes: mesStr }, sp)
+                            : "#"
+                        }
                         scroll={false}
                         className={cn(
-                          "relative block min-h-[2.25rem] rounded-lg py-2 transition-all",
-                          !selectable && "pointer-events-none text-muted/50 line-through",
-                          past && "text-muted/40",
-                          isSel && selectable && "bg-foreground text-white rounded-lg shadow-sm",
-                          selectable && !isSel && "hover:bg-black/[0.04]",
+                          "relative block min-h-[2.5rem] rounded-lg py-2 transition-all duration-150 tabular-nums",
+                          !selectable && "pointer-events-none text-ink-faint line-through",
+                          past && "text-ink-faint",
+                          isSel && selectable && "bg-rose text-white shadow-[var(--shadow-sm)]",
+                          selectable && !isSel && "text-ink hover:bg-line/40",
                         )}
                         aria-disabled={!selectable}
                       >
                         {c.date.getDate()}
-                        {isToday ? <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-coral" /> : null}
+                        {isToday && !isSel ? (
+                          <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-rose" />
+                        ) : null}
                       </Link>
                     );
                   })}
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted">
-                  Dias riscados: fora do período cadastrado ou indisponíveis. Horários são gerados de 30 em 30 minutos
-                  dentro da janela (ex.: 12:00–17:00 → 12:00, 12:30, …).
+                <p className="mt-4 text-sm leading-relaxed text-ink-dim">
+                  Dias riscados: fora do período cadastrado ou indisponíveis. Horários são gerados
+                  de 30 em 30 minutos dentro da janela (ex.: 12:00–17:00 → 12:00, 12:30, …).
                 </p>
               </div>
             </section>
 
+            {/* 02 — Horário e duração */}
             <section>
-              <p className="text-xs font-medium text-muted">02 · Horário e duração</p>
+              <StepEyebrow>02 · Horário e duração</StepEyebrow>
               {!isOvernight && (
                 <>
-                  <p className="mt-3 text-xs font-medium text-muted">Horários disponíveis</p>
+                  <p className="mt-4 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                    Horários disponíveis
+                  </p>
                   {starts.length ? (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {starts.map((h) => (
@@ -276,10 +312,10 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                           href={buildSolicitarHref(slug, { hora: h }, sp)}
                           scroll={false}
                           className={cn(
-                            "rounded-lg border px-3 py-2 text-base font-medium transition-all active:scale-[0.97]",
+                            "inline-flex min-h-[44px] items-center justify-center rounded-xl border px-4 text-base font-medium tabular-nums transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                             hora === h
-                              ? "border-foreground bg-foreground text-white shadow-sm"
-                              : "border-black/10 bg-white hover:border-black/20 shadow-[inset_0_0.5px_2px_rgba(0,0,0,0.04)]",
+                              ? "border-rose bg-rose text-white shadow-[var(--shadow-sm)]"
+                              : "border-line bg-white text-ink hover:border-rose/30 hover:bg-rose-soft",
                           )}
                         >
                           {h}
@@ -287,17 +323,21 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-2 text-md text-muted">Não há horários para este dia — escolha outra data.</p>
+                    <p className="mt-2 text-md text-ink-dim">
+                      Não há horários para este dia — escolha outra data.
+                    </p>
                   )}
                 </>
               )}
               {isOvernight && (
-                <p className="mt-3 text-md text-muted">
+                <p className="mt-3 text-md text-ink-dim">
                   Pernoite não tem horário fixo — o início será combinado diretamente pelo WhatsApp.
                 </p>
               )}
 
-              <p className="mt-6 text-xs font-medium text-muted">Duração</p>
+              <p className="mt-6 text-2xs font-semibold uppercase tracking-wider text-ink-dim">
+                Duração
+              </p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {durations.map((d) => (
                   <Link
@@ -305,36 +345,49 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                     href={buildSolicitarHref(slug, { durMin: String(d.minutes) }, sp)}
                     scroll={false}
                     className={cn(
-                      "rounded-2xl border bg-white p-4 text-center text-md transition-all active:scale-[0.97]",
-                      "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
+                      "rounded-2xl border p-4 text-center transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      "shadow-[var(--shadow-sm)]",
                       durationMinutes === d.minutes
-                        ? "border-foreground bg-foreground text-white shadow-sm"
-                        : "border-black/[0.06] hover:border-black/20",
+                        ? "border-rose bg-rose text-white"
+                        : "border-line bg-white text-ink hover:border-rose/30 hover:bg-rose-soft",
                     )}
                   >
-                    <p className="font-semibold">{d.label}</p>
-                    <p className="mt-1 text-sm opacity-80">{formatBrl(d.priceBrl)}</p>
+                    <p className="text-md font-semibold">{d.label}</p>
+                    <p
+                      className={cn(
+                        "mt-1 text-sm tabular-nums",
+                        durationMinutes === d.minutes ? "opacity-90" : "text-ink-dim",
+                      )}
+                    >
+                      {formatBrl(d.priceBrl)}
+                    </p>
                   </Link>
                 ))}
               </div>
             </section>
 
+            {/* 03 — Local */}
             <section>
-              <p className="text-xs font-medium text-muted">03 · Onde será?</p>
+              <StepEyebrow>03 · Onde será?</StepEyebrow>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <Link
                   href={buildSolicitarHref(slug, { local: "proprio" }, sp)}
                   scroll={false}
                   className={cn(
-                    "rounded-2xl border p-5 text-md transition-all active:scale-[0.97]",
-                    "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
+                    "rounded-2xl border p-5 transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "shadow-[var(--shadow-sm)]",
                     local === "proprio"
-                      ? "border-foreground bg-foreground text-white"
-                      : "border-black/[0.06] bg-white hover:border-black/20",
+                      ? "border-rose bg-rose text-white"
+                      : "border-line bg-white text-ink hover:border-rose/30 hover:bg-rose-soft",
                   )}
                 >
-                  <p className="font-semibold">Local próprio</p>
-                  <p className={cn("mt-2 text-sm", local === "proprio" ? "opacity-80" : "text-muted")}>
+                  <p className="text-md font-semibold">Local próprio</p>
+                  <p
+                    className={cn(
+                      "mt-2 text-sm leading-relaxed",
+                      local === "proprio" ? "opacity-90" : "text-ink-dim",
+                    )}
+                  >
                     Atendimento no espaço dela. Valor conforme duração acima.
                   </p>
                 </Link>
@@ -342,26 +395,39 @@ export default async function SolicitarPage({ params, searchParams }: Props) {
                   href={buildSolicitarHref(slug, { local: "domicilio" }, sp)}
                   scroll={false}
                   className={cn(
-                    "rounded-2xl border p-5 text-md transition-all active:scale-[0.97]",
-                    "shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)]",
+                    "rounded-2xl border p-5 transition-all duration-150 ease-[var(--ease-tahoe)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "shadow-[var(--shadow-sm)]",
                     local === "domicilio"
-                      ? "border-foreground bg-foreground text-white"
-                      : "border-black/[0.06] bg-white hover:border-black/20",
+                      ? "border-rose bg-rose text-white"
+                      : "border-line bg-white text-ink hover:border-rose/30 hover:bg-rose-soft",
                   )}
                 >
-                  <p className="font-semibold">A domicílio</p>
-                  <p className={cn("mt-2 text-sm", local === "domicilio" ? "opacity-80" : "text-muted")}>
+                  <p className="text-md font-semibold">A domicílio</p>
+                  <p
+                    className={cn(
+                      "mt-2 text-sm leading-relaxed",
+                      local === "domicilio" ? "opacity-90" : "text-ink-dim",
+                    )}
+                  >
                     Endereço e taxa de deslocamento combinados no WhatsApp.
                   </p>
-                  <p className="mt-2 text-sm font-medium text-coral">+ estimativa R$ 100 no resumo (ajustável)</p>
+                  <p
+                    className={cn(
+                      "mt-2 text-sm font-semibold",
+                      local === "domicilio" ? "text-white" : "text-rose",
+                    )}
+                  >
+                    + estimativa R$ 100 no resumo (ajustável)
+                  </p>
                 </Link>
               </div>
             </section>
 
             <section>
-              <p className="text-xs font-medium text-muted">04 · Observações (opcional)</p>
-              <p className="mt-2 text-base text-muted">
-                Serão incluídas na mensagem do WhatsApp ao clicar em Marcar — não ficam salvas no servidor.
+              <StepEyebrow>04 · Observações (opcional)</StepEyebrow>
+              <p className="mt-2 text-base text-ink-dim">
+                Serão incluídas na mensagem do WhatsApp ao clicar em Marcar — não ficam salvas
+                no servidor.
               </p>
             </section>
           </div>
