@@ -1,6 +1,6 @@
 # Privello — Mapa de Componentes & Migração v2 (Tahoe Sensual)
 
-**Última atualização**: 2026-05-17 (cleanup final v2: cidades, avaliar, solicitar, assinar, age-gate, ticket-chat — 100% rotas em status 🟢)
+**Última atualização**: 2026-05-17 (polish final v2: site-footer, admin-charts, media-manager, reels-manager — 100% componentes em verde + SEO Fase 1-4 entregue)
 **Steering**: [`.kiro/steering/design-system.md`](../.kiro/steering/design-system.md)
 **Identidade**: macOS Tahoe + sensual — Inter only, rose `#e85a7a` accent, peach + plum + cream secundárias, ambient gradient pastel, glass calibrado v2.3.
 
@@ -107,7 +107,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Componente | Status v2 | API resumida | Notas |
 |------------|-----------|--------------|-------|
 | `site-header.tsx` | 🟢 | `<SiteHeader />` | Mobile = só logo, desktop = logo + Entrar/Criar |
-| `site-footer.tsx` | 🟡 | `<SiteFooter />` | Funcional, visual ok mas pode polish |
+| `site-footer.tsx` | 🟢 | `<SiteFooter />` | Border `border-line`, surface `bg-white/65 backdrop-blur-sm`, links em `text-ink-dim` com focus rose, ponto rose final no logo. +18 em `text-ink-faint`. Inclui Termos + Privacidade. |
 | `bottom-nav.tsx` | 🟢 | `<BottomNav />` | Pill flutuante glass em todos breakpoints, auto-hide quando `body[data-modal-open]` |
 | `bottom-nav-wrapper.tsx` | 🟢 | server wrapper | Headless |
 | 🆕 `auth-shell.tsx` | 🟢 | `<AuthShell footer caption width>` | Shell centralizado para /entrar, /cadastro, /recuperar-senha, /cadastro/sucesso |
@@ -134,8 +134,8 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
 | `painel-sidebar.tsx` | 🟢 | Sidebar ink (preto ameixa) com nav + status do plano + avatar/logout |
-| `media-manager.tsx` | 🟡 | Editor de mídia (tokens migrados, estrutura mantida) |
-| `reels-manager.tsx` | 🟡 | Editor de reels (tokens migrados, estrutura mantida) |
+| `media-manager.tsx` | 🟢 | Editor de mídia v2 — card outer rounded-2xl border-line shadow-sm, tab bar com underline rose, tile cover ring rose-30, hover overlay `bg-ink/60`, formulário Stories usa `<Input>` v2 + `<Button>` polimórfico |
+| `reels-manager.tsx` | 🟢 | Editor de reels v2 — empty state em pill rose-soft, tile bg-ink ring-line, switch privacy em pill bg-line/30, progress rose, Button polimórfico em todos os CTAs |
 | `online-toggle.tsx` | 🟢 | Switch de online (Switch primitive) |
 | `provider-heartbeat.tsx` | ⚪ | Headless |
 | `logout-button.tsx` | 🟢 | Visual ok |
@@ -146,7 +146,7 @@ passa por aqui pra garantir consistência e reuso entre as 80+ páginas.
 | Componente | Status v2 | Notas |
 |------------|-----------|-------|
 | `admin-shell.tsx` | 🟢 | Wrapper de DarkSidebarShell para admin (props: displayName, role, handle, avatarUrl) |
-| `admin-charts.tsx` | 🟡 | Recharts com cores v1 (precisa rever chart-tokens) |
+| `admin-charts.tsx` | 🟢 | Recharts com tokens v2 (rose primary, peach mídias, plum reels). chart-tokens.ts aponta direto pros tokens v2 (`var(--rose)`, `var(--ink-dim)`, `var(--line)`). ChartCard com eyebrow uppercase tracking-wider. |
 | `admin-city-filter.tsx` | 🟢 | Filtro de cidade |
 | `media-actions.tsx` | 🟢 | Aprovar/rejeitar |
 | `quick-actions.tsx` | 🟢 | Atalhos |
