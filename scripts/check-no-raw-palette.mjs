@@ -45,8 +45,9 @@ const LEGACY_TOKEN_RE =
     /\b(?:text|bg|border|ring|fill|accent|from|to|via)-(?:foreground|muted|coral)(?:\/[\d.]+)?\b|\bfont-serif\b|\bborder-black\/\[0\.0[0-9]+\]/g;
 
 // v2: raw shadow inline `shadow-[0_1px_3px_rgba(0,0,0,...)]` ou variantes
-// hardcoded — usar tokens `shadow-[var(--shadow-sm|md|lg|hairline)]` em vez.
-// Bate em `shadow-[<...rgba...>]` quando o conteúdo tem `rgba(`.
+// hardcoded — usar tokens `shadow-[var(--shadow-sm)]`, `shadow-[var(--shadow-md)]`,
+// `shadow-[var(--shadow-lg)]`, `shadow-[var(--shadow-hairline)]` em vez.
+// Bate em `shadow-[<...rgba...>]` quando o conteudo tem `rgba(`.
 const RAW_SHADOW_RE = /shadow-\[[^\]]*rgba\([^\]]*\]/g;
 
 // v2: focus-ring azul de v1 (`focus:shadow-[0_0_0_3px_rgba(10,132,255...]`),

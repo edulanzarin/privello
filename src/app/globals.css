@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Tailwind v4 escaneia o repo todo por default — exclui scripts/ (lint guards
+   contêm strings literais com classes "exemplo" que Tailwind não deve gerar)
+   e .kiro/ (specs/steering markdown). Tests também ficam fora porque podem
+   conter fixtures violadoras intencionalmente. */
+@source not "../../scripts/**";
+@source not "../../.kiro/**";
+@source not "../**/*.test.{ts,tsx}";
+@source not "../**/*.pbt.{ts,tsx}";
+
 /* ──────────────────────────────────────────────────────────────────────────
    Privello — Design System v2 (Tahoe Sensual)
    Steering: .kiro/steering/design-system.md
