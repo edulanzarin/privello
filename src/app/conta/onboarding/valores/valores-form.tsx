@@ -22,9 +22,8 @@ const DURATIONS = [
 const PAYMENT_OPTIONS = [
   "Pix",
   "Dinheiro",
+  "Cartão de débito",
   "Cartão de crédito",
-  "Transferência",
-  "Cripto",
 ];
 
 type DurationKey = (typeof DURATIONS)[number]["key"];

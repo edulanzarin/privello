@@ -36,7 +36,7 @@ const LANGUAGE_OPTIONS = [
   { value: "IT", label: "Italiano" },
   { value: "DE", label: "AlemÃ£o" },
 ];
-const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "CartÃ£o de crÃ©dito", "TransferÃªncia", "Cripto"];
+const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de débito", "Cartão de crédito"];
 const DURATIONS = [
   { key: "30min", label: "30 min", minutes: 30, required: false },
   { key: "1h", label: "1 hora", minutes: 60, required: true },
@@ -303,9 +303,9 @@ export function ProviderRegisterForm() {
                 placeholder="25"
                 required
               />
-              <div>
-                <label className="block text-xs font-medium text-ink-dim-foreground mb-1.5">Cidade</label>
-                <div className="rounded-lg border border-black/10 bg-white ">
+              <div className="space-y-1.5">
+                <label className="block text-base font-medium text-ink">Cidade</label>
+                <div className="rounded-xl border border-line bg-white px-3 py-[9px] transition-colors duration-150 ease-[var(--ease-tahoe)] focus-within:border-rose/50 focus-within:ring-2 focus-within:ring-rose/40 focus-within:ring-offset-2 focus-within:ring-offset-background">
                   <CityAutocomplete
                     compact
                     onSelect={(s, lbl) => { setCitySlug(s); setCityLabel(lbl); }}

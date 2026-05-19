@@ -20,7 +20,7 @@ const DURATIONS = [
   { minutes: 1440, label: "Diária", required: false },
 ] as const;
 
-const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de crédito", "Transferência", "Cripto"];
+const PAYMENT_OPTIONS = ["Pix", "Dinheiro", "Cartão de débito", "Cartão de crédito"];
 
 type DurationOption = { minutes: number; priceBrl: number };
 type Profile = {
